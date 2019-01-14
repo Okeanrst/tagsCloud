@@ -1,6 +1,7 @@
 import * as types from './actionTypes'
 import api from '../../api';
 import calcPositions from '../../utilities/positioningAlgorithm';
+import {prepareData} from '../../utilities/tagsCloud';
 
 const createAction = (type, data) => ({type, data});
 
@@ -20,7 +21,7 @@ export function getData() {
 export function buildTagsCloud(data) {
   return (dispatch) => {
     dispatch(createAction(types.PROCESS_DATA_REQUEST));
-    return calcPositions(data)
+    return calcPositions(prepareData(data))
       .then(response => {
         dispatch(createAction(types.PROCESS_DATA_SUCCESS, response));
       })
