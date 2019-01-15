@@ -1,5 +1,5 @@
 export function prepareData(data, options = {}) {
-  const {minFontSize = 6, maxFontSize = 36, horizontalMargin = 5, verticalMargin = 5} = options;
+  const {minFontSize = 6, maxFontSize = 36, horizontalMargin = 20, verticalMargin = 20} = options;
 
   const countRating = ({positive = 0, neutral = 0, negative = 0} = {}) => positive - negative;
 
@@ -23,22 +23,23 @@ export function prepareData(data, options = {}) {
 
   const horizMargin = 1 + horizontalMargin / 100;
   const vertMargin = 1 + verticalMargin / 100;
+
+  //TODO use opentype.js
+  const fontSizeFactor = 1.12;
+
   data.forEach(item => {
     ctx.font = `${item.fontSize}px OpenSans`;
     const measure = ctx.measureText(item.label);
     item.width = measure.width * horizMargin;
-    //TODO use opentype.js
-    item.height = item.fontSize * vertMargin;
-    if (item.id === '1751295897__Odessa') {
-      console.log('item.width=',item.width)
-      console.log('item.height=',item.height)
-    }
+
+    item.height = item.fontSize * fontSizeFactor * vertMargin;
+    item.fill = randomColor();
   });
 
   return data;
 }
 
-export function adaptDataToScene(data, sceneWidth) {
+export function adaptDataToScene(data, sceneWidth, {horizontalMargin = 20, verticalMargin = 20} = {}) {
   let maxTop;
   let minBottom;
   let maxRight;
@@ -62,22 +63,31 @@ export function adaptDataToScene(data, sceneWidth) {
     }
   });
 
-  //const ratio = sceneWidth / (maxRight - minLeft);
-  const ratio = 1;
+  const ratio = sceneWidth / (maxRight - minLeft) * 0.8;
+  const halfHorizMargin = horizontalMargin / 100 / 2;
+  const halfVertMargin = verticalMargin / 100 / 2;
+
   data.forEach(item => {
-    item.rectTranslateX = item.rectLeft * ratio;
+    item.rectTranslateX = (item.rectLeft + halfHorizMargin * item.width) * ratio;
     //item.rectTranslateY = item.rectTop * ratio;
-    item.rectTranslateY = item.rectBottom * ratio;
+    item.rectTranslateY = (item.rectBottom - halfVertMargin * item.height) * ratio;
     item.adaptFontSize = item.fontSize * ratio;
   });
 
-  return {maxRight, minLeft, minBottom, maxTop, data};
+  const res = {
+    maxRight: maxRight * ratio,
+    minLeft: minLeft * ratio,
+    minBottom: minBottom * ratio,
+    maxTop: maxTop * ratio,
+    data
+  };
+
+  return res;
 }
 
 export function randomColor() {
   let r = Math.round(Math.random() * 0xff);
   let g = Math.round(Math.random() * 0xff);
   let b = Math.round(Math.random() * 0xff);
-  //return `rgb(${r}, ${g}, ${b})`;
-  return `rgb(1, 0, 0)`;
+  return `rgb(${r}, ${g}, ${b})`;
 }
