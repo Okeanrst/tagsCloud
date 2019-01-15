@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import {adaptDataToScene} from '../utilities/tagsCloud';
 
 const TagsCloud = ({width, data, onTagClick}) => {
-  let { maxRight, minLeft, minBottom, maxTop, data: preparedData } = adaptDataToScene(data, width);
+  const aspectRatio = document.documentElement.clientWidth / document.documentElement.clientHeight;
+  const adaptedWidth = width / aspectRatio;
+  let { maxRight, minLeft, minBottom, maxTop, data: preparedData } = adaptDataToScene(data, adaptedWidth);
 
   const height = (maxTop - minBottom) * 1.1;
   const axisYOffset = width / 2 - (Math.abs(maxRight) - Math.abs(minLeft))/2;
