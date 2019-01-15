@@ -4,7 +4,7 @@ import {adaptDataToScene} from '../utilities/tagsCloud';
 
 const TagsCloud = ({width, data, onTagClick}) => {
   const aspectRatio = document.documentElement.clientWidth / document.documentElement.clientHeight;
-  const adaptedWidth = width / aspectRatio;
+  const adaptedWidth = width / (aspectRatio < 1.1 ? 1.1 : aspectRatio);
   let { maxRight, minLeft, minBottom, maxTop, data: preparedData } = adaptDataToScene(data, adaptedWidth);
 
   const height = (maxTop - minBottom) * 1.1;
