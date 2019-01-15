@@ -1,6 +1,5 @@
 # tagsCloud
 
-### npm
 
 ```sh
 npm install
