@@ -59,7 +59,9 @@ class HomePage extends Component {
     }
   }
 
-  renderTagsList = () => {
+  onTagClick = (id) => this.props.history.push('/' + id);
+
+  renderTagsList = () => {return null;
     const list = this.props.rawData.data.map(i => {
       return (
         <li key={i.id} ><Link to={`/${i.id}`} >{i.label}</Link></li>
@@ -73,15 +75,14 @@ class HomePage extends Component {
 
     return (
       <div>
-        HomePage
         {this.props.rawData.isFetching && ('...fetching')}
-        {this.props.rawData.data && (this.renderTagsList())}
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
           {this.props.tagsCloud.data && (
             <TagsCloud
               width={tagsCloudSceneSize.width}
               height={tagsCloudSceneSize.height}
               data={this.props.tagsCloud.data}
+              onTagClick={this.onTagClick}
             />
           )}
         </div>
@@ -91,18 +92,18 @@ class HomePage extends Component {
 }
 
 HomePage.propTypes = {
+  history: PropTypes.object.isRequired,
   tagsCloud: PropTypes.shape({
-    data: PropTypes.array.isRequired,
+    data: PropTypes.array,
     isFetching: PropTypes.bool.isRequired,
   }),
   rawData: PropTypes.shape({
-    data: PropTypes.array.isRequired,
+    data: PropTypes.array,
     isFetching: PropTypes.bool.isRequired,
   }),
 };
 
 const mapStateToProps = (state, ownProps) => {
-  //const activity = ownProps.match.params.val
   const { tagsCloud, rawData } = state;
   return {tagsCloud, rawData}
 };

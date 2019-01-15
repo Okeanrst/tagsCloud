@@ -162,8 +162,14 @@ module.exports = function (data, options = {}) {
         }
 
         const res = laidRectsData.map(i => {
-          i.rectWidth = SceneMap.sceneMapToRect(i.cols, ratio);
-          i.rectHeight = SceneMap.sceneMapToRect(i.rows, ratio);
+          //i.rectTop = SceneMap.sceneMapToRect(i.top, ratio);
+          i.rectBottom = SceneMap.sceneMapToRect(i.bottom, ratio);
+          //i.rectRight = SceneMap.sceneMapToRect(i.right, ratio);
+          i.rectLeft = SceneMap.sceneMapToRect(i.left, ratio);
+
+          if (i.id === '1751295897__Odessa') {
+            console.log('i.top, i.bottom, i.left, i.right',i.top, i.bottom, i.left, i.right)
+          }
           return i;
         });
 

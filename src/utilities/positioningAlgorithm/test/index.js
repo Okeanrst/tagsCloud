@@ -1,6 +1,6 @@
 'use strict';
 
-const data = require('./data.json');
+const data = require('./realData.json');
 const calculatePositions = require('..');
 const { pickingStrategies } = require('..');
 
@@ -21,5 +21,10 @@ const options = {
   addIfEmptyIndex: 5,
 };
 
-const result = calculatePositions(data, options);
+calculatePositions(data, options)
+  .then(result => {
+
+  })
+  .catch(error => console.log(error))
+;
 

@@ -6,7 +6,7 @@ import {
   PROCESS_DATA_REQUEST, PROCESS_DATA_SUCCESS, PROCESS_DATA_FAILURE,
 } from '../actions/actionTypes';
 
-const rawDataReducer = (state = {}, action) => {
+const rawDataReducer = (state = {isFetching: false}, action) => {
   switch (action.type) {
     case FETCH_DATA_REQUEST:
       return {...state, isFetching: true};
@@ -19,12 +19,12 @@ const rawDataReducer = (state = {}, action) => {
   }
 };
 
-const tagsCloudReducer = (state = {}, action) => {
+const tagsCloudReducer = (state = {isFetching: false}, action) => {
   switch (action.type) {
     case PROCESS_DATA_REQUEST:
-      return {...state, isFetching: true, data: action.data};
+      return {...state, isFetching: true};
     case PROCESS_DATA_SUCCESS:
-      return {...state, isFetching: false};
+      return {...state, isFetching: false, data: action.data};
     case PROCESS_DATA_FAILURE:
       return {...state, isFetching: false};
     default:
