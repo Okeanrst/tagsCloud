@@ -14,9 +14,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Provider store={store}>
-          <div className="container mt-5">
-            <Router/>
-          </div>
+          <Router/>
         </Provider>
       </BrowserRouter>
     );

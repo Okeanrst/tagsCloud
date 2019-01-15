@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import * as actions from '../redux/actions';
 import { Link } from 'react-router-dom';
 import TagsCloud from '../components/TagsCloud';
+import WithRawData from '../decorators/WithRawData';
 
 class HomePage extends Component {
   constructor(props) {
@@ -14,9 +15,7 @@ class HomePage extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.rawData.data) {
-      this.props.getData();
-    } else if (!this.props.tagsCloud) {
+    if (!this.props.tagsCloud && !this.props.tagsCloud.isFetching) {
       this.props.buildTagsCloud(this.props.rawData.data);
     }
     window.addEventListener('resize', this.handleResize);
@@ -101,23 +100,21 @@ HomePage.propTypes = {
     data: PropTypes.array,
     isFetching: PropTypes.bool.isRequired,
   }),
+  buildTagsCloud: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
-  const { tagsCloud, rawData } = state;
-  return {tagsCloud, rawData}
+  const { tagsCloud } = state;
+  return {tagsCloud}
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  getData() {
-    dispatch(actions.getData());
-  },
   buildTagsCloud(...args) {
     dispatch(actions.buildTagsCloud(...args));
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default connect(mapStateToProps, mapDispatchToProps)(WithRawData(HomePage));
 
 const styles = {
   tagsCloudScene: {width: '100%', height: '100%', },
