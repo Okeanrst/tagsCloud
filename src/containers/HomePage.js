@@ -5,6 +5,7 @@ import * as actions from '../redux/actions';
 import { Link } from 'react-router-dom';
 import TagsCloud from '../components/TagsCloud';
 import WithRawData from '../decorators/WithRawData';
+import FadeLoader from 'react-spinners/FadeLoader';
 
 class HomePage extends Component {
   constructor(props) {
@@ -60,6 +61,17 @@ class HomePage extends Component {
 
   onTagClick = (id) => this.props.history.push('/' + id);
 
+  renderLoader = (loading) => (
+    <div style={styles.loaderContainer} >
+      <FadeLoader
+        sizeUnit={"px"}
+        size={50}
+        color={'#123abc'}
+        loading={loading}
+      />
+    </div>
+  )
+
   renderTagsList = () => {return null;
     const list = this.props.rawData.data.map(i => {
       return (
@@ -71,10 +83,10 @@ class HomePage extends Component {
 
   render() {
     const { tagsCloudSceneWidth } = this.state;
-
+    const loading = this.props.rawData.isFetching || this.props.tagsCloud.isFetching;
     return (
       <div>
-        {this.props.rawData.isFetching && ('...fetching')}
+        {this.renderLoader(loading)}
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
           {this.props.tagsCloud.data && (
             <TagsCloud
@@ -116,5 +128,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 export default connect(mapStateToProps, mapDispatchToProps)(WithRawData(HomePage));
 
 const styles = {
+  loaderContainer: {
+    position: 'absolute', display: 'flex', justifyContent: 'center',
+    width: '100%'
+  },
   tagsCloudScene: {width: '100%', height: '100%', },
 };
