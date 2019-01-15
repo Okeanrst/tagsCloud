@@ -28,12 +28,12 @@ class TagInformation extends Component {
     if (!days.length) {
       return null;
     }
-    const list = days.map(i => {
+    const list = days.map((i, ind) => {
       return (
-        <li key={i.id} >{`${i.date} ${i.volume}`}</li>
+        <li key={ind} >{`${(new Date(i.date)).toLocaleDateString()} - ${i.volume}`}</li>
       );
     });
-    return (<ul>{list}</ul>)
+    return (<ul style={styles.days} >{list}</ul>)
   }
 
   renderSentiment = (sentiment) => {
@@ -70,12 +70,12 @@ class TagInformation extends Component {
         <li key="label" >label: {label}</li>
         <li key="volume" >volume: {volume}</li>
         <li key="type" >type: {type}</li>
-        <li key="sentiment" >sentiment: {this.renderSentiment(sentiment)}</li>
-        <li key="sentimentScore" >{sentimentScore}</li>
-        <li key="burst" >{burst}</li>
+        <li key="sentiment" style={{display: 'flex'}} >sentiment: {this.renderSentiment(sentiment)}</li>
+        <li key="sentimentScore" >sentimentScore: {sentimentScore}</li>
+        <li key="burst" >burst: {burst}</li>
         <li key="daysPick" >days: {showDays ? this.renderDaysPicker('-') : days.length ? this.renderDaysPicker('+') : 0}</li>
         <li key="days" >{showDays && this.renderDays(days)}</li>
-        <li key="pageType" >{this.renderPageType(pageType)}</li>
+        <li key="pageType" >pageType:{this.renderPageType(pageType)}</li>
       </ul>
     );
   }
@@ -84,7 +84,8 @@ class TagInformation extends Component {
 const styles = {
   containerStyle: {listStyle: 'none'},
   pageType: {listStyle: 'none'},
-  sentiment: {listStyle: 'none', display: 'flex', textAlign: 'center', alignItems: 'center',},
+  days: {listStyle: 'none'},
+  sentiment: {listStyle: 'none', display: 'flex', textAlign: 'center', alignItems: 'center', padding: '0px', marginLeft: '24px'},
 };
 
 const TagInformationRenderer = {};

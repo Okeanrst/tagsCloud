@@ -11,17 +11,17 @@ class HomePage extends Component {
     super(props);
 
     this.tagsCloudScene = React.createRef();
-    this.state = {tagsCloudSceneSize: {width: 1, height: 1}};
+    this.state = {tagsCloudSceneWidth: 1};
   }
 
   componentDidMount() {
-    if (!this.props.tagsCloud && !this.props.tagsCloud.isFetching) {
+    if (this.props.rawData.data && !this.props.tagsCloud.data && !this.props.tagsCloud.isFetching) {
       this.props.buildTagsCloud(this.props.rawData.data);
     }
     window.addEventListener('resize', this.handleResize);
 
-    const tagsCloudSceneSize = this.calcTagsCloudScene(this.tagsCloudScene.current)
-    this.setState({tagsCloudSceneSize})
+    const tagsCloudSceneWidth = this.calcTagsCloudWidth(this.tagsCloudScene.current)
+    this.setState({tagsCloudSceneWidth})
   }
 
   componentWillUnmount() {
@@ -30,24 +30,24 @@ class HomePage extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevProps.rawData.data && this.props.rawData.data) {
+    if (!prevProps.rawData.data && this.props.rawData.data && !this.props.tagsCloud.data) {
       this.props.buildTagsCloud(this.props.rawData.data);
     }
   }
 
-  calcTagsCloudScene(elem) {
-    const {left, right, top, bottom} = elem.getBoundingClientRect();
+  calcTagsCloudWidth(elem) {
+    const {left, right} = elem.getBoundingClientRect();
     const width = right - left;
-    const height = top - bottom;
-    return {width, height};
+
+    return width;
   }
 
   handleResize = () => {
     const recalcState = () => {
       this.resizeTaskTimer = null;
       if (this.tagsCloudScene && this.tagsCloudScene.current) {
-        const tagsCloudSceneSize = this.calcTagsCloudScene(this.tagsCloudScene.current);
-        this.setState({tagsCloudSceneSize})
+        const tagsCloudSceneWidth = this.calcTagsCloudWidth(this.tagsCloudScene.current);
+        this.setState({tagsCloudSceneWidth})
       }
     }
 
@@ -70,7 +70,7 @@ class HomePage extends Component {
   }
 
   render() {
-    const { tagsCloudSceneSize } = this.state;
+    const { tagsCloudSceneWidth } = this.state;
 
     return (
       <div>
@@ -78,8 +78,7 @@ class HomePage extends Component {
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
           {this.props.tagsCloud.data && (
             <TagsCloud
-              width={tagsCloudSceneSize.width}
-              height={tagsCloudSceneSize.height}
+              width={tagsCloudSceneWidth}
               data={this.props.tagsCloud.data}
               onTagClick={this.onTagClick}
             />

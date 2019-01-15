@@ -62,7 +62,6 @@ TagsCloud.propTypes = {
 
   }).isRequired).isRequired,
   width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
   onTagClick: PropTypes.func.isRequired,
 };
 
