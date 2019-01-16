@@ -1,28 +1,22 @@
 export function prepareData(data, options = {}) {
-  const {minFontSize = 6, maxFontSize = 36, horizontalMargin = 20, verticalMargin = 20} = options;
+  const { minFontSize = 6, maxFontSize = 36 } = options;
 
-  const countRating = ({positive = 0, neutral = 0, negative = 0} = {}) => positive - negative;
-
-  let minRating = 0;
-  let maxRating = 0;
+  let minRating;
+  let maxRating;
   data.forEach(item => {
-    item.rating = countRating(item.sentiment);
-    if (minRating > item.rating) {
-      minRating = item.rating;
+    if (minRating > item.sentimentScore || minRating === undefined) {
+      minRating = item.sentimentScore;
     }
-    if (maxRating < item.rating) {
-      maxRating = item.rating;
+    if (maxRating < item.sentimentScore || maxRating === undefined) {
+      maxRating = item.sentimentScore;
     }
   });
 
   const ratio = (maxFontSize - minFontSize) / (maxRating - minRating);
-  data.forEach(item => item.fontSize = minFontSize + Math.round((item.rating - minRating) * ratio));
+  data.forEach(item => item.fontSize = minFontSize + Math.round((item.sentimentScore - minRating) * ratio));
 
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-
-  const horizMargin = 1 + horizontalMargin / 100;
-  const vertMargin = 1 + verticalMargin / 100;
 
   //TODO use opentype.js
   const fontSizeFactor = 1.12;
@@ -30,16 +24,16 @@ export function prepareData(data, options = {}) {
   data.forEach(item => {
     ctx.font = `${item.fontSize}px OpenSans`;
     const measure = ctx.measureText(item.label);
-    item.width = measure.width * horizMargin;
+    item.width = measure.width;
 
-    item.height = item.fontSize * fontSizeFactor * vertMargin;
+    item.height = item.fontSize * fontSizeFactor;
     item.fill = randomColor();
   });
 
   return data;
 }
 
-export function adaptDataToScene(data, sceneWidth, {horizontalMargin = 20, verticalMargin = 20} = {}) {
+export function adaptDataToScene(data, sceneWidth) {
   let maxTop;
   let minBottom;
   let maxRight;
@@ -63,22 +57,24 @@ export function adaptDataToScene(data, sceneWidth, {horizontalMargin = 20, verti
     }
   });
 
-  const ratio = sceneWidth / (maxRight - minLeft) * 0.8;
-  const halfHorizMargin = horizontalMargin / 100 / 2;
-  const halfVertMargin = verticalMargin / 100 / 2;
+  const scale = sceneWidth * 0.8 / (maxRight - minLeft) ;
 
   data.forEach(item => {
-    item.rectTranslateX = (item.rectLeft + halfHorizMargin * item.width) * ratio;
-    //item.rectTranslateY = item.rectTop * ratio;
-    item.rectTranslateY = (item.rectBottom - halfVertMargin * item.height) * ratio;
-    item.adaptFontSize = item.fontSize * ratio;
+    item.rectTranslateX = (item.rectLeft) * scale;
+    if (item.rotate) {
+      item.rectTranslateY = -(item.rectBottom + item.height) * scale
+    } else {
+      item.rectTranslateY = -(item.rectBottom ) * scale;
+    }
+
+    item.adaptFontSize = item.fontSize * scale;
   });
 
   const res = {
-    maxRight: maxRight * ratio,
-    minLeft: minLeft * ratio,
-    minBottom: minBottom * ratio,
-    maxTop: maxTop * ratio,
+    maxRight: maxRight * scale,
+    minLeft: minLeft * scale,
+    minBottom: minBottom * scale,
+    maxTop: maxTop * scale,
     data
   };
 
