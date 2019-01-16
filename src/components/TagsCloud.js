@@ -23,7 +23,7 @@ const TagsCloud = ({width, data, onTagClick}) => {
           return (
             <text
               key={`${i.id}_${ind}`}
-              textAnchor="start"
+              textAnchor="middle"
               transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
               style={style}
               onClick={() => onTagClick(i.id)}

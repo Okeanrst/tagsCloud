@@ -59,12 +59,29 @@ export function adaptDataToScene(data, sceneWidth) {
 
   const scale = sceneWidth * 0.8 / (maxRight - minLeft) ;
 
-  data.forEach(item => {
+  /*data.forEach(item => {
     item.rectTranslateX = (item.rectLeft) * scale;
     if (item.rotate) {
       item.rectTranslateY = -(item.rectBottom + item.height) * scale
     } else {
       item.rectTranslateY = -(item.rectBottom ) * scale;
+    }
+
+    item.adaptFontSize = item.fontSize * scale;
+  });*/
+
+  data.forEach(item => {
+    const diffX = (item.rectRight - item.rectLeft);
+    const diffY = (item.rectTop - item.rectBottom);
+    const middleX = item.rectLeft + diffX / 2;
+    const middleY = item.rectBottom + diffY / 2;
+    
+    if (item.rotate) {
+      item.rectTranslateX = (middleX - diffX * 0.3) * scale;
+      item.rectTranslateY = - (middleY) * scale;
+    } else {
+      item.rectTranslateX = middleX * scale;
+      item.rectTranslateY = -(middleY - diffY * 0.3) * scale;
     }
 
     item.adaptFontSize = item.fontSize * scale;
