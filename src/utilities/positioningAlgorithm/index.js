@@ -410,8 +410,12 @@ module.exports = function (data, options = {}) {
         }
       }
 
-      function updateSceneMap(laidRects) {
-        laidRects.forEach(laidRect => {
+      function updateSceneMap(laidRect) {
+        const affectedPositions = [];
+        const recoverClosedVacancyState = () => {
+          affectedPositions.forEach(i => sceneMap.releasePosition(...i));
+        }
+        try {
           const {top, right, bottom, left} = laidRect;
 
           for (let row = top; row >= bottom; row--) {
@@ -419,9 +423,15 @@ module.exports = function (data, options = {}) {
             for (let col = left; col <= right; col++) {
               if (col === 0) continue;
               sceneMap.setDataAtPosition(col, row);
+              affectedPositions.push([col, row])
             }
           }
-        });
+        } catch (e) {
+          if (e instanceof IntersectionError) {
+            return recoverClosedVacancyState();
+          }
+          throw e;
+        }
 
         if (options.drawStepMap) {
           console.clear();
@@ -430,7 +440,7 @@ module.exports = function (data, options = {}) {
       }
 
       function layRect(rect) {
-        updateSceneMap([rect]);
+        updateSceneMap(rect);
         laidRectsData.push(rect);
       }
 

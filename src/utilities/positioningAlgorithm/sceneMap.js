@@ -29,7 +29,7 @@ sceneMap.prototype.getSceneSize = function getSceneSize() {
 	return {[X]: sizeX, [MINUS_X]: sizeMinusX, [Y]: sizeY, [MINUS_Y]: sizeMinusY};
 }
 
-sceneMap.prototype.setDataAtPosition = function setDataAtPosition(x, y) {
+sceneMap.prototype.setDataAtPosition = function setDataAtPosition(x, y, val = true) {
 	if (typeof x !== 'number' || typeof y !== 'number') {
 		throw new Error('setDataAtPosition error: typeof x !== number || typeof y !== number');
 	}
@@ -47,7 +47,7 @@ sceneMap.prototype.setDataAtPosition = function setDataAtPosition(x, y) {
 	if (!Array.isArray(this.sceneMap[quarter][Math.abs(y)])) {
 		this.sceneMap[quarter][row] = [];
 	}
-	this.sceneMap[quarter][row][col] = true;
+	this.sceneMap[quarter][row][col] = val;
 
 	if (xIsPositive && this.sizeX < col) {
 		this.sizeX = col;
@@ -60,6 +60,10 @@ sceneMap.prototype.setDataAtPosition = function setDataAtPosition(x, y) {
 	} else if (!yIsPositive && this.sizeMinusY < row) {
 		this.sizeMinusY = row;
 	}
+}
+
+sceneMap.prototype.releasePosition = function(x, y) {
+  this.setDataAtPosition(x, y, undefined);
 }
 
 sceneMap.prototype.getDataAtPosition = function getDataAtPosition(x, y) {
