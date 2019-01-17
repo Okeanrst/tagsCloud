@@ -161,9 +161,11 @@ module.exports = function (data, options = {}) {
           sceneMap.drawItself();
         }
         const res = laidRectsData.map(i => {
-          i.rectTop = SceneMap.sceneMapToRect(SceneMap.nextPosition(i.top), ratio);
-          i.rectBottom = SceneMap.sceneMapToRect(i.bottom, ratio);
-          i.rectRight = SceneMap.sceneMapToRect(SceneMap.nextPosition(i.right), ratio);
+          const bottom = i.bottom > 0 ? i.bottom - 1 : i.bottom + 1;
+          const left = i.left > 0 ? i.left - 1 : i.left + 1;
+          i.rectTop = SceneMap.sceneMapToRect(i.top, ratio);
+          i.rectBottom = SceneMap.sceneMapToRect(bottom, ratio);
+          i.rectRight = SceneMap.sceneMapToRect(i.right, ratio);
           i.rectLeft = SceneMap.sceneMapToRect(i.left, ratio);
 
           return i;

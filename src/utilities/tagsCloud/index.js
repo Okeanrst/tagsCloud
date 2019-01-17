@@ -38,10 +38,9 @@ export function adaptDataToScene(data, sceneWidth) {
   let minBottom;
   let maxRight;
   let minLeft;
-  data.forEach(item => {
-    const rectTop = item.rectBottom + item.height;
-    if (rectTop > maxTop || maxTop === undefined) {
-      maxTop = rectTop;
+  data.forEach(item => {    
+    if (item.rectTop > maxTop || maxTop === undefined) {
+      maxTop = item.rectTop;
     }
 
     if (minBottom > item.rectBottom || minBottom === undefined) {
@@ -51,9 +50,9 @@ export function adaptDataToScene(data, sceneWidth) {
     if (item.rectLeft < minLeft || minLeft === undefined) {
       minLeft = item.rectLeft;
     }
-    const rectRight = item.rectLeft + item.width;
-    if (maxRight < rectRight || maxRight === undefined) {
-      maxRight = rectRight;
+    
+    if (maxRight < item.rectRight || maxRight === undefined) {
+      maxRight = item.rectRight;
     }
   });
 

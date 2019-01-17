@@ -11,9 +11,9 @@ const TagsCloud = ({width, data, onTagClick}) => {
 
   let { maxRight, minLeft, minBottom, maxTop, data: preparedData } = adaptDataToScene(data, adaptedWidth);
 
-  const height = (maxTop - minBottom) * adaptedWidth / (maxRight - minLeft) * 1.2;
+  const height = (maxTop - minBottom) * adaptedWidth / (maxRight - minLeft) * 1.25;
   const axisYOffset = width / 2 - (Math.abs(maxRight) - Math.abs(minLeft))/2;
-  const axisXOffset = (height / 2 - (Math.abs(maxTop) - Math.abs(minBottom))/2) * 1.2;
+  const axisXOffset = (height / 2 - (Math.abs(maxTop) - Math.abs(minBottom))/2) * 1.25;
 
   return (
     <svg id="small_cloud" width={width} height={height} >
