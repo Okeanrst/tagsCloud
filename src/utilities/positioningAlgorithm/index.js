@@ -453,7 +453,8 @@ module.exports = function (data, options = {}) {
           }
         } catch (e) {
           if (e instanceof IntersectionError) {
-            return recoverClosedVacanciesState();
+            recoverClosedVacanciesState();
+            return false;
           }
           throw e;
         }
@@ -464,11 +465,13 @@ module.exports = function (data, options = {}) {
           console.clear();
           sceneMap.drawItself();
         }
+        return true;
       }
 
       function layRect(rect) {
-        updateSceneMap(rect);
-        laidRectsData.push(rect);
+        if (updateSceneMap(rect)) {
+          laidRectsData.push(rect);
+        }
       }
 
       function creatLaidRect(rect, {top, right, bottom, left}) {
