@@ -41,7 +41,7 @@ export function getGlyphsMap(canvas, word, fontSize, wordWidth, {fontFamily = 'O
     }
   }
 
-  if (true) {
+  if (false) {
     console.log(visualizeMap(map, {cols, rows}));
   }
   return map;
@@ -55,12 +55,12 @@ export function glyphsMapToRectMap(glyphsMap, rect, rotate) {
   const horizRatio = glyphsRows/rectRows;
   const vertRatio = glyphsCols/rectCols;
 
-  const isRectSquareBusy = (col, row) => {
-    const rowStart = Math.round(glyphsRows / vertRatio * (row - 1));
-    let rowFinish = Math.round(glyphsRows / vertRatio * (row));
+  const isRectSquareBusy = (rectCol, rectRow) => {
+    const rowStart = Math.round(vertRatio * rectRow);
+    let rowFinish = Math.round(vertRatio * (rectRow + 1));
 
-    const colStart = Math.round(glyphsCols / horizRatio * (col - 1));
-    let colFinish = Math.round(glyphsCols / horizRatio * col);
+    const colStart = Math.round(horizRatio * rectCol);
+    let colFinish = Math.round(horizRatio * (rectCol + 1));
 
     //if (rowFinish > glyphsRows || colFinish > glyphsCols) debugger
     if (rowFinish > glyphsRows) {
@@ -72,7 +72,7 @@ export function glyphsMapToRectMap(glyphsMap, rect, rotate) {
 
     for (let row = rowStart; row < rowFinish; row++) {
       for (let col = colStart; col < colFinish; col++) {
-        if (glyphsMap[row - 1] && glyphsMap[row - 1][col - 1]) {
+        if (glyphsMap[row] && glyphsMap[row][col]) {
           return true;
         }
       }
@@ -81,18 +81,18 @@ export function glyphsMapToRectMap(glyphsMap, rect, rotate) {
   }
 
   const rectMap = [];
-  for (let row = 1; row <= rectRows; row++) {
-    for (let col = 1; col <= rectCols; col++) {
+  for (let row = 0; row < rectRows; row++) {
+    for (let col = 0; col < rectCols; col++) {
       if (!rectMap[row]) {
         rectMap[row] = [];
       }
       rectMap[row][col] = isRectSquareBusy(col, row);
     }
   }
-  if (true) {
+  if (false) {
     console.log(visualizeMap(rectMap, {cols: rectCols, rows: rectRows}));
   }
-  debugger
+
   return rectMap;
 }
 
@@ -101,18 +101,9 @@ function visualizeMap(map, {cols, rows}) {
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
 
-      res += map[row] && map[row][col] ? '#' : '.';
+      res += map[row] && map[row][col] ? '#' : map[row] === undefined || map[row][col] === undefined ? '_' : '.';
     }
     res += '\n'
   }
   return res;
 }
-
-/*const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-
-const word = 'Alphabetic';
-ctx.font = `${30}px ${'OpenSans'}`;
-const wordWidth = ctx.measureText(word).width;
-
-getGlyphsMap(canvas, word, 30, wordWidth);*/

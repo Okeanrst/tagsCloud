@@ -18,7 +18,7 @@ module.exports = function (data, options = {}) {
     try {
       const {
         pickingClosedVacancyStrategy = DESC, pickingEdgeVacancyStrategy = ASC,
-        useGlyphsMap = true
+        useGlyphsMap = false
       } = options;
 
       let canvas;
@@ -423,7 +423,7 @@ module.exports = function (data, options = {}) {
 
       function updateSceneMap(rect) {
         const affectedPositions = [];
-        const recoverClosedVacancyState = () => {
+        const recoverClosedVacanciesState = () => {
           affectedPositions.forEach(i => sceneMap.releasePosition(...i));
         }
 
@@ -453,10 +453,12 @@ module.exports = function (data, options = {}) {
           }
         } catch (e) {
           if (e instanceof IntersectionError) {
-            return recoverClosedVacancyState();
+            return recoverClosedVacanciesState();
           }
           throw e;
         }
+
+        sceneMap.calcSceneSize();
 
         if (options.drawStepMap) {
           console.clear();

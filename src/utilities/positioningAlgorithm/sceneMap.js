@@ -29,6 +29,59 @@ sceneMap.prototype.getSceneSize = function getSceneSize() {
 	return {[X]: sizeX, [MINUS_X]: sizeMinusX, [Y]: sizeY, [MINUS_Y]: sizeMinusY};
 }
 
+sceneMap.prototype.calcSceneSize = function getSceneSize() {
+  //Y
+	if (this.sceneMap['xy'].length > this.sizeY) {
+    this.sizeY = this.sceneMap['xy'].length;
+	}
+
+  if (this.sceneMap['-xy'].length > this.sizeY) {
+    this.sizeY = this.sceneMap['-xy'].length;
+  }
+	//-Y
+  if (this.sceneMap['x-y'].length > this.sizeMinusY) {
+    this.sizeMinusY = this.sceneMap['x-y'].length
+  }
+  if (this.sceneMap['x-y'].length > this.sizeMinusY) {
+    this.sizeMinusY = this.sceneMap['x-y'].length
+  }
+
+  //X
+  this.sceneMap['xy'].forEach(row => {
+    if (row.length > this.sizeX) {
+      this.sizeX = row.length;
+    }
+  });
+  this.sceneMap['x-y'].forEach(row => {
+    if (row.length > this.sizeX) {
+      this.sizeX = row.length;
+    }
+  });
+	//-X
+  this.sceneMap['-xy'].forEach(row => {
+    if (row.length > this.sizeMinusX) {
+      this.sizeMinusX = row.length;
+    }
+  });
+  this.sceneMap['-x-y'].forEach(row => {
+    if (row.length > this.sizeMinusX) {
+      this.sizeMinusX = row.length;
+    }
+  });
+}
+
+sceneMap.prototype._setDataAtPosition = function setDataAtPosition(x, y, val = true) {
+  const xIsPositive = x >= 0;
+  const yIsPositive = y >= 0;
+  const quarter = calcQuarter(xIsPositive, yIsPositive);
+  const row = Math.abs(y);
+  const col = Math.abs(x);
+  if (!Array.isArray(this.sceneMap[quarter][Math.abs(y)])) {
+    this.sceneMap[quarter][row] = [];
+  }
+  this.sceneMap[quarter][row][col] = val;
+}
+
 sceneMap.prototype.setDataAtPosition = function setDataAtPosition(x, y, val = true) {
 	if (typeof x !== 'number' || typeof y !== 'number') {
 		throw new Error('setDataAtPosition error: typeof x !== number || typeof y !== number');
@@ -39,31 +92,11 @@ sceneMap.prototype.setDataAtPosition = function setDataAtPosition(x, y, val = tr
 	if (this.getDataAtPosition(x, y)) {
 		throw new IntersectionError();
 	}
-	const xIsPositive = x >= 0;
-	const yIsPositive = y >= 0;
-	const quarter = calcQuarter(xIsPositive, yIsPositive);
-	const row = Math.abs(y);
-	const col = Math.abs(x);
-	if (!Array.isArray(this.sceneMap[quarter][Math.abs(y)])) {
-		this.sceneMap[quarter][row] = [];
-	}
-	this.sceneMap[quarter][row][col] = val;
-
-	if (xIsPositive && this.sizeX < col) {
-		this.sizeX = col;
-	} else if (!xIsPositive && this.sizeMinusX < col) {
-		this.sizeMinusX = col;
-	}
-
-	if (yIsPositive && this.sizeY < row) {
-		this.sizeY = row;
-	} else if (!yIsPositive && this.sizeMinusY < row) {
-		this.sizeMinusY = row;
-	}
+  this._setDataAtPosition(x, y);
 }
 
 sceneMap.prototype.releasePosition = function(x, y) {
-  this.setDataAtPosition(x, y, undefined);
+  this._setDataAtPosition(x, y, undefined);
 }
 
 sceneMap.prototype.getDataAtPosition = function getDataAtPosition(x, y) {
