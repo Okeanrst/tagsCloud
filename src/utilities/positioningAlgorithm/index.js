@@ -6,6 +6,7 @@ const EdgesManager = require('./edgesManager');
 const VacanciesManager = require('./vacanciesManager');
 const { edgesOrder, edges } = require('./edgesManager');
 const IntersectionError = require('./IntersectionError');
+const { getGlyphsMap, glyphsMapToRectMap } = require('./getGlyphsMap');
 
 const { TOP, RIGHT, BOTTOM, LEFT } = edges;
 
@@ -15,7 +16,15 @@ const DESC = 'descendant';
 module.exports = function (data, options = {}) {
   return new Promise(function(resolve, reject) {
     try {
-      const {pickingClosedVacancyStrategy = DESC, pickingEdgeVacancyStrategy = ASC} = options;
+      const {
+        pickingClosedVacancyStrategy = DESC, pickingEdgeVacancyStrategy = ASC,
+        useGlyphsMap = true
+      } = options;
+
+      let canvas;
+      if (useGlyphsMap){
+        canvas = document.createElement('canvas');
+      }
 
       let minSize = 10;
       data.forEach(i => {
@@ -412,21 +421,35 @@ module.exports = function (data, options = {}) {
         }
       }
 
-      function updateSceneMap(laidRect) {
+      function updateSceneMap(rect) {
         const affectedPositions = [];
         const recoverClosedVacancyState = () => {
           affectedPositions.forEach(i => sceneMap.releasePosition(...i));
         }
-        try {
-          const {top, right, bottom, left} = laidRect;
 
+        let rectMap;
+        if (useGlyphsMap) {
+          const wordWidth = rect.rotate ? rect.height : rect.width;
+          const glyphsMap = getGlyphsMap(canvas, rect.label, rect.fontSize, wordWidth);
+          rectMap = glyphsMapToRectMap(glyphsMap, {rows: rect.rows, cols: rect.cols}, rect.rotate);
+        }
+
+        try {
+          const {top, right, bottom, left} = rect;
+
+          let innerRow = 0;
           for (let row = top; row >= bottom; row--) {
             if (row === 0) continue;
+            let innerCol = 0;
             for (let col = left; col <= right; col++) {
               if (col === 0) continue;
-              sceneMap.setDataAtPosition(col, row);
-              affectedPositions.push([col, row])
+              if (!useGlyphsMap || (rectMap[innerRow] && rectMap[innerRow][innerCol])) {
+                sceneMap.setDataAtPosition(col, row);
+                affectedPositions.push([col, row]);
+              }
+              innerCol++;
             }
+            innerRow++;
           }
         } catch (e) {
           if (e instanceof IntersectionError) {
