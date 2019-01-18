@@ -42,37 +42,37 @@ export function getGlyphsMap(canvas, word, fontSize, wordWidth, {fontFamily = 'O
   }
 
   if (true) {
-    let res = '';
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-
-        res += map[row][col] ? '#' : '.';
-      }
-      res += '\n'
-    }
-    console.log(res)
+    console.log(visualizeMap(map, {cols, rows}));
   }
   return map;
 }
 
 export function glyphsMapToRectMap(glyphsMap, rect, rotate) {
   const {rows: rectRows, cols: rectCols} = rect;
-  const glyphsRows = glyphsMap.length;
-  const glyphsCols = glyphsMap[0].length;
+  const glyphsRows = rotate ? glyphsMap[0].length : glyphsMap.length;
+  const glyphsCols = rotate ? glyphsMap.length : glyphsMap[0].length;
 
-  const horizRatio = rotate ? glyphsCols/rectRows : glyphsRows/rectRows;
-  const vertRatio = rotate ? glyphsRows/rectCols : glyphsCols/rectCols;
+  const horizRatio = glyphsRows/rectRows;
+  const vertRatio = glyphsCols/rectCols;
 
   const isRectSquareBusy = (col, row) => {
-    const rowStart = Math.round((rotate ? glyphsCols : glyphsRows) * vertRatio * (row - 1));
-    const rowFinish = Math.round((rotate ? glyphsCols : glyphsRows) * vertRatio * row);
+    const rowStart = Math.round(glyphsRows / vertRatio * (row - 1));
+    let rowFinish = Math.round(glyphsRows / vertRatio * (row));
 
-    const colStart = Math.round((rotate ? glyphsRows : glyphsCols) * horizRatio * (col - 1));
-    const colFinish = Math.round((rotate ? glyphsRows : glyphsCols) * horizRatio * col);
+    const colStart = Math.round(glyphsCols / horizRatio * (col - 1));
+    let colFinish = Math.round(glyphsCols / horizRatio * col);
+
+    //if (rowFinish > glyphsRows || colFinish > glyphsCols) debugger
+    if (rowFinish > glyphsRows) {
+      rowFinish = glyphsRows + 1
+    }
+    if (colFinish > glyphsCols) {
+      colFinish = glyphsCols + 1
+    }
 
     for (let row = rowStart; row < rowFinish; row++) {
       for (let col = colStart; col < colFinish; col++) {
-        if (glyphsMap[row] && glyphsMap[row][col]) {
+        if (glyphsMap[row - 1] && glyphsMap[row - 1][col - 1]) {
           return true;
         }
       }
@@ -81,15 +81,31 @@ export function glyphsMapToRectMap(glyphsMap, rect, rotate) {
   }
 
   const rectMap = [];
-  for (let row = 0; row < rectRows; row++) {
-    for (let col = 0; col < rectCols; col++) {
+  for (let row = 1; row <= rectRows; row++) {
+    for (let col = 1; col <= rectCols; col++) {
       if (!rectMap[row]) {
         rectMap[row] = [];
       }
       rectMap[row][col] = isRectSquareBusy(col, row);
     }
   }
+  if (true) {
+    console.log(visualizeMap(rectMap, {cols: rectCols, rows: rectRows}));
+  }
+  debugger
   return rectMap;
+}
+
+function visualizeMap(map, {cols, rows}) {
+  let res = '';
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+
+      res += map[row] && map[row][col] ? '#' : '.';
+    }
+    res += '\n'
+  }
+  return res;
 }
 
 /*const canvas = document.getElementById('canvas');
