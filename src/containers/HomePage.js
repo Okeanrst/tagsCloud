@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import * as actions from '../redux/actions';
 import { Link } from 'react-router-dom';
 import TagsCloud from '../components/TagsCloud';
+import TagsCloudCanvas from '../components/TagsCloudCanvas';
 import WithRawData from '../decorators/WithRawData';
 import FadeLoader from 'react-spinners/FadeLoader';
 
@@ -12,7 +13,7 @@ class HomePage extends Component {
     super(props);
 
     this.tagsCloudScene = React.createRef();
-    this.state = {tagsCloudSceneWidth: 1};
+    this.state = {tagsCloudSceneWidth: 1, useCanvas: false};
   }
 
   componentDidMount() {
@@ -61,6 +62,8 @@ class HomePage extends Component {
 
   onTagClick = (id) => this.props.history.push('/' + id);
 
+  onToggleCheckbox = () => this.setState(({useCanvas}) => ({useCanvas: !useCanvas}))
+
   renderLoader = (loading) => (
     <div style={styles.loaderContainer} >
       <FadeLoader
@@ -82,14 +85,19 @@ class HomePage extends Component {
   }
 
   render() {
-    const { tagsCloudSceneWidth } = this.state;
+    const { tagsCloudSceneWidth, useCanvas } = this.state;
     const loading = this.props.rawData.isFetching || this.props.tagsCloud.isFetching;
+    const TagsCloudComponent = useCanvas ?  TagsCloudCanvas : TagsCloud;
     return (
       <div>
         {this.renderLoader(loading)}
+        <div style={styles.checkbox}>
+          <input type="checkbox" value={useCanvas} onChange={this.onToggleCheckbox} />
+          <span>use canvas</span>
+        </div>
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
           {this.props.tagsCloud.data && (
-            <TagsCloud
+            <TagsCloudComponent
               width={tagsCloudSceneWidth}
               data={this.props.tagsCloud.data}
               onTagClick={this.onTagClick}
@@ -132,5 +140,6 @@ const styles = {
     position: 'absolute', display: 'flex', justifyContent: 'center',
     width: '100%'
   },
-  tagsCloudScene: {width: '100%', height: '100%', },
+  tagsCloudScene: {width: '100%', display: 'flex', justifyContent: 'center',},
+  checkbox: {display: 'inline-block', position: 'absolute', top: '20px', left: '20px'}
 };

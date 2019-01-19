@@ -1,5 +1,3 @@
-'use strict';
-
 const IntersectionError = require('./IntersectionError');
 
 const X = 'x';

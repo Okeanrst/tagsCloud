@@ -1,10 +1,12 @@
-export function getGlyphsMap(canvas, word, fontSize, wordWidth, {fontFamily = 'OpenSans', fontK = 1.12} = {}) {
+export function getGlyphsMap(canvas, word, fontSize, /*wordWidth_,*/ {fontFamily = 'OpenSans', fontK = 1.1} = {}) {
   const height = fontSize * fontK;
+
+  const ctx = canvas.getContext('2d');
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  const wordWidth = ctx.measureText(word).width;
 
   canvas.width = wordWidth * 1.1;
   canvas.height = height * 1.1;
-
-  const ctx = canvas.getContext('2d');
 
   ctx.textBaseline = "alphabetic";
   ctx.font = `${fontSize}px ${fontFamily}`;
@@ -12,7 +14,7 @@ export function getGlyphsMap(canvas, word, fontSize, wordWidth, {fontFamily = 'O
   const sx = 0;
   const sy = 0;
   const sh = height;
-  const sw = wordWidth/*ctx.measureText(word).width*/;
+  const sw = wordWidth;
 
   ctx.fillText(word, 0, height * 0.8);
 
@@ -21,13 +23,10 @@ export function getGlyphsMap(canvas, word, fontSize, wordWidth, {fontFamily = 'O
 
   const rows = Math.floor(sh - sx);
   const cols = Math.floor(sw - sy);
-  let last = 0;
   const map = [];
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-
       const ind = cols * row + col;
-      last = ind;
       const firstBt = ind * 4;
       //const red = 255 - data[firstBt];
       //const green = 255 - data[firstBt + 1];
@@ -41,8 +40,11 @@ export function getGlyphsMap(canvas, word, fontSize, wordWidth, {fontFamily = 'O
     }
   }
 
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   if (false) {
-    console.log(visualizeMap(map, {cols, rows}));
+    console.log(word);
+    console.log(visualizeMap(map, {cols, rows}, 196));
   }
   return map;
 }
@@ -72,7 +74,7 @@ export function glyphsMapToRectMap(glyphsMap, rect, rotate) {
 
     for (let row = rowStart; row < rowFinish; row++) {
       for (let col = colStart; col < colFinish; col++) {
-        if (glyphsMap[row] && glyphsMap[row][col]) {
+        if ((rotate && (glyphsMap[col] && glyphsMap[col][row])) || (glyphsMap[row] && glyphsMap[row][col])) {
           return true;
         }
       }
@@ -96,11 +98,11 @@ export function glyphsMapToRectMap(glyphsMap, rect, rotate) {
   return rectMap;
 }
 
-function visualizeMap(map, {cols, rows}) {
+function visualizeMap(map, {cols, rows}, rowLength) {
   let res = '';
+  const maxCol = rowLength < cols ? rowLength : cols;
   for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-
+    for (let col = 0; col < maxCol; col++) {
       res += map[row] && map[row][col] ? '#' : map[row] === undefined || map[row][col] === undefined ? '_' : '.';
     }
     res += '\n'

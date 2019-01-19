@@ -19,7 +19,7 @@ export function prepareData(data, options = {}) {
   const ctx = canvas.getContext('2d');
 
   //TODO use opentype.js
-  const fontSizeFactor = 1.12;
+  const fontSizeFactor = 1.1;
 
   data.forEach(item => {
     ctx.font = `${item.fontSize}px OpenSans`;
@@ -33,12 +33,12 @@ export function prepareData(data, options = {}) {
   return data;
 }
 
-export function adaptDataToScene(data, sceneWidth) {
+export function getBorderCoordinates(data) {
   let maxTop;
   let minBottom;
   let maxRight;
   let minLeft;
-  data.forEach(item => {    
+  data.forEach(item => {
     if (item.rectTop > maxTop || maxTop === undefined) {
       maxTop = item.rectTop;
     }
@@ -50,13 +50,30 @@ export function adaptDataToScene(data, sceneWidth) {
     if (item.rectLeft < minLeft || minLeft === undefined) {
       minLeft = item.rectLeft;
     }
-    
+
     if (maxRight < item.rectRight || maxRight === undefined) {
       maxRight = item.rectRight;
     }
   });
 
-  const scale = sceneWidth * 0.8 / (maxRight - minLeft) ;
+  return {top: maxTop, bottom: minBottom, right: maxRight, left: minLeft};
+}
+
+export function calcAllowedWidth(width) {
+  const aspectRatio = document.documentElement.clientWidth / document.documentElement.clientHeight;
+  let allowedWidth = width * 0.9;
+  if (aspectRatio >= 1) {
+    allowedWidth = width / aspectRatio * 1.2;
+  }
+  return allowedWidth;
+}
+
+export function adaptDataToScene(data, allowedWidth) {
+  const {
+    top: maxTop, bottom: minBottom, right: maxRight, left: minLeft
+  } = getBorderCoordinates(data);
+
+  const scale = allowedWidth * 0.8 / (maxRight - minLeft) ;
 
   /*data.forEach(item => {
     item.rectTranslateX = (item.rectLeft) * scale;

@@ -1,5 +1,3 @@
-'use strict';
-
 const SceneMap = require('./sceneMap');
 const {dimensions} = require('./sceneMap');
 const {X, MINUS_X, MINUS_Y, Y} = dimensions;

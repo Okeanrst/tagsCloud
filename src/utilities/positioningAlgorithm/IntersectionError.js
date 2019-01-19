@@ -1,5 +1,3 @@
-'use strict';
-
 function IntersectionError(message) {
   this.name = 'IntersectionError';
   this.message = message || 'Position already taken';

@@ -1,40 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {adaptDataToScene} from '../utilities/tagsCloud';
+import {adaptDataToScene, calcAllowedWidth} from '../utilities/tagsCloud';
 
 const TagsCloud = ({width, data, onTagClick}) => {
-  const aspectRatio = document.documentElement.clientWidth / document.documentElement.clientHeight;
-  let adaptedWidth = width * 0.9;
-  if (aspectRatio >= 1) {
-    adaptedWidth = width / aspectRatio * 2;
-  }
+  const allowedWidth = calcAllowedWidth(width);
 
-  let { maxRight, minLeft, minBottom, maxTop, data: preparedData } = adaptDataToScene(data, adaptedWidth);
+  const { maxRight, minLeft, minBottom, maxTop, data: preparedData } = adaptDataToScene(data, allowedWidth);
+  const padding = 1.1;
+  const sceneWidth = (maxRight - minLeft) * padding;
+  const sceneHeight = (maxTop - minBottom) * padding;
 
-  const height = (maxTop - minBottom) * adaptedWidth / (maxRight - minLeft) * 1.25;
-  const axisYOffset = width / 2 - (Math.abs(maxRight) - Math.abs(minLeft))/2;
-  const axisXOffset = (height / 2 - (Math.abs(maxTop) - Math.abs(minBottom))/2) * 1.25;
+  const axisXOffset = - minLeft + sceneWidth * (padding - 1)/2;
+  const axisYOffset = maxTop + sceneHeight * (padding - 1)/2;
 
   return (
-    <svg id="small_cloud" width={width} height={height} >
-      <g transform={`translate(${axisYOffset}, ${axisXOffset})`}>
-        {preparedData.map((i, ind) => {
-          const style = {fontSize: `${i.adaptFontSize}px`, fontFamily: 'OpenSans', fill: i.fill};
-          return (
-            <text
-              key={`${i.id}_${ind}`}
-              textAnchor="middle"
-              transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
-              style={style}
-              onClick={() => onTagClick(i.id)}
-            >
-              {i.label}
-            </text>
-          )
-        })}
-        {false && drawAxises()}
-      </g>
-    </svg>
+    <div style={{display: 'inline-block'}} >
+      <svg id="small_cloud" width={sceneWidth} height={sceneHeight} >
+        <g transform={`translate(${axisXOffset}, ${axisYOffset})`}>
+          {preparedData.map((i, ind) => {
+            const style = {fontSize: `${i.adaptFontSize}px`, fontFamily: 'OpenSans', fill: i.fill};
+            return (
+              <text
+                key={`${i.id}_${ind}`}
+                textAnchor="middle"
+                transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
+                style={style}
+                onClick={() => onTagClick(i.id)}
+              >
+                {i.label}
+              </text>
+            )
+          })}
+          {false && drawAxises()}
+        </g>
+      </svg>
+    </div>
   )
 }
 

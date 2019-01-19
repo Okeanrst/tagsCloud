@@ -18,11 +18,11 @@ module.exports = function (data, options = {}) {
     try {
       const {
         pickingClosedVacancyStrategy = DESC, pickingEdgeVacancyStrategy = ASC,
-        useGlyphsMap = false
+        considerGlyphsMap = true
       } = options;
 
       let canvas;
-      if (useGlyphsMap){
+      if (considerGlyphsMap){
         canvas = document.createElement('canvas');
       }
 
@@ -170,12 +170,14 @@ module.exports = function (data, options = {}) {
           sceneMap.drawItself();
         }
         const res = laidRectsData.map(i => {
-          const bottom = i.bottom > 0 ? i.bottom - 1 : i.bottom + 1;
-          const left = i.left > 0 ? i.left - 1 : i.left + 1;
-          i.rectTop = SceneMap.sceneMapToRect(i.top, ratio);
+          const top = i.top > 0 ? i.top : i.top + 1;
+          const bottom = i.bottom > 0 ? i.bottom - 1 : i.bottom;
+          const right = i.right > 0 ? i.right : i.right + 1;
+          const left = i.left > 0 ? i.left - 1 : i.left;
+          i.rectTop = SceneMap.sceneMapToRect(top, ratio);
           i.rectBottom = SceneMap.sceneMapToRect(bottom, ratio);
-          i.rectRight = SceneMap.sceneMapToRect(i.right, ratio);
-          i.rectLeft = SceneMap.sceneMapToRect(i.left, ratio);
+          i.rectRight = SceneMap.sceneMapToRect(right, ratio);
+          i.rectLeft = SceneMap.sceneMapToRect(left, ratio);
 
           return i;
         });
@@ -428,9 +430,9 @@ module.exports = function (data, options = {}) {
         }
 
         let rectMap;
-        if (useGlyphsMap) {
-          const wordWidth = rect.rotate ? rect.height : rect.width;
-          const glyphsMap = getGlyphsMap(canvas, rect.label, rect.fontSize, wordWidth);
+        if (considerGlyphsMap) {
+          const biggestFontSize = 30 < rect.fontSize ? rect.fontSize : 30;
+          const glyphsMap = getGlyphsMap(canvas, rect.label, biggestFontSize/*, wordWidth*/);
           rectMap = glyphsMapToRectMap(glyphsMap, {rows: rect.rows, cols: rect.cols}, rect.rotate);
         }
 
@@ -443,7 +445,7 @@ module.exports = function (data, options = {}) {
             let innerCol = 0;
             for (let col = left; col <= right; col++) {
               if (col === 0) continue;
-              if (!useGlyphsMap || (rectMap[innerRow] && rectMap[innerRow][innerCol])) {
+              if (!considerGlyphsMap || rectMap[innerRow] && rectMap[innerRow][innerCol]) {
                 sceneMap.setDataAtPosition(col, row);
                 affectedPositions.push([col, row]);
               }

@@ -1,5 +1,3 @@
-'use strict';
-
 const TOP = 'top';
 const RIGHT = 'right';
 const BOTTOM = 'bottom';
