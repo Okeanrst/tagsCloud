@@ -2,18 +2,20 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import * as actions from '../redux/actions';
-import { Link } from 'react-router-dom';
 import TagsCloud from '../components/TagsCloud';
 import TagsCloudCanvas from '../components/TagsCloudCanvas';
 import WithRawData from '../decorators/WithRawData';
 import FadeLoader from 'react-spinners/FadeLoader';
+import queryString from 'query-string';
 
 class HomePage extends Component {
   constructor(props) {
     super(props);
 
+    const { useCanvas = false } = queryString.parse(this.props.location.search);
+
     this.tagsCloudScene = React.createRef();
-    this.state = {tagsCloudSceneWidth: 1, useCanvas: false};
+    this.state = {tagsCloudSceneWidth: 1, useCanvas};
   }
 
   componentDidMount() {
@@ -60,7 +62,14 @@ class HomePage extends Component {
     }
   }
 
-  onTagClick = (id) => this.props.history.push('/' + id);
+  onTagClick = (id) => {
+    let uri = '/' + id;
+    if (this.state.useCanvas) {
+      uri += '?useCanvas=true'
+    }
+
+    this.props.history.push(uri);
+  }
 
   onToggleCheckbox = () => this.setState(({useCanvas}) => ({useCanvas: !useCanvas}))
 
@@ -74,16 +83,6 @@ class HomePage extends Component {
       />
     </div>
   )
-
-  renderTagsList = () => {return null;
-    const list = this.props.rawData.data.map(i => {
-      return (
-        <li key={i.id} ><Link to={`/${i.id}`} >{i.label}</Link></li>
-      );
-    });
-    return (<ul>{list}</ul>)
-  }
-
   render() {
     const { tagsCloudSceneWidth, useCanvas } = this.state;
     const loading = this.props.rawData.isFetching || this.props.tagsCloud.isFetching;
@@ -92,7 +91,7 @@ class HomePage extends Component {
       <div>
         {this.renderLoader(loading)}
         <div style={styles.checkbox}>
-          <input type="checkbox" value={useCanvas} onChange={this.onToggleCheckbox} />
+          <input type="checkbox" checked={useCanvas} onChange={this.onToggleCheckbox} />
           <span>use canvas</span>
         </div>
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
@@ -120,6 +119,7 @@ HomePage.propTypes = {
     isFetching: PropTypes.bool.isRequired,
   }),
   buildTagsCloud: PropTypes.func.isRequired,
+  location: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {

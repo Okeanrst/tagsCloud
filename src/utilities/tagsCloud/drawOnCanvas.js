@@ -62,5 +62,5 @@ export default function drawOnCanvas(data, canvas, allowedWidth, options = {}) {
 
   const clearParams = [minLeft * scale, -maxTop * scale, sceneWidth * scale, sceneHeight * scale];
   const restoreCoords = [-axisXOffset, -axisYOffset];
-  return {clearParams, restoreCoords};
+  return {clearParams, restoreCoords, scale};
 }
