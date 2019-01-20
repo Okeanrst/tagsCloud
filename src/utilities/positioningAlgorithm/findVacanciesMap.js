@@ -1,5 +1,5 @@
-const SceneMap = require('./sceneMap');
-const {dimensions} = require('./sceneMap');
+import SceneMap, {dimensions} from './sceneMap';
+
 const {X, MINUS_X, MINUS_Y, Y} = dimensions;
 
 function findVacancies(sceneMap, addIfEmpty = true) {
@@ -178,4 +178,4 @@ function findVacancies(sceneMap, addIfEmpty = true) {
 	return {topEdgeVacancies, rightEdgeVacancies, bottomEdgeVacancies, leftEdgeVacancies, closedVacancies};
 }
 
-module.exports = findVacancies;
+export default findVacancies;

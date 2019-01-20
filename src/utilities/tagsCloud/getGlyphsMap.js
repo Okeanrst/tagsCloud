@@ -1,4 +1,8 @@
-export function getGlyphsMap(canvas, word, fontSize, /*wordWidth_,*/ {fontFamily = 'OpenSans', fontK = 1.1} = {}) {
+// @flow
+
+export type GlyphsMap = Array<Array<boolean>>;
+
+export function getGlyphsMap(canvas, word, fontSize, {fontFamily = 'OpenSans', fontK = 1.1} = {}):GlyphsMap {
   const height = fontSize * fontK;
 
   const ctx = canvas.getContext('2d');

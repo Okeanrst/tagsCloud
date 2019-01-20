@@ -1,5 +1,3 @@
-'use strict';
-
 import React, { Component } from 'react';
 //import 'bootstrap/dist/css/bootstrap.css'
 import {Provider} from 'react-redux';

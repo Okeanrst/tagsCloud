@@ -3,9 +3,9 @@ const RIGHT = 'right';
 const BOTTOM = 'bottom';
 const LEFT = 'left';
 
-const edgesOrder = [TOP, RIGHT, BOTTOM, LEFT];
+export const edgesOrder = [TOP, RIGHT, BOTTOM, LEFT];
 
-const edges = {TOP, RIGHT, BOTTOM, LEFT};
+export const edges = {TOP, RIGHT, BOTTOM, LEFT};
 
 class EdgesManager {
 	constructor() {
@@ -35,6 +35,4 @@ class EdgesManager {
 	}
 }
 
-module.exports = EdgesManager;
-module.exports.edgesOrder = edgesOrder;
-module.exports.edges = edges;
+export default EdgesManager;

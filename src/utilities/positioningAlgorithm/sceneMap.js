@@ -1,4 +1,4 @@
-const IntersectionError = require('./IntersectionError');
+import IntersectionError from './IntersectionError';
 
 const X = 'x';
 const MINUS_X = '-x';
@@ -196,5 +196,5 @@ sceneMap.changePosition = (cur, diff) => {
   return res;
 }
 
-module.exports = sceneMap;
-module.exports.dimensions = {X, MINUS_X, MINUS_Y, Y};
+export default sceneMap;
+export const dimensions = {X, MINUS_X, MINUS_Y, Y};

@@ -1,30 +1,43 @@
-'use strict';
+// @flow
+import { iterateAsync } from '../common';
+import SceneMap, { dimensions } from './sceneMap';
+import EdgesManager from './edgesManager';
+import VacanciesManager from './vacanciesManager';
+import { edgesOrder, edges } from './edgesManager';
+import IntersectionError from './IntersectionError';
+import { glyphsMapToRectMap } from '../tagsCloud/getGlyphsMap';
 
-const SceneMap = require('./sceneMap');
-const { dimensions } = require('./sceneMap');
-const EdgesManager = require('./edgesManager');
-const VacanciesManager = require('./vacanciesManager');
-const { edgesOrder, edges } = require('./edgesManager');
-const IntersectionError = require('./IntersectionError');
-const { getGlyphsMap, glyphsMapToRectMap } = require('./getGlyphsMap');
+import type { PrepareDataItem } from '../tagsCloud';
+import type { GlyphsMap } from '../tagsCloud/getGlyphsMap';
+
 
 const { TOP, RIGHT, BOTTOM, LEFT } = edges;
 
 const ASC = 'ascendant';
 const DESC = 'descendant';
 
-module.exports = function (data, options = {}) {
+export const pickingStrategies = {ASC, DESC};
+
+export type Options = {
+  pickingClosedVacancyStrategy: string,
+  pickingEdgeVacancyStrategy: string,
+  drawFinishMap: boolean,
+  addIfEmptyIndex?: number,
+  drawStepMap: boolean,
+  drawVacanciesMap: boolean,
+};
+
+type IdGlyphsMap = {
+  id: string,
+  map: GlyphsMap,
+}
+
+export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdGlyphsMap>, options: Options = {}):Promise {
   return new Promise(function(resolve, reject) {
     try {
       const {
         pickingClosedVacancyStrategy = DESC, pickingEdgeVacancyStrategy = ASC,
-        considerGlyphsMap = true
       } = options;
-
-      let canvas;
-      if (considerGlyphsMap){
-        canvas = document.createElement('canvas');
-      }
 
       let minSize = 10;
       data.forEach(i => {
@@ -142,28 +155,15 @@ module.exports = function (data, options = {}) {
         }
       }
 
-      const allowedDuration = 50;
 
-      const performJob = (index, restTime) => {
-        const start = Date.now();
-        const rect = rectsData[index];
-
-        work(rect, index);
-
-        const nextIndex = index + 1;
-        const spent = Date.now() - start;
-        if (rectsData.length > nextIndex) {
-          if (spent >= restTime) {
-            setTimeout(performJob, 0, nextIndex, allowedDuration);
-          } else {
-            performJob(nextIndex, restTime - spent);
-          }
-        } else {
-          finish();
+      function* generateWorkers() {
+        for (let i = 0; i < rectsData.length; i++) {
+          work(rectsData[i], i);
+          yield;
         }
       }
 
-      performJob(0, allowedDuration);
+      iterateAsync(generateWorkers(), 50).then(finish);
 
       function finish() {
         if (options.drawFinishMap) {
@@ -430,10 +430,13 @@ module.exports = function (data, options = {}) {
         }
 
         let rectMap;
-        if (considerGlyphsMap) {
-          const biggestFontSize = 30 < rect.fontSize ? rect.fontSize : 30;
-          const glyphsMap = getGlyphsMap(canvas, rect.label, biggestFontSize/*, wordWidth*/);
-          rectMap = glyphsMapToRectMap(glyphsMap, {rows: rect.rows, cols: rect.cols}, rect.rotate);
+        if (dataGlyphsMap) {
+          const glyphsMap = dataGlyphsMap.find(itemMap => itemMap.id === rect.id);
+          if (glyphsMap) {
+            rectMap = glyphsMapToRectMap(glyphsMap.map, {rows: rect.rows, cols: rect.cols}, rect.rotate);
+          } else if (process.env.NODE_ENV !== 'production') {
+            throw new Error('rectMap is empty');
+          }
         }
 
         try {
@@ -445,7 +448,7 @@ module.exports = function (data, options = {}) {
             let innerCol = 0;
             for (let col = left; col <= right; col++) {
               if (col === 0) continue;
-              if (!considerGlyphsMap || rectMap[innerRow] && rectMap[innerRow][innerCol]) {
+              if (!rectMap || rectMap[innerRow] && rectMap[innerRow][innerCol]) {
                 sceneMap.setDataAtPosition(col, row);
                 affectedPositions.push([col, row]);
               }
@@ -564,7 +567,4 @@ module.exports = function (data, options = {}) {
       reject(e);
     }
   });
-
 }
-
-module.exports.pickingStrategies = {ASC, DESC};

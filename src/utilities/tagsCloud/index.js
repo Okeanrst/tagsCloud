@@ -1,10 +1,28 @@
 // @flow
+import { iterateAsync } from '../common';
+import { getGlyphsMap } from './getGlyphsMap';
+
 export type PrepareDataOptions = {
   minFontSize: number,
   maxFontSize: number  
 };
 
-export function prepareData(data, options?: PrepareDataOptions = {}) {
+export type RawDataItem = {
+  id: string,
+  label: string,
+  sentimentScore: number,
+  volume: number,
+  type: string,
+};
+
+export type PrepareDataItem = RawDataItem & {
+  fontSize: number,
+  width: number,
+  height: number,
+  fill: string,
+};
+
+export function prepareData(data: Array<RawDataItem>, options?: PrepareDataOptions = {}): Array<PrepareDataItem> {
   const { minFontSize = 6, maxFontSize = 36 } = options;
 
   let minRating;
@@ -125,4 +143,22 @@ export function randomColor(): string {
   let g = Math.round(Math.random() * 0xff);
   let b = Math.round(Math.random() * 0xff);
   return `rgb(${r}, ${g}, ${b})`;
+}
+
+export function prepareDataGlyphsMap(data: Array<RawDataItem>, minFontSize = 30):Promise {
+  return new Promise(function(resolve, reject) {
+    const canvas = document.createElement('canvas');
+
+    function* generateWorkers() {
+      for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        const biggestFontSize = minFontSize < item.fontSize ? item.fontSize : minFontSize;
+        const map = getGlyphsMap(canvas, item.label, biggestFontSize);
+        yield {id: item.id, map};
+      }
+    }
+    iterateAsync(generateWorkers(), 50)
+      .then(result => resolve(result))
+      .catch(error => reject(error));
+  });
 }

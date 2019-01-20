@@ -1,10 +1,7 @@
-'use strict';
+import findVacanciesMap from './findVacanciesMap';
+import SceneMap, { dimensions } from './sceneMap';
 
-const findVacanciesMap = require('./findVacanciesMap');
-const SceneMap = require('./sceneMap');
-const { dimensions } = require('./sceneMap');
-
-class VacanciesManager {
+export default class VacanciesManager {
 	constructor(sceneMap) {
 		this.sceneMap = sceneMap;
 
@@ -115,5 +112,3 @@ VacanciesManager.prepareClosedVacancy = function (vacancy) {
   }
 	return Object.assign(vacancy, {rows, cols, square: rows * cols});
 }
-
-module.exports = VacanciesManager;
