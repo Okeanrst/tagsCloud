@@ -31,3 +31,6 @@ export function buildTagsCloud(data) {
   };
 }
 
+export function toggleUseCanvas() {
+  return createAction(types.USE_CANVAS_TOGGLE);
+}

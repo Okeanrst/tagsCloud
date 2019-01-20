@@ -6,16 +6,13 @@ import TagsCloud from '../components/TagsCloud';
 import TagsCloudCanvas from '../components/TagsCloudCanvas';
 import WithRawData from '../decorators/WithRawData';
 import FadeLoader from 'react-spinners/FadeLoader';
-import queryString from 'query-string';
 
 class HomePage extends Component {
   constructor(props) {
     super(props);
 
-    const { useCanvas = false } = queryString.parse(this.props.location.search);
-
     this.tagsCloudScene = React.createRef();
-    this.state = {tagsCloudSceneWidth: 1, useCanvas};
+    this.state = {tagsCloudSceneWidth: 1};
   }
 
   componentDidMount() {
@@ -62,16 +59,7 @@ class HomePage extends Component {
     }
   }
 
-  onTagClick = (id) => {
-    let uri = '/' + id;
-    if (this.state.useCanvas) {
-      uri += '?useCanvas=true'
-    }
-
-    this.props.history.push(uri);
-  }
-
-  onToggleCheckbox = () => this.setState(({useCanvas}) => ({useCanvas: !useCanvas}))
+  onTagClick = (id) => this.props.history.push('/' + id);
 
   renderLoader = (loading) => (
     <div style={styles.loaderContainer} >
@@ -84,21 +72,22 @@ class HomePage extends Component {
     </div>
   )
   render() {
-    const { tagsCloudSceneWidth, useCanvas } = this.state;
-    const loading = this.props.rawData.isFetching || this.props.tagsCloud.isFetching;
+    const { tagsCloudSceneWidth } = this.state;
+    const { useCanvas, rawData, tagsCloud, toggleUseCanvas } = this.props;
+    const loading = rawData.isFetching || tagsCloud.isFetching;
     const TagsCloudComponent = useCanvas ?  TagsCloudCanvas : TagsCloud;
     return (
       <div>
         {this.renderLoader(loading)}
         <div style={styles.checkbox}>
-          <input type="checkbox" checked={useCanvas} onChange={this.onToggleCheckbox} />
+          <input type="checkbox" checked={useCanvas} onChange={toggleUseCanvas} />
           <span>use canvas</span>
         </div>
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
-          {this.props.tagsCloud.data && (
+          {tagsCloud.data && (
             <TagsCloudComponent
               width={tagsCloudSceneWidth}
-              data={this.props.tagsCloud.data}
+              data={tagsCloud.data}
               onTagClick={this.onTagClick}
             />
           )}
@@ -119,18 +108,22 @@ HomePage.propTypes = {
     isFetching: PropTypes.bool.isRequired,
   }),
   buildTagsCloud: PropTypes.func.isRequired,
+  toggleUseCanvas: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
-  const { tagsCloud } = state;
-  return {tagsCloud}
+  const { tagsCloud, useCanvas } = state;
+  return {tagsCloud, useCanvas};
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   buildTagsCloud(...args) {
     dispatch(actions.buildTagsCloud(...args));
   },
+  toggleUseCanvas() {
+    dispatch(actions.toggleUseCanvas());
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WithRawData(HomePage));

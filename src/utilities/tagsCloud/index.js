@@ -1,4 +1,10 @@
-export function prepareData(data, options = {}) {
+// @flow
+export type PrepareDataOptions = {
+  minFontSize: number,
+  maxFontSize: number  
+};
+
+export function prepareData(data, options?: PrepareDataOptions = {}) {
   const { minFontSize = 6, maxFontSize = 36 } = options;
 
   let minRating;
@@ -59,7 +65,7 @@ export function getBorderCoordinates(data) {
   return {top: maxTop, bottom: minBottom, right: maxRight, left: minLeft};
 }
 
-export function calcAllowedWidth(width) {
+export function calcAllowedWidth(width: number): number {
   const aspectRatio = document.documentElement.clientWidth / document.documentElement.clientHeight;
   let allowedWidth = width * 0.9;
   if (aspectRatio >= 1) {
@@ -68,12 +74,12 @@ export function calcAllowedWidth(width) {
   return allowedWidth;
 }
 
-export function adaptDataToScene(data, allowedWidth) {
+export function adaptDataToScene(data, allowedWidth: number) {
   const {
     top: maxTop, bottom: minBottom, right: maxRight, left: minLeft
   } = getBorderCoordinates(data);
 
-  const scale = allowedWidth * 0.8 / (maxRight - minLeft) ;
+  const scale = allowedWidth / (maxRight - minLeft);
 
   /*data.forEach(item => {
     item.rectTranslateX = (item.rectLeft) * scale;
@@ -114,7 +120,7 @@ export function adaptDataToScene(data, allowedWidth) {
   return res;
 }
 
-export function randomColor() {
+export function randomColor(): string {
   let r = Math.round(Math.random() * 0xff);
   let g = Math.round(Math.random() * 0xff);
   let b = Math.round(Math.random() * 0xff);

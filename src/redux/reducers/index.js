@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 import {
   FETCH_DATA_REQUEST, FETCH_DATA_SUCCESS, FETCH_DATA_FAILURE,
   PROCESS_DATA_REQUEST, PROCESS_DATA_SUCCESS, PROCESS_DATA_FAILURE,
+  USE_CANVAS_TOGGLE
 } from '../actions/actionTypes';
 
 const rawDataReducer = (state = {isFetching: false}, action) => {
@@ -32,7 +33,13 @@ const tagsCloudReducer = (state = {isFetching: false}, action) => {
   }
 };
 
+const useCanvasReducer = (state = false, action) => {
+  if (action.type === USE_CANVAS_TOGGLE) return !state;
+  return state;
+}
+
 export default combineReducers({
   rawData: rawDataReducer,
   tagsCloud: tagsCloudReducer,
+  useCanvas: useCanvasReducer,
 });
