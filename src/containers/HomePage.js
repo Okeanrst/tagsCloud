@@ -59,7 +59,7 @@ class HomePage extends Component {
     }
   }
 
-  onTagClick = (id) => this.props.history.push('/' + id);
+  onTagClick = (id) => this.props.history.push('/' + encodeURIComponent(id));
 
   renderLoader = (loading) => (
     <div style={styles.loaderContainer} >
@@ -79,8 +79,14 @@ class HomePage extends Component {
     return (
       <div>
         {this.renderLoader(loading)}
-        <div style={styles.checkbox}>
-          <input type="checkbox" checked={useCanvas} onChange={toggleUseCanvas} id="useCanvas" />
+        <div style={styles.checkbox} className="form-group form-check" >
+          <input
+            type="checkbox"
+            checked={useCanvas}
+            onChange={toggleUseCanvas}
+            id="useCanvas"
+            className="form-check-input"
+          />
           <label htmlFor="useCanvas" >use canvas</label >
         </div>
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
@@ -134,5 +140,5 @@ const styles = {
     width: '100%'
   },
   tagsCloudScene: {width: '100%', display: 'flex', justifyContent: 'center',},
-  checkbox: {display: 'flex', position: 'absolute', top: '20px', left: '20px'}
+  checkbox: {position: 'absolute', top: '20px', left: '20px'}
 };

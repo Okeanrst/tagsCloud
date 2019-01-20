@@ -14,7 +14,7 @@ class TagInformation extends Component {
   }
 
   getTagData = (rawData) => {
-    const id = this.props.match.params.id
+    const id = decodeURIComponent(this.props.match.params.id)
     let data;
     if (rawData.data) {
       data = rawData.data.find(i => i.id === id);
@@ -40,9 +40,9 @@ class TagInformation extends Component {
     const {negative = 0, neutral = 0, positive = 0} = sentiment;
     return (
       <ul style={styles.sentiment} >
-        <li key="negative" >{negative}, </li>
-        <li key="neutral" >{neutral}, </li>
-        <li key="positive" >{positive}</li>
+        <li key="negative" className="badge badge-secondary" >negative {negative}</li>
+        <li key="neutral" className="badge badge-secondary" style={{marginLeft: '8px'}} >neutral {neutral}</li>
+        <li key="positive" className="badge badge-secondary" style={{marginLeft: '8px'}} >positive {positive}</li>
       </ul>
     );
   }
@@ -56,36 +56,61 @@ class TagInformation extends Component {
     );
   }
 
-  renderDaysPicker = (icon) => (<span onClick={this.toggleDays} >{icon}</span>);
+  renderDaysPicker = (icon) => (
+    <div style={styles.daysPicker} onClick={this.toggleDays} key="daysPicker" >
+      {icon}
+    </div>
+  );
+
 
   render() {
     const data = this.getTagData(this.props.rawData);
     if (!data) return null;
     const showDays = this.state.showDays;
 
-    const { id, label, volume, type, sentiment, sentimentScore, burst, days, pageType } = data;
+    const { label, volume, type, sentiment, sentimentScore, burst, days, pageType } = data;
+
+    const listItems = [
+      {key: 'label', rows: ['label:', label]},
+      {key: 'volume', rows: ['volume:', volume]},
+      {key: 'type', rows: ['type:', type]},
+      {key: 'sentimentScore', rows: ['sentimentScore:', sentimentScore]},
+      {key: 'sentiment', rows: ['sentiment:', () => this.renderSentiment(sentiment)]},
+      {key: 'burst', rows: ['burst:', burst]},
+      {key: 'daysPick', rows: [
+          () => (['days: ', (showDays ? this.renderDaysPicker('-') : days.length ? this.renderDaysPicker('+') : 0)]),
+          () => (showDays && this.renderDays(days))
+      ]},
+      {key: 'pageType', rows: ['sentiment:', () => this.renderPageType(pageType)]},
+    ];
+
+    const renderIt = (it) => typeof it === 'function' ? it() : it
 
     return (
-      <ul style={styles.containerStyle} >
-        <li key="label" >label: {label}</li>
-        <li key="volume" >volume: {volume}</li>
-        <li key="type" >type: {type}</li>
-        <li key="sentiment" style={{display: 'flex'}} >sentiment: {this.renderSentiment(sentiment)}</li>
-        <li key="sentimentScore" >sentimentScore: {sentimentScore}</li>
-        <li key="burst" >burst: {burst}</li>
-        <li key="daysPick" >days: {showDays ? this.renderDaysPicker('-') : days.length ? this.renderDaysPicker('+') : 0}</li>
-        <li key="days" >{showDays && this.renderDays(days)}</li>
-        <li key="pageType" >pageType:{this.renderPageType(pageType)}</li>
+      <ul style={styles.containerStyle} className="list-group list-group-flush" key="tagInformation" >
+        {listItems.map(i => (
+          <li key={i.key} className="list-group-item" style={styles.listItems} >
+            {i.rows && [
+              <div style={{display: 'flex', flex: 2}} key="0" >{renderIt(i.rows[0])}</div>,
+              <div style={{flex: 10}} key="1" >{renderIt(i.rows[1])}</div>
+            ]}
+          </li>
+        ))}
       </ul>
     );
   }
 }
 
 const styles = {
+  listItems: {display: 'flex',},
   containerStyle: {listStyle: 'none'},
-  pageType: {listStyle: 'none'},
-  days: {listStyle: 'none'},
-  sentiment: {listStyle: 'none', display: 'flex', textAlign: 'center', alignItems: 'center', padding: '0px', marginLeft: '24px'},
+  pageType: {listStyle: 'none', padding: '0px'},
+  days: {listStyle: 'none', padding: '0px'},
+  sentiment: {listStyle: 'none', display: 'flex', alignItems: 'center', padding: '0px'},
+  daysPicker: {
+    display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%',
+    height: '1.5em', width: '1.5em', backgroundColor: '#e3f2fd', marginLeft: '1.5em',
+  }
 };
 
 const TagInformationRenderer = {};

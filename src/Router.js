@@ -13,10 +13,9 @@ const Router = () => {
       <Switch>
         <Route exact path="/" component={HomePage}/>
         <Route exact path="/notFound" component={NotFoundPage}/>
-        <Route
-          path='/:id'
-          render={(props) => <Layout><TagInformation {...props} /></Layout>}
-        />
+        <Layout>
+          <Route path='/:id' component={TagInformation} />
+        </Layout>
         <Route component={NotFoundPage}/>
       </Switch>
     </div>
