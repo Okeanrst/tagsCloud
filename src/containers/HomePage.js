@@ -80,8 +80,8 @@ class HomePage extends Component {
       <div>
         {this.renderLoader(loading)}
         <div style={styles.checkbox}>
-          <input type="checkbox" checked={useCanvas} onChange={toggleUseCanvas} />
-          <span>use canvas</span>
+          <input type="checkbox" checked={useCanvas} onChange={toggleUseCanvas} id="useCanvas" />
+          <label htmlFor="useCanvas" >use canvas</label >
         </div>
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
           {tagsCloud.data && (
@@ -134,5 +134,5 @@ const styles = {
     width: '100%'
   },
   tagsCloudScene: {width: '100%', display: 'flex', justifyContent: 'center',},
-  checkbox: {display: 'inline-block', position: 'absolute', top: '20px', left: '20px'}
+  checkbox: {display: 'flex', position: 'absolute', top: '20px', left: '20px'}
 };

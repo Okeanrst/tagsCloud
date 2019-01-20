@@ -1,30 +1,33 @@
 export function iterateAsync(iterable, allowedDuration = 50) {
-  return new Promise(function(resolve, reject) {
-    const values = [];
-    let iterationsCount = 0;
-    const iterate = (restTime) => {
-      const start = Date.now();
-
-      const {done, value} = iterable.next();
-
-      const spent = Date.now() - start;
-      if (!done) {
-        values.push(value);
-
-        iterationsCount++;
-
-        if (spent >= restTime) {
-          setTimeout(iterate, 0, allowedDuration);
-        } else {
-          iterate(restTime - spent);
+  return new Promise(async function(resolve, reject) {
+    const withDelay = () => (new Promise((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          const res = iterable.next();
+          resolve(res);
+        } catch (err) {
+          reject(err);
         }
-      } else if (iterationsCount > 999) {
-        reject(new Error('Maximum number of iterations reached'));
-      } else {
-        resolve(values);
-      }
-    };
+      }, 0);
+    }));
 
-    iterate(allowedDuration);
+    let restTime = allowedDuration;
+    const start = Date.now();
+    const values = [];
+
+    let {done, value} = iterable.next();
+
+    while(!done) {
+      values.push(value);
+      const spent = Date.now() - start;
+      if (spent >= restTime) {
+        restTime = allowedDuration;
+        ({done, value} = await withDelay());        
+      } else {
+        restTime = restTime - spent;
+        ({done, value} = iterable.next());        
+      }
+    }
+    resolve(values);    
   });
 }
