@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {adaptDataToScene, calcAllowedWidth} from '../utilities/tagsCloud';
+import { Transition, TransitionGroup } from 'react-transition-group';
 
 const TagsCloud = ({width, data, onTagClick}) => {
   const allowedWidth = calcAllowedWidth(width);
@@ -13,24 +14,49 @@ const TagsCloud = ({width, data, onTagClick}) => {
   const axisXOffset = - minLeft + sceneWidth * (padding - 1)/2;
   const axisYOffset = maxTop + sceneHeight * (padding - 1)/2;
 
+  const duration = 500;
+
+  const defaultStyle = {
+    transition: `all ${duration}ms ease-in-out`,
+    opacity: 0,
+  }
+
   return (
-    <div style={{display: 'inline-block'}} >
-      <svg id="small_cloud" width={sceneWidth} height={sceneHeight} >
+    <div style={{display: 'inline-block'}}>
+      <svg id="small_cloud" width={sceneWidth} height={sceneHeight}>
         <g transform={`translate(${axisXOffset}, ${axisYOffset})`}>
-          {preparedData.map((i, ind) => {
-            const style = {fontSize: `${i.adaptFontSize}px`, fontFamily: 'OpenSans', fill: i.fill};
-            return (
-              <text
-                key={`${i.id}_${ind}`}
-                textAnchor="middle"
-                transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
-                style={style}
-                onClick={() => onTagClick(i.id)}
-              >
-                {i.label}
-              </text>
-            )
-          })}
+          <TransitionGroup className="tagsCloud" component={null} enter appear exite={false} >
+            {preparedData.map((i, ind) => {
+              const style = {fontSize: `${i.adaptFontSize}px`, fontFamily: 'Open Sans', fill: i.fill};
+              const transitionStyles = {
+                exited: { opacity: 0, transform: `translate(${i.rectTranslateX}px,${i.rectTranslateY}px) rotate(${i.rotate ? 90 : 0}deg) scale(1)` },
+                entering: { opacity: 0, transform: `translate(${i.rectTranslateX}px,${i.rectTranslateY}px) rotate(${i.rotate ? 90 : 0}deg) scale(0.1)` },
+                entered:  { opacity: 1, transform: `translate(${i.rectTranslateX}px,${i.rectTranslateY}px) rotate(${i.rotate ? 90 : 0}deg) scale(1)` },
+              };
+
+              return (
+                <Transition
+                  key={i.id}
+                  timeout={duration}
+                  //classNames="tagText"
+                >
+                  {(state) => {
+                    return (
+                      <text
+                        key={`${i.id}_${ind}`}
+                        textAnchor="middle"
+                        //transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}                        
+                        style={{...style, ...defaultStyle, ...transitionStyles[state]}}
+                        onClick={() => onTagClick(i.id)}                    
+                      >
+                        {i.label}
+                      </text>
+                    )
+                  }}                 
+                </Transition>
+              )
+            })}
+          </TransitionGroup>
           {false && drawAxises()}
         </g>
       </svg>
@@ -39,7 +65,7 @@ const TagsCloud = ({width, data, onTagClick}) => {
 }
 
 function drawAxises () {
-  const style = {fontSize: `${2}px`, fontFamily: 'OpenSans', fill: 'rgb(0, 0, 0)'};
+  const style = {fontSize: `${2}px`, fontFamily: 'Open Sans', fill: 'rgb(0, 0, 0)'};
   return [
     <text
       key={`x`}

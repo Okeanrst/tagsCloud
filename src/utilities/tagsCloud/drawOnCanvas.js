@@ -1,7 +1,7 @@
 import {getBorderCoordinates} from './index';
 
 export default function drawOnCanvas(data, canvas, allowedWidth, options = {}) {
-  const { padding = 1.1, fontFamily = 'OpenSans', drawAxises = false } = options;
+  const { padding = 1.1, fontFamily = 'Open Sans', drawAxises = false } = options;
   const {
     top: maxTop, bottom: minBottom, right: maxRight, left: minLeft
   } = getBorderCoordinates(data);

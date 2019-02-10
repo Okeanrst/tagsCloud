@@ -2,7 +2,7 @@
 
 export type GlyphsMap = Array<Array<boolean>>;
 
-export function getGlyphsMap(canvas, word, fontSize, {fontFamily = 'OpenSans', fontK = 1.1} = {}):GlyphsMap {
+export function getGlyphsMap(canvas, word, fontSize, {fontFamily = 'Open Sans', fontK = 1.1} = {}):GlyphsMap {
   const height = fontSize * fontK;
 
   const ctx = canvas.getContext('2d');

@@ -1,5 +1,5 @@
 // @flow
-import { iterateAsync } from '../common';
+import splitAndPerformWork from '../common/splitAndPerformWork';
 import { getGlyphsMap } from './getGlyphsMap';
 
 export type PrepareDataOptions = {
@@ -46,7 +46,7 @@ export function prepareData(data: Array<RawDataItem>, options?: PrepareDataOptio
   const fontSizeFactor = 1.1;
 
   data.forEach(item => {
-    ctx.font = `${item.fontSize}px OpenSans`;
+    ctx.font = `${item.fontSize}px Open Sans`;
     const measure = ctx.measureText(item.label);
     item.width = measure.width;
 
@@ -157,7 +157,7 @@ export function prepareDataGlyphsMap(data: Array<RawDataItem>, minFontSize = 30)
         yield {id: item.id, map};
       }
     }
-    iterateAsync(generateWorkers(), 50)
+    splitAndPerformWork(generateWorkers, 50)
       .then(result => resolve(result))
       .catch(error => reject(error));
   });

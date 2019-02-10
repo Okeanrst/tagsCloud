@@ -1,5 +1,8 @@
-export function iterateAsync(iterable, allowedDuration = 50) {
+// @flow
+
+export default function(generateWorkers: Generator, allowedDuration: number = 50) {
   return new Promise(async function(resolve, reject) {
+    const iterable = generateWorkers();
     const withDelay = () => (new Promise((resolve, reject) => {
       setTimeout(() => {
         try {

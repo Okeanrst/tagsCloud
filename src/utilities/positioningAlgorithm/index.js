@@ -1,5 +1,5 @@
 // @flow
-import { iterateAsync } from '../common';
+import splitAndPerformWork from '../common/splitAndPerformWork';
 import SceneMap, { dimensions } from './sceneMap';
 import EdgesManager from './edgesManager';
 import VacanciesManager from './vacanciesManager';
@@ -163,7 +163,7 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
         }
       }
 
-      iterateAsync(generateWorkers(), 50).then(finish);
+      splitAndPerformWork(generateWorkers, 50).then(finish);
 
       function finish() {
         if (options.drawFinishMap) {
