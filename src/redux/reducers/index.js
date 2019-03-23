@@ -4,6 +4,7 @@ import {
   PROCESS_DATA_REQUEST, PROCESS_DATA_SUCCESS, PROCESS_DATA_FAILURE,
   USE_CANVAS_TOGGLE
 } from '../actions/actionTypes';
+import fontLoaded from './fontLoaded';
 
 const rawDataReducer = (state = {isFetching: false}, action) => {
   switch (action.type) {
@@ -40,4 +41,5 @@ export default combineReducers({
   rawData: rawDataReducer,
   tagsCloud: tagsCloudReducer,
   useCanvas: useCanvasReducer,
+  fontLoaded,
 });

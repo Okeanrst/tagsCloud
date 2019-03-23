@@ -16,7 +16,15 @@ function withRawData(Component) {
     }
 
     componentDidMount() {
-      if (!this.props.rawData.data && !this.props.rawData.isFetching) {
+      const { rawData, fontLoaded } = this.props;
+      if (fontLoaded.data && !rawData.data && !rawData.isFetching) {
+        this.props.getData();
+      }
+    }
+
+    componentDidUpdate(prevProps) {
+      const { rawData, fontLoaded } = this.props;
+      if (!prevProps.fontLoaded.data && fontLoaded.data && !rawData.data && !rawData.isFetching) {
         this.props.getData();
       }
     }
@@ -35,8 +43,8 @@ function withRawData(Component) {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { rawData } = state;
-  return {rawData};
+  const { rawData, fontLoaded } = state;
+  return {rawData, fontLoaded};
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

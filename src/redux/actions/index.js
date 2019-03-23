@@ -1,9 +1,8 @@
-import * as types from './actionTypes'
+import * as types from './actionTypes';
 import api from '../../api';
 import calcPositions from '../../utilities/positioningAlgorithm';
 import { prepareData, prepareDataGlyphsMap } from '../../utilities/tagsCloud';
-
-const createAction = (type, data) => ({type, data});
+import { createAction } from './helpers';
 
 export function getData() {
   return (dispatch) => {

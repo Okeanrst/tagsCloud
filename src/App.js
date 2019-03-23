@@ -4,8 +4,11 @@ import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
 import Router from './Router';
 import configureStore from './redux/store/configureStore';
+import loadFont from './redux/actions/loadFont';
 
 const store = configureStore();
+
+store.dispatch(loadFont());
 
 class App extends Component {
   render() {
@@ -18,5 +21,4 @@ class App extends Component {
     );
   }
 }
-
-export default App
+export default App;
