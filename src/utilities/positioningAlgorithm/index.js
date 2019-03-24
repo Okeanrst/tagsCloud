@@ -459,7 +459,6 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
         } catch (e) {
           if (e instanceof IntersectionError) {
             recoverClosedVacanciesState();
-            return false;
           }
           throw e;
         }
@@ -470,13 +469,11 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
           console.clear();
           sceneMap.drawItself();
         }
-        return true;
       }
 
       function layRect(rect) {
-        if (updateSceneMap(rect)) {
-          laidRectsData.push(rect);
-        }
+        updateSceneMap(rect);
+        laidRectsData.push(rect);
       }
 
       function creatLaidRect(rect, {top, right, bottom, left}) {
