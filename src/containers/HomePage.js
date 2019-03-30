@@ -16,7 +16,9 @@ class HomePage extends Component {
   }
 
   componentDidMount() {
-    if (this.props.rawData.data && !this.props.tagsCloud.data && !this.props.tagsCloud.isFetching) {
+    //!prevProps.fontLoaded.data && fontLoaded.data
+    const { rawData, tagsCloud,  } = this.props;
+    if (rawData.data && !tagsCloud.data && !tagsCloud.isFetching) {
       this.props.buildTagsCloud(this.props.rawData.data);
     }
     window.addEventListener('resize', this.handleResize);
@@ -52,14 +54,14 @@ class HomePage extends Component {
       }
     }
 
-    const delay = 500
+    const delay = 500;
 
     if (!this.resizeTaskTimer) {
-      this.resizeTaskTimer = setTimeout(recalcState, delay)
+      this.resizeTaskTimer = setTimeout(recalcState, delay);
     }
   }
 
-  onTagClick = (id) => this.props.history.push('/' + encodeURIComponent(id));
+  onTagClick = (id) => this.props.history.push('/tag/' + encodeURIComponent(id));
 
   renderLoader = (loading) => (
     <div style={styles.loaderContainer} >
@@ -73,8 +75,8 @@ class HomePage extends Component {
   )
   render() {
     const { tagsCloudSceneWidth } = this.state;
-    const { useCanvas, rawData, tagsCloud, toggleUseCanvas } = this.props;
-    const loading = rawData.isFetching || tagsCloud.isFetching;
+    const { useCanvas, rawData, tagsCloud, toggleUseCanvas, fontLoaded } = this.props;
+    const loading = rawData.isFetching || tagsCloud.isFetching || fontLoaded.isFetching;
     const TagsCloudComponent = useCanvas ?  TagsCloudCanvas : TagsCloud;
     return (
       <div>
@@ -113,14 +115,18 @@ HomePage.propTypes = {
     data: PropTypes.array,
     isFetching: PropTypes.bool.isRequired,
   }),
+  fontLoaded: PropTypes.shape({
+    data: PropTypes.bool.isRequired,
+    isFetching: PropTypes.bool.isRequired,
+  }),
   buildTagsCloud: PropTypes.func.isRequired,
   toggleUseCanvas: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
-  const { tagsCloud, useCanvas } = state;
-  return {tagsCloud, useCanvas};
+  const { tagsCloud, useCanvas, fontLoaded, rawData } = state;
+  return {tagsCloud, useCanvas, fontLoaded, rawData };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

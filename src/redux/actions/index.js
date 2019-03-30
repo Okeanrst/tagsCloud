@@ -35,3 +35,10 @@ export function buildTagsCloud(data) {
 export function toggleUseCanvas() {
   return createAction(types.USE_CANVAS_TOGGLE);
 }
+
+export function deleteDataItem(id) {
+  return (dispatch) => {
+    dispatch(createAction(types.DELETE_DATA_ITEM, id));
+    dispatch(createAction(types.RESET_TAGS_CLOUD_DATA));
+  };
+}

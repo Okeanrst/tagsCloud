@@ -10,6 +10,7 @@ const Layout = ({ children }) => (
   <main role="main" className="container">
     <nav key="nav" className="navbar navbar-light mb-4" style={styles.navbar} >
       <Link to="/" className="navbar-brand" >Home page</Link>
+      <Link to="/tagsListEditor" className="navbar-brand" >Tags list editor</Link>
     </nav>
     {children}
   </main>

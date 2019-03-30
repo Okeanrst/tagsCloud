@@ -1,0 +1,28 @@
+.active-modal-root, .modalWindowLayout, .modalWindowContainer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+.modalWindowLayout {
+  background-color: grey;
+  opacity: 0.5;
+  z-index: 1001;
+}
+
+.modalWindowContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+}
+
+.modalWindowContainer .smallModalWindow {
+  width: 50%;
+  max-width: 550px;
+  z-index: 1010;
+  padding: 24px;
+  background-color: white;
+}
