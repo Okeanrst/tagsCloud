@@ -33,7 +33,10 @@ class HomePage extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevProps.rawData.data && this.props.rawData.data && !this.props.tagsCloud.data) {
+    if (
+      !prevProps.rawData.data && this.props.rawData.data && !this.props.tagsCloud.data ||
+      prevProps.rawData.data && prevProps.rawData.data !== this.props.rawData.data
+    ) {
       this.props.buildTagsCloud(this.props.rawData.data);
     }
   }

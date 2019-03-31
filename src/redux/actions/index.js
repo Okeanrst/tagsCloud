@@ -3,12 +3,16 @@ import api from '../../api';
 import calcPositions from '../../utilities/positioningAlgorithm';
 import { prepareData, prepareDataGlyphsMap } from '../../utilities/tagsCloud';
 import { createAction } from './helpers';
+import validateTagsCloudRawData from './rawDataValidator';
 
 export function getData() {
   return (dispatch) => {
     dispatch(createAction(types.FETCH_DATA_REQUEST));
     return api.getData()
       .then(response => {
+        if (!validateTagsCloudRawData(response)){
+          throw new Error('Raw tagsCloud data is invalid');
+        }
         dispatch(createAction(types.FETCH_DATA_SUCCESS, response));
       })
       .catch(error => {

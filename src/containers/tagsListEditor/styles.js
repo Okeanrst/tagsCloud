@@ -1,4 +1,14 @@
 const styles = {
+  cloudConfFiles: {
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    padding: '24px'
+  },
+  fileUploader: {
+
+  },
+  fileUploaderLabel: {
+    display: 'block',
+  },
   loaderContainer: {
     position: 'absolute', display: 'flex', justifyContent: 'center',
     width: '100%'

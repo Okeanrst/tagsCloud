@@ -5,7 +5,8 @@ import WithRawData from '../../decorators/WithRawData';
 import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from '../../redux/actions';
 import styles from './styles';
-import SmallModalWindow from "../../components/modalWindows/SmallModalWindow";
+import SmallModalWindow from '../../components/modalWindows/SmallModalWindow';
+import { downloadCloudRawDataFile, uploadCloudRawDataFile } from '../../redux/actions/tagsCloudConfFile';
 
 class TagsListEditor extends Component {
   constructor(props) {
@@ -26,7 +27,30 @@ class TagsListEditor extends Component {
     </div>
   )
 
-  renderFileUploader = () => null;
+  uploadCloudRawDataFile = e => {
+    this.props.uploadCloudRawDataFile(e.target.files[0]);
+  }
+
+  renderFileUploader = () => (
+    <div style={styles.fileUploader} >
+      <label htmlFor="cloud_conf_upload" style={styles.fileUploaderLabel} >
+        Choose tags cloud configuration file (*.json)
+      </label>
+      <input id="cloud_conf_upload" type="file" onChange={this.uploadCloudRawDataFile} accept=".json" />
+    </div>
+  )
+
+  downloadCloudRawDataFile = () => {
+    const tagsCloudData = this.props.rawData.data;
+    if (!tagsCloudData) return;
+    downloadCloudRawDataFile(tagsCloudData);
+  }
+
+  renderFileDownloader = () => (
+    <button onClick={this.downloadCloudRawDataFile} >
+      Download tags cloud as a file
+    </button>
+  )
 
   renderConfirmDelete = (id) => {
     const resetId = () => this.setState({id: undefined});
@@ -84,7 +108,12 @@ class TagsListEditor extends Component {
     return (
       <div>
         {this.renderLoader(loading)}
-        {!loading && this.renderFileUploader()}
+        {!loading && (
+          <div key="cloudConfFiles" style={styles.cloudConfFiles}>
+            {this.renderFileUploader()}
+            {rawData.data && this.renderFileDownloader()}
+          </div>
+        )}
         {rawData.data && this.renderList(rawData.data)}
         {this.state.id !== undefined && this.renderConfirmDelete(this.state.id)}
       </div>
@@ -98,6 +127,7 @@ TagsListEditor.propTypes = {
     isFetching: PropTypes.bool.isRequired,
   }),
   deleteTag: PropTypes.func.isRequired,
+  uploadCloudRawDataFile: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
@@ -108,6 +138,9 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => ({
   deleteTag(id) {
     dispatch(actions.deleteDataItem(id));
+  },
+  uploadCloudRawDataFile(...args) {
+    dispatch(uploadCloudRawDataFile(...args));
   },
 });
 
