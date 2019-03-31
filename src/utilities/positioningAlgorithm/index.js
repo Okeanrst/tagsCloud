@@ -102,15 +102,14 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
           }
 
           if (rectPosition) {
-            needVacanciesRefresh = true;
             try {
               layRect(creatLaidRect(rect, rectPosition));
+              needVacanciesRefresh = true;
             } catch (e) {
               if (e instanceof IntersectionError) {
                 return tryPickClosedVacancy();
               }
             }
-
             return true;
           }
         }
@@ -128,11 +127,16 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
             const rectPosition = pickEdgeVacancy(rect, edge, {force, threshold});
 
             if (rectPosition) {
-              layRect(creatLaidRect(rect, rectPosition));
-
-              updateVacancies(addIfEmpty);
-              needVacanciesRefresh = false;
-              return;
+              try {
+                layRect(creatLaidRect(rect, rectPosition));
+                updateVacancies(addIfEmpty);
+                needVacanciesRefresh = false;
+                return;
+              } catch (e) {
+                if (!(e instanceof IntersectionError)) {
+                  throw e;
+                }
+              }
             }
           }
         }
@@ -142,12 +146,16 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
           const edge = edgesManager.getNextEdge(sizeRatio);
 
           const rectPosition = placeRectOutsideScene(rect, edge);
-          layRect(creatLaidRect(rect, rectPosition));
-
-          updateVacancies(addIfEmpty);
-          needVacanciesRefresh = false;
-
-          return ;
+          try {
+            layRect(creatLaidRect(rect, rectPosition));
+            updateVacancies(addIfEmpty);
+            needVacanciesRefresh = false;
+            return;
+          } catch (e) {
+            if (!(e instanceof IntersectionError)) {
+              throw e;
+            }
+          }
         }
 
         if (process.env.NODE_ENV !== 'production') {
