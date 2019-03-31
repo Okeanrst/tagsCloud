@@ -12,9 +12,9 @@ const Router = () => {
   return (
     <div>
       <Switch>
-        <Route exact path="/" component={HomePage}/>
-        <Route exact path="/notFound" component={NotFoundPage}/>
         <Layout>
+          <Route exact path="/" component={HomePage}/>
+          <Route exact path="/notFound" component={NotFoundPage}/>
           <Route exact path="/tagsListEditor" component={TagsListEditor} />
           <Route path="/tag/:id" component={TagInformation} />
         </Layout>

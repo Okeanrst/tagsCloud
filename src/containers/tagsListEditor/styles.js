@@ -21,6 +21,19 @@ const styles = {
   confirmDeleteButtons: {
     marginTop: '100px', display: 'flex', justifyContent: 'flex-end',
   },
+  tagsList: {
+    listStyleType: 'none', paddingLeft: 0,
+  },
+  tagsListRow: {
+    display: 'flex',
+  },
+  tagsListLabel: {
+    flexGrow: 12, textOverflow: 'ellipsis',
+  },
+  tagsListScore: {flexShrink: 0, width: '24px', marginLeft: '12px'},
+  tagsListButton: {
+    flexShrink: 0, marginLeft: '12px'
+  },
 };
 
 export default styles;

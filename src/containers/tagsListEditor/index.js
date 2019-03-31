@@ -87,14 +87,21 @@ class TagsListEditor extends Component {
     }
   }
 
+  onEdit = (e) => {
+    //TODO
+    const id = e.target.dataset.id;
+    console.log('edit id: ', id);
+  }
+
   renderList = (data) => {
     return (
-      <ul>
+      <ul style={styles.tagsList} >
         {data.map(item => (
-          <li key={item.id} >
-            <span key="label" >{item.label}</span>
+          <li key={item.id} style={styles.tagsListRow} >
+            <span key="label" style={styles.tagsListLabel} >{item.label}</span>
             <span key="sentimentScore" >{item.sentimentScore}</span>
-            <button data-id={item.id} onClick={this.onDelete} >delete</button>
+            <button data-id={item.id} onClick={this.onEdit} style={styles.tagsListButton} >edit</button>
+            <button data-id={item.id} onClick={this.onDelete} style={styles.tagsListButton} >delete</button>
           </li>
         ))}
       </ul>
