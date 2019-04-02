@@ -17,8 +17,11 @@ class EdgesManager {
 		const sorter = (a, b) => this.edgesStatistics[a] - this.edgesStatistics[b];
 		const edges = (sizeRatio === 1 ? edgesOrder : sizeRatio < 1 ? [RIGHT, LEFT] : [TOP, BOTTOM]).sort(sorter);
 		const edge = edges[0];
-		this.edgesStatistics[edge]++;
 		return edge;	
+	}
+
+  confirmEdgeUsage(usedEdge) {
+    this.edgesStatistics[usedEdge]++;
 	}
 
 	getNextVacanciesEdge(spentEdges = []) {

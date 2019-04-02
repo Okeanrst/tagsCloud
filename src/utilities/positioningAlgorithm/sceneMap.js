@@ -28,20 +28,24 @@ sceneMap.prototype.getSceneSize = function getSceneSize() {
 }
 
 sceneMap.prototype.calcSceneSize = function getSceneSize() {
+  //TODO
+  //it is a bad idea to calc sceneSize using array.length
+  // because releasePosition uses undefined to reset cell value which lead to
+  // [undefined, undefined].length === 2
   //Y
 	if (this.sceneMap['xy'].length > this.sizeY) {
     this.sizeY = this.sceneMap['xy'].length;
 	}
-
   if (this.sceneMap['-xy'].length > this.sizeY) {
     this.sizeY = this.sceneMap['-xy'].length;
   }
+
 	//-Y
   if (this.sceneMap['x-y'].length > this.sizeMinusY) {
     this.sizeMinusY = this.sceneMap['x-y'].length
   }
-  if (this.sceneMap['x-y'].length > this.sizeMinusY) {
-    this.sizeMinusY = this.sceneMap['x-y'].length
+  if (this.sceneMap['-x-y'].length > this.sizeMinusY) {
+    this.sizeMinusY = this.sceneMap['-x-y'].length
   }
 
   //X

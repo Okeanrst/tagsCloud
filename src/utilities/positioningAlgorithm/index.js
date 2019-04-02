@@ -146,10 +146,12 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
           const edge = edgesManager.getNextEdge(sizeRatio);
 
           const rectPosition = placeRectOutsideScene(rect, edge);
+
           try {
             layRect(creatLaidRect(rect, rectPosition));
             updateVacancies(addIfEmpty);
             needVacanciesRefresh = false;
+            edgesManager.confirmEdgeUsage(edge);
             return;
           } catch (e) {
             if (!(e instanceof IntersectionError)) {
@@ -164,14 +166,15 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
       }
 
 
-      function* generateWorkers() {
+      function* generateWorks() {
         for (let i = 0; i < rectsData.length; i++) {
-          work(rectsData[i], i);
-          yield;
+          yield () => work(rectsData[i], i);
         }
       }
 
-      splitAndPerformWork(generateWorkers, 50).then(finish);
+      splitAndPerformWork(generateWorks, 50)
+        .then(finish)
+        .catch(error => reject(error));
 
       function finish() {
         if (options.drawFinishMap) {
