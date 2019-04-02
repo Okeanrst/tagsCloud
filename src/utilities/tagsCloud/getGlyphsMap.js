@@ -62,18 +62,18 @@ export function glyphsMapToRectMap(glyphsMap, rect, rotate) {
   const vertRatio = glyphsCols/rectCols;
 
   const isRectSquareBusy = (rectCol, rectRow) => {
-    const rowStart = Math.round(vertRatio * rectRow);
-    let rowFinish = Math.round(vertRatio * (rectRow + 1));
+    const rowStart = Math.floor(horizRatio * rectRow);
+    let rowFinish = Math.floor(horizRatio * (rectRow + 1));
 
-    const colStart = Math.round(horizRatio * rectCol);
-    let colFinish = Math.round(horizRatio * (rectCol + 1));
+    const colStart = Math.floor(vertRatio * rectCol);
+    let colFinish = Math.floor(vertRatio * (rectCol + 1));
 
     //if (rowFinish > glyphsRows || colFinish > glyphsCols) debugger
     if (rowFinish > glyphsRows) {
-      rowFinish = glyphsRows + 1
+      rowFinish = glyphsRows + 1;
     }
     if (colFinish > glyphsCols) {
-      colFinish = glyphsCols + 1
+      colFinish = glyphsCols + 1;
     }
 
     for (let row = rowStart; row < rowFinish; row++) {

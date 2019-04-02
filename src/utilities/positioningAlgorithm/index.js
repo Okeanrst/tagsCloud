@@ -108,6 +108,8 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
             } catch (e) {
               if (e instanceof IntersectionError) {
                 return tryPickClosedVacancy();
+              } else {
+                throw e;
               }
             }
             return true;
@@ -444,7 +446,7 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
         if (dataGlyphsMap) {
           const glyphsMap = dataGlyphsMap.find(itemMap => itemMap.id === rect.id);
           if (glyphsMap) {
-            rectMap = glyphsMapToRectMap(glyphsMap.map, {rows: rect.rows, cols: rect.cols}, rect.rotate);
+            rectMap = glyphsMapToRectMap(glyphsMap.map, {rows: rect.rows, cols: rect.cols}, !!rect.rotate);
           } else if (process.env.NODE_ENV !== 'production') {
             throw new Error('rectMap is empty');
           }
