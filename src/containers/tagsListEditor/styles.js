@@ -25,14 +25,14 @@ const styles = {
     listStyleType: 'none', paddingLeft: 0,
   },
   tagsListRow: {
-    display: 'flex',
+    display: 'flex', alignItems: 'center',
   },
   tagsListLabel: {
     flexGrow: 12, textOverflow: 'ellipsis',
   },
   tagsListScore: {flexShrink: 0, width: '24px', marginLeft: '12px'},
   tagsListButton: {
-    flexShrink: 0, marginLeft: '12px'
+    flexShrink: 0, marginLeft: '12px', minWidth: '100px',
   },
 };
 

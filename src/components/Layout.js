@@ -13,6 +13,7 @@ const Layout = ({ children }) => (
       <Link to="/tagsListEditor" className="" >Tags list editor</Link>
     </nav>
     {children}
+    <footer>Okeanrst 2019</footer>
   </main>
 );
 

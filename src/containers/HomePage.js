@@ -44,7 +44,6 @@ class HomePage extends Component {
   calcTagsCloudWidth(elem) {
     const {left, right} = elem.getBoundingClientRect();
     const width = right - left;
-
     return width;
   }
 
