@@ -3,7 +3,7 @@ import withModalWindowLayout from './withModalWindowLayout';
 import PropTypes from 'prop-types';
 import withModalWindowContainer from './withModalWindowContainer';
 
-class SmallModalWindow extends React.PureComponent {
+class FullScreenModalWindow extends React.PureComponent {
   render() {
     const { style, children } = this.props;
     return (
@@ -14,7 +14,8 @@ class SmallModalWindow extends React.PureComponent {
   }
 }
 
-SmallModalWindow.propTypes = {
+FullScreenModalWindow.propTypes = {
   style: PropTypes.object,
 };
-export default withModalWindowLayout()(withModalWindowContainer(SmallModalWindow));
+
+export default withModalWindowLayout()(withModalWindowContainer(FullScreenModalWindow));

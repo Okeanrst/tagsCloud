@@ -3,7 +3,7 @@ import RootModal from './RootModal';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 
-const ModalWindowLayout = ({children, className, style}) => (
+const ModalWindowLayout = ({ children, className, style }) => (
   <RootModal>
     <div
       className={cx('modalWindowLayout', {[className]: !!className})}

@@ -114,36 +114,37 @@ const styles = {
 };
 
 const TagInformationRenderer = {};
+export const tagDataType = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  volume: PropTypes.number.isRequired,
+  type: PropTypes.string.isRequired,
+  sentiment: PropTypes.shape({
+    negative: PropTypes.number,
+    neutral: PropTypes.number,
+    positive: PropTypes.number,
+  }).isRequired,
+  sentimentScore: PropTypes.number.isRequired,
+  burst: PropTypes.number.isRequired,
+  days: PropTypes.arrayOf(PropTypes.shape({
+    date: PropTypes.string.isRequired,
+    volume: PropTypes.number.isRequired,
+  })).isRequired,
+  pageType: PropTypes.shape({
+    blog: PropTypes.number.isRequired,
+    facebook: PropTypes.number.isRequired,
+    forum: PropTypes.number.isRequired,
+    general: PropTypes.number.isRequired,
+    image: PropTypes.number.isRequired,
+    news: PropTypes.number.isRequired,
+    review: PropTypes.number.isRequired,
+    twitter: PropTypes.number.isRequired,
+    video: PropTypes.number.isRequired,
+  }).isRequired,
+});
 
 TagInformationRenderer.propTypes = {
-  data: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    volume: PropTypes.number.isRequired,
-    type: PropTypes.string.isRequired,
-    sentiment: PropTypes.shape({
-      negative: PropTypes.number,
-      neutral: PropTypes.number,
-      positive: PropTypes.number,
-    }).isRequired,
-    sentimentScore: PropTypes.number.isRequired,
-    burst: PropTypes.number.isRequired,
-    days: PropTypes.arrayOf(PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      volume: PropTypes.number.isRequired,
-    })).isRequired,
-    pageType: PropTypes.shape({
-      blog: PropTypes.number.isRequired,
-      facebook: PropTypes.number.isRequired,
-      forum: PropTypes.number.isRequired,
-      general: PropTypes.number.isRequired,
-      image: PropTypes.number.isRequired,
-      news: PropTypes.number.isRequired,
-      review: PropTypes.number.isRequired,
-      twitter: PropTypes.number.isRequired,
-      video: PropTypes.number.isRequired,
-    }).isRequired,
-  }),
+  data: tagDataType,
 };
 
 export default withRouter(WithRawData(TagInformation));

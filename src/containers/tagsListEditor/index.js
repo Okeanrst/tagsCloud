@@ -7,8 +7,10 @@ import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from '../../redux/actions';
 import styles from './styles';
 import SmallModalWindow from '../../components/modalWindows/SmallModalWindow';
+import FullScreenModalWindow from '../../components/modalWindows/FullScreenModalWindow';
 import { downloadCloudRawDataFile, uploadCloudRawDataFile } from '../../redux/actions/tagsCloudConfFile';
 import { FixedSizeList as List } from 'react-window';
+import TagForm from './tagForm';
 
 const tagsListRowHeight = 35;
 
@@ -107,26 +109,26 @@ class TagsListEditor extends Component {
     </button>
   )
 
+  resetIdForDelete = () => this.setState({id: undefined})
+
   renderConfirmDelete = (id) => {
-    const resetId = () => this.setState({id: undefined});
     const onConfirm = () => {
-      resetId();
+      this.resetIdForDelete();
       this.props.deleteTag(id);
     };
-    const onCancel = () => resetId();
 
     const modalWindowBody = [
       <span key="question" style={styles.confirmDeleteQuestion} >
         Are you sure you want to delete tag "{id}"?
       </span>,
       <div key="buttons" style={styles.confirmDeleteButtons} >
-        <button onClick={onCancel} key="cancel" >cancel</button>
+        <button onClick={this.resetIdForDelete} key="cancel" >cancel</button>
         <button onClick={onConfirm} key="delete" style={{marginLeft: '24px'}}>delete</button>
       </div>
     ];
 
     return (
-      <SmallModalWindow>
+      <SmallModalWindow onContainerClick={this.resetIdForDelete} >
         <div style={styles.confirmDelete}>
           {modalWindowBody}
         </div>
@@ -142,11 +144,31 @@ class TagsListEditor extends Component {
     }
   }
 
-  onEdit = (e) => {
+  onTagChange = (data) => {
     //TODO
-    const id = e.target.dataset.id;
-    console.log('edit id: ', id);
+    this.setState({editedTagData: undefined});
   }
+
+  onTagAdd = (data) => {
+    //озможно id нужно генерировать не в форме, а в редьюсере
+  }
+
+  onEdit = (e) => {
+    const id = e.target.dataset.id;
+    const { rawData } = this.props;
+    const editedTagData = rawData.data.find(item => item.id === id);
+    this.setState({editedTagData});
+  }
+
+  closeTagForm = () => {
+    this.setState({editedTagData: undefined});
+  }
+
+  renderTagForm = (data) => (
+    <FullScreenModalWindow onContainerClick={this.closeTagForm} >
+      <TagForm onSubmit={this.onTagChange} data={data} />
+    </FullScreenModalWindow>
+  )
 
   renderListRow  = (data) => ({ index, style }) => {
     const item = data[index];
@@ -175,7 +197,7 @@ class TagsListEditor extends Component {
 
   render() {
     const { rawData } = this.props;
-    const { tagsListHeight } = this.state;
+    const { tagsListHeight, editedTagData } = this.state;
     const loading = rawData.isFetching;
 
     return (
@@ -185,6 +207,7 @@ class TagsListEditor extends Component {
           {this.renderFileUploader(loading)}
           {this.renderFileDownloader(!!(!rawData.data || loading))}
         </div>
+        {editedTagData && this.renderTagForm(editedTagData)}
         {rawData.data && this.renderList(rawData.data, tagsListHeight)}
         {this.state.id !== undefined && this.renderConfirmDelete(this.state.id)}
       </div>
