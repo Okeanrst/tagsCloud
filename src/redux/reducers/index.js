@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import {
   FETCH_DATA_REQUEST, FETCH_DATA_SUCCESS, FETCH_DATA_FAILURE,
-  DELETE_DATA_ITEM,
+  DELETE_DATA_ITEM, EDIT_DATA_ITEM, ADD_DATA_ITEM,
   PROCESS_DATA_REQUEST, PROCESS_DATA_SUCCESS, PROCESS_DATA_FAILURE,
   RESET_TAGS_CLOUD_DATA,
   USE_CANVAS_TOGGLE
@@ -20,6 +20,25 @@ const rawDataReducer = (state = {isFetching: false}, action) => {
       const idToDelete = action.data;
       const data = state.data.filter(item => item.id !== idToDelete);
       return {...state, data};
+    case EDIT_DATA_ITEM: {
+      const itemData = action.data;
+      const itemIndex = state.data.findIndex(item => item.id === itemData.id);
+      let data = state.data;
+      if (itemIndex > -1) {
+        data = [
+          ...state.data.slice(0, itemIndex),
+          itemData,
+          ...state.data.slice(itemIndex + 1)
+        ];
+      }
+      return {...state, data};
+    }
+    case ADD_DATA_ITEM: {
+      const itemData = action.data;
+      itemData.id = itemData.label + Math.round();
+      const data = [...state.data, itemData];
+      return {...state, data};
+    }
     default:
       return state;
   }

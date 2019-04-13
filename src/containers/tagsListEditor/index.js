@@ -145,12 +145,20 @@ class TagsListEditor extends Component {
   }
 
   onTagChange = (data) => {
-    //TODO
-    this.setState({editedTagData: undefined});
+    this.closeTagForm();
+    data.id ? this.props.editTag(data) : this.props.addTag(data);
   }
 
-  onTagAdd = (data) => {
-    //озможно id нужно генерировать не в форме, а в редьюсере
+  onClone = (e) => {
+    const targetId = e.target.dataset.id;
+    const { rawData } = this.props;
+    const { id, ...restProps } = rawData.data.find(item => item.id === targetId);
+    const newTagData = {...restProps};
+    this.setState({newTagData});
+  }
+
+  onAdd = () => {
+    this.setState({newTagData: {}});
   }
 
   onEdit = (e) => {
@@ -161,12 +169,12 @@ class TagsListEditor extends Component {
   }
 
   closeTagForm = () => {
-    this.setState({editedTagData: undefined});
+    this.setState({editedTagData: undefined, newTagData: undefined});
   }
 
   renderTagForm = (data) => (
     <FullScreenModalWindow onContainerClick={this.closeTagForm} >
-      <TagForm onSubmit={this.onTagChange} data={data} />
+      <TagForm onSubmit={this.onTagChange} onCancel={this.closeTagForm} data={data} />
     </FullScreenModalWindow>
   )
 
@@ -176,8 +184,15 @@ class TagsListEditor extends Component {
       <li style={{...styles.tagsListRow, ...style}} >
         <span key="label" style={styles.tagsListLabel} >{item.label}</span>
         <span key="sentimentScore" >{item.sentimentScore}</span>
-        <button data-id={item.id} onClick={this.onEdit} style={styles.tagsListButton} >edit</button>
-        <button data-id={item.id} onClick={this.onDelete} style={styles.tagsListButton} >delete</button>
+        <button data-id={item.id} onClick={this.onClone} style={styles.tagsListButton} key="clone" >
+          clone
+        </button>
+        <button data-id={item.id} onClick={this.onEdit} style={styles.tagsListButton} key="edit" >
+          edit
+        </button>
+        <button data-id={item.id} onClick={this.onDelete} style={styles.tagsListButton} key="delete" >
+          delete
+        </button>
       </li>
     );
   }
@@ -197,17 +212,18 @@ class TagsListEditor extends Component {
 
   render() {
     const { rawData } = this.props;
-    const { tagsListHeight, editedTagData } = this.state;
+    const { tagsListHeight, editedTagData, newTagData } = this.state;
     const loading = rawData.isFetching;
-
+    const tagFormData = newTagData || editedTagData;
     return (
       <div>
         {this.renderLoader(loading)}
         <div key="cloudConfFiles" style={styles.cloudConfFiles} ref={this.confFiles} >
           {this.renderFileUploader(loading)}
           {this.renderFileDownloader(!!(!rawData.data || loading))}
+          <button onClick={this.onAdd} >Add new</button>
         </div>
-        {editedTagData && this.renderTagForm(editedTagData)}
+        {tagFormData && this.renderTagForm(tagFormData)}
         {rawData.data && this.renderList(rawData.data, tagsListHeight)}
         {this.state.id !== undefined && this.renderConfirmDelete(this.state.id)}
       </div>
@@ -221,6 +237,8 @@ TagsListEditor.propTypes = {
     isFetching: PropTypes.bool.isRequired,
   }),
   deleteTag: PropTypes.func.isRequired,
+  addTag: PropTypes.func.isRequired,
+  editTag: PropTypes.func.isRequired,
   uploadCloudRawDataFile: PropTypes.func.isRequired,
   restScreenHeight: PropTypes.number.isRequired,
 };
@@ -233,6 +251,12 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => ({
   deleteTag(id) {
     dispatch(actions.deleteDataItem(id));
+  },
+  addTag(data) {
+    dispatch(actions.addDataItem(data));
+  },
+  editTag(data) {
+    dispatch(actions.editDataItem(data));
   },
   uploadCloudRawDataFile(...args) {
     dispatch(uploadCloudRawDataFile(...args));

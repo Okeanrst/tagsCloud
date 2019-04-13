@@ -46,3 +46,17 @@ export function deleteDataItem(id) {
     dispatch(createAction(types.RESET_TAGS_CLOUD_DATA));
   };
 }
+
+export function editDataItem(data) {
+  return (dispatch) => {
+    dispatch(createAction(types.EDIT_DATA_ITEM, data));
+    dispatch(createAction(types.RESET_TAGS_CLOUD_DATA));
+  };
+}
+
+export function addDataItem(data) {
+  return (dispatch) => {
+    dispatch(createAction(types.ADD_DATA_ITEM, data));
+    dispatch(createAction(types.RESET_TAGS_CLOUD_DATA));
+  };
+}
