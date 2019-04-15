@@ -11,6 +11,8 @@ import FullScreenModalWindow from '../../components/modalWindows/FullScreenModal
 import { downloadCloudRawDataFile, uploadCloudRawDataFile } from '../../redux/actions/tagsCloudConfFile';
 import { FixedSizeList as List } from 'react-window';
 import TagForm from './tagForm';
+import SearchWithAutocomplete from './searchWithAutocomplete';
+import { createSelector } from 'reselect'
 
 const tagsListRowHeight = 35;
 
@@ -19,6 +21,7 @@ class TagsListEditor extends Component {
     super(props);
 
     this.confFiles = React.createRef();
+    this.listRef = React.createRef();
     this.state = {tagsListHeight: tagsListRowHeight * 1};
   }
 
@@ -42,6 +45,10 @@ class TagsListEditor extends Component {
       if (tagsListHeight !== this.state.tagsListHeight) {
         this.setState({tagsListHeight});
       }
+    }
+    const { scrollToItem } = this.state;
+    if (scrollToItem && prevState.scrollToItem !== scrollToItem) {
+      this.listRef.current.scrollToItem(scrollToItem.index, 'center');
     }
   }
 
@@ -172,6 +179,14 @@ class TagsListEditor extends Component {
     this.setState({editedTagData: undefined, newTagData: undefined});
   }
 
+  onSearch = (target) => {
+    const { rawData: {data = []} } = this.props;
+    const index = data.findIndex(item => target === item.label);
+    if (index >= 0) {
+      this.setState({scrollToItem: {index}});
+    }
+  }
+
   renderTagForm = (data) => (
     <FullScreenModalWindow onContainerClick={this.closeTagForm} >
       <TagForm onSubmit={this.onTagChange} onCancel={this.closeTagForm} data={data} />
@@ -204,6 +219,7 @@ class TagsListEditor extends Component {
         itemCount={data.length}
         itemSize={tagsListRowHeight}
         width="100%"
+        ref={this.listRef}
       >
         {this.renderListRow(data)}
       </List>
@@ -211,7 +227,7 @@ class TagsListEditor extends Component {
   }
 
   render() {
-    const { rawData } = this.props;
+    const { rawData, searchAutocompleteSuggestions } = this.props;
     const { tagsListHeight, editedTagData, newTagData } = this.state;
     const loading = rawData.isFetching;
     const tagFormData = newTagData || editedTagData;
@@ -222,6 +238,11 @@ class TagsListEditor extends Component {
           {this.renderFileUploader(loading)}
           {this.renderFileDownloader(!!(!rawData.data || loading))}
           <button onClick={this.onAdd} >Add new</button>
+          <SearchWithAutocomplete
+            suggestions={searchAutocompleteSuggestions}
+            placeholder="Search a tag by label"
+            onSubmit={this.onSearch}
+          />
         </div>
         {tagFormData && this.renderTagForm(tagFormData)}
         {rawData.data && this.renderList(rawData.data, tagsListHeight)}
@@ -241,11 +262,22 @@ TagsListEditor.propTypes = {
   editTag: PropTypes.func.isRequired,
   uploadCloudRawDataFile: PropTypes.func.isRequired,
   restScreenHeight: PropTypes.number.isRequired,
+  searchAutocompleteSuggestions: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    label: PropTypes.string.isRequired,
+  })).isRequired,
 };
+
+const getTagsRawData = (state) => state.rawData.data;
+const getSearchAutocompleteSuggestions = createSelector(
+  [getTagsRawData],
+  tagsRawData => tagsRawData ? tagsRawData.map(item => ({id: item.id, label: item.label})) : [],
+);
 
 const mapStateToProps = (state, ownProps) => {
   const { rawData } = state;
-  return {rawData};
+  const searchAutocompleteSuggestions = getSearchAutocompleteSuggestions(state);
+  return {rawData, searchAutocompleteSuggestions};
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
