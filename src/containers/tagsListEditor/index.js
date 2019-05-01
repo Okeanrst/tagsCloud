@@ -12,7 +12,8 @@ import { downloadCloudRawDataFile, uploadCloudRawDataFile } from '../../redux/ac
 import { FixedSizeList as List } from 'react-window';
 import TagForm from './tagForm';
 import SearchWithAutocomplete from './searchWithAutocomplete';
-import { createSelector } from 'reselect'
+import { createSelector } from 'reselect';
+import { bindActionCreators } from 'redux';
 
 const tagsListRowHeight = 35;
 
@@ -280,19 +281,13 @@ const mapStateToProps = (state, ownProps) => {
   return {rawData, searchAutocompleteSuggestions};
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  deleteTag(id) {
-    dispatch(actions.deleteDataItem(id));
-  },
-  addTag(data) {
-    dispatch(actions.addDataItem(data));
-  },
-  editTag(data) {
-    dispatch(actions.editDataItem(data));
-  },
-  uploadCloudRawDataFile(...args) {
-    dispatch(uploadCloudRawDataFile(...args));
-  },
-});
+const mapDispatchToProps = (dispatch, ownProps) => (
+  bindActionCreators({
+    deleteTag: actions.deleteDataItem,
+    addTag: actions.addDataItem,
+    editTag: actions.editDataItem,
+    uploadCloudRawDataFile
+  }, dispatch)
+);
 
 export default connect(mapStateToProps, mapDispatchToProps)(WithRawData(withRestScreenHeight(TagsListEditor)));
