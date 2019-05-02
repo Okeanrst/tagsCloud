@@ -1,7 +1,10 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import {withRouter} from 'react-router-dom';
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import WithRawData from '../decorators/WithRawData';
+import { getTagDataType } from '../types';
+import PropTypes from 'prop-types';
+
+const tagDataType = getTagDataType();
 
 class TagInformation extends Component {
   state = {showDays: false}
@@ -113,38 +116,11 @@ const styles = {
   }
 };
 
-const TagInformationRenderer = {};
-export const tagDataType = PropTypes.shape({
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  volume: PropTypes.number.isRequired,
-  type: PropTypes.string.isRequired,
-  sentiment: PropTypes.shape({
-    negative: PropTypes.number,
-    neutral: PropTypes.number,
-    positive: PropTypes.number,
-  }).isRequired,
-  sentimentScore: PropTypes.number.isRequired,
-  burst: PropTypes.number.isRequired,
-  days: PropTypes.arrayOf(PropTypes.shape({
-    date: PropTypes.string.isRequired,
-    volume: PropTypes.number.isRequired,
-  })).isRequired,
-  pageType: PropTypes.shape({
-    blog: PropTypes.number.isRequired,
-    facebook: PropTypes.number.isRequired,
-    forum: PropTypes.number.isRequired,
-    general: PropTypes.number.isRequired,
-    image: PropTypes.number.isRequired,
-    news: PropTypes.number.isRequired,
-    review: PropTypes.number.isRequired,
-    twitter: PropTypes.number.isRequired,
-    video: PropTypes.number.isRequired,
-  }).isRequired,
-});
-
-TagInformationRenderer.propTypes = {
-  data: tagDataType,
+TagInformation.propTypes = {
+  rawData: PropTypes.shape({
+    data: PropTypes.arrayOf(tagDataType),
+    isFetching: PropTypes.bool.isRequired,
+  }),
 };
 
 export default withRouter(WithRawData(TagInformation));

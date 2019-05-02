@@ -2,7 +2,9 @@
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { tagDataType } from '../TagInformation';
+import { getTagDataType } from '../../types';
+
+const tagDataType = getTagDataType(false);
 
 const styles = {
   buttons: {
@@ -14,7 +16,10 @@ class TagForm extends Component {
   constructor(props) {
     super(props);
 
-    const { id, label, volume, type, sentiment, sentimentScore, burst, days, pageType } = props.data;
+    const {
+      id, label = '', volume = 0, type = '', sentiment, sentimentScore = 0,
+      burst, days, pageType
+    } = props.data;
     this.state = {id, label, volume, type, sentiment, sentimentScore, burst, days, pageType};
   }
 
@@ -38,9 +43,9 @@ class TagForm extends Component {
     const { onCancel } = this.props;
     const { id, label, volume, type, sentiment, sentimentScore, burst, days, pageType } = this.state;
     return (
-      <form>
-        <input type="hidden" value={id} />
+      <form onSubmit={this.onSubmit} >
         <input
+          type="text"
           name="label"
           value={label}
           onChange={this.handleChange}
@@ -58,6 +63,7 @@ class TagForm extends Component {
         />
         <br />
         <input
+          type="text"
           name="type"
           value={type}
           onChange={this.handleChange}
@@ -74,8 +80,8 @@ class TagForm extends Component {
           required={true}
         />
         <div key="buttons" style={styles.buttons} >
-          <button onClick={onCancel} key="cancel" >cancel</button>
-          <button onClick={this.onSubmit} key="submit" style={{marginLeft: '24px'}}>submit</button>
+          <button type="button" onClick={onCancel} key="cancel" >cancel</button>
+          <input type="submit" value="submit" style={{marginLeft: '24px'}} />
         </div>
       </form>
     );

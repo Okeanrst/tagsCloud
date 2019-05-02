@@ -56,7 +56,8 @@ export function editDataItem(data) {
 
 export function addDataItem(data) {
   return (dispatch) => {
-    dispatch(createAction(types.ADD_DATA_ITEM, data));
+    const id = data.label + '_' + Date.now() + (Math.random() + '').slice(-3);
+    dispatch(createAction(types.ADD_DATA_ITEM, {...data, id}));
     dispatch(createAction(types.RESET_TAGS_CLOUD_DATA));
   };
 }

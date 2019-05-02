@@ -34,10 +34,7 @@ const rawDataReducer = (state = {isFetching: false}, action) => {
       return {...state, data};
     }
     case ADD_DATA_ITEM: {
-      const itemData = action.data;
-      itemData.id = itemData.label + Math.round();
-      const data = [...state.data, itemData];
-      return {...state, data};
+      return {...state, data: [...state.data, action.data]};
     }
     default:
       return state;

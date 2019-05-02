@@ -6,6 +6,9 @@ import TagsCloud from '../components/TagsCloud';
 import TagsCloudCanvas from '../components/TagsCloudCanvas';
 import WithRawData from '../decorators/WithRawData';
 import FadeLoader from 'react-spinners/FadeLoader';
+import { getTagDataType } from '../types';
+
+const tagDataType = getTagDataType();
 
 class HomePage extends Component {
   constructor(props) {
@@ -114,7 +117,7 @@ HomePage.propTypes = {
     isFetching: PropTypes.bool.isRequired,
   }),
   rawData: PropTypes.shape({
-    data: PropTypes.array,
+    data: PropTypes.arrayOf(tagDataType),
     isFetching: PropTypes.bool.isRequired,
   }),
   fontLoaded: PropTypes.shape({
