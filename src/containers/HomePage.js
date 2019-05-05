@@ -71,9 +71,7 @@ class HomePage extends Component {
   renderLoader = (loading) => (
     <div style={styles.loaderContainer} >
       <FadeLoader
-        sizeUnit={"px"}
-        size={50}
-        color={'#123abc'}
+        color="#123abc"
         loading={loading}
       />
     </div>
@@ -84,7 +82,7 @@ class HomePage extends Component {
     const loading = rawData.isFetching || tagsCloud.isFetching || fontLoaded.isFetching;
     const TagsCloudComponent = useCanvas ?  TagsCloudCanvas : TagsCloud;
     return (
-      <div>
+      <div style={styles.pageContainer} >
         {this.renderLoader(loading)}
         <div ref={this.tagsCloudScene} style={styles.tagsCloudScene} >
           <div style={styles.checkbox} className="form-group form-check" >
@@ -146,6 +144,7 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 export default connect(mapStateToProps, mapDispatchToProps)(WithRawData(HomePage));
 
 const styles = {
+  pageContainer: {position: 'relative', minHeight: '250px'},
   loaderContainer: {
     position: 'absolute', display: 'flex', justifyContent: 'center',
     width: '100%'
