@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {adaptDataToScene, calcAllowedWidth} from '../utilities/tagsCloud';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import { withStyles } from '@material-ui/core';
+import { PADDING } from '../constants';
 
 const styles = {
   text: {
@@ -21,12 +22,11 @@ const TagsCloud = ({width, data, onTagClick, classes}) => {
   const allowedWidth = calcAllowedWidth(width);
 
   const { maxRight, minLeft, minBottom, maxTop, data: preparedData } = adaptDataToScene(data, allowedWidth);
-  const padding = 1.1;
-  const sceneWidth = (maxRight - minLeft) * padding;
-  const sceneHeight = (maxTop - minBottom) * padding;
+  const sceneWidth = (maxRight - minLeft) * PADDING;
+  const sceneHeight = (maxTop - minBottom) * PADDING;
 
-  const axisXOffset = - minLeft + sceneWidth * (padding - 1)/2;
-  const axisYOffset = maxTop + sceneHeight * (padding - 1)/2;
+  const axisXOffset = - minLeft + sceneWidth * (PADDING - 1)/2;
+  const axisYOffset = maxTop + sceneHeight * (PADDING - 1)/2;
 
   return (
     <div style={{display: 'inline-block'}}>
