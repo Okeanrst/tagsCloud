@@ -2,8 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {adaptDataToScene, calcAllowedWidth} from '../utilities/tagsCloud';
 import { Transition, TransitionGroup } from 'react-transition-group';
+import { withStyles } from '@material-ui/core';
 
-const TagsCloud = ({width, data, onTagClick}) => {
+const styles = {
+  text: {
+    'white-space': 'pre',
+  },
+};
+
+const DURATION = 500;
+
+const DEFAULT_STYLE = {
+  transition: `all ${DURATION}ms ease-in-out`,
+  opacity: 0,
+};
+
+const TagsCloud = ({width, data, onTagClick, classes}) => {
   const allowedWidth = calcAllowedWidth(width);
 
   const { maxRight, minLeft, minBottom, maxTop, data: preparedData } = adaptDataToScene(data, allowedWidth);
@@ -13,13 +27,6 @@ const TagsCloud = ({width, data, onTagClick}) => {
 
   const axisXOffset = - minLeft + sceneWidth * (padding - 1)/2;
   const axisYOffset = maxTop + sceneHeight * (padding - 1)/2;
-
-  const duration = 500;
-
-  const defaultStyle = {
-    transition: `all ${duration}ms ease-in-out`,
-    opacity: 0,
-  }
 
   return (
     <div style={{display: 'inline-block'}}>
@@ -37,7 +44,7 @@ const TagsCloud = ({width, data, onTagClick}) => {
               return (
                 <Transition
                   key={i.id}
-                  timeout={duration}
+                  timeout={DURATION}
                   //classNames="tagText"
                 >
                   {(state) => {
@@ -45,14 +52,15 @@ const TagsCloud = ({width, data, onTagClick}) => {
                       <text
                         key={`${i.id}_${ind}`}
                         textAnchor="middle"
-                        //transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}                        
-                        style={{...style, ...defaultStyle, ...transitionStyles[state]}}
-                        onClick={() => onTagClick(i.id)}                    
+                        className={classes.text}
+                        //transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
+                        style={{...style, ...DEFAULT_STYLE, ...transitionStyles[state]}}
+                        onClick={() => onTagClick(i.id)}
                       >
                         {i.label}
                       </text>
                     )
-                  }}                 
+                  }}
                 </Transition>
               )
             })}
@@ -95,4 +103,4 @@ TagsCloud.propTypes = {
   onTagClick: PropTypes.func.isRequired,
 };
 
-export default TagsCloud;
+export default withStyles(styles)(TagsCloud);
