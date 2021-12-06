@@ -1,4 +1,6 @@
-.active-modal-root, .modalWindowLayout, .modalWindowContainer {
+.active-modal-root,
+.modalWindowLayout,
+.modalWindowContainer {
   position: fixed;
   left: 0;
   top: 0;
