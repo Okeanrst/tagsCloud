@@ -1,90 +1,66 @@
-import React from 'react';
-import getDisplayName from 'react-display-name';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-type StateT = {
-  height: number;
-};
+export function withRestScreenHeight<T extends { restScreenHeight: number }>(
+  WrappedComponent: React.ComponentType<T>,
+): React.ComponentType<
+  Omit<T, 'restScreenHeight'> & { restScreenHeight?: never }
+> {
+  return function (props) {
+    const [height, setHeight] = useState<number>(0);
+    const wrapperRef = useRef<HTMLDivElement | null>(null);
+    const resizeTaskTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+      null,
+    );
 
-type WithRestScreenHeightPropsT = {
-  restScreenHeight: number;
-};
+    const { children } = props;
 
-export default function withRestScreenHeight<
-  T extends WithRestScreenHeightPropsT,
->(WrappedComponent: React.ComponentType<T>) {
-  class EnhancedComponent extends React.Component<
-    Omit<T, 'restScreenHeight'>,
-    StateT
-  > {
-    state = { height: 0 };
-    wrapperRef = React.createRef<HTMLDivElement>();
-    resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
+    const calcRestScreenHeight = useCallback((): number => {
+      if (!wrapperRef.current) {
+        return 0;
+      }
 
-    public static displayName = `withRestScreenHeight(${getDisplayName(
-      WrappedComponent,
-    )})`;
+      const node = wrapperRef.current;
 
-    componentDidMount() {
-      window.addEventListener('resize', this.handleResize);
+      const { top } = node.getBoundingClientRect();
+      const scrollTop = document.documentElement.scrollTop;
+      const screenHeight = document.documentElement.clientHeight;
+      const restScreenHeight = screenHeight - (scrollTop + top);
+      return restScreenHeight > 0 ? restScreenHeight : 0;
+    }, []);
 
-      const height = this.calcRestScreenHeight();
-      this.setState({ height });
-    }
-
-    componentWillUnmount() {
-      window.removeEventListener('resize', this.handleResize);
-
-      this.resizeTaskTimer && clearTimeout(this.resizeTaskTimer);
-    }
-
-    handleResize = (): void => {
+    const handleResize = useCallback((): void => {
       const recalculateState = () => {
-        this.resizeTaskTimer = null;
-        const height = this.calcRestScreenHeight();
-        if (height !== this.state.height) {
-          this.setState({ height });
+        resizeTaskTimerRef.current = null;
+        const nextHeight = calcRestScreenHeight();
+
+        if (height !== nextHeight) {
+          setHeight(nextHeight);
         }
       };
 
       const delay = 500;
 
-      if (!this.resizeTaskTimer) {
-        this.resizeTaskTimer = setTimeout(recalculateState, delay);
+      if (!resizeTaskTimerRef.current) {
+        resizeTaskTimerRef.current = setTimeout(recalculateState, delay);
       }
-    };
+    }, [height, calcRestScreenHeight]);
 
-    calcRestScreenHeight = (): number => {
-      if (!this.wrapperRef.current) {
-        return 0;
-      }
+    useEffect(() => {
+      setHeight(calcRestScreenHeight());
 
-      const node = this.wrapperRef.current;
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
 
-      const { top } = node.getBoundingClientRect();
-      const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
-      const screenHeight = document.documentElement.clientHeight;
-      const restScreenHeight = screenHeight - (scrollTop + top);
-      return restScreenHeight > 0 ? restScreenHeight : 0;
-    };
+        resizeTaskTimerRef.current && clearTimeout(resizeTaskTimerRef.current);
+      };
+    }, [handleResize, calcRestScreenHeight]);
 
-    render() {
-      const { children } = this.props;
-
-      return (
-        <div ref={this.wrapperRef}>
-          // TODO
-          {/* @ts-ignore */}
-          <WrappedComponent
-            {...this.props}
-            restScreenHeight={this.state.height}
-          >
-            {children}
-          </WrappedComponent>
-        </div>
-      );
-    }
-  }
-
-  return EnhancedComponent;
+    const nextProps = { ...props, restScreenHeight: height };
+    return (
+      <div ref={wrapperRef}>
+        <WrappedComponent {...nextProps}>{children}</WrappedComponent>
+      </div>
+    );
+  };
 }

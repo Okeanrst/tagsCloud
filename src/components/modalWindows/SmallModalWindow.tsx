@@ -18,10 +18,10 @@ const SmallModalWindow = ({ style, children }: PropsT) => {
 const SmallModalWindowWithModalWindowContainer =
   withModalWindowContainer<PropsT>(SmallModalWindow);
 
-type SmallModalWindowWithModalWindowContainerProps = React.ComponentProps<
+type SmallModalWindowWithModalWindowContainerPropsT = React.ComponentProps<
   typeof SmallModalWindowWithModalWindowContainer
 >;
 
-export default withModalWindowLayout<SmallModalWindowWithModalWindowContainerProps>()(
+export default withModalWindowLayout<SmallModalWindowWithModalWindowContainerPropsT>()(
   SmallModalWindowWithModalWindowContainer,
 );

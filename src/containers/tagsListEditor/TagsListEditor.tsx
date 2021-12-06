@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { FixedSizeList } from 'react-window';
 import FadeLoader from 'react-spinners/FadeLoader';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
-import withRestScreenHeight from 'decorators/withRestScreenHeight';
+import { withRestScreenHeight } from 'decorators/withRestScreenHeight';
 import * as actions from 'store/actions/tagsCloud';
 import styles from './styles';
 import SmallModalWindow from 'components/modalWindows/SmallModalWindow';
@@ -372,7 +372,18 @@ class TagsListEditor extends Component<PropsT, StateT> {
   }
 }
 
+const TagsListEditorWithRestScreenHeight =
+  withRestScreenHeight<PropsT>(TagsListEditor);
+
+type TagsListEditorWithRestScreenHeightPropsT = React.ComponentProps<
+  typeof TagsListEditorWithRestScreenHeight
+>;
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withTriggerGettingRawData(withRestScreenHeight(TagsListEditor)));
+)(
+  withTriggerGettingRawData<TagsListEditorWithRestScreenHeightPropsT>(
+    TagsListEditorWithRestScreenHeight,
+  ),
+);
