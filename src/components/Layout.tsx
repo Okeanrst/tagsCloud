@@ -1,13 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-
-type PropsT = { children: React.ReactNode };
+import { Link, Outlet } from 'react-router-dom';
 
 const styles = {
   navbar: { backgroundColor: '#e3f2fd' },
 };
 
-const Layout = ({ children }: PropsT) => (
+export const Layout = () => (
   <main role="main" className="container">
     <nav key="nav" className="navbar navbar-light mb-4" style={styles.navbar}>
       <Link to="/" className="navbar-brand">
@@ -17,9 +15,7 @@ const Layout = ({ children }: PropsT) => (
         Tags list editor
       </Link>
     </nav>
-    {children}
+    <Outlet />
     <footer>Okeanrst 2021</footer>
   </main>
 );
-
-export default Layout;

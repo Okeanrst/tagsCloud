@@ -6,7 +6,7 @@ import TagsCloud from 'components/TagsCloud';
 import TagsCloudCanvas from 'components/TagsCloudCanvas';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 
-import { History } from 'history';
+import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
 
 const mapStateToProps = (state: RootStateT) => {
@@ -28,7 +28,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type PropsT = PropsFromRedux & {
-  history: History;
+  navigate: NavigateFunction;
 };
 
 type StateT = {
@@ -121,7 +121,7 @@ class HomePage extends Component<PropsT, StateT> {
   };
 
   onTagClick = (id: string) => {
-    this.props.history.push('/tag/' + encodeURIComponent(id));
+    this.props.navigate('/tag/' + encodeURIComponent(id));
   };
 
   renderLoader = (loading: boolean) => (

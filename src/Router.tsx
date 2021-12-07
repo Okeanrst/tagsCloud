@@ -1,24 +1,26 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 
 import HomePage from 'containers/HomePage';
 import { NotFoundPage } from 'components/NotFoundPage';
 import TagInformation from 'containers/TagInformation';
 import TagsListEditor from 'containers/tagsListEditor/TagsListEditor';
-import Layout from 'components/Layout';
+import { Layout } from 'components/Layout';
 
 const Router = () => {
+  const navigate = useNavigate();
+
   return (
     <div>
-      <Switch>
-        <Layout>
-          <Route exact path="/" component={HomePage} />
-          <Route exact path="/notFound" component={NotFoundPage} />
-          <Route exact path="/tagsListEditor" component={TagsListEditor} />
-          <Route path="/tag/:id" component={TagInformation} />
-        </Layout>
-        <Route component={NotFoundPage} />
-      </Switch>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage navigate={navigate} />} />
+          <Route path="/notFound" element={<NotFoundPage />} />
+          <Route path="/tagsListEditor" element={<TagsListEditor />} />
+          <Route path="/tag/:id" element={<TagInformation />} />
+        </Route>
+        <Route element={<NotFoundPage />} />
+      </Routes>
     </div>
   );
 };
