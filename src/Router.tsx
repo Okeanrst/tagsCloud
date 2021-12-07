@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import HomePage from 'containers/HomePage';
-import NotFoundPage from 'components/NotFoundPage';
+import { NotFoundPage } from 'components/NotFoundPage';
 import TagInformation from 'containers/TagInformation';
 import TagsListEditor from 'containers/tagsListEditor/TagsListEditor';
 import Layout from 'components/Layout';
