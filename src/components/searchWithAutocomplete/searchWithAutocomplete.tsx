@@ -47,24 +47,15 @@ type OptionsT = Pick<IntegrationDownshiftPropsT, 'placeholder' | 'onChange'> & {
 const SUGGESTIONS_MAX_NUMBER = 5;
 
 function renderInput(inputProps: ItemPropsT) {
-  const {
-    InputProps: { ref, ...restInputProps },
-    classes,
-    fullWidth,
-  } = inputProps;
-
-  console.log('renderInput ref:', ref);
-
+  const { InputProps, classes, fullWidth } = inputProps;
   return (
     <TextField
       InputProps={{
-        // TODO
-        //inputRef: ref,
         classes: {
           root: classes.inputRoot,
           input: classes.inputInput,
         },
-        ...restInputProps,
+        ...InputProps,
       }}
       fullWidth={fullWidth}
     />

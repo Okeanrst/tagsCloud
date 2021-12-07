@@ -42,8 +42,7 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
           ),
         );
       })
-      .catch(error => {
-        debugger;
+      .catch(() => {
         dispatch(createAction(actionTypes.PROCESS_DATA_FAILURE));
       });
   };

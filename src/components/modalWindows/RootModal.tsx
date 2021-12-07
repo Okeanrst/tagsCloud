@@ -47,15 +47,19 @@ export default class RootModal extends Component<PropsT> {
     );
     if (!modalWindowsIds.length && modalRoot) {
       modalRoot.classList.remove('active-modal-root');
-      this.resetScroll();
+      this.restoreScroll();
     }
   }
 
   hideScroll = () => {
+    if (modalWindowsIds.length) {
+      return;
+    }
     this.overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
   };
-  resetScroll = () => {
+
+  restoreScroll = () => {
     document.body.style.overflow = this.overflow || 'auto';
   };
 

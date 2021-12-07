@@ -3,7 +3,7 @@ import RootModal from './RootModal';
 import cx from 'classnames';
 
 type PropsT = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className: string;
   style?: React.CSSProperties;
 };

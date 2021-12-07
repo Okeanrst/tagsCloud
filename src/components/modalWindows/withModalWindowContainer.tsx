@@ -11,7 +11,7 @@ export default function withModalWindowContainer<P>(
 ) {
   const EnhancedComponent = React.forwardRef<any, P & EnhancedComponentPropsT>(
     ({ onContainerClick, ...props }: P & EnhancedComponentPropsT, ref) => {
-      const modalWindowRef = useRef(null);
+      const modalWindowRef = useRef<any>(null);
 
       const setComponentRef = useCallback(
         elem => {
@@ -34,8 +34,15 @@ export default function withModalWindowContainer<P>(
             return;
           }
 
-          const node = ReactDOM.findDOMNode(modalWindowRef.current);
-          if (node && !node.contains(e.target)) {
+          const wrappedComponentNode =
+            modalWindowRef.current &&
+            modalWindowRef.current instanceof HTMLElement
+              ? modalWindowRef.current
+              : ReactDOM.findDOMNode(modalWindowRef.current);
+          if (
+            wrappedComponentNode &&
+            !wrappedComponentNode.contains(e.target)
+          ) {
             onContainerClick(e);
           }
         },
@@ -49,9 +56,6 @@ export default function withModalWindowContainer<P>(
           onClick={onClick}
         >
           <WrappedComponent {...props} ref={setComponentRef} />
-          {/*<WrappedComponent {...props} ref={setComponentRef}>
-            {children}
-          </WrappedComponent>*/}
         </div>
       );
     },

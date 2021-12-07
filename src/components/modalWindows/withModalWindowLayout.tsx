@@ -14,16 +14,16 @@ export function withModalWindowLayout<P>({
 }: PropsT = {}) {
   return (WrappedComponent: React.ComponentType<P>) => {
     const EnhancedComponent = (props: P) => (
-      <ModalWindowLayout
-        key="layout"
-        className={cx('smallModalWindowLayout', {
-          [layoutClassName ?? '']: !!layoutClassName,
-        })}
-        style={layoutStyle}
-      >
+      <React.Fragment>
+        <ModalWindowLayout
+          key="layout"
+          className={cx('smallModalWindowLayout', {
+            [layoutClassName ?? '']: !!layoutClassName,
+          })}
+          style={layoutStyle}
+        />
         <WrappedComponent {...props} />
-        {/*<WrappedComponent {...props}>{children}</WrappedComponent>*/}
-      </ModalWindowLayout>
+      </React.Fragment>
     );
     if (process.env.NODE_ENV !== 'production') {
       EnhancedComponent.displayName = `withModalWindowLayout(${getDisplayName(
