@@ -11,6 +11,7 @@ import {
 export type PrepareDataOptionsT = {
   minFontSize?: number;
   maxFontSize?: number;
+  fontFamily?: string;
 };
 
 export type BorderCoordinatesT = {
@@ -30,6 +31,7 @@ export function prepareData(
   const {
     minFontSize = DEFAULT_MIN_FONT_SIZE,
     maxFontSize = DEFAULT_MAX_FONT_SIZE,
+    fontFamily = 'Open Sans',
   } = options;
 
   const canvas = document.createElement('canvas');
@@ -39,8 +41,8 @@ export function prepareData(
     return [];
   }
 
-  let minSentimentScore: number = 0;
-  let maxSentimentScore: number = 0;
+  let minSentimentScore: number = Infinity;
+  let maxSentimentScore: number = -Infinity;
   data.forEach(item => {
     if (
       minSentimentScore > item.sentimentScore ||
@@ -62,12 +64,12 @@ export function prepareData(
   //TODO use opentype.js
   const fontSizeFactor = 1.1;
 
-  const preparedData = data.map(item => {
+  return data.map(item => {
     const fontSize =
       minFontSize +
       Math.round((item.sentimentScore - minSentimentScore) * ratio);
 
-    ctx.font = `${fontSize}px Open Sans`;
+    ctx.font = `${fontSize}px ${fontFamily}`;
     const measure = ctx.measureText(item.label);
 
     return {
@@ -78,8 +80,6 @@ export function prepareData(
       fill: getRandomRGBColor(),
     };
   });
-
-  return preparedData;
 }
 
 export function getBorderCoordinates(

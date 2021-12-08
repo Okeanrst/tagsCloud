@@ -127,10 +127,10 @@ const TagsCloud = ({ tagData, width, onTagClick, classes }: PropsT) => {
   );
 };
 
-function drawAxles() {
+function drawAxles(fontFamily = 'Open Sans') {
   const style = {
     fontSize: `${2}px`,
-    fontFamily: 'Open Sans',
+    fontFamily,
     fill: 'rgb(0, 0, 0)',
   };
   return [
