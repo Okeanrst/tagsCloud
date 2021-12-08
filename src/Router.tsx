@@ -11,17 +11,15 @@ const Router = () => {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<HomePage navigate={navigate} />} />
-          <Route path="/notFound" element={<NotFoundPage />} />
-          <Route path="/tagsListEditor" element={<TagsListEditor />} />
-          <Route path="/tag/:id" element={<TagInformation />} />
-        </Route>
-        <Route element={<NotFoundPage />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage navigate={navigate} />} />
+        <Route path="/notFound" element={<NotFoundPage />} />
+        <Route path="/tagsListEditor" element={<TagsListEditor />} />
+        <Route path="/tag/:id" element={<TagInformation />} />
+      </Route>
+      <Route element={<NotFoundPage />} />
+    </Routes>
   );
 };
 

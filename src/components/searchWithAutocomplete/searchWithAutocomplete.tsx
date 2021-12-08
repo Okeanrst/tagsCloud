@@ -23,9 +23,7 @@ type IntegrationDownshiftPropsT = {
 };
 
 type ItemPropsT = {
-  InputProps: {
-    ref?: React.LegacyRef<HTMLInputElement>;
-  };
+  InputProps: {};
   classes: ClassesT;
   fullWidth: boolean;
 };

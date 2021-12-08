@@ -19,6 +19,7 @@ import SearchWithAutocomplete from './searchWithAutocomplete';
 
 import type { TagDataT } from 'types/types';
 import type { RootStateT, AppDispatchT } from 'store/types';
+import { withStyles } from '@material-ui/core';
 
 type CreatedTagDataT = Partial<Omit<TagDataT, 'id'>>;
 
@@ -52,8 +53,11 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
+type ClassesT = { [key: string]: string };
+
 type PropsT = PropsFromRedux & {
   restScreenHeight: number;
+  classes: ClassesT;
 };
 
 type StateT = {
@@ -131,15 +135,14 @@ class TagsListEditor extends Component<PropsT, StateT> {
       : TAGS_LIST_ROW_HEIGHT;
   };
 
-  renderLoader = (loading: boolean) => (
-    <div style={styles.loaderContainer}>
-      <FadeLoader
-        /*sizeUnit="px" size="50px"*/
-        color="#123abc"
-        loading={loading}
-      />
-    </div>
-  );
+  renderLoader = (loading: boolean) => {
+    const { classes } = this.props;
+    return (
+      <div className={classes.loaderContainer}>
+        <FadeLoader color="#123abc" loading={loading} />
+      </div>
+    );
+  };
 
   uploadCloudRawDataFile = (e: SyntheticEvent<HTMLInputElement>) => {
     if (
@@ -153,20 +156,26 @@ class TagsListEditor extends Component<PropsT, StateT> {
     this.props.uploadCloudRawDataFile(e.target.files[0]);
   };
 
-  renderFileUploader = (disabled: boolean) => (
-    <div style={styles.fileUploader}>
-      <label htmlFor="cloud_conf_upload" style={styles.fileUploaderLabel}>
-        Choose tags cloud configuration file (*.json)
-      </label>
-      <input
-        id="cloud_conf_upload"
-        type="file"
-        onChange={this.uploadCloudRawDataFile}
-        accept=".json"
-        disabled={disabled}
-      />
-    </div>
-  );
+  renderFileUploader = (disabled: boolean) => {
+    const { classes } = this.props;
+    return (
+      <div className={classes.fileUploader}>
+        <label
+          htmlFor="cloud_conf_upload"
+          className={classes.fileUploaderLabel}
+        >
+          Choose tags cloud configuration file (*.json)
+        </label>
+        <input
+          id="cloud_conf_upload"
+          type="file"
+          onChange={this.uploadCloudRawDataFile}
+          accept=".json"
+          disabled={disabled}
+        />
+      </div>
+    );
+  };
 
   downloadCloudRawDataFile = () => {
     const tagsCloudData = this.props.rawData.data;
@@ -185,16 +194,18 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   renderConfirmDelete = (tagIdToDelete: string) => {
+    const { classes } = this.props;
+
     const onConfirm = () => {
       this.resetIdForDelete();
       this.props.deleteTag(tagIdToDelete);
     };
 
     const modalWindowBody = [
-      <span key="question" style={styles.confirmDeleteQuestion}>
+      <span key="question" className={classes.confirmDeleteQuestion}>
         Are you sure you want to delete tag with "{tagIdToDelete}" id?
       </span>,
-      <div key="buttons" style={styles.confirmDeleteButtons}>
+      <div key="buttons" className={classes.confirmDeleteButtons}>
         <button onClick={this.resetIdForDelete} key="cancel">
           cancel
         </button>
@@ -206,7 +217,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
     return (
       <SmallModalWindow onContainerClick={this.resetIdForDelete}>
-        <div style={styles.confirmDelete}>{modalWindowBody}</div>
+        <div className={classes.confirmDelete}>{modalWindowBody}</div>
       </SmallModalWindow>
     );
   };
@@ -289,19 +300,19 @@ class TagsListEditor extends Component<PropsT, StateT> {
   );
 
   renderListRow =
-    (data: ReadonlyArray<TagDataT>) =>
+    (data: ReadonlyArray<TagDataT>, classes: ClassesT) =>
     ({ index, style }: { index: number; style: {} }) => {
       const item = data[index];
       return (
-        <li style={{ ...styles.tagsListRow, ...style }}>
-          <span key="label" style={styles.tagsListLabel}>
+        <li style={style} className={classes.tagsListRow}>
+          <span key="label" className={classes.tagsListLabel}>
             {item.label}
           </span>
           <span key="sentimentScore">{item.sentimentScore}</span>
           <button
             data-id={item.id}
             onClick={this.onClone}
-            style={styles.tagsListButton}
+            className={classes.tagsListButton}
             key="clone"
           >
             clone
@@ -309,7 +320,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
           <button
             data-id={item.id}
             onClick={this.onEdit}
-            style={styles.tagsListButton}
+            className={classes.tagsListButton}
             key="edit"
           >
             edit
@@ -317,7 +328,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
           <button
             data-id={item.id}
             onClick={this.onDelete}
-            style={styles.tagsListButton}
+            className={classes.tagsListButton}
             key="delete"
           >
             delete
@@ -327,6 +338,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
     };
 
   renderList = (data: ReadonlyArray<TagDataT>, height: number) => {
+    const { classes } = this.props;
     return (
       <FixedSizeList
         height={height}
@@ -335,13 +347,13 @@ class TagsListEditor extends Component<PropsT, StateT> {
         width="100%"
         ref={this.listRef}
       >
-        {this.renderListRow(data)}
+        {this.renderListRow(data, classes)}
       </FixedSizeList>
     );
   };
 
   render() {
-    const { rawData, searchAutocompleteSuggestions } = this.props;
+    const { rawData, searchAutocompleteSuggestions, classes } = this.props;
     const { tagsListHeight, editedTagData, createdTagData } = this.state;
     const loading = rawData.isFetching;
     const tagFormData = createdTagData || editedTagData;
@@ -351,7 +363,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
         {this.renderLoader(loading)}
         <div
           key="cloudConfFiles"
-          style={styles.cloudConfFiles}
+          className={classes.cloudConfFiles}
           ref={this.confFilesRef}
         >
           {this.renderFileUploader(loading)}
@@ -372,8 +384,9 @@ class TagsListEditor extends Component<PropsT, StateT> {
   }
 }
 
-const TagsListEditorWithRestScreenHeight =
-  withRestScreenHeight<PropsT>(TagsListEditor);
+const TagsListEditorWithRestScreenHeight = withStyles(styles)(
+  withRestScreenHeight<PropsT>(TagsListEditor),
+);
 
 type TagsListEditorWithRestScreenHeightPropsT = React.ComponentProps<
   typeof TagsListEditorWithRestScreenHeight
