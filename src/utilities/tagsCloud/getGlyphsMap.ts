@@ -26,6 +26,7 @@ export function getGlyphsMap(
   canvas.height = height * 1.1;
 
   ctx.textBaseline = 'alphabetic';
+  ctx.font = `${fontSize}px ${fontFamily}`;
 
   const sx = 0;
   const sy = 0;
