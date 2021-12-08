@@ -1,3 +1,3 @@
-export default function (data: {}): boolean {
+export default function rawDataValidator(): boolean {
   return true;
 }
