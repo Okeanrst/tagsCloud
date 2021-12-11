@@ -314,7 +314,7 @@ export function drawVacancy(vacancy: VacancyT, sceneSize: SceneSizeT): void {
       if (row === 0) {
         res += '-';
       } else {
-        res += col === 0 ? '|' : isBelongVacancy(col, row) ? '#' : '.';
+        res += col === 0 ? '|' : isBelongVacancy(col, row) ? '#' : '•';
       }
     }
     res += '\n';

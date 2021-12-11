@@ -1,21 +1,54 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core';
 
-const styles = {
-  navbar: { backgroundColor: '#e3f2fd' },
+const useStyles = makeStyles(theme => ({
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100%',
+  },
+  navbar: {
+    backgroundColor: 'var(--navbar-color)',
+  },
+  main: {
+    flexGrow: 12,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(4),
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  footer: {
+    padding: `${theme.spacing(2)}px ${theme.spacing(4)}px`,
+    backgroundColor: 'var(--footer-color)',
+  },
+  header: {
+    maxWidth: '1440px',
+    margin: '0px auto',
+  },
+}));
+
+export const Layout = () => {
+  const classes = useStyles();
+  return (
+    <div className={classes.container}>
+      <nav
+        key="nav"
+        className={['navbar', 'navbar-light', classes.navbar].join(' ')}
+      >
+        <div className="container">
+          <Link to="/" className="navbar-brand">
+            Home page
+          </Link>
+          <Link to="/tagsListEditor">Tags list editor</Link>
+        </div>
+      </nav>
+      <main className={['container', classes.main].join(' ')}>
+        <Outlet />
+      </main>
+      <footer className={classes.footer}>
+        <div className="container">Okeanrst {new Date().getFullYear()}</div>
+      </footer>
+    </div>
+  );
 };
-
-export const Layout = () => (
-  <main role="main" className="container">
-    <nav key="nav" className="navbar navbar-light mb-4" style={styles.navbar}>
-      <Link to="/" className="navbar-brand">
-        Home page
-      </Link>
-      <Link to="/tagsListEditor" className="">
-        Tags list editor
-      </Link>
-    </nav>
-    <Outlet />
-    <footer>Okeanrst 2021</footer>
-  </main>
-);

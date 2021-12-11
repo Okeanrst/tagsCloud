@@ -3,7 +3,7 @@ import { SceneMap, Dimensions } from './sceneMap';
 import EdgesManager, { edgesOrder, EDGE } from './edgesManager';
 import VacanciesManager, { drawVacancy } from './vacanciesManager';
 import IntersectionError from './IntersectionError';
-import { glyphsMapToRectMap } from '../tagsCloud/getGlyphsMap';
+import { glyphsMapToRectMap } from '../getGlyphsMap';
 
 import { IdGlyphsMapT } from 'types/types';
 import type {
@@ -576,19 +576,15 @@ export function calcTagsPositions(
         };
 
         let rectMap;
-        if (dataGlyphsMap) {
-          const glyphsMap = dataGlyphsMap.find(
-            itemMap => itemMap.id === rect.id,
+        const glyphsMap = dataGlyphsMap.find(itemMap => itemMap.id === rect.id);
+        if (glyphsMap?.map) {
+          rectMap = glyphsMapToRectMap(
+            glyphsMap.map,
+            { rows: rect.rows, cols: rect.cols },
+            !!rect.rotate,
           );
-          if (glyphsMap && glyphsMap.map) {
-            rectMap = glyphsMapToRectMap(
-              glyphsMap.map,
-              { rows: rect.rows, cols: rect.cols },
-              !!rect.rotate,
-            );
-          } else if (process.env.NODE_ENV !== 'production') {
-            throw new Error('rectMap is empty');
-          }
+        } else if (process.env.NODE_ENV !== 'production') {
+          throw new Error('glyphsMap is not found for target rect');
         }
 
         try {
@@ -733,13 +729,13 @@ export function calcTagsPositions(
       const performWork = (rect: TagRectT, index: number): void => {
         if (index === 0) {
           const { rows, cols } = rect;
-          const laidRectData = {
+          const rectPosition = {
             top: Math.ceil(rows / 2),
             right: Math.ceil(cols / 2),
             bottom: -Math.ceil(rows / 2),
             left: -Math.ceil(cols / 2),
           };
-          layRect(creatLaidRect(rect, laidRectData));
+          layRect(creatLaidRect(rect, rectPosition));
           return;
         }
 

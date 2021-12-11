@@ -32,11 +32,17 @@ type PropsT = PropsFromRedux & {
 };
 
 type StateT = {
-  tagsCloudSceneWidth: number;
+  tagsCloudSceneSize: { width: number; height: number } | null;
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-  pageContainer: { position: 'relative', minHeight: '250px' },
+  pageContainer: {
+    position: 'relative',
+    minHeight: '250px',
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 12,
+  },
   loaderContainer: {
     position: 'absolute',
     display: 'flex',
@@ -48,12 +54,18 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     justifyContent: 'center',
     position: 'relative',
+    flexGrow: 12,
   },
-  checkbox: { position: 'absolute', top: '20px', left: '20px' },
+  checkbox: {
+    position: 'absolute',
+    top: '20px',
+    left: '20px',
+    zIndex: 1,
+  },
 };
 
 class HomePage extends Component<PropsT, StateT> {
-  state: StateT = { tagsCloudSceneWidth: 1 };
+  state: StateT = { tagsCloudSceneSize: null };
 
   tagsCloudSceneRef = React.createRef<HTMLDivElement>();
 
@@ -71,10 +83,11 @@ class HomePage extends Component<PropsT, StateT> {
       return;
     }
 
-    const tagsCloudSceneWidth = this.calcTagsCloudWidth(
+    const tagsCloudSceneSize = this.calcTagsCloudSize(
       this.tagsCloudSceneRef.current,
     );
-    this.setState({ tagsCloudSceneWidth });
+
+    this.setState({ tagsCloudSceneSize });
   }
 
   componentWillUnmount() {
@@ -96,27 +109,29 @@ class HomePage extends Component<PropsT, StateT> {
     }
   }
 
-  calcTagsCloudWidth(elem: HTMLDivElement) {
-    const { left, right } = elem.getBoundingClientRect();
+  calcTagsCloudSize(elem: HTMLDivElement) {
+    const clientRect = elem.getBoundingClientRect();
+    const { left, right, top, bottom } = clientRect;
     const width = right - left;
-    return width;
+    const height = bottom - top;
+    return { width, height };
   }
 
   handleResize = () => {
-    const recalcState = () => {
+    const recalculateState = () => {
       this.resizeTaskTimer = null;
       if (this.tagsCloudSceneRef && this.tagsCloudSceneRef.current) {
-        const tagsCloudSceneWidth = this.calcTagsCloudWidth(
+        const tagsCloudSceneSize = this.calcTagsCloudSize(
           this.tagsCloudSceneRef.current,
         );
-        this.setState({ tagsCloudSceneWidth });
+        this.setState({ tagsCloudSceneSize });
       }
     };
 
     const delay = 500;
 
     if (!this.resizeTaskTimer) {
-      this.resizeTaskTimer = setTimeout(recalcState, delay);
+      this.resizeTaskTimer = setTimeout(recalculateState, delay);
     }
   };
 
@@ -131,29 +146,31 @@ class HomePage extends Component<PropsT, StateT> {
   );
 
   render() {
-    const { tagsCloudSceneWidth } = this.state;
+    const { tagsCloudSceneSize } = this.state;
     const { useCanvas, rawData, tagsCloud, toggleUseCanvas, fontLoaded } =
       this.props;
     const loading =
       rawData.isFetching || tagsCloud.isFetching || fontLoaded.isFetching;
     const TagsCloudComponent = useCanvas ? TagsCloudCanvas : TagsCloud;
+
     return (
       <div style={styles.pageContainer}>
         {this.renderLoader(loading)}
+        <div style={styles.checkbox} className="form-group form-check">
+          <input
+            type="checkbox"
+            checked={useCanvas}
+            onChange={toggleUseCanvas}
+            id="useCanvas"
+            className="form-check-input"
+          />
+          <label htmlFor="useCanvas">use canvas</label>
+        </div>
         <div ref={this.tagsCloudSceneRef} style={styles.tagsCloudScene}>
-          <div style={styles.checkbox} className="form-group form-check">
-            <input
-              type="checkbox"
-              checked={useCanvas}
-              onChange={toggleUseCanvas}
-              id="useCanvas"
-              className="form-check-input"
-            />
-            <label htmlFor="useCanvas">use canvas</label>
-          </div>
-          {tagsCloud.data && (
+          {tagsCloudSceneSize && tagsCloud.data && (
             <TagsCloudComponent
-              width={tagsCloudSceneWidth}
+              width={tagsCloudSceneSize.width}
+              height={tagsCloudSceneSize.height}
               tagData={tagsCloud.data}
               onTagClick={this.onTagClick}
             />

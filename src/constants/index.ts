@@ -1,1 +1,1 @@
-export const PADDING = 1.1;
+export const FONT_FAMILY = 'Open Sans';

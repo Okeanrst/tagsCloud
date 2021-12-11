@@ -1,17 +1,18 @@
 import React from 'react';
+import { withStyles } from '@material-ui/core';
 import { drawOnCanvas } from 'utilities/tagsCloud/drawOnCanvas';
-import {
-  calcAllowedWidth,
-  getBorderCoordinates,
-} from 'utilities/tagsCloud/tagsCloud';
-import { PADDING } from '../constants';
+import { getBorderCoordinates } from 'utilities/tagsCloud/tagsCloud';
 
 import type { PositionedTagRectT } from 'types/types';
 
 type PropsT = {
   tagData: ReadonlyArray<PositionedTagRectT>;
   width: number;
+  height: number;
   onTagClick: (id: string) => void;
+  classes: {
+    container: string;
+  };
 };
 
 type StateT = {
@@ -20,8 +21,17 @@ type StateT = {
   clearParams?: [number, number, number, number];
 };
 
+const PADDING = 16;
+
+const styles = {
+  container: {
+    padding: `${PADDING}px`,
+    lineHeight: 0,
+  },
+};
+
 class TagsCloudCanvas extends React.Component<PropsT, StateT> {
-  tagCloudCanvas = React.createRef<HTMLCanvasElement>();
+  tagCloudCanvasRef = React.createRef<HTMLCanvasElement>();
   state: StateT = { scale: 1 };
 
   componentDidMount() {
@@ -31,7 +41,9 @@ class TagsCloudCanvas extends React.Component<PropsT, StateT> {
   shouldComponentUpdate(nextProps: PropsT) {
     return (
       this.props.width !== nextProps.width ||
-      this.props.tagData !== nextProps.tagData
+      this.props.height !== nextProps.height ||
+      this.props.tagData !== nextProps.tagData ||
+      this.props.onTagClick !== nextProps.onTagClick
     );
   }
 
@@ -74,9 +86,9 @@ class TagsCloudCanvas extends React.Component<PropsT, StateT> {
   };
 
   draw = () => {
-    const allowedWidth = calcAllowedWidth(this.props.width);
+    const { width, height } = this.props;
 
-    const canvas = this.tagCloudCanvas.current;
+    const canvas = this.tagCloudCanvasRef.current;
 
     if (!canvas) {
       return;
@@ -89,8 +101,12 @@ class TagsCloudCanvas extends React.Component<PropsT, StateT> {
       ctx.translate(...this.state.restoreCoords);
     }
 
-    const drawResult = drawOnCanvas(this.props.tagData, canvas, allowedWidth, {
-      padding: PADDING,
+    const availableWidth = width - PADDING * 2;
+    const availableHeight = height - PADDING * 2;
+
+    const drawResult = drawOnCanvas(this.props.tagData, canvas, {
+      width: availableWidth,
+      height: availableHeight,
     });
 
     if (!drawResult) {
@@ -103,14 +119,18 @@ class TagsCloudCanvas extends React.Component<PropsT, StateT> {
   };
 
   render() {
+    const { classes } = this.props;
+
     return (
-      <canvas
-        ref={this.tagCloudCanvas}
-        id="tagCloudCanvas"
-        onClick={this.onCanvasClick}
-      />
+      <div className={classes.container}>
+        <canvas
+          ref={this.tagCloudCanvasRef}
+          id="tagCloudCanvasRef"
+          onClick={this.onCanvasClick}
+        />
+      </div>
     );
   }
 }
 
-export default TagsCloudCanvas;
+export default withStyles(styles)(TagsCloudCanvas);

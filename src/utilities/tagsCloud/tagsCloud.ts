@@ -1,9 +1,6 @@
-import { splitAndPerformWork } from '../common/splitAndPerformWork';
-import { getGlyphsMap } from './getGlyphsMap';
 import {
   TagDataT,
   PreparedTagDataT,
-  IdGlyphsMapT,
   PositionedTagRectT,
   PositionedTagSvgDataT,
 } from 'types/types';
@@ -124,25 +121,13 @@ export function getBorderCoordinates(
   return { top: maxTop, bottom: minBottom, right: maxRight, left: minLeft };
 }
 
-export function calcAllowedWidth(width: number): number {
-  const aspectRatio =
-    document.documentElement.clientWidth /
-    document.documentElement.clientHeight;
-  let allowedWidth = width * 0.9;
-  if (aspectRatio >= 1) {
-    allowedWidth = (width / aspectRatio) * 1.2;
-  }
-  return allowedWidth;
-}
-
 export function getTagsSvgData(
   data: ReadonlyArray<PositionedTagRectT>,
   allowedWidth: number,
 ): {
-  maxRight: number;
-  minLeft: number;
-  minBottom: number;
-  maxTop: number;
+  transform: string;
+  viewBox: string;
+  aspectRatio: number;
   data: ReadonlyArray<PositionedTagSvgDataT>;
 } | null {
   const borderCoordinates = getBorderCoordinates(data);
@@ -152,13 +137,13 @@ export function getTagsSvgData(
   }
 
   const {
-    top: maxTop,
-    bottom: minBottom,
-    right: maxRight,
-    left: minLeft,
+    top: borderTop,
+    bottom: borderBottom,
+    right: borderRight,
+    left: borderLeft,
   } = borderCoordinates;
 
-  const scale = allowedWidth / (maxRight - minLeft);
+  const scale = allowedWidth / (borderRight - borderLeft);
 
   /*data.forEach(item => {
     item.rectTranslateX = (item.rectLeft) * scale;
@@ -194,41 +179,25 @@ export function getTagsSvgData(
     };
   });
 
+  const maxRight = borderRight * scale;
+  const minLeft = borderLeft * scale;
+  const minBottom = borderBottom * scale;
+  const maxTop = borderTop * scale;
+
+  const sceneWidth = maxRight - minLeft;
+  const sceneHeight = maxTop - minBottom;
+
   return {
-    maxRight: maxRight * scale,
-    minLeft: minLeft * scale,
-    minBottom: minBottom * scale,
-    maxTop: maxTop * scale,
+    transform: `translate(${-minLeft}, ${maxTop})`,
+    viewBox: `0 0 ${sceneWidth} ${sceneHeight}`,
+    aspectRatio: sceneWidth / sceneHeight,
     data: positionedTagSvgData,
   };
 }
 
-export function getRandomRGBColor(): string {
+function getRandomRGBColor(): string {
   let r = Math.round(Math.random() * 0xff);
   let g = Math.round(Math.random() * 0xff);
   let b = Math.round(Math.random() * 0xff);
   return `rgb(${r}, ${g}, ${b})`;
-}
-
-export function prepareDataGlyphsMap(
-  data: ReadonlyArray<PreparedTagDataT>,
-  minFontSize = 30,
-): Promise<ReadonlyArray<IdGlyphsMapT>> {
-  return new Promise(function (resolve, reject) {
-    const canvas = document.createElement('canvas');
-
-    const workGenerator: () => Generator<IdGlyphsMapT> =
-      function* workGenerator() {
-        for (let i = 0; i < data.length; i++) {
-          const item = data[i];
-          const biggestFontSize =
-            minFontSize < item.fontSize ? item.fontSize : minFontSize;
-          const map = getGlyphsMap(canvas, item.label, biggestFontSize);
-          yield { id: item.id, map };
-        }
-      };
-    splitAndPerformWork<IdGlyphsMapT>(workGenerator, 50)
-      .then(resolve)
-      .catch(reject);
-  });
 }

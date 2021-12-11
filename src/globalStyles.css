@@ -1,0 +1,19 @@
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  height: 1px;
+  min-height: 100%;
+}
+
+:root {
+  --navbar-color: #e3f2fd;
+  --footer-color: #9ec2f1;
+}
+
+[data-color-scheme="dark"] {
+  --navbar-color: #212529;
+  --footer-color: #23313e;
+}

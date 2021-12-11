@@ -1,10 +1,8 @@
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
 import { calcTagsPositions } from 'utilities/positioningAlgorithm/calcTagsPositions';
-import {
-  prepareData,
-  prepareDataGlyphsMap,
-} from 'utilities/tagsCloud/tagsCloud';
+import { prepareData } from 'utilities/tagsCloud/tagsCloud';
+import { prepareDataGlyphsMap } from 'utilities/prepareDataGlyphsMap';
 import { createAction } from './helpers';
 import validateTagsCloudRawData from './rawDataValidator';
 

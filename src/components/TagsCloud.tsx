@@ -1,10 +1,7 @@
 import { withStyles } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
-import {
-  getTagsSvgData,
-  calcAllowedWidth,
-} from 'utilities/tagsCloud/tagsCloud';
-import { PADDING } from '../constants';
+import { getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
+import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 
 import type { PositionedTagRectT } from 'types/types';
 import React from 'react';
@@ -12,17 +9,15 @@ import React from 'react';
 type PropsT = {
   tagData: ReadonlyArray<PositionedTagRectT>;
   width: number;
+  height: number;
   onTagClick: (id: string) => void;
   classes: {
+    container: string;
     text: string;
   };
 };
 
-const styles = {
-  text: {
-    'white-space': 'pre',
-  },
-};
+const PADDING = 16;
 
 const DURATION = 500;
 
@@ -31,33 +26,41 @@ const DEFAULT_STYLE = {
   opacity: 0,
 };
 
-const TagsCloud = ({ tagData, width, onTagClick, classes }: PropsT) => {
-  const allowedWidth = calcAllowedWidth(width);
+const BASE_WIDTH = 1000;
 
-  const result = getTagsSvgData(tagData, allowedWidth);
+const styles = {
+  container: { padding: `${PADDING}px` },
+  text: {
+    'white-space': 'pre',
+  },
+};
 
-  if (!result) {
+const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
+  const tagsSvgData = getTagsSvgData(tagData, BASE_WIDTH);
+
+  if (!tagsSvgData) {
     return null;
   }
 
   const {
-    maxRight,
-    minLeft,
-    minBottom,
-    maxTop,
+    viewBox,
+    transform,
+    aspectRatio,
     data: positionedTagSvgData,
-  } = result;
+  } = tagsSvgData;
 
-  const sceneWidth = (maxRight - minLeft) * PADDING;
-  const sceneHeight = (maxTop - minBottom) * PADDING;
+  const availableWidth = width - PADDING * 2;
+  const availableHeight = height - PADDING * 2;
 
-  const axisXOffset = -minLeft + (sceneWidth * (PADDING - 1)) / 2;
-  const axisYOffset = maxTop + (sceneHeight * (PADDING - 1)) / 2;
+  const svgSize = getSuitableSize(
+    { width: availableWidth, height: availableHeight },
+    aspectRatio,
+  );
 
   return (
-    <div style={{ display: 'inline-block' }}>
-      <svg id="small_cloud" width={sceneWidth} height={sceneHeight}>
-        <g transform={`translate(${axisXOffset}, ${axisYOffset})`}>
+    <div className={classes.container}>
+      <svg id="small_cloud" {...svgSize} viewBox={viewBox}>
+        <g transform={transform}>
           <TransitionGroup
             className="tagsCloud"
             component={null}

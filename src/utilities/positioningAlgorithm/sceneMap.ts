@@ -172,7 +172,7 @@ export class SceneMap {
         if (row === 0) {
           res += '-';
         } else {
-          res += col === 0 ? '|' : this.getDataAtPosition(col, row) ? '#' : '.';
+          res += col === 0 ? '|' : this.getDataAtPosition(col, row) ? '#' : '•';
         }
       }
       res += '\n';

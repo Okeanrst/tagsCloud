@@ -1,8 +1,9 @@
 import { getBorderCoordinates } from './tagsCloud';
 import { PositionedTagRectT } from 'types/types';
+import { FONT_FAMILY } from 'constants/index';
+import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 
 type OptionsT = {
-  padding: number;
   fontFamily?: string;
   drawAxles?: boolean;
 };
@@ -13,14 +14,14 @@ type RestoreCoordsT = [number, number];
 export function drawOnCanvas(
   data: ReadonlyArray<PositionedTagRectT>,
   canvas: HTMLCanvasElement,
-  allowedWidth: number,
-  options: OptionsT,
+  availableSize: { width: number; height: number },
+  options?: OptionsT,
 ): {
   clearParams: ClearParamsT;
   restoreCoords: RestoreCoordsT;
   scale: number;
 } | null {
-  const { padding, fontFamily = 'Open Sans', drawAxles = false } = options;
+  const { fontFamily = FONT_FAMILY, drawAxles = false } = options ?? {};
   const borderCoordinates = getBorderCoordinates(data);
 
   if (!borderCoordinates) {
@@ -37,16 +38,20 @@ export function drawOnCanvas(
   const sceneWidth = maxRight - minLeft;
   const sceneHeight = maxTop - minBottom;
 
-  const scale = allowedWidth / (sceneWidth * padding);
+  const aspectRatio = sceneWidth / sceneHeight;
 
-  const canvasWidth = sceneWidth * padding * scale;
-  const canvasHeight = sceneHeight * padding * scale;
+  const { width: canvasWidth, height: canvasHeight } = getSuitableSize(
+    availableSize,
+    aspectRatio,
+  );
 
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
-  const axisXOffset = -minLeft * scale + (canvasWidth * (padding - 1)) / 2;
-  const axisYOffset = maxTop * scale + (canvasHeight * (padding - 1)) / 2;
+  const scale = canvasWidth / sceneWidth;
+
+  const axisXOffset = -minLeft * scale;
+  const axisYOffset = maxTop * scale;
 
   const ctx = canvas.getContext('2d');
 
