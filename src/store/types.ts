@@ -1,21 +1,22 @@
 import { ThunkDispatch } from 'redux-thunk';
 import { Action } from 'redux';
+import { QueryStatusesT } from 'constants/queryStatuses';
 
 import type { PositionedTagRectT, TagDataT } from 'types/types';
 
 export type RootStateT = {
   rawData: {
     data?: ReadonlyArray<TagDataT>;
-    isFetching: boolean;
+    status: QueryStatusesT;
   };
   tagsCloud: {
     data?: ReadonlyArray<PositionedTagRectT>;
-    isFetching: boolean;
+    status: QueryStatusesT;
   };
   useCanvas: boolean;
   fontLoaded: {
-    data: any;
-    isFetching: boolean;
+    data: boolean;
+    status: QueryStatusesT;
   };
 };
 

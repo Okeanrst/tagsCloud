@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
+import { PENDING } from 'constants/queryStatuses';
 
 import { TagDataT } from '../types/types';
 import { RootStateT } from '../store/types';
@@ -148,10 +149,10 @@ const TagInformation = (props: PropsT) => {
   }, []);
 
   useEffect(() => {
-    if (!tagData && !rawData.isFetching) {
+    if (!tagData && rawData.status !== PENDING) {
       navigate('/notFound', { replace: true });
     }
-  }, [tagData, rawData.isFetching, navigate]);
+  }, [tagData, rawData.status, navigate]);
 
   if (!tagData) return null;
 

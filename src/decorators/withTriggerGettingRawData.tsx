@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import getDisplayName from 'react-display-name';
 import { useSelector, useDispatch } from 'react-redux';
 import * as actions from 'store/actions/tagsCloud';
+import { PENDING } from 'constants/queryStatuses';
 
 import type { RootStateT } from 'store/types';
 
@@ -17,7 +18,7 @@ function withTriggerGettingRawData<T>(
     const dispatch = useDispatch();
 
     useEffect(() => {
-      if (!rawData.data && !rawData.isFetching) {
+      if (!rawData.data && rawData.status !== PENDING) {
         dispatch(actions.getData());
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -5,6 +5,7 @@ import * as actions from 'store/actions/tagsCloud';
 import TagsCloud from 'components/TagsCloud';
 import TagsCloudCanvas from 'components/TagsCloudCanvas';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
+import { PENDING, PRISTINE, SUCCESS } from 'constants/queryStatuses';
 
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
@@ -72,10 +73,16 @@ class HomePage extends Component<PropsT, StateT> {
   resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
 
   componentDidMount() {
-    //!prevProps.fontLoaded.data && fontLoaded.data
-    const { rawData, tagsCloud } = this.props;
-    if (rawData.data && !tagsCloud.data && !tagsCloud.isFetching) {
-      this.props.buildTagsCloud(rawData.data);
+    const { rawData, tagsCloud, fontLoaded, buildTagsCloud } = this.props;
+
+    if (
+      fontLoaded.status === SUCCESS &&
+      fontLoaded.data &&
+      rawData.status === SUCCESS &&
+      rawData.data &&
+      tagsCloud.status === PRISTINE
+    ) {
+      buildTagsCloud(rawData.data);
     }
     window.addEventListener('resize', this.handleResize);
 
@@ -97,15 +104,16 @@ class HomePage extends Component<PropsT, StateT> {
   }
 
   componentDidUpdate(prevProps: PropsT, prevState: StateT) {
+    const { fontLoaded, rawData, tagsCloud, buildTagsCloud } = this.props;
+
     if (
-      this.props.rawData.data &&
-      ((!prevProps.rawData.data &&
-        this.props.rawData.data &&
-        !this.props.tagsCloud.data) ||
-        (prevProps.rawData.data &&
-          prevProps.rawData.data !== this.props.rawData.data))
+      fontLoaded.data &&
+      rawData.status === SUCCESS &&
+      rawData.data &&
+      !tagsCloud.data &&
+      tagsCloud.status === PRISTINE
     ) {
-      this.props.buildTagsCloud(this.props.rawData.data);
+      buildTagsCloud(rawData.data);
     }
   }
 
@@ -149,8 +157,11 @@ class HomePage extends Component<PropsT, StateT> {
     const { tagsCloudSceneSize } = this.state;
     const { useCanvas, rawData, tagsCloud, toggleUseCanvas, fontLoaded } =
       this.props;
-    const loading =
-      rawData.isFetching || tagsCloud.isFetching || fontLoaded.isFetching;
+    const loading = [
+      rawData.status,
+      tagsCloud.status,
+      fontLoaded.status,
+    ].includes(PENDING);
     const TagsCloudComponent = useCanvas ? TagsCloudCanvas : TagsCloud;
 
     return (

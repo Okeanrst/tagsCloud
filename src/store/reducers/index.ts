@@ -13,20 +13,21 @@ import {
   USE_CANVAS_TOGGLE,
 } from '../actions/actionTypes';
 import fontLoaded from './fontLoaded';
+import { PRISTINE, SUCCESS, FAILURE, PENDING } from 'constants/queryStatuses';
 
 import type { RootStateT } from '../types';
 
 const rawDataReducer = (
-  state: RootStateT['rawData'] = { isFetching: false },
+  state: RootStateT['rawData'] = { status: PRISTINE },
   action: AnyAction,
 ) => {
   switch (action.type) {
     case FETCH_DATA_REQUEST:
-      return { ...state, isFetching: true };
+      return { ...state, status: PENDING };
     case FETCH_DATA_SUCCESS:
-      return { ...state, isFetching: false, data: action.data };
+      return { ...state, status: SUCCESS, data: action.data };
     case FETCH_DATA_FAILURE:
-      return { ...state, isFetching: false };
+      return { ...state, status: FAILURE };
     case DELETE_DATA_ITEM:
       const idToDelete = action.data;
       const data = state.data?.filter(item => item.id !== idToDelete);
@@ -54,18 +55,18 @@ const rawDataReducer = (
 };
 
 const tagsCloudReducer = (
-  state: RootStateT['tagsCloud'] = { isFetching: false },
+  state: RootStateT['tagsCloud'] = { status: PRISTINE },
   action: AnyAction,
 ) => {
   switch (action.type) {
     case PROCESS_DATA_REQUEST:
-      return { ...state, isFetching: true };
+      return { ...state, status: PENDING };
     case PROCESS_DATA_SUCCESS:
-      return { ...state, isFetching: false, data: action.data };
+      return { ...state, status: SUCCESS, data: action.data };
     case PROCESS_DATA_FAILURE:
-      return { ...state, isFetching: false };
+      return { ...state, status: FAILURE };
     case RESET_TAGS_CLOUD_DATA:
-      return { ...state, isFetching: false, data: undefined };
+      return { ...state, status: PRISTINE, data: undefined };
     default:
       return state;
   }

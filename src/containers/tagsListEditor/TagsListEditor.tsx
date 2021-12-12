@@ -16,6 +16,7 @@ import {
 } from 'store/actions/tagsCloudDataFile';
 import { TagForm } from './TagForm';
 import SearchWithAutocomplete from './searchWithAutocomplete';
+import { PENDING } from 'constants/queryStatuses';
 
 import type { TagDataT } from 'types/types';
 import type { RootStateT, AppDispatchT } from 'store/types';
@@ -355,7 +356,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
   render() {
     const { rawData, searchAutocompleteSuggestions, classes } = this.props;
     const { tagsListHeight, editedTagData, createdTagData } = this.state;
-    const loading = rawData.isFetching;
+    const loading = rawData.status === PENDING;
     const tagFormData = createdTagData || editedTagData;
 
     return (
