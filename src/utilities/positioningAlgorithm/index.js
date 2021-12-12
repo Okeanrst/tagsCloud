@@ -91,7 +91,7 @@ export default function (data: Array<PrepareDataItem>, dataGlyphsMap?: Array<IdG
           return;
         }
 
-        const addIfEmpty = ind < options.addIfEmptyIndex || 5;
+        const addIfEmpty = ind < (options.addIfEmptyIndex || 5);
 
         const tryPickClosedVacancy = () => {
           let rectPosition = pickClosedVacancy(rect);
