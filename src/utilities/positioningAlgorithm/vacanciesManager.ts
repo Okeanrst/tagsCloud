@@ -280,10 +280,11 @@ export default class VacanciesManager {
   }
 
   filterUnsuitableClosedVacancies(
-    vacancyApprover: (vacancy: ClosedVacancyT | void) => boolean,
+    vacancyFilter: (vacancy: ClosedVacancyT | void) => boolean,
   ) {
-    // TBD it seems to be useless
-    this.closedVacancies.filter(vacancy => vacancyApprover(vacancy));
+    this.closedVacancies = this.closedVacancies.filter(vacancy =>
+      vacancyFilter(vacancy),
+    );
   }
 }
 

@@ -692,7 +692,7 @@ export function calcTagsPositions(
         vacanciesManager.buildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
         const { minRectCols, minRectRows } = calcMinRectsSizes(rectsData);
 
-        const vacancyApprover = (vacancy: ClosedVacancyT | void) => {
+        const vacancyFilter = (vacancy: ClosedVacancyT | void) => {
           return (
             !!vacancy &&
             isVacancyLargeEnoughToFitRect(
@@ -702,8 +702,7 @@ export function calcTagsPositions(
           );
         };
 
-        // TBD it seems to be useless
-        vacanciesManager.filterUnsuitableClosedVacancies(vacancyApprover);
+        vacanciesManager.filterUnsuitableClosedVacancies(vacancyFilter);
 
         if (options?.drawVacanciesMap) {
           const sceneSize = sceneMap.getSceneSize();
