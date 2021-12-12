@@ -253,11 +253,13 @@ export function calcTagsPositions(
         return { top, bottom, right, left };
       };
 
-      const edgeVacanciesByEdge = {
-        [TOP]: vacanciesManager.topEdgeVacancies,
-        [BOTTOM]: vacanciesManager.bottomEdgeVacancies,
-        [RIGHT]: vacanciesManager.rightEdgeVacancies,
-        [LEFT]: vacanciesManager.leftEdgeVacancies,
+      const getEdgeVacanciesByEdge = (edge: EDGE) => {
+        return {
+          [TOP]: () => vacanciesManager.topEdgeVacancies,
+          [BOTTOM]: () => vacanciesManager.bottomEdgeVacancies,
+          [RIGHT]: () => vacanciesManager.rightEdgeVacancies,
+          [LEFT]: () => vacanciesManager.leftEdgeVacancies,
+        }[edge]();
       };
 
       const pickEdgeVacancy = (
@@ -265,7 +267,7 @@ export function calcTagsPositions(
         edge: EDGE,
         { force = false, threshold = 0.5 } = {},
       ) => {
-        const vacancies = edgeVacanciesByEdge[edge];
+        const vacancies = getEdgeVacanciesByEdge(edge);
 
         const baseSize =
           edge === TOP || edge === BOTTOM ? rect.cols : rect.rows;
@@ -684,7 +686,9 @@ export function calcTagsPositions(
         }
       };
 
-      const updateVacancies = (isShouldCreateVacancyIfNoSuchKind: boolean) => {
+      const rebuildVacanciesMap = (
+        isShouldCreateVacancyIfNoSuchKind: boolean,
+      ) => {
         vacanciesManager.buildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
         const { minRectCols, minRectRows } = calcMinRectsSizes(rectsData);
 
@@ -745,7 +749,7 @@ export function calcTagsPositions(
         const tryPickClosedVacancy = (): boolean => {
           let rectPosition = pickClosedVacancy(rect);
           if (!rectPosition && needVacanciesRefresh) {
-            updateVacancies(isShouldCreateVacancyIfNoSuchKind);
+            rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
             needVacanciesRefresh = false;
             rectPosition = pickClosedVacancy(rect);
           }
@@ -793,7 +797,7 @@ export function calcTagsPositions(
             if (rectPosition) {
               try {
                 layRect(creatLaidRect(rect, rectPosition));
-                updateVacancies(isShouldCreateVacancyIfNoSuchKind);
+                rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
                 needVacanciesRefresh = false;
                 return;
               } catch (e) {
@@ -806,6 +810,7 @@ export function calcTagsPositions(
         }
 
         {
+          // place rect outside the Scene
           const sizeRatio = rect.cols / rect.rows;
           const edge = edgesManager.getNextEdge(sizeRatio);
 
@@ -813,7 +818,7 @@ export function calcTagsPositions(
 
           try {
             layRect(creatLaidRect(rect, rectPosition));
-            updateVacancies(isShouldCreateVacancyIfNoSuchKind);
+            rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
             needVacanciesRefresh = false;
             edgesManager.confirmEdgeUsage(edge);
             return;

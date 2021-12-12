@@ -19,14 +19,14 @@ export function getGlyphsMap(
     return null;
   }
 
-  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.font = `${fontSize}px "${fontFamily}"`;
   const wordWidth = ctx.measureText(word).width;
 
   canvas.width = wordWidth * 1.1;
   canvas.height = height * 1.1;
 
   ctx.textBaseline = 'alphabetic';
-  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.font = `${fontSize}px "${fontFamily}"`;
 
   const sx = 0;
   const sy = 0;
