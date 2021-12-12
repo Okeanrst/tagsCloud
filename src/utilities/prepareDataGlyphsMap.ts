@@ -15,8 +15,9 @@ export function prepareDataGlyphsMap(
           const item = tagsData[i];
           const biggestFontSize =
             minFontSize < item.fontSize ? item.fontSize : minFontSize;
-          const map = getGlyphsMap(canvas, item.label, biggestFontSize);
-          yield { id: item.id, map };
+          const { map = null, meta = null } =
+            getGlyphsMap(canvas, item.label, biggestFontSize) ?? {};
+          yield { id: item.id, map, meta };
         }
       };
     splitAndPerformWork<IdGlyphsMapT>(workGenerator, 50)

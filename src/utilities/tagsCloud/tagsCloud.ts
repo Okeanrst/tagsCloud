@@ -1,3 +1,5 @@
+import { FONT_FAMILY } from 'constants/index';
+
 import {
   TagDataT,
   PreparedTagDataT,
@@ -28,7 +30,7 @@ export function prepareData(
   const {
     minFontSize = DEFAULT_MIN_FONT_SIZE,
     maxFontSize = DEFAULT_MAX_FONT_SIZE,
-    fontFamily = 'Open Sans',
+    fontFamily = FONT_FAMILY,
   } = options;
 
   const canvas = document.createElement('canvas');
@@ -66,7 +68,7 @@ export function prepareData(
       minFontSize +
       Math.round((item.sentimentScore - minSentimentScore) * ratio);
 
-    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.font = `${fontSize}px "${fontFamily}"`;
     const measure = ctx.measureText(item.label);
 
     return {

@@ -42,9 +42,17 @@ export type PreparedTagDataT = TagDataT &
 
 export type GlyphsMapT = Array<Array<boolean>>;
 
+export type GlyphsMapMetaT = {
+  firstNotEmptyRow: number;
+  lastNotEmptyRow: number;
+  firstNotEmptyColumn: number;
+  lastNotEmptyColumn: number;
+};
+
 export type IdGlyphsMapT = {
   id: string;
   map: GlyphsMapT | null;
+  meta: GlyphsMapMetaT | null;
 };
 
 export type RectAreaT = {

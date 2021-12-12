@@ -1,4 +1,6 @@
-import { GlyphsMapT, RectAreaT, RectMapT } from 'types/types';
+import { FONT_FAMILY } from 'constants/index';
+
+import { GlyphsMapMetaT, GlyphsMapT, RectAreaT, RectMapT } from 'types/types';
 
 type OptionsT = {
   fontFamily?: string;
@@ -9,8 +11,11 @@ export function getGlyphsMap(
   canvas: HTMLCanvasElement,
   word: string,
   fontSize: number,
-  { fontFamily = 'Open Sans', fontK = 1.1 }: OptionsT = {},
-): GlyphsMapT | null {
+  { fontFamily = FONT_FAMILY, fontK = 1.1 }: OptionsT = {},
+): {
+  map: GlyphsMapT;
+  meta: GlyphsMapMetaT;
+} | null {
   const height = fontSize * fontK;
 
   const ctx = canvas.getContext('2d');
@@ -40,7 +45,7 @@ export function getGlyphsMap(
 
   const rows = Math.floor(sh - sx) + 1;
   const cols = Math.floor(sw - sy);
-  const rawMap: GlyphsMapT = [];
+  const map: GlyphsMapT = [];
 
   const emptyRows = Array.from({ length: rows }).fill(true);
   const emptyColumns = Array.from({ length: cols }).fill(true);
@@ -54,11 +59,11 @@ export function getGlyphsMap(
       //const blue = 255 - data[firstBt + 2];
       const opacity = data[firstByte + 3] / 255;
 
-      if (!rawMap[row]) {
-        rawMap[row] = [];
+      if (!map[row]) {
+        map[row] = [];
       }
-      rawMap[row][col] = !!opacity;
-      if (rawMap[row][col]) {
+      map[row][col] = !!opacity;
+      if (map[row][col]) {
         emptyRows[row] = false;
         emptyColumns[col] = false;
       }
@@ -66,22 +71,23 @@ export function getGlyphsMap(
   }
 
   // to cut of empty rows and columns
-  const targetRows = Array.from({ length: rows }).fill(true);
 
+  let firstNotEmptyRow: number = 0;
   // Rows: forward direction
   for (let i = 0; i < emptyRows.length; i++) {
     if (!emptyRows[i]) {
       // till meet the first not empty position
+      firstNotEmptyRow = i;
       break;
     }
-    targetRows[i] = false;
   }
+  let lastNotEmptyRow: number = emptyRows.length - 1;
   // Rows: reverse direction
   for (let i = emptyRows.length - 1; i >= 0; i--) {
     if (!emptyRows[i]) {
+      lastNotEmptyRow = i;
       break;
     }
-    targetRows[i] = false;
   }
 
   // Columns: forward direction
@@ -102,10 +108,12 @@ export function getGlyphsMap(
     }
   }
 
+  /*
+  // cutting of GlyphsMap empty area
   const map: GlyphsMapT = [];
   let targetMapRow = 0;
   for (let row = 0; row < rows; row++) {
-    if (!targetRows[row]) {
+    if (row < firstNotEmptyRow || lastNotEmptyRow < row) {
       // not copy
       continue;
     }
@@ -114,18 +122,24 @@ export function getGlyphsMap(
       lastNotEmptyColumn + 1,
     );
     targetMapRow++;
-  }
+  }*/
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (false) {
     console.log(word);
-    console.log(visualizeMap(rawMap, { cols, rows }, 250));
-    console.log(
-      visualizeMap(map, { cols: map[0]?.length ?? 0, rows: map.length }, 250),
-    );
+    console.log(visualizeMap(map, { cols, rows }, 250));
   }
-  return map;
+
+  return {
+    map,
+    meta: {
+      firstNotEmptyRow,
+      lastNotEmptyRow,
+      firstNotEmptyColumn,
+      lastNotEmptyColumn,
+    },
+  };
 }
 
 export function glyphsMapToRectMap(

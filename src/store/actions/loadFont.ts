@@ -2,6 +2,7 @@ import * as actionTypes from './actionTypes';
 import { createAction } from './helpers';
 import FontFaceObserver from 'fontfaceobserver';
 import { Dispatch } from 'redux';
+import { FONT_FAMILY } from 'constants/index';
 
 import { AppDispatchT } from '../types';
 
@@ -13,7 +14,7 @@ export function loadFont(): (dispatch: Dispatch) => void {
       // return dispatch(createAction(FONT_LOAD_SUCCESS));
     }
     dispatch(createAction(FONT_LOAD_REQUEST));
-    const font = new FontFaceObserver('Open Sans');
+    const font = new FontFaceObserver(FONT_FAMILY);
     font
       .load(null, 5000)
       .then(function () {

@@ -2,6 +2,7 @@ import { withStyles } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import { getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
+import { FONT_FAMILY } from 'constants/index';
 
 import type { PositionedTagRectT } from 'types/types';
 import React from 'react';
@@ -71,7 +72,7 @@ const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
             {positionedTagSvgData.map((i, index: number) => {
               const style = {
                 fontSize: `${i.adaptFontSize}px`,
-                fontFamily: 'Open Sans',
+                fontFamily: FONT_FAMILY,
                 fill: i.fill,
               };
               const transitionStyles: { [key: string]: React.CSSProperties } = {
@@ -130,7 +131,7 @@ const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
   );
 };
 
-function drawAxles(fontFamily = 'Open Sans') {
+function drawAxles(fontFamily = FONT_FAMILY) {
   const style = {
     fontSize: `${2}px`,
     fontFamily,
