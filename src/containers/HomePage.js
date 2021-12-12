@@ -19,9 +19,8 @@ class HomePage extends Component {
   }
 
   componentDidMount() {
-    //!prevProps.fontLoaded.data && fontLoaded.data
-    const { rawData, tagsCloud,  } = this.props;
-    if (rawData.data && !tagsCloud.data && !tagsCloud.isFetching) {
+    const { rawData, tagsCloud, fontLoaded } = this.props;
+    if (fontLoaded.data && rawData.data && !tagsCloud.data && !tagsCloud.isFetching) {
       this.props.buildTagsCloud(this.props.rawData.data);
     }
     window.addEventListener('resize', this.handleResize);
@@ -37,8 +36,9 @@ class HomePage extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (
-      !prevProps.rawData.data && this.props.rawData.data && !this.props.tagsCloud.data ||
-      prevProps.rawData.data && prevProps.rawData.data !== this.props.rawData.data
+      this.props.fontLoaded.data && (
+      this.props.rawData.data && !this.props.tagsCloud.data && !this.props.tagsCloud.isFetching ||
+      (prevProps.rawData.data && prevProps.rawData.data !== this.props.rawData.data))
     ) {
       this.props.buildTagsCloud(this.props.rawData.data);
     }

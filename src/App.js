@@ -8,7 +8,7 @@ import loadFont from './redux/actions/loadFont';
 
 const store = configureStore();
 
-store.dispatch(loadFont());
+loadFont()(store.dispatch);
 
 class App extends Component {
   render() {
