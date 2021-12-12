@@ -38,9 +38,13 @@ export function getGlyphsMap(
   const imageData = ctx.getImageData(sx, sy, sw, sh);
   const data = imageData.data;
 
-  const rows = Math.floor(sh - sx);
+  const rows = Math.floor(sh - sx) + 1;
   const cols = Math.floor(sw - sy);
-  const map: GlyphsMapT = [];
+  const rawMap: GlyphsMapT = [];
+
+  const emptyRows = Array.from({ length: rows }).fill(true);
+  const emptyColumns = Array.from({ length: cols }).fill(true);
+
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const ind = cols * row + col;
@@ -50,18 +54,76 @@ export function getGlyphsMap(
       //const blue = 255 - data[firstBt + 2];
       const opacity = data[firstByte + 3] / 255;
 
-      if (!map[row]) {
-        map[row] = [];
+      if (!rawMap[row]) {
+        rawMap[row] = [];
       }
-      map[row][col] = !!opacity;
+      rawMap[row][col] = !!opacity;
+      if (rawMap[row][col]) {
+        emptyRows[row] = false;
+        emptyColumns[col] = false;
+      }
     }
+  }
+
+  // to cut of empty rows and columns
+  const targetRows = Array.from({ length: rows }).fill(true);
+
+  // Rows: forward direction
+  for (let i = 0; i < emptyRows.length; i++) {
+    if (!emptyRows[i]) {
+      // till meet the first not empty position
+      break;
+    }
+    targetRows[i] = false;
+  }
+  // Rows: reverse direction
+  for (let i = emptyRows.length - 1; i >= 0; i--) {
+    if (!emptyRows[i]) {
+      break;
+    }
+    targetRows[i] = false;
+  }
+
+  // Columns: forward direction
+  let firstNotEmptyColumn: number = 0;
+  for (let i = 0; i < emptyColumns.length; i++) {
+    if (!emptyColumns[i]) {
+      // till meet the first not empty position
+      firstNotEmptyColumn = i;
+      break;
+    }
+  }
+  // Columns: reverse direction
+  let lastNotEmptyColumn: number = emptyColumns.length - 1;
+  for (let i = emptyColumns.length - 1; i >= 0; i--) {
+    if (!emptyColumns[i]) {
+      lastNotEmptyColumn = i;
+      break;
+    }
+  }
+
+  const map: GlyphsMapT = [];
+  let targetMapRow = 0;
+  for (let row = 0; row < rows; row++) {
+    if (!targetRows[row]) {
+      // not copy
+      continue;
+    }
+    map[targetMapRow] = rawMap[row].slice(
+      firstNotEmptyColumn,
+      lastNotEmptyColumn + 1,
+    );
+    targetMapRow++;
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (false) {
     console.log(word);
-    console.log(visualizeMap(map, { cols, rows }, 196));
+    console.log(visualizeMap(rawMap, { cols, rows }, 250));
+    console.log(
+      visualizeMap(map, { cols: map[0]?.length ?? 0, rows: map.length }, 250),
+    );
   }
   return map;
 }
@@ -137,7 +199,7 @@ function visualizeMap(
           ? '#'
           : map[row] === undefined || map[row][col] === undefined
           ? '_'
-          : '.';
+          : '•';
     }
     res += '\n';
   }
