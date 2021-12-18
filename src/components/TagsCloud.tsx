@@ -60,13 +60,17 @@ const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
 
   return (
     <div className={classes.container}>
-      <svg id="small_cloud" {...svgSize} viewBox={viewBox}>
+      <svg
+        id="small_cloud"
+        {...svgSize}
+        viewBox={viewBox}
+      >
         <g transform={transform}>
           <TransitionGroup
+            appear
+            enter
             className="tagsCloud"
             component={null}
-            enter
-            appear
             exite={false}
           >
             {positionedTagSvgData.map((i, index: number) => {
@@ -100,20 +104,20 @@ const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
                 <Transition
                   key={i.id}
                   timeout={DURATION}
-                  //classNames="tagText"
+                  // classNames="tagText"
                 >
                   {state => {
                     return (
                       <text
-                        key={`${i.id}_${index}`}
-                        textAnchor="middle"
                         className={classes.text}
-                        //transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
+                        key={`${i.id}_${index}`}
                         style={{
                           ...style,
                           ...DEFAULT_STYLE,
                           ...transitionStyles[state],
                         }}
+                        // transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
+                        textAnchor="middle"
                         onClick={() => onTagClick(i.id)}
                       >
                         {i.label}
@@ -140,17 +144,17 @@ function drawAxles(fontFamily = FONT_FAMILY) {
   return [
     <text
       key={`x`}
+      style={style}
       textAnchor="middle"
       transform={`translate(${0},${0})rotate(${0})`}
-      style={style}
     >
       ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     </text>,
     <text
       key={`y`}
+      style={style}
       textAnchor="middle"
       transform={`translate(${0},${0})rotate(${90})`}
-      style={style}
     >
       ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     </text>,

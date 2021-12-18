@@ -59,7 +59,9 @@ export function withRestScreenHeight<T extends { restScreenHeight: number }>(
     const nextProps = { ...props, restScreenHeight: height };
     return (
       <div ref={wrapperRef}>
-        <WrappedComponent {...nextProps}>{children}</WrappedComponent>
+        <WrappedComponent {...nextProps}>
+          {children}
+        </WrappedComponent>
       </div>
     );
   };

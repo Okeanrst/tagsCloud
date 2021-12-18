@@ -63,9 +63,9 @@ export function drawOnCanvas(
 
   if (drawAxles) {
     ctx.strokeStyle = 'black';
-    //axisY
+    // axisY
     ctx.strokeRect(0, -maxTop * scale, 1, canvasHeight);
-    //axisX
+    // axisX
     ctx.strokeRect(minLeft * scale, 0, canvasWidth, 1);
   }
 

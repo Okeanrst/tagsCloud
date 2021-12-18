@@ -13,10 +13,22 @@ const Router = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<HomePage navigate={navigate} />} />
-        <Route path="/notFound" element={<NotFoundPage />} />
-        <Route path="/tagsListEditor" element={<TagsListEditor />} />
-        <Route path="/tag/:id" element={<TagInformation />} />
+        <Route
+          element={<HomePage navigate={navigate} />}
+          path="/"
+        />
+        <Route
+          element={<NotFoundPage />}
+          path="/notFound"
+        />
+        <Route
+          element={<TagsListEditor />}
+          path="/tagsListEditor"
+        />
+        <Route
+          element={<TagInformation />}
+          path="/tag/:id"
+        />
       </Route>
       <Route element={<NotFoundPage />} />
     </Routes>

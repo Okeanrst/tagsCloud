@@ -9,7 +9,10 @@ type PropsT = {
 
 const SmallModalWindow = ({ style, children }: PropsT) => {
   return (
-    <div className="fullScreenModalWindow" style={style}>
+    <div
+      className="fullScreenModalWindow"
+      style={style}
+    >
       {children}
     </div>
   );

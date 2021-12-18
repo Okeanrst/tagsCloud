@@ -60,7 +60,7 @@ export function prepareData(
   const ratio =
     (maxFontSize - minFontSize) / (maxSentimentScore - minSentimentScore);
 
-  //TODO use opentype.js
+  // TODO use opentype.js
   const fontSizeFactor = 1.1;
 
   return data.map(item => {
@@ -147,7 +147,7 @@ export function getTagsSvgData(
 
   const scale = allowedWidth / (borderRight - borderLeft);
 
-  /*data.forEach(item => {
+  /* data.forEach(item => {
     item.rectTranslateX = (item.rectLeft) * scale;
     if (item.rotate) {
       item.rectTranslateY = -(item.rectBottom + item.height) * scale

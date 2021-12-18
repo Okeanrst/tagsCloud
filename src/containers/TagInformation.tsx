@@ -37,29 +37,42 @@ const renderDays = (days: TagDataT['days']) => {
       </li>
     );
   });
-  return <ul style={styles.days}>{list}</ul>;
+  return (
+    <ul style={styles.days}>
+      {list}
+    </ul>
+  );
 };
 
 const renderSentiment = (sentiment?: TagDataT['sentiment']) => {
   const { negative = 0, neutral = 0, positive = 0 } = sentiment ?? {};
   return (
     <ul style={styles.sentiment}>
-      <li key="negative" className="badge badge-secondary">
-        negative {negative}
+      <li
+        className="badge badge-secondary"
+        key="negative"
+      >
+        negative
+        {' '}
+        {negative}
       </li>
       <li
+        className="badge badge-secondary"
         key="neutral"
-        className="badge badge-secondary"
         style={{ marginLeft: '8px' }}
       >
-        neutral {neutral}
+        neutral
+        {' '}
+        {neutral}
       </li>
       <li
-        key="positive"
         className="badge badge-secondary"
+        key="positive"
         style={{ marginLeft: '8px' }}
       >
-        positive {positive}
+        positive
+        {' '}
+        {positive}
       </li>
     </ul>
   );
@@ -70,7 +83,9 @@ const renderPageType = (pageType?: TagDataT['pageType']) => {
     <ul style={styles.pageType}>
       {pageType
         ? (Object.keys(pageType) as Array<keyof typeof pageType>).map(i => (
-            <li key={i}>{`${i}: ${pageType[i]}`}</li>
+          <li key={i}>
+            {`${i}: ${pageType[i]}`}
+          </li>
           ))
         : null}
     </ul>
@@ -81,7 +96,11 @@ const renderDaysPicker = (
   icon: string,
   toggleShowingDays: ToggleShowingDaysT,
 ) => (
-  <div style={styles.daysPicker} onClick={toggleShowingDays} key="daysPicker">
+  <div
+    key="daysPicker"
+    style={styles.daysPicker}
+    onClick={toggleShowingDays}
+  >
     {icon}
   </div>
 );
@@ -164,17 +183,27 @@ const TagInformation = (props: PropsT) => {
 
   return (
     <ul
-      style={styles.containerStyle}
       className="list-group list-group-flush"
       key="tagInformation"
+      style={styles.containerStyle}
     >
       {informationListRenderers.map(i => (
-        <li key={i.key} className="list-group-item" style={styles.listItems}>
+        <li
+          className="list-group-item"
+          key={i.key}
+          style={styles.listItems}
+        >
           {i.rows && [
-            <div style={{ display: 'flex', flex: 2 }} key="0">
+            <div
+              key="0"
+              style={{ display: 'flex', flex: 2 }}
+            >
               {renderIt(i.rows[0])}
             </div>,
-            <div style={{ flex: 10 }} key="1">
+            <div
+              key="1"
+              style={{ flex: 10 }}
+            >
               {renderIt(i.rows[1])}
             </div>,
           ]}

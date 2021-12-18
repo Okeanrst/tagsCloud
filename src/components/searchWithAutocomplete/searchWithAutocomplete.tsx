@@ -48,6 +48,7 @@ function renderInput(inputProps: ItemPropsT) {
   const { InputProps, classes, fullWidth } = inputProps;
   return (
     <TextField
+      fullWidth={fullWidth}
       InputProps={{
         classes: {
           root: classes.inputRoot,
@@ -55,7 +56,6 @@ function renderInput(inputProps: ItemPropsT) {
         },
         ...InputProps,
       }}
-      fullWidth={fullWidth}
     />
   );
 }
@@ -73,9 +73,9 @@ function renderSuggestion({
   return (
     <MenuItem
       {...itemProps}
+      component="div"
       key={suggestion.label}
       selected={isHighlighted}
-      component="div"
       style={{
         fontWeight: isSelected ? 500 : 400,
       }}
@@ -148,7 +148,10 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
               })}
               <div {...getMenuProps()}>
                 {isOpen ? (
-                  <Paper className={classes.paper} square>
+                  <Paper
+                    square
+                    className={classes.paper}
+                  >
                     {getSuggestions(inputValue, suggestions).map(
                       (suggestion, index) =>
                         renderSuggestion({

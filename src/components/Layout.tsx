@@ -33,11 +33,14 @@ export const Layout = () => {
   return (
     <div className={classes.container}>
       <nav
-        key="nav"
         className={['navbar', 'navbar-light', classes.navbar].join(' ')}
+        key="nav"
       >
         <div className="container">
-          <Link to="/" className="navbar-brand">
+          <Link
+            className="navbar-brand"
+            to="/"
+          >
             Home page
           </Link>
           <Link to="/tagsListEditor">Tags list editor</Link>
@@ -47,7 +50,10 @@ export const Layout = () => {
         <Outlet />
       </main>
       <footer className={classes.footer}>
-        <div className="container">Okeanrst {new Date().getFullYear()}</div>
+        <div className="container">
+          Okeanrst
+          {new Date().getFullYear()}
+        </div>
       </footer>
     </div>
   );
