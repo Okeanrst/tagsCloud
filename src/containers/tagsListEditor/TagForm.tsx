@@ -23,6 +23,10 @@ type StateT = {
 };
 
 const styles = {
+  form: {
+    width: '400px',
+    maxWidth: '100%',
+  },
   buttons: {
     marginTop: '100px',
     display: 'flex',
@@ -88,7 +92,10 @@ export class TagForm extends Component<PropsT, StateT> {
       values: { label, volume, type, sentimentScore },
     } = this.state;
     return (
-      <form onSubmit={this.onSubmit}>
+      <form
+        style={styles.form}
+        onSubmit={this.onSubmit}
+      >
         <input
           required
           name={InputFieldName.LABEL}
