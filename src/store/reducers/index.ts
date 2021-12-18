@@ -44,7 +44,7 @@ const rawDataReducer = (
           ...(state.data ?? []).slice(itemIndex + 1),
         ];
       }
-      return { ...state, nextStateData };
+      return { ...state, data: nextStateData };
     }
     case ADD_DATA_ITEM: {
       return { ...state, data: [...(state.data ?? []), action.data] };

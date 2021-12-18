@@ -51,11 +51,14 @@ export default function withModalWindowContainer<P>(
 
       return (
         <div
-          key="modalWindowContainer"
           className="modalWindowContainer"
+          key="modalWindowContainer"
           onClick={onClick}
         >
-          <WrappedComponent {...props} ref={setComponentRef} />
+          <WrappedComponent
+            {...props}
+            ref={setComponentRef}
+          />
         </div>
       );
     },

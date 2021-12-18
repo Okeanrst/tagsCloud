@@ -74,7 +74,11 @@ const renderDays = (days: TagDataT['days'], classes: ClassesT) => {
       </li>
     );
   });
-  return <ul className={classes.days}>{list}</ul>;
+  return (
+    <ul className={classes.days}>
+      {list}
+    </ul>
+  );
 };
 
 const renderSentiment = (
@@ -84,22 +88,31 @@ const renderSentiment = (
   const { negative = 0, neutral = 0, positive = 0 } = sentiment ?? {};
   return (
     <ul className={classes.sentiment}>
-      <li className="badge badge-secondary" key="negative">
-        negative {negative}
+      <li
+        className="badge badge-secondary"
+        key="negative"
+      >
+        negative
+        {' '}
+        {negative}
       </li>
       <li
         className="badge badge-secondary"
         key="neutral"
         style={{ marginLeft: '8px' }}
       >
-        neutral {neutral}
+        neutral
+        {' '}
+        {neutral}
       </li>
       <li
         className="badge badge-secondary"
         key="positive"
         style={{ marginLeft: '8px' }}
       >
-        positive {positive}
+        positive
+        {' '}
+        {positive}
       </li>
     </ul>
   );
@@ -110,7 +123,9 @@ const renderPageType = (pageType: TagDataT['pageType'], classes: ClassesT) => {
     <ul className={classes.pageType}>
       {pageType
         ? (Object.keys(pageType) as Array<keyof typeof pageType>).map(i => (
-            <li key={i}>{`${i}: ${pageType[i]}`}</li>
+          <li key={i}>
+            {`${i}: ${pageType[i]}`}
+          </li>
           ))
         : null}
     </ul>
@@ -219,7 +234,10 @@ const TagInformation = (props: PropsT) => {
     <div className={classes.root}>
       {loading ? (
         <div className={classes.loaderContainer}>
-          <FadeLoader color="#123abc" loading={loading} />
+          <FadeLoader
+            color="#123abc"
+            loading={loading}
+          />
         </div>
       ) : null}
       <ul
@@ -236,10 +254,16 @@ const TagInformation = (props: PropsT) => {
             key={i.key}
           >
             {i.cells && [
-              <div key="0" style={{ display: 'flex', flex: 2 }}>
+              <div
+                key="0"
+                style={{ display: 'flex', flex: 2 }}
+              >
                 {renderCell(i.cells[0])}
               </div>,
-              <div key="1" style={{ flex: 10 }}>
+              <div
+                key="1"
+                style={{ flex: 10 }}
+              >
                 {renderCell(i.cells[1])}
               </div>,
             ]}

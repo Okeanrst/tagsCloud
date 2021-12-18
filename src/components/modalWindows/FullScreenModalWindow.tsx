@@ -11,7 +11,11 @@ type PropsT = {
 const FullScreenModalWindow = React.forwardRef<HTMLDivElement, PropsT>(
   ({ style, children }: PropsT, ref) => {
     return (
-      <div className="fullScreenModalWindow" style={style} ref={ref}>
+      <div
+        className="fullScreenModalWindow"
+        ref={ref}
+        style={style}
+      >
         {children}
       </div>
     );

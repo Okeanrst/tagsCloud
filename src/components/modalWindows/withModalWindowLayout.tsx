@@ -16,10 +16,10 @@ export function withModalWindowLayout<P>({
     const EnhancedComponent = (props: P) => (
       <React.Fragment>
         <ModalWindowLayout
-          key="layout"
           className={cx('smallModalWindowLayout', {
             [layoutClassName ?? '']: !!layoutClassName,
           })}
+          key="layout"
           style={layoutStyle}
         />
         <WrappedComponent {...props} />

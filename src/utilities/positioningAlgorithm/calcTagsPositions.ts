@@ -550,8 +550,10 @@ export function calcTagsPositions(
           // eslint-disable-next-line no-console
           console.log('updateSceneMap --------start');
           mainInformation.forEach(information => {
+            // eslint-disable-next-line no-console
             console.log(information);
           });
+          // eslint-disable-next-line no-console
           console.log('rectPosition:', rectPosition);
           console.log('rectAreaMap:', rectAreaMap);
           console.log('rectArea:', rectArea);

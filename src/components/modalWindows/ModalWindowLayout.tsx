@@ -12,8 +12,8 @@ const ModalWindowLayout = ({ children, className, style }: PropsT) => (
   <RootModal>
     <div
       className={cx('modalWindowLayout', { [className]: !!className })}
-      onClick={e => e.stopPropagation()}
       style={style}
+      onClick={e => e.stopPropagation()}
     >
       {children}
     </div>

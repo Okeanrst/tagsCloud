@@ -59,7 +59,7 @@ export default class VacanciesManager {
     const rawLeftEdgeVacancies: Array<RawPreparedVacancyT> = [];
 
     const sceneSize = this.sceneMap.getSceneSize();
-    //свнизу вверх, слева направо
+    // bottom to top, left to right
     const sceneTopRow = sceneSize[Y];
     const sceneBottomRow = -sceneSize[MINUS_Y];
     const sceneLeftCol = -sceneSize[MINUS_X];
@@ -72,7 +72,7 @@ export default class VacanciesManager {
     const change = SceneMap.changePosition;
 
     function extractVacancies(columnsToClose: number[], curRow: number) {
-      //отфильтровываем рядом стоящие, идущие на закрытие (будет сохранена самая правая колонка)
+      // отфильтровываем рядом стоящие, идущие на закрытие (будет сохранена самая правая колонка)
       const deduplicatedColumnsToClose = columnsToClose.filter(
         (curItemCol: number, index: number) => {
           const nextItemCol = columnsToClose[index + 1];
@@ -120,7 +120,7 @@ export default class VacanciesManager {
         oppositeLines.push({ begin, end, val: prevColVal });
       });
 
-      //spread opposite line
+      // spread opposite line
       oppositeLines.forEach(line => {
         let begin = prev(line.begin);
         while (accumulated[begin] >= line.val) {
@@ -298,7 +298,7 @@ export function drawVacancy(vacancy: VacancyT, sceneSize: SceneSizeT): void {
   ) {
     return;
   }
-  //сверху вниз
+  // сверху вниз
   const sceneTopRow = sceneSize[Y];
   const sceneBottomRow = -sceneSize[MINUS_Y];
   const sceneLeftCol = -sceneSize[MINUS_X];

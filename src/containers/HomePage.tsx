@@ -149,7 +149,10 @@ class HomePage extends Component<PropsT, StateT> {
 
   renderLoader = (loading: boolean) => (
     <div style={styles.loaderContainer}>
-      <FadeLoader color="#123abc" loading={loading} />
+      <FadeLoader
+        color="#123abc"
+        loading={loading}
+      />
     </div>
   );
 
@@ -167,22 +170,28 @@ class HomePage extends Component<PropsT, StateT> {
     return (
       <div style={styles.pageContainer}>
         {this.renderLoader(loading)}
-        <div style={styles.checkbox} className="form-group form-check">
+        <div
+          className="form-group form-check"
+          style={styles.checkbox}
+        >
           <input
-            type="checkbox"
             checked={useCanvas}
-            onChange={toggleUseCanvas}
-            id="useCanvas"
             className="form-check-input"
+            id="useCanvas"
+            type="checkbox"
+            onChange={toggleUseCanvas}
           />
           <label htmlFor="useCanvas">use canvas</label>
         </div>
-        <div ref={this.tagsCloudSceneRef} style={styles.tagsCloudScene}>
+        <div
+          ref={this.tagsCloudSceneRef}
+          style={styles.tagsCloudScene}
+        >
           {tagsCloudSceneSize && tagsCloud.data && (
             <TagsCloudComponent
-              width={tagsCloudSceneSize.width}
               height={tagsCloudSceneSize.height}
               tagData={tagsCloud.data}
+              width={tagsCloudSceneSize.width}
               onTagClick={this.onTagClick}
             />
           )}
