@@ -54,7 +54,8 @@ export const Layout = () => {
       </main>
       <footer className={classes.footer}>
         <div className="container">
-          Okeanrst
+          Okeanrst©
+          {' '}
           {new Date().getFullYear()}
         </div>
       </footer>
