@@ -74,7 +74,7 @@ export class TagForm extends Component<PropsT, StateT> {
   onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { onSubmit } = this.props;
-    //TODO add validation
+    // TODO add validation
     const { initValues: { id } = {} } = this.props;
     const {
       values: { label, volume, type, sentimentScore },
@@ -90,45 +90,56 @@ export class TagForm extends Component<PropsT, StateT> {
     return (
       <form onSubmit={this.onSubmit}>
         <input
-          type={inputByTypes.label}
+          required
           name={InputFieldName.LABEL}
+          placeholder="Label"
+          type={inputByTypes.label}
           value={label}
           onChange={this.handleInputChange}
-          placeholder="Label"
-          required={true}
         />
         <br />
         <input
+          required
           name={InputFieldName.VOLUME}
-          value={volume}
-          onChange={this.handleInputChange}
           placeholder="Volume"
           type={inputByTypes.volume}
-          required={true}
+          value={volume}
+          onChange={this.handleInputChange}
         />
         <br />
         <input
-          type={inputByTypes.type}
+          required
           name={InputFieldName.TYPE}
+          placeholder="Type"
+          type={inputByTypes.type}
           value={type}
           onChange={this.handleInputChange}
-          placeholder="Type"
-          required={true}
         />
         <br />
         <input
+          required
           name={InputFieldName.SENTIMENT_SCORE}
-          value={sentimentScore}
-          onChange={this.handleInputChange}
           placeholder="SentimentScore"
           type={inputByTypes.sentimentScore}
-          required={true}
+          value={sentimentScore}
+          onChange={this.handleInputChange}
         />
-        <div key="buttons" style={styles.buttons}>
-          <button type="button" onClick={onCancel} key="cancel">
+        <div
+          key="buttons"
+          style={styles.buttons}
+        >
+          <button
+            key="cancel"
+            type="button"
+            onClick={onCancel}
+          >
             cancel
           </button>
-          <input type="submit" value="submit" style={styles.submitButton} />
+          <input
+            style={styles.submitButton}
+            type="submit"
+            value="submit"
+          />
         </div>
       </form>
     );

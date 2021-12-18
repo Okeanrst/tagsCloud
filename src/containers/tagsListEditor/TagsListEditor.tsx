@@ -140,7 +140,10 @@ class TagsListEditor extends Component<PropsT, StateT> {
     const { classes } = this.props;
     return (
       <div className={classes.loaderContainer}>
-        <FadeLoader color="#123abc" loading={loading} />
+        <FadeLoader
+          color="#123abc"
+          loading={loading}
+        />
       </div>
     );
   };
@@ -162,17 +165,17 @@ class TagsListEditor extends Component<PropsT, StateT> {
     return (
       <div className={classes.fileUploader}>
         <label
-          htmlFor="cloud_conf_upload"
           className={classes.fileUploaderLabel}
+          htmlFor="cloud_conf_upload"
         >
           Choose tags cloud configuration file (*.json)
         </label>
         <input
+          accept=".json"
+          disabled={disabled}
           id="cloud_conf_upload"
           type="file"
           onChange={this.uploadCloudRawDataFile}
-          accept=".json"
-          disabled={disabled}
         />
       </div>
     );
@@ -185,7 +188,10 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   renderFileDownloader = (disabled: boolean) => (
-    <button onClick={this.downloadCloudRawDataFile} disabled={disabled}>
+    <button
+      disabled={disabled}
+      onClick={this.downloadCloudRawDataFile}
+    >
       Download tags cloud as a file
     </button>
   );
@@ -203,14 +209,29 @@ class TagsListEditor extends Component<PropsT, StateT> {
     };
 
     const modalWindowBody = [
-      <span key="question" className={classes.confirmDeleteQuestion}>
-        Are you sure you want to delete tag with "{tagIdToDelete}" id?
+      <span
+        className={classes.confirmDeleteQuestion}
+        key="question"
+      >
+        Are you sure you want to delete tag with "
+        {tagIdToDelete}
+        " id?
       </span>,
-      <div key="buttons" className={classes.confirmDeleteButtons}>
-        <button onClick={this.resetIdForDelete} key="cancel">
+      <div
+        className={classes.confirmDeleteButtons}
+        key="buttons"
+      >
+        <button
+          key="cancel"
+          onClick={this.resetIdForDelete}
+        >
           cancel
         </button>
-        <button onClick={onConfirm} key="delete" style={{ marginLeft: '24px' }}>
+        <button
+          key="delete"
+          style={{ marginLeft: '24px' }}
+          onClick={onConfirm}
+        >
           delete
         </button>
       </div>,
@@ -218,7 +239,9 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
     return (
       <SmallModalWindow onContainerClick={this.resetIdForDelete}>
-        <div className={classes.confirmDelete}>{modalWindowBody}</div>
+        <div className={classes.confirmDelete}>
+          {modalWindowBody}
+        </div>
       </SmallModalWindow>
     );
   };
@@ -238,7 +261,9 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
   onTagChange = (data: TagDataT | Omit<TagDataT, 'id'>) => {
     this.closeTagForm();
-    'id' in data ? this.props.editTag(data) : this.props.addTag(data);
+    'id' in data && data.id
+      ? this.props.editTag(data)
+      : this.props.addTag(data);
   };
 
   onClone = (e: SyntheticEvent<EventTarget>) => {
@@ -293,9 +318,9 @@ class TagsListEditor extends Component<PropsT, StateT> {
   renderTagForm = (data: Partial<TagDataT>) => (
     <FullScreenModalWindow onContainerClick={this.closeTagForm}>
       <TagForm
-        onSubmit={this.onTagChange}
-        onCancel={this.closeTagForm}
         initValues={data}
+        onCancel={this.closeTagForm}
+        onSubmit={this.onTagChange}
       />
     </FullScreenModalWindow>
   );
@@ -305,32 +330,40 @@ class TagsListEditor extends Component<PropsT, StateT> {
     ({ index, style }: { index: number; style: {} }) => {
       const item = data[index];
       return (
-        <li style={style} className={classes.tagsListRow}>
-          <span key="label" className={classes.tagsListLabel}>
+        <li
+          className={classes.tagsListRow}
+          style={style}
+        >
+          <span
+            className={classes.tagsListLabel}
+            key="label"
+          >
             {item.label}
           </span>
-          <span key="sentimentScore">{item.sentimentScore}</span>
+          <span key="sentimentScore">
+            {item.sentimentScore}
+          </span>
           <button
-            data-id={item.id}
-            onClick={this.onClone}
             className={classes.tagsListButton}
+            data-id={item.id}
             key="clone"
+            onClick={this.onClone}
           >
             clone
           </button>
           <button
-            data-id={item.id}
-            onClick={this.onEdit}
             className={classes.tagsListButton}
+            data-id={item.id}
             key="edit"
+            onClick={this.onEdit}
           >
             edit
           </button>
           <button
-            data-id={item.id}
-            onClick={this.onDelete}
             className={classes.tagsListButton}
+            data-id={item.id}
             key="delete"
+            onClick={this.onDelete}
           >
             delete
           </button>
@@ -345,8 +378,8 @@ class TagsListEditor extends Component<PropsT, StateT> {
         height={height}
         itemCount={data.length}
         itemSize={TAGS_LIST_ROW_HEIGHT}
-        width="100%"
         ref={this.listRef}
+        width="100%"
       >
         {this.renderListRow(data, classes)}
       </FixedSizeList>
@@ -363,16 +396,16 @@ class TagsListEditor extends Component<PropsT, StateT> {
       <div>
         {this.renderLoader(loading)}
         <div
-          key="cloudConfFiles"
           className={classes.cloudConfFiles}
+          key="cloudConfFiles"
           ref={this.confFilesRef}
         >
           {this.renderFileUploader(loading)}
-          {this.renderFileDownloader(!!(!rawData.data || loading))}
+          {this.renderFileDownloader(!rawData.data || loading)}
           <button onClick={this.onAdd}>Add new</button>
           <SearchWithAutocomplete
-            suggestions={searchAutocompleteSuggestions}
             placeholder="Search a tag by label"
+            suggestions={searchAutocompleteSuggestions}
             onSubmit={this.onSearch}
           />
         </div>
@@ -393,10 +426,7 @@ type TagsListEditorWithRestScreenHeightPropsT = React.ComponentProps<
   typeof TagsListEditorWithRestScreenHeight
 >;
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(
+export default connector(
   withTriggerGettingRawData<TagsListEditorWithRestScreenHeightPropsT>(
     TagsListEditorWithRestScreenHeight,
   ),
