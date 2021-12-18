@@ -9,6 +9,9 @@ const useStyles = makeStyles(theme => ({
     minHeight: '100%',
   },
   navbar: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 1,
     backgroundColor: 'var(--navbar-color)',
   },
   main: {
@@ -41,7 +44,7 @@ export const Layout = () => {
             className="navbar-brand"
             to="/"
           >
-            Home page
+            Tags cloud
           </Link>
           <Link to="/tagsListEditor">Tags list editor</Link>
         </div>
