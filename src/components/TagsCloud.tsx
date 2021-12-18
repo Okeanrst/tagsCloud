@@ -27,8 +27,6 @@ const DEFAULT_STYLE = {
   opacity: 0,
 };
 
-const BASE_WIDTH = 1000;
-
 const styles = {
   container: { padding: `${PADDING}px` },
   text: {
@@ -37,7 +35,7 @@ const styles = {
 };
 
 const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
-  const tagsSvgData = getTagsSvgData(tagData, BASE_WIDTH);
+  const tagsSvgData = getTagsSvgData(tagData);
 
   if (!tagsSvgData) {
     return null;
