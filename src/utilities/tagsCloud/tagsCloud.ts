@@ -118,7 +118,6 @@ export function getBorderCoordinates(
 
 export function getTagsSvgData(
   data: ReadonlyArray<PositionedTagRectT>,
-  allowedWidth: number,
 ): {
   transform: string;
   viewBox: string;
@@ -138,19 +137,6 @@ export function getTagsSvgData(
     left: borderLeft,
   } = borderCoordinates;
 
-  const scale = allowedWidth / (borderRight - borderLeft);
-
-  /* data.forEach(item => {
-    item.rectTranslateX = (item.rectLeft) * scale;
-    if (item.rotate) {
-      item.rectTranslateY = -(item.rectBottom + item.height) * scale
-    } else {
-      item.rectTranslateY = -(item.rectBottom ) * scale;
-    }
-
-    item.adaptFontSize = item.fontSize * scale;
-  });*/
-
   const positionedTagSvgData = data.map(tagData => {
     const diffX = tagData.rectRight - tagData.rectLeft;
     const diffY = tagData.rectTop - tagData.rectBottom;
@@ -158,13 +144,13 @@ export function getTagsSvgData(
     const middleY = tagData.rectBottom + diffY / 2;
 
     const rectTranslateX = tagData.rotate
-      ? (middleX - diffX * 0.3) * scale
-      : middleX * scale;
+      ? (middleX - diffX * 0.3)
+      : middleX;
     const rectTranslateY = tagData.rotate
-      ? -middleY * scale
-      : -(middleY - diffY * 0.3) * scale;
+      ? -middleY
+      : -(middleY - diffY * 0.3);
 
-    const adaptFontSize = tagData.fontSize * scale;
+    const adaptFontSize = tagData.fontSize;
 
     return {
       ...tagData,
@@ -174,10 +160,10 @@ export function getTagsSvgData(
     };
   });
 
-  const maxRight = borderRight * scale;
-  const minLeft = borderLeft * scale;
-  const minBottom = borderBottom * scale;
-  const maxTop = borderTop * scale;
+  const maxRight = borderRight;
+  const minLeft = borderLeft;
+  const minBottom = borderBottom;
+  const maxTop = borderTop;
 
   const sceneWidth = maxRight - minLeft;
   const sceneHeight = maxTop - minBottom;
