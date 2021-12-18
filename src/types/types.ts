@@ -7,8 +7,8 @@ export type TagSentimentT = Readonly<{
 export type TagDataT = Readonly<{
   id: string;
   label: string;
-  volume: number;
-  type: string;
+  volume?: number;
+  type?: string;
   sentiment?: TagSentimentT;
   sentimentScore: number;
   burst?: number;
