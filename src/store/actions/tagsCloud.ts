@@ -1,8 +1,9 @@
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
+import { SCENE_MAP_RESOLUTION } from 'constants/index';
 import { calcTagsPositions } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { prepareData } from 'utilities/tagsCloud/tagsCloud';
-import { prepareDataGlyphsMap } from 'utilities/prepareDataGlyphsMap';
+import { prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { createAction } from './helpers';
 import validateTagsCloudRawData from './rawDataValidator';
 
@@ -30,8 +31,13 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT) => {
     dispatch(createAction(actionTypes.PROCESS_DATA_REQUEST));
     const preparedData = prepareData(data);
-    return prepareDataGlyphsMap(preparedData)
-      .then(dataGlyphsMap => calcTagsPositions(preparedData, dataGlyphsMap))
+    return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
+      .then(tagsRectAreasMaps => {
+        return calcTagsPositions(preparedData, tagsRectAreasMaps, {
+          drawVacanciesMap: false,
+          drawStepMap: false,
+        });
+      })
       .then(preparedDataWithPositions => {
         dispatch(
           createAction(

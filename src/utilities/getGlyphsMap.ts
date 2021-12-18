@@ -2,50 +2,165 @@ import { FONT_FAMILY } from 'constants/index';
 
 import { GlyphsMapMetaT, GlyphsMapT, RectAreaT, RectMapT } from 'types/types';
 
-type OptionsT = {
-  fontFamily?: string;
-  fontK?: number;
-};
-
-export function getGlyphsMap(
+export function getRectAreaMap(
   canvas: HTMLCanvasElement,
-  word: string,
-  fontSize: number,
-  { fontFamily = FONT_FAMILY, fontK = 1.1 }: OptionsT = {},
-): {
-  map: GlyphsMapT;
-  meta: GlyphsMapMetaT;
-} | null {
-  const height = fontSize * fontK;
-
+  {
+    word,
+    fontSize,
+    resolution,
+    fontFamily = FONT_FAMILY,
+  }: {
+    word: string;
+    fontSize: number;
+    resolution: number;
+    fontFamily?: string;
+  },
+) {
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
     return null;
   }
 
+  const height = Math.ceil(fontSize / resolution) * resolution;
+
   ctx.font = `${fontSize}px "${fontFamily}"`;
   const wordWidth = ctx.measureText(word).width;
+  const width = Math.ceil(wordWidth / resolution) * resolution;
 
-  canvas.width = wordWidth * 1.1;
-  canvas.height = height * 1.1;
+  const rectArea = {
+    rows: height / resolution,
+    cols: width / resolution,
+  };
+
+  if (false) {
+    // for debug
+
+    const fakeRectMap: GlyphsMapT = [];
+
+    for (let row = 0; row < rectArea.rows; row++) {
+      if (!fakeRectMap[row]) {
+        fakeRectMap[row] = [];
+      }
+      for (let col = 0; col < rectArea.cols; col++) {
+        fakeRectMap[row][col] = true;
+      }
+    }
+
+    return {
+      map: fakeRectMap,
+      meta: {
+        marginTop: 0,
+        marginBottom: 0,
+        marginLeft: 0,
+        marginRight: 0,
+      },
+    };
+  }
+
+  // it is needed to add xOffset for such letter like "J" which starts not from 0
+  // const xOffset = Math.floor(fontSize * 0.4);
+
+  // canvas.width = wordWidth + xOffset * 2;
+
+  const glyphsMap = getGlyphsMap(canvas, {
+    word,
+    fontSize,
+    width,
+    height,
+    fontFamily,
+    xOffset: (width - wordWidth) / 2,
+  });
+
+  if (!glyphsMap) {
+    return null;
+  }
+
+  const fullSizeRectMap = glyphsMapToRectMap(glyphsMap.map, rectArea, false);
+
+  if (false) {
+    // for debug
+    return {
+      map: fullSizeRectMap,
+      meta: {
+        marginTop: 0,
+        marginBottom: 0,
+        marginLeft: 0,
+        marginRight: 0,
+      },
+    };
+  }
+
+  const {
+    rectMap,
+    meta: {
+      topCutOffRows,
+      bottomCutOffRows,
+      leftCutOffColumns,
+      rightCutOffColumns,
+    },
+  } = cutOffMapEmptyArea(fullSizeRectMap);
+
+  return {
+    map: rectMap,
+    meta: {
+      marginTop: topCutOffRows,
+      marginBottom: bottomCutOffRows,
+      marginLeft: leftCutOffColumns,
+      marginRight: rightCutOffColumns,
+    },
+  };
+}
+
+export function getGlyphsMap(
+  canvas: HTMLCanvasElement,
+  {
+    word,
+    fontSize,
+    width,
+    height,
+    fontFamily = FONT_FAMILY,
+    xOffset = 0,
+  }: {
+    word: string;
+    fontSize: number;
+    width: number;
+    height: number;
+    fontFamily?: string;
+    xOffset?: number;
+  },
+): {
+  map: GlyphsMapT;
+  meta: GlyphsMapMetaT;
+} | null {
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    return null;
+  }
+
+  canvas.width = width; // wordWidth * 1.1;
+  canvas.height = height; // * 1.1;
 
   ctx.textBaseline = 'alphabetic';
   ctx.font = `${fontSize}px "${fontFamily}"`;
 
+  // TODO use opentype.js
+  ctx.fillText(word, xOffset, height * 0.8);
+
   const sx = 0;
   const sy = 0;
   const sh = height;
-  const sw = wordWidth;
-
-  ctx.fillText(word, 0, height * 0.8);
+  const sw = width;
+  // const sw = wordWidth + xOffset * 2;
 
   const imageData = ctx.getImageData(sx, sy, sw, sh);
   const data = imageData.data;
 
-  const rows = Math.floor(sh - sx) + 1;
+  // row and column are 1px size
+  const rows = Math.floor(sh - sx);
   const cols = Math.floor(sw - sy);
-  const map: GlyphsMapT = [];
+  const glyphsMap: GlyphsMapT = [];
 
   const emptyRows = Array.from({ length: rows }).fill(true);
   const emptyColumns = Array.from({ length: cols }).fill(true);
@@ -54,23 +169,21 @@ export function getGlyphsMap(
     for (let col = 0; col < cols; col++) {
       const ind = cols * row + col;
       const firstByte = ind * 4;
-      //const red = 255 - data[firstBt];
-      //const green = 255 - data[firstBt + 1];
-      //const blue = 255 - data[firstBt + 2];
+      // const red = 255 - data[firstBt];
+      // const green = 255 - data[firstBt + 1];
+      // const blue = 255 - data[firstBt + 2];
       const opacity = data[firstByte + 3] / 255;
 
-      if (!map[row]) {
-        map[row] = [];
+      if (!glyphsMap[row]) {
+        glyphsMap[row] = [];
       }
-      map[row][col] = !!opacity;
-      if (map[row][col]) {
+      glyphsMap[row][col] = !!opacity;
+      if (glyphsMap[row][col]) {
         emptyRows[row] = false;
         emptyColumns[col] = false;
       }
     }
   }
-
-  // to cut of empty rows and columns
 
   let firstNotEmptyRow: number = 0;
   // Rows: forward direction
@@ -108,31 +221,26 @@ export function getGlyphsMap(
     }
   }
 
-  /*
-  // cutting of GlyphsMap empty area
-  const map: GlyphsMapT = [];
-  let targetMapRow = 0;
-  for (let row = 0; row < rows; row++) {
-    if (row < firstNotEmptyRow || lastNotEmptyRow < row) {
-      // not copy
-      continue;
-    }
-    map[targetMapRow] = rawMap[row].slice(
-      firstNotEmptyColumn,
-      lastNotEmptyColumn + 1,
-    );
-    targetMapRow++;
-  }*/
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (false) {
+    // eslint-disable-next-line no-console
     console.log(word);
-    console.log(visualizeMap(map, { cols, rows }, 250));
+    // eslint-disable-next-line no-console
+    console.log('fontSize', fontSize);
+    // eslint-disable-next-line no-console
+    console.log('meta', {
+      firstNotEmptyRow,
+      lastNotEmptyRow,
+      firstNotEmptyColumn,
+      lastNotEmptyColumn,
+    });
+    // eslint-disable-next-line no-console
+    console.log(visualizeMap(glyphsMap, { cols, rows }, 250));
   }
 
   return {
-    map,
+    map: glyphsMap,
     meta: {
       firstNotEmptyRow,
       lastNotEmptyRow,
@@ -161,7 +269,7 @@ export function glyphsMapToRectMap(
     const colStart = Math.floor(vertRatio * rectCol);
     let colFinish = Math.floor(vertRatio * (rectCol + 1));
 
-    //if (rowFinish > glyphsRows || colFinish > glyphsCols) debugger
+    // if (rowFinish > glyphsRows || colFinish > glyphsCols) debugger
     if (rowFinish > glyphsRows) {
       rowFinish = glyphsRows + 1;
     }
@@ -199,6 +307,97 @@ export function glyphsMapToRectMap(
   return rectMap;
 }
 
+export function getRectAreaOfRectMap(map: Array<Array<boolean>>) {
+  const rows = map.length;
+  const cols = map[0]?.length ?? 0;
+  return { rows, cols };
+}
+
+function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
+  rectMap: Array<Array<boolean>>;
+  meta: {
+    topCutOffRows: number;
+    bottomCutOffRows: number;
+    leftCutOffColumns: number;
+    rightCutOffColumns: number;
+  };
+} {
+  const { rows: entryMapRows, cols: entryMapCols } =
+    getRectAreaOfRectMap(entryMap);
+
+  const emptyRows = Array.from({ length: entryMapRows }).fill(true);
+  const emptyColumns = Array.from({ length: entryMapCols }).fill(true);
+
+  for (let row = 0; row < entryMapRows; row++) {
+    for (let col = 0; col < entryMapCols; col++) {
+      if (entryMap[row][col]) {
+        emptyRows[row] = false;
+        emptyColumns[col] = false;
+      }
+    }
+  }
+
+  let firstNotEmptyRow: number = 0;
+  // Rows: forward direction
+  for (let i = 0; i < emptyRows.length; i++) {
+    if (!emptyRows[i]) {
+      // till meet the first not empty position
+      firstNotEmptyRow = i;
+      break;
+    }
+  }
+  let lastNotEmptyRow: number = emptyRows.length - 1;
+  // Rows: reverse direction
+  for (let i = emptyRows.length - 1; i >= 0; i--) {
+    if (!emptyRows[i]) {
+      lastNotEmptyRow = i;
+      break;
+    }
+  }
+
+  // Columns: forward direction
+  let firstNotEmptyColumn: number = 0;
+  for (let i = 0; i < emptyColumns.length; i++) {
+    if (!emptyColumns[i]) {
+      // till meet the first not empty position
+      firstNotEmptyColumn = i;
+      break;
+    }
+  }
+  // Columns: reverse direction
+  let lastNotEmptyColumn: number = emptyColumns.length - 1;
+  for (let i = emptyColumns.length - 1; i >= 0; i--) {
+    if (!emptyColumns[i]) {
+      lastNotEmptyColumn = i;
+      break;
+    }
+  }
+
+  const map = [];
+  let targetMapRow = 0;
+  for (let row = 0; row < entryMapRows; row++) {
+    if (row < firstNotEmptyRow || lastNotEmptyRow < row) {
+      // not copy
+      continue;
+    }
+    map[targetMapRow] = entryMap[row].slice(
+      firstNotEmptyColumn,
+      lastNotEmptyColumn + 1,
+    );
+    targetMapRow++;
+  }
+
+  return {
+    rectMap: map,
+    meta: {
+      topCutOffRows: firstNotEmptyRow,
+      bottomCutOffRows: entryMapRows - lastNotEmptyRow,
+      leftCutOffColumns: firstNotEmptyColumn,
+      rightCutOffColumns: entryMapCols - lastNotEmptyColumn,
+    },
+  };
+}
+
 function visualizeMap(
   map: RectMapT,
   { cols, rows }: RectAreaT,
@@ -206,6 +405,12 @@ function visualizeMap(
 ): string {
   let res = '';
   const maxCol = rowLength < cols ? rowLength : cols;
+
+  if (rowLength < cols) {
+    // eslint-disable-next-line no-console
+    console.warn('rowLength < cols, cols:', cols);
+  }
+
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < maxCol; col++) {
       res +=

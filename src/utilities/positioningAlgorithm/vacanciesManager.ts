@@ -149,19 +149,19 @@ export default class VacanciesManager {
           closed = false;
         }
         if (right === sceneRightCol) {
-          vacancy.rightEdge = right;
+          vacancy.rightEdge = sceneRightCol;
           vacancy.right = Infinity;
           rawRightEdgeVacancies.push(vacancy);
           closed = false;
         }
         if (bottom === sceneBottomRow) {
-          vacancy.bottomEdge = bottom;
+          vacancy.bottomEdge = sceneBottomRow;
           vacancy.bottom = -Infinity;
           rawBottomEdgeVacancies.push(vacancy);
           closed = false;
         }
         if (left === sceneLeftCol) {
-          vacancy.leftEdge = left;
+          vacancy.leftEdge = sceneLeftCol;
           vacancy.left = -Infinity;
           rawLeftEdgeVacancies.push(vacancy);
           closed = false;

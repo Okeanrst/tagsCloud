@@ -1,5 +1,3 @@
-import { FONT_FAMILY } from 'constants/index';
-
 import {
   TagDataT,
   PreparedTagDataT,
@@ -30,7 +28,6 @@ export function prepareData(
   const {
     minFontSize = DEFAULT_MIN_FONT_SIZE,
     maxFontSize = DEFAULT_MAX_FONT_SIZE,
-    fontFamily = FONT_FAMILY,
   } = options;
 
   const canvas = document.createElement('canvas');
@@ -57,25 +54,21 @@ export function prepareData(
     }
   });
 
-  const ratio =
+  const fontSizeToSentimentScoreRatio =
     (maxFontSize - minFontSize) / (maxSentimentScore - minSentimentScore);
 
-  //TODO use opentype.js
-  const fontSizeFactor = 1.1;
-
   return data.map(item => {
-    const fontSize =
-      minFontSize +
-      Math.round((item.sentimentScore - minSentimentScore) * ratio);
-
-    ctx.font = `${fontSize}px "${fontFamily}"`;
-    const measure = ctx.measureText(item.label);
+    const fontSize = Number.isFinite(fontSizeToSentimentScoreRatio)
+      ? minFontSize +
+        Math.round(
+          (item.sentimentScore - minSentimentScore) *
+            fontSizeToSentimentScoreRatio,
+        )
+      : minFontSize + (maxFontSize - minFontSize) / 2;
 
     return {
       ...item,
       fontSize,
-      width: measure.width,
-      height: fontSize * fontSizeFactor,
       fill: getRandomRGBColor(),
     };
   });

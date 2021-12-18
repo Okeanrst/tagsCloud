@@ -62,46 +62,46 @@ export class SceneMap {
   }
 
   calcSceneSize(): void {
-    //TODO
-    //it is a bad idea to calc sceneSize using array.length
+    // TODO
+    // it is a bad idea to calc sceneSize using array.length
     // because releasePosition uses undefined to reset cell value which lead to
     // [undefined, undefined].length === 2
-    //Y
-    if (this.sceneMap[TOP_RIGHT_QUARTER].length > this.sizeY) {
-      this.sizeY = this.sceneMap[TOP_RIGHT_QUARTER].length;
+    // Y
+    if (this.sceneMap[TOP_RIGHT_QUARTER].length - 1 > this.sizeY) {
+      this.sizeY = this.sceneMap[TOP_RIGHT_QUARTER].length - 1;
     }
-    if (this.sceneMap[TOP_LEFT_QUARTER].length > this.sizeY) {
-      this.sizeY = this.sceneMap[TOP_LEFT_QUARTER].length;
-    }
-
-    //-Y
-    if (this.sceneMap[BOTTOM_RIGHT_QUARTER].length > this.sizeMinusY) {
-      this.sizeMinusY = this.sceneMap[BOTTOM_RIGHT_QUARTER].length;
-    }
-    if (this.sceneMap[BOTTOM_LEFT_QUARTER].length > this.sizeMinusY) {
-      this.sizeMinusY = this.sceneMap[BOTTOM_LEFT_QUARTER].length;
+    if (this.sceneMap[TOP_LEFT_QUARTER].length - 1 > this.sizeY) {
+      this.sizeY = this.sceneMap[TOP_LEFT_QUARTER].length - 1;
     }
 
-    //X
+    // -Y
+    if (this.sceneMap[BOTTOM_RIGHT_QUARTER].length - 1 > this.sizeMinusY) {
+      this.sizeMinusY = this.sceneMap[BOTTOM_RIGHT_QUARTER].length - 1;
+    }
+    if (this.sceneMap[BOTTOM_LEFT_QUARTER].length - 1 > this.sizeMinusY) {
+      this.sizeMinusY = this.sceneMap[BOTTOM_LEFT_QUARTER].length - 1;
+    }
+
+    // X
     this.sceneMap[TOP_RIGHT_QUARTER].forEach((row: RowT) => {
-      if (row.length > this.sizeX) {
-        this.sizeX = row.length;
+      if (row.length - 1 > this.sizeX) {
+        this.sizeX = row.length - 1;
       }
     });
     this.sceneMap[BOTTOM_RIGHT_QUARTER].forEach((row: RowT) => {
-      if (row.length > this.sizeX) {
-        this.sizeX = row.length;
+      if (row.length - 1 > this.sizeX) {
+        this.sizeX = row.length - 1;
       }
     });
-    //-X
+    // -X
     this.sceneMap['-xy'].forEach((row: Array<boolean>) => {
-      if (row.length > this.sizeMinusX) {
-        this.sizeMinusX = row.length;
+      if (row.length - 1 > this.sizeMinusX) {
+        this.sizeMinusX = row.length - 1;
       }
     });
     this.sceneMap[BOTTOM_LEFT_QUARTER].forEach((row: RowT) => {
-      if (row.length > this.sizeMinusX) {
-        this.sizeMinusX = row.length;
+      if (row.length - 1 > this.sizeMinusX) {
+        this.sizeMinusX = row.length - 1;
       }
     });
   }
@@ -170,14 +170,16 @@ export class SceneMap {
     for (let row = topRow; row >= bottomRow; row--) {
       for (let col = leftCol; col <= rightCol; col++) {
         if (row === 0) {
-          res += '-';
+          res += '';
         } else {
-          res += col === 0 ? '|' : this.getDataAtPosition(col, row) ? '#' : '•';
+          res +=
+            col === 0 ? '|' : this.getDataAtPosition(col, row) ? '⬛' : '⬜';
         }
       }
       res += '\n';
     }
 
+    // eslint-disable-next-line no-console
     console.log(res, '\n\n');
   }
 
@@ -247,7 +249,7 @@ export class SceneMap {
 }
 
 function calcQuarter(xIsPositive: boolean, yIsPositive: boolean): QuarterType {
-  //return `${xIsPositive ? '' : '-'}x${yIsPositive ? '' : '-'}y`;
+  // return `${xIsPositive ? '' : '-'}x${yIsPositive ? '' : '-'}y`;
   if (xIsPositive && yIsPositive) {
     return TOP_RIGHT_QUARTER;
   } else if (xIsPositive && !yIsPositive) {

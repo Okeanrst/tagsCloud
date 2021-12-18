@@ -35,8 +35,6 @@ export type TagDataT = Readonly<{
 export type PreparedTagDataT = TagDataT &
   Readonly<{
     fontSize: number;
-    width: number;
-    height: number;
     fill: string;
   }>;
 
@@ -62,11 +60,19 @@ export type RectAreaT = {
 
 export type RectMapT = Array<Array<boolean>>;
 
+export type IdRectAreaMapT = {
+  id: string;
+  map: RectMapT | null;
+  mapMeta: {
+    marginTop: number;
+    marginBottom: number;
+    marginLeft: number;
+    marginRight: number;
+  } | null;
+};
+
 export type TagRectT = PreparedTagDataT & {
-  rows: number;
-  cols: number;
   square: number;
-  rotate?: boolean;
 };
 
 export type RectPositionT = {
@@ -80,7 +86,8 @@ export type RectPositionT = {
   rectRight?: number;
 };
 
-export type PositionedTagRectT = TagRectT & Required<RectPositionT>;
+export type PositionedTagRectT = TagRectT &
+  Required<RectPositionT> & { rotate: boolean };
 
 export type PositionedTagSvgDataT = Readonly<
   PositionedTagRectT & {
