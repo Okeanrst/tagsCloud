@@ -115,7 +115,6 @@ export class TagForm extends Component<PropsT, StateT> {
         />
         <br />
         <input
-          required
           name={InputFieldName.TYPE}
           placeholder="Type"
           type={inputByTypes.type}
