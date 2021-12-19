@@ -18,6 +18,8 @@ export type BorderCoordinatesT = {
   left: number;
 };
 
+export type ViewBoxT = [number, number, number, number];
+
 const DEFAULT_MIN_FONT_SIZE = 6;
 const DEFAULT_MAX_FONT_SIZE = 36;
 
@@ -120,7 +122,7 @@ export function getTagsSvgData(
   data: ReadonlyArray<PositionedTagRectT>,
 ): {
   transform: string;
-  viewBox: string;
+  viewBox: ViewBoxT;
   aspectRatio: number;
   data: ReadonlyArray<PositionedTagSvgDataT>;
 } | null {
@@ -150,13 +152,11 @@ export function getTagsSvgData(
       ? -middleY
       : -(middleY - diffY * 0.3);
 
-    const adaptFontSize = tagData.fontSize;
-
     return {
       ...tagData,
       rectTranslateX,
       rectTranslateY,
-      adaptFontSize,
+      adaptFontSize: tagData.fontSize,
     };
   });
 
@@ -170,7 +170,7 @@ export function getTagsSvgData(
 
   return {
     transform: `translate(${-minLeft}, ${maxTop})`,
-    viewBox: `0 0 ${sceneWidth} ${sceneHeight}`,
+    viewBox: [0, 0, sceneWidth, sceneHeight],
     aspectRatio: sceneWidth / sceneHeight,
     data: positionedTagSvgData,
   };

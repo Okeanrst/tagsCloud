@@ -1,11 +1,13 @@
-import { withStyles } from '@material-ui/core';
+import { withStyles, createStyles } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import { getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
-import { FONT_FAMILY } from 'constants/index';
+import { FONT_FAMILY, SCENE_MAP_RESOLUTION } from 'constants/index';
 
-import type { PositionedTagRectT } from 'types/types';
 import React from 'react';
+import type { PositionedTagRectT } from 'types/types';
+import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
+import type { ViewBoxT } from 'utilities/tagsCloud/tagsCloud';
 
 type PropsT = {
   tagData: ReadonlyArray<PositionedTagRectT>;
@@ -27,12 +29,15 @@ const DEFAULT_STYLE = {
   opacity: 0,
 };
 
-const styles = {
-  container: { padding: `${PADDING}px` },
+const styles = createStyles({
+  container: {
+    position: 'relative',
+    padding: `${PADDING}px`,
+  },
   text: {
     'white-space': 'pre',
   },
-};
+});
 
 const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
   const tagsSvgData = getTagsSvgData(tagData);
@@ -58,10 +63,13 @@ const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
 
   return (
     <div className={classes.container}>
+      {false && drawCoordinateGrid(svgSize, viewBox)}
+      {false && drawReactAreas(tagData, svgSize, viewBox, transform)}
       <svg
         id="small_cloud"
         {...svgSize}
-        viewBox={viewBox}
+        style={{ position: 'relative', zIndex: 2 }}
+        viewBox={viewBox.join(' ')}
       >
         <g transform={transform}>
           <TransitionGroup
@@ -126,19 +134,112 @@ const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
               );
             })}
           </TransitionGroup>
-          {false && drawAxles()}
+          {false && drawAxles(svgSize)}
         </g>
       </svg>
     </div>
   );
 };
 
-function drawAxles(fontFamily = FONT_FAMILY) {
+const coordinateGridStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: `${PADDING}px`,
+  left: `${PADDING}px`,
+  outline: '1px solid'
+};
+
+function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
+  const sceneMapUnitSize = SCENE_MAP_RESOLUTION;
+
+  const [minX, minY, width, height] = viewBox;
+
+  const columns = (width - minX) / sceneMapUnitSize;
+  const rows = (height - minY ?? 0) / sceneMapUnitSize;
+
+  const cells = [];
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < columns; col++) {
+      const translateX = (col) * sceneMapUnitSize;
+      const translateY = (row) * sceneMapUnitSize;
+
+      cells.push((
+        <rect
+          fill="purple"
+          fillOpacity="0"
+          height={sceneMapUnitSize}
+          key={`${row},${col}`}
+          stroke="blue"
+          strokeOpacity="0.5"
+          strokeWidth="0.5"
+          width={sceneMapUnitSize}
+          x={translateX}
+          y={translateY}
+        />
+      ));
+    }
+  }
+
+  return (
+    <svg
+      id="coordinateGrid"
+      {...svgSize}
+      style={coordinateGridStyle}
+      viewBox={viewBox.join(' ')}
+    >
+      <g>
+        {cells}
+      </g>
+    </svg>
+  );
+}
+
+function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT, transform: string) {
+  const rects = tagData.map(({ id, fill, rectRight, rectTop, rectLeft, rectBottom }) => {
+    const x = rectLeft;
+    const y = -rectTop;
+
+    const width = rectRight - rectLeft;
+    const height = rectTop - rectBottom;
+
+    return (
+      <rect
+        // fill="purple"
+        fillOpacity="0"
+        height={height}
+        key={id}
+        stroke={fill}
+        strokeOpacity="0.5"
+        strokeWidth="1"
+        style={{ position: 'relative', zIndex: 1 }}
+        width={width}
+        x={x}
+        y={y}
+      />
+    );
+  });
+  return (
+    <svg
+      id="reactAreas"
+      {...svgSize}
+      style={coordinateGridStyle}
+      viewBox={viewBox.join(' ')}
+    >
+      <g transform={transform} >
+        {rects.slice(0)}
+      </g>
+    </svg>
+  );
+}
+
+function drawAxles({ width, height }: SizeT) {
+  const fontSize = 2;
   const style = {
-    fontSize: `${2}px`,
-    fontFamily,
+    fontSize: `${fontSize}px`,
+    fontFamily: FONT_FAMILY,
     fill: 'rgb(0, 0, 0)',
   };
+
   return [
     <text
       key={`x`}
@@ -146,7 +247,7 @@ function drawAxles(fontFamily = FONT_FAMILY) {
       textAnchor="middle"
       transform={`translate(${0},${0})rotate(${0})`}
     >
-      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      {Array.from({ length: Math.floor(width/fontSize) }).fill('–').join('')}
     </text>,
     <text
       key={`y`}
@@ -154,7 +255,7 @@ function drawAxles(fontFamily = FONT_FAMILY) {
       textAnchor="middle"
       transform={`translate(${0},${0})rotate(${90})`}
     >
-      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      {Array.from({ length: Math.floor(height/fontSize) }).fill('–').join('')}
     </text>,
   ];
 }

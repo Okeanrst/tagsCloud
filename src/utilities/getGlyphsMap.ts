@@ -58,11 +58,6 @@ export function getRectAreaMap(
     };
   }
 
-  // it is needed to add xOffset for such letter like "J" which starts not from 0
-  // const xOffset = Math.floor(fontSize * 0.4);
-
-  // canvas.width = wordWidth + xOffset * 2;
-
   const glyphsMap = getGlyphsMap(canvas, {
     word,
     fontSize,
@@ -100,6 +95,19 @@ export function getRectAreaMap(
       rightCutOffColumns,
     },
   } = cutOffMapEmptyArea(fullSizeRectMap);
+
+  if (false) {
+    // eslint-disable-next-line no-console
+    console.log('getRectAreaMap');
+    // eslint-disable-next-line no-console
+    console.log(word);
+    // eslint-disable-next-line no-console
+    console.log('fontSize', fontSize);
+    // eslint-disable-next-line no-console
+    console.log(visualizeMap(fullSizeRectMap));
+    // eslint-disable-next-line no-console
+    console.log(visualizeMap(rectMap));
+  }
 
   return {
     map: rectMap,
@@ -229,6 +237,8 @@ export function getGlyphsMap(
     // eslint-disable-next-line no-console
     console.log('fontSize', fontSize);
     // eslint-disable-next-line no-console
+    console.log('rectArea', { cols, rows });
+    // eslint-disable-next-line no-console
     console.log('meta', {
       firstNotEmptyRow,
       lastNotEmptyRow,
@@ -236,7 +246,7 @@ export function getGlyphsMap(
       lastNotEmptyColumn,
     });
     // eslint-disable-next-line no-console
-    console.log(visualizeMap(glyphsMap, { cols, rows }, 250));
+    console.log(visualizeMap(glyphsMap));
   }
 
   return {
@@ -298,10 +308,6 @@ export function glyphsMapToRectMap(
       }
       rectMap[row][col] = isRectAreaBusy(col, row);
     }
-  }
-  if (false) {
-    // TODO rowLength ?
-    console.log(visualizeMap(rectMap, { cols: rectCols, rows: rectRows }, 196));
   }
 
   return rectMap;
@@ -391,19 +397,16 @@ function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
     rectMap: map,
     meta: {
       topCutOffRows: firstNotEmptyRow,
-      bottomCutOffRows: entryMapRows - lastNotEmptyRow,
+      bottomCutOffRows: entryMapRows - 1 - lastNotEmptyRow,
       leftCutOffColumns: firstNotEmptyColumn,
-      rightCutOffColumns: entryMapCols - lastNotEmptyColumn,
+      rightCutOffColumns: entryMapCols - 1 - lastNotEmptyColumn,
     },
   };
 }
 
-function visualizeMap(
-  map: RectMapT,
-  { cols, rows }: RectAreaT,
-  rowLength: number,
-): string {
+function visualizeMap(map: RectMapT, rowLength: number = 250): string {
   let res = '';
+  const { cols, rows } = getRectAreaOfRectMap(map);
   const maxCol = rowLength < cols ? rowLength : cols;
 
   if (rowLength < cols) {
@@ -415,10 +418,10 @@ function visualizeMap(
     for (let col = 0; col < maxCol; col++) {
       res +=
         map[row] && map[row][col]
-          ? '#'
+          ? '⬛'
           : map[row] === undefined || map[row][col] === undefined
-          ? '_'
-          : '•';
+          ? ''
+          : '⬜';
     }
     res += '\n';
   }

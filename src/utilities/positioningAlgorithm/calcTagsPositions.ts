@@ -129,7 +129,6 @@ export function calcTagsPositions(
       const edgesManager = new EdgesManager();
 
       const positionedRectsData: RawPositionedTagRectT[] = [];
-      let needVacanciesRefresh = false;
 
       const pickClosedVacancy = (rectArea: RectAreaT): RectPositionT | void => {
         const vacancies = vacanciesManager.closedVacancies;
@@ -170,7 +169,8 @@ export function calcTagsPositions(
         const takePositionsFromFirst = SceneMap.takePositionsFromFirst;
         const takePositionsFromLast = SceneMap.takePositionsFromLast;
 
-        const RATION_LIMIT = 1.9;
+        // vacancy square to rectArea square ratio limit to put at the center of a vacancy
+        const SQUARE_RATION_LIMIT = 1.9;
 
         let left: number;
         let right: number;
@@ -179,7 +179,7 @@ export function calcTagsPositions(
 
         const rectAreaSquare = rectArea.rows * rectArea.cols;
 
-        if (suitableVacancy.square / rectAreaSquare > RATION_LIMIT) {
+        if (suitableVacancy.square / rectAreaSquare > SQUARE_RATION_LIMIT) {
           // from edge
           if (
             Math.abs(suitableVacancy.right) > Math.abs(suitableVacancy.left)
@@ -555,9 +555,13 @@ export function calcTagsPositions(
           });
           // eslint-disable-next-line no-console
           console.log('rectPosition:', rectPosition);
+          // eslint-disable-next-line no-console
           console.log('rectAreaMap:', rectAreaMap);
+          // eslint-disable-next-line no-console
           console.log('rectArea:', rectArea);
+          // eslint-disable-next-line no-console
           console.log('isRectAreaRotated:', isRectAreaRotated);
+          // eslint-disable-next-line no-console
           console.log('updateSceneMap --------end');
         };
 
@@ -591,10 +595,14 @@ export function calcTagsPositions(
           let lastInnerRowPlusOne = 0;
           let lastInnerColPlusOne = 0;
           for (let row = top; row >= bottom; row--) {
-            if (row === 0) continue;
+            if (row === 0) {
+              continue;
+            }
             let innerCol = 0;
             for (let col = left; col <= right; col++) {
-              if (col === 0) continue;
+              if (col === 0) {
+                continue;
+              }
 
               const rectAreaMapValue = isRectAreaRotated
                 ? getDataAtPosition(rectArea.rows - 1 - innerCol, innerRow)
@@ -617,7 +625,7 @@ export function calcTagsPositions(
               Array.isArray(rectAreaMap[lastInnerRowPlusOne])) ||
               (isRectAreaRotated &&
                 Array.isArray(
-                  rectAreaMap[rectArea.rows - lastInnerColPlusOne],
+                  rectAreaMap[rectArea.rows - 1 - lastInnerColPlusOne],
                 )))
           ) {
             logDebugInformation(['Not all rectAreaMap rows is used']);
@@ -636,6 +644,8 @@ export function calcTagsPositions(
           throw err;
         }
 
+        needVacanciesRebuild = true;
+
         sceneMap.calcSceneSize();
 
         if (options?.drawStepMap) {
@@ -652,8 +662,8 @@ export function calcTagsPositions(
 
         const takePositionsFromFirst = SceneMap.takePositionsFromFirst;
         const takePositionsFromLast = SceneMap.takePositionsFromLast;
-        const next = SceneMap.nextPosition;
-        const prev = SceneMap.prevPosition;
+        const next = SceneMap.calcNextPositionFromEdge;
+        const prev = SceneMap.calcPrevPositionFromPositionEdge;
 
         // stick to the right edge, we can make it randomly
         switch (edge) {
@@ -700,12 +710,15 @@ export function calcTagsPositions(
         }
       };
 
+      let needVacanciesRebuild = false;
       const rebuildVacanciesMap = (
         isShouldCreateVacancyIfNoSuchKind: boolean,
       ) => {
         vacanciesManager.buildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
 
         // vacanciesManager.filterUnsuitableClosedVacancies(vacancyFilter);
+
+        needVacanciesRebuild = false;
 
         if (options?.drawVacanciesMap) {
           const sceneSize = sceneMap.getSceneSize();
@@ -774,9 +787,8 @@ export function calcTagsPositions(
 
         const tryPickClosedVacancy = (): boolean => {
           let rectPosition = pickClosedVacancy(rectArea);
-          if (!rectPosition && needVacanciesRefresh) {
+          if (!rectPosition && needVacanciesRebuild) {
             rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
-            needVacanciesRefresh = false;
             rectPosition = pickClosedVacancy(rectArea);
           }
 
@@ -786,9 +798,11 @@ export function calcTagsPositions(
               positionedRectsData.push(
                 creatRawPositionedTagRect(rect, rectPosition, isRotated),
               );
-              needVacanciesRefresh = true;
             } catch (e) {
               if (e instanceof IntersectionError) {
+                if (needVacanciesRebuild) {
+                  rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
+                }
                 return tryPickClosedVacancy();
               } else {
                 throw e;
@@ -831,7 +845,6 @@ export function calcTagsPositions(
                 );
 
                 rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
-                needVacanciesRefresh = false;
                 return;
               } catch (e) {
                 if (!(e instanceof IntersectionError)) {
@@ -856,7 +869,6 @@ export function calcTagsPositions(
             );
 
             rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
-            needVacanciesRefresh = false;
             edgesManager.confirmEdgeUsage(edge);
             return;
           } catch (e) {
@@ -875,7 +887,7 @@ export function calcTagsPositions(
         if (options?.drawFinishMap) {
           sceneMap.drawItself();
         }
-        positionedRectsData.forEach(tagData => {
+        positionedRectsData.forEach((tagData) => {
           const top = tagData.top > 0 ? tagData.top : tagData.top + 1;
           const bottom =
             tagData.bottom > 0 ? tagData.bottom - 1 : tagData.bottom;
@@ -884,10 +896,10 @@ export function calcTagsPositions(
 
           const { mapMeta: rectAreaMapMeta } =
             rectAreaMapByIdMap.get(tagData.id) ?? {};
-          let marginRight = 0;
-          let marginLeft = 0;
-          let marginTop = 0;
-          let marginBottom = 0;
+          let marginRight;
+          let marginLeft;
+          let marginTop;
+          let marginBottom;
 
           if (tagData.rotate) {
             // clockwise

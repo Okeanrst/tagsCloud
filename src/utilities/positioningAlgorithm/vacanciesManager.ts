@@ -313,14 +313,15 @@ export function drawVacancy(vacancy: VacancyT, sceneSize: SceneSizeT): void {
   for (let row = sceneTopRow; row >= sceneBottomRow; row--) {
     for (let col = sceneLeftCol; col <= sceneRightCol; col++) {
       if (row === 0) {
-        res += '-';
+        res += '';
       } else {
-        res += col === 0 ? '|' : isBelongVacancy(col, row) ? '#' : '•';
+        res += col === 0 ? '|' : isBelongVacancy(col, row) ? '⬛' : '⬜';
       }
     }
     res += '\n';
   }
 
+  // eslint-disable-next-line no-console
   console.log(res, '\n\n');
 }
 

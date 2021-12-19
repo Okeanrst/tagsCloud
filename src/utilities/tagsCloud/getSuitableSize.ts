@@ -1,4 +1,4 @@
-type SizeT = { width: number; height: number };
+export type SizeT = { width: number; height: number };
 
 export const getSuitableSize = (
   availableSize: SizeT,

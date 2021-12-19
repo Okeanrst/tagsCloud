@@ -119,11 +119,6 @@ export class SceneMap {
   }
 
   setDataAtPosition(x: number, y: number, val: boolean = true): void {
-    if (typeof x !== 'number' || typeof y !== 'number') {
-      throw new Error(
-        'setDataAtPosition error: typeof x !== number || typeof y !== number',
-      );
-    }
     if (x === 0 || y === 0) {
       throw new Error('setDataAtPosition error: x === 0 || y === 0');
     }
@@ -140,11 +135,6 @@ export class SceneMap {
   }
 
   getDataAtPosition(x: number, y: number): boolean | void {
-    if (typeof x !== 'number' || typeof y !== 'number') {
-      throw new Error(
-        'getDataAtPosition error: typeof x !== number || typeof y !== number',
-      );
-    }
     if (x === 0 || y === 0) {
       throw new Error('getDataAtPosition error: x === 0 || y === 0');
     }
@@ -204,35 +194,43 @@ export class SceneMap {
     return begin < 0 && end > 0 ? end - begin : end - begin + 1;
   }
 
-  static takePositionsFromFirst(first: number, count: number) {
+  static takePositionsFromFirst(firstPosition: number, count: number) {
     if (count <= 0) throw new Error('"count" must be positive');
-    if (first === 0) throw new Error('"first" can not be zero');
-    if (count === 1) return first;
-    let res = first + count;
-    if (!(first < 0 && res >= 0)) {
+    if (firstPosition === 0) throw new Error('"first" can not be zero');
+    if (count === 1) return firstPosition;
+    let res = firstPosition + count;
+    if (!(firstPosition < 0 && res >= 0)) {
       res--;
     }
     return res;
   }
 
-  static takePositionsFromLast(last: number, count: number): number {
+  static takePositionsFromLast(lastPosition: number, count: number): number {
     if (count <= 0) throw new Error('"count" must be positive');
-    if (last === 0) throw new Error('"last" can not be zero');
-    if (count === 1) return last;
+    if (lastPosition === 0) throw new Error('"last" can not be zero');
+    if (count === 1) return lastPosition;
 
-    let res = last - count;
-    if (res >= 0 || last < 0) {
+    let res = lastPosition - count;
+    if (res >= 0 || lastPosition < 0) {
       res++;
     }
     return res;
   }
 
-  static nextPosition(cur: number): number {
-    return cur === -1 ? cur + 2 : cur + 1;
+  static nextPosition(currentPosition: number): number {
+    return currentPosition === -1 ? currentPosition + 2 : currentPosition + 1;
   }
 
-  static prevPosition(cur: number): number {
-    return cur === 1 ? cur - 2 : cur - 1;
+  static prevPosition(currentPosition: number): number {
+    return currentPosition === 1 ? currentPosition - 2 : currentPosition - 1;
+  }
+
+  static calcNextPositionFromEdge(edge: number): number {
+    return edge >= 0 ? edge + 1 : edge;
+  }
+
+  static calcPrevPositionFromPositionEdge(edge: number): number {
+    return edge <= 0 ? edge - 1 : edge;
   }
 
   static changePosition(cur: number, diff: number): number {
