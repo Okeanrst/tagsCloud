@@ -39,7 +39,7 @@ const styles = createStyles({
   },
 });
 
-const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
+const SvgTagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
   const tagsSvgData = getTagsSvgData(tagData);
 
   if (!tagsSvgData) {
@@ -260,4 +260,4 @@ function drawAxles({ width, height }: SizeT) {
   ];
 }
 
-export default withStyles(styles)(TagsCloud);
+export default withStyles(styles)(SvgTagsCloud);

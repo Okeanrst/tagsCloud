@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from 'store/actions/tagsCloud';
-import TagsCloud from 'components/TagsCloud';
-import TagsCloudCanvas from 'components/TagsCloudCanvas';
+import SvgTagsCloud from 'components/SvgTagsCloud';
+import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { PENDING, PRISTINE, SUCCESS } from 'constants/queryStatuses';
 
@@ -165,7 +165,7 @@ class HomePage extends Component<PropsT, StateT> {
       tagsCloud.status,
       fontLoaded.status,
     ].includes(PENDING);
-    const TagsCloudComponent = useCanvas ? TagsCloudCanvas : TagsCloud;
+    const TagsCloudComponent = useCanvas ? CanvasTagsCloud : SvgTagsCloud;
 
     return (
       <div style={styles.pageContainer}>

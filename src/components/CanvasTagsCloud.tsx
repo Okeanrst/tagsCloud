@@ -30,7 +30,7 @@ const styles = {
   },
 };
 
-class TagsCloudCanvas extends React.Component<PropsT, StateT> {
+class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   tagCloudCanvasRef = React.createRef<HTMLCanvasElement>();
   state: StateT = { scale: 1 };
 
@@ -133,4 +133,4 @@ class TagsCloudCanvas extends React.Component<PropsT, StateT> {
   }
 }
 
-export default withStyles(styles)(TagsCloudCanvas);
+export default withStyles(styles)(CanvasTagsCloud);
