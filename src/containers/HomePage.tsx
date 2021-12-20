@@ -61,7 +61,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'absolute',
     top: '20px',
     left: '20px',
-    zIndex: 1,
+    zIndex: 3,
   },
 };
 
