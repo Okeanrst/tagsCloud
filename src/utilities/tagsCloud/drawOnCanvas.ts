@@ -73,7 +73,7 @@ export function drawOnCanvas(
   data.forEach(item => {
     const width = item.rectRight - item.rectLeft;
     const height = item.rectTop - item.rectBottom;
-    ctx.strokeStyle = item.fill;
+    ctx.strokeStyle = item.color;
     ctx.strokeRect(
       item.rectLeft * scale,
       -item.rectTop * scale,
@@ -83,7 +83,7 @@ export function drawOnCanvas(
 
     ctx.textBaseline = 'alphabetic';
     ctx.font = `${item.fontSize * scale}px ${fontFamily}`;
-    ctx.fillStyle = item.fill;
+    ctx.fillStyle = item.color;
 
     const wordWidth = ctx.measureText(item.label).width;
 
@@ -93,7 +93,7 @@ export function drawOnCanvas(
       ctx.translate(dX, dY);
       rotate(90);
       const xOffset = (height * scale - wordWidth) / 2;
-      ctx.fillText(item.label, 0 + xOffset, width * 0.8 * scale);
+      ctx.fillText(item.label, xOffset, width * 0.8 * scale);
       rotate(-90);
       ctx.translate(-dX, -dY);
     } else {

@@ -35,22 +35,16 @@ export type TagDataT = Readonly<{
 export type PreparedTagDataT = TagDataT &
   Readonly<{
     fontSize: number;
-    fill: string;
+    color: string;
   }>;
 
-export type GlyphsMapT = Array<Array<boolean>>;
+export type TwoDimensionalMapT = Array<Array<boolean>>;
 
-export type GlyphsMapMetaT = {
+export type TwoDimensionalMapMetaT = {
   firstNotEmptyRow: number;
   lastNotEmptyRow: number;
   firstNotEmptyColumn: number;
   lastNotEmptyColumn: number;
-};
-
-export type IdGlyphsMapT = {
-  id: string;
-  map: GlyphsMapT | null;
-  meta: GlyphsMapMetaT | null;
 };
 
 export type RectAreaT = {
@@ -58,11 +52,9 @@ export type RectAreaT = {
   cols: number;
 };
 
-export type RectMapT = Array<Array<boolean>>;
-
 export type IdRectAreaMapT = {
   id: string;
-  map: RectMapT | null;
+  map: TwoDimensionalMapT | null;
   mapMeta: {
     marginTop: number;
     marginBottom: number;

@@ -1,6 +1,6 @@
 import { FONT_FAMILY } from 'constants/index';
 
-import { GlyphsMapMetaT, GlyphsMapT, RectAreaT, RectMapT } from 'types/types';
+import { TwoDimensionalMapMetaT, TwoDimensionalMapT, RectAreaT } from 'types/types';
 
 export function getRectAreaMap(
   canvas: HTMLCanvasElement,
@@ -36,7 +36,7 @@ export function getRectAreaMap(
   if (false) {
     // for debug
 
-    const fakeRectMap: GlyphsMapT = [];
+    const fakeRectMap: TwoDimensionalMapT = [];
 
     for (let row = 0; row < rectArea.rows; row++) {
       if (!fakeRectMap[row]) {
@@ -138,8 +138,8 @@ export function getGlyphsMap(
     xOffset?: number;
   },
 ): {
-  map: GlyphsMapT;
-  meta: GlyphsMapMetaT;
+  map: TwoDimensionalMapT;
+  meta: TwoDimensionalMapMetaT;
 } | null {
   const ctx = canvas.getContext('2d');
 
@@ -147,8 +147,8 @@ export function getGlyphsMap(
     return null;
   }
 
-  canvas.width = width; // wordWidth * 1.1;
-  canvas.height = height; // * 1.1;
+  canvas.width = width;
+  canvas.height = height;
 
   ctx.textBaseline = 'alphabetic';
   ctx.font = `${fontSize}px "${fontFamily}"`;
@@ -160,7 +160,6 @@ export function getGlyphsMap(
   const sy = 0;
   const sh = height;
   const sw = width;
-  // const sw = wordWidth + xOffset * 2;
 
   const imageData = ctx.getImageData(sx, sy, sw, sh);
   const data = imageData.data;
@@ -168,7 +167,7 @@ export function getGlyphsMap(
   // row and column are 1px size
   const rows = Math.floor(sh - sx);
   const cols = Math.floor(sw - sy);
-  const glyphsMap: GlyphsMapT = [];
+  const glyphsMap: TwoDimensionalMapT = [];
 
   const emptyRows = Array.from({ length: rows }).fill(true);
   const emptyColumns = Array.from({ length: cols }).fill(true);
@@ -261,10 +260,10 @@ export function getGlyphsMap(
 }
 
 export function glyphsMapToRectMap(
-  glyphsMap: GlyphsMapT,
+  glyphsMap: TwoDimensionalMapT,
   rectArea: RectAreaT,
   rotate: boolean,
-): RectMapT {
+): TwoDimensionalMapT {
   const { rows: rectRows, cols: rectCols } = rectArea;
   const glyphsRows = rotate ? glyphsMap[0].length : glyphsMap.length;
   const glyphsCols = rotate ? glyphsMap.length : glyphsMap[0].length;
@@ -300,7 +299,7 @@ export function glyphsMapToRectMap(
     return false;
   };
 
-  const rectMap: RectMapT = [];
+  const rectMap: TwoDimensionalMapT = [];
   for (let row = 0; row < rectRows; row++) {
     for (let col = 0; col < rectCols; col++) {
       if (!rectMap[row]) {
@@ -404,7 +403,7 @@ function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
   };
 }
 
-function visualizeMap(map: RectMapT, rowLength: number = 250): string {
+function visualizeMap(map: TwoDimensionalMapT, rowLength: number = 250): string {
   let res = '';
   const { cols, rows } = getRectAreaOfRectMap(map);
   const maxCol = rowLength < cols ? rowLength : cols;

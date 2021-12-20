@@ -6,7 +6,7 @@ import VacanciesManager, { drawVacancy } from './vacanciesManager';
 import IntersectionError from './IntersectionError';
 import { getRectAreaOfRectMap } from '../getGlyphsMap';
 
-import { IdRectAreaMapT, RectMapT } from 'types/types';
+import { IdRectAreaMapT, TwoDimensionalMapT } from 'types/types';
 import type {
   PreparedTagDataT,
   TagRectT,
@@ -534,7 +534,7 @@ export function calcTagsPositions(
 
       const updateSceneMap = (
         rectPosition: RectPositionT,
-        rectAreaMap: RectMapT,
+        rectAreaMap: TwoDimensionalMapT,
         isRectAreaRotated: boolean,
       ) => {
         const affectedPositions: [number, number][] = [];

@@ -71,7 +71,7 @@ export function prepareData(
     return {
       ...item,
       fontSize,
-      fill: getRandomRGBColor(),
+      color: getRandomRGBColor(),
     };
   });
 }

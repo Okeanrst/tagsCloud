@@ -83,7 +83,7 @@ const TagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
               const style = {
                 fontSize: `${i.adaptFontSize}px`,
                 fontFamily: FONT_FAMILY,
-                fill: i.fill,
+                fill: i.color,
               };
               const transitionStyles: { [key: string]: React.CSSProperties } = {
                 exited: {
@@ -195,7 +195,7 @@ function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
 }
 
 function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT, transform: string) {
-  const rects = tagData.map(({ id, fill, rectRight, rectTop, rectLeft, rectBottom }) => {
+  const rects = tagData.map(({ id, color, rectRight, rectTop, rectLeft, rectBottom }) => {
     const x = rectLeft;
     const y = -rectTop;
 
@@ -208,7 +208,7 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
         fillOpacity="0"
         height={height}
         key={id}
-        stroke={fill}
+        stroke={color}
         strokeOpacity="0.5"
         strokeWidth="1"
         style={{ position: 'relative', zIndex: 1 }}
