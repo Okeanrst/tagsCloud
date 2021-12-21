@@ -58,7 +58,7 @@ function creatRawPositionedTagRect(
   { top, right, bottom, left }: RectPositionT,
   isRotated: boolean,
 ): RawPositionedTagRectT {
-  if (process.env.NODE_ENV !== 'production' && (top < bottom || left > right)) {
+  if (!['production', 'test'].includes(process.env.NODE_ENV) && (top < bottom || left > right)) {
     throw new Error(
       'creatRawPositionedTagRect error: top < bottom || left > right',
     );
@@ -567,7 +567,7 @@ export function calcTagsPositions(
 
         const getDataAtPosition = (row: number, column: number) => {
           if (
-            process.env.NODE_ENV !== 'production' &&
+            !['production', 'test'].includes(process.env.NODE_ENV) &&
             !Array.isArray(rectAreaMap[row])
           ) {
             logDebugInformation([
@@ -576,7 +576,7 @@ export function calcTagsPositions(
             ]);
           }
           if (
-            process.env.NODE_ENV !== 'production' &&
+            !['production', 'test'].includes(process.env.NODE_ENV) &&
             Array.isArray(rectAreaMap[row]) &&
             rectAreaMap[row].length <= column
           ) {
@@ -620,7 +620,7 @@ export function calcTagsPositions(
           }
 
           if (
-            process.env.NODE_ENV !== 'production' &&
+            !['production', 'test'].includes(process.env.NODE_ENV) &&
             ((!isRectAreaRotated &&
               Array.isArray(rectAreaMap[lastInnerRowPlusOne])) ||
               (isRectAreaRotated &&
@@ -632,7 +632,7 @@ export function calcTagsPositions(
           }
         } catch (err) {
           if (
-            process.env.NODE_ENV !== 'production' &&
+            !['production', 'test'].includes(process.env.NODE_ENV) &&
             err instanceof IntersectionError
           ) {
             logDebugInformation([`IntersectionError: ${err.message}`]);
@@ -878,7 +878,7 @@ export function calcTagsPositions(
           }
         }
 
-        if (process.env.NODE_ENV !== 'production') {
+        if (!['production', 'test'].includes(process.env.NODE_ENV)) {
           throw new Error('it is impossible to find rect position');
         }
       };

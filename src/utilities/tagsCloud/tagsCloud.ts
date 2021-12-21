@@ -1,3 +1,4 @@
+import { getRandomRGBColor } from 'utilities/common/getRandomRGBColor';
 import {
   TagDataT,
   PreparedTagDataT,
@@ -31,13 +32,6 @@ export function prepareData(
     minFontSize = DEFAULT_MIN_FONT_SIZE,
     maxFontSize = DEFAULT_MAX_FONT_SIZE,
   } = options;
-
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) {
-    return [];
-  }
 
   let minSentimentScore: number = Infinity;
   let maxSentimentScore: number = -Infinity;
@@ -174,11 +168,4 @@ export function getTagsSvgData(
     aspectRatio: sceneWidth / sceneHeight,
     data: positionedTagSvgData,
   };
-}
-
-function getRandomRGBColor(): string {
-  let r = Math.round(Math.random() * 0xff);
-  let g = Math.round(Math.random() * 0xff);
-  let b = Math.round(Math.random() * 0xff);
-  return `rgb(${r}, ${g}, ${b})`;
 }
