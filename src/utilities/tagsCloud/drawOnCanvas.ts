@@ -1,6 +1,6 @@
 import { getBorderCoordinates } from './tagsCloud';
 import { PositionedTagRectT } from 'types/types';
-import { FONT_FAMILY } from 'constants/index';
+import { FONT_FAMILY, FONT_Y_FACTOR } from 'constants/index';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 
 type OptionsT = {
@@ -93,7 +93,7 @@ export function drawOnCanvas(
       ctx.translate(dX, dY);
       rotate(90);
       const xOffset = (height * scale - wordWidth) / 2;
-      ctx.fillText(item.label, xOffset, width * 0.8 * scale);
+      ctx.fillText(item.label, xOffset, width * FONT_Y_FACTOR * scale);
       rotate(-90);
       ctx.translate(-dX, -dY);
     } else {
@@ -101,7 +101,7 @@ export function drawOnCanvas(
       ctx.fillText(
         item.label,
         item.rectLeft * scale + xOffset,
-        (-item.rectTop + height * 0.8) * scale,
+        (-item.rectTop + height * FONT_Y_FACTOR) * scale,
       );
     }
   });

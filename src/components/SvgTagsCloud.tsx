@@ -170,7 +170,7 @@ function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
           height={sceneMapUnitSize}
           key={`${row},${col}`}
           stroke="blue"
-          strokeOpacity="0.5"
+          strokeOpacity="0.25"
           strokeWidth="0.5"
           width={sceneMapUnitSize}
           x={translateX}

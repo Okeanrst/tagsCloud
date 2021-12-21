@@ -34,6 +34,7 @@ export type Options = Readonly<{
   addIfEmptyIndex?: number;
   drawStepMap?: boolean;
   drawVacanciesMap?: boolean;
+  shouldTryRotated?: boolean;
 }>;
 
 const { TOP, RIGHT, BOTTOM, LEFT } = EDGE;
@@ -747,7 +748,7 @@ export function calcTagsPositions(
 
       let isPreviousRotated = true;
 
-      const performWork = (rect: TagRectT, index: number): void => {
+      const performWork = (rect: TagRectT, index: number, tryRotated: boolean = true): boolean => {
         const isShouldRotate = !isPreviousRotated;
 
         const { map: rectAreaMap } = rectAreaMapByIdMap.get(rect.id) ?? {};
@@ -779,7 +780,7 @@ export function calcTagsPositions(
             creatRawPositionedTagRect(rect, rectPosition, isRotated),
           );
 
-          return;
+          return true;
         }
 
         const isShouldCreateVacancyIfNoSuchKind: boolean =
@@ -815,7 +816,7 @@ export function calcTagsPositions(
         };
 
         if (tryPickClosedVacancy()) {
-          return;
+          return true;
         }
 
         const INIT_THRESHOLD = 0.75;
@@ -845,7 +846,7 @@ export function calcTagsPositions(
                 );
 
                 rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
-                return;
+                return true;
               } catch (e) {
                 if (!(e instanceof IntersectionError)) {
                   throw e;
@@ -853,6 +854,16 @@ export function calcTagsPositions(
               }
             }
           }
+        }
+
+        if (options?.shouldTryRotated && tryRotated) {
+          // try to rotate the rect before putting it outside the scene
+          if (performWork(rect, index, false)) {
+            return true;
+          }
+        } else if (options?.shouldTryRotated) {
+          // return to continue the initial try (just below this place to placeRectOutsideScene)
+          return false;
         }
 
         {
@@ -870,7 +881,7 @@ export function calcTagsPositions(
 
             rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
             edgesManager.confirmEdgeUsage(edge);
-            return;
+            return true;
           } catch (e) {
             if (!(e instanceof IntersectionError)) {
               throw e;
@@ -881,6 +892,7 @@ export function calcTagsPositions(
         if (!['production', 'test'].includes(process.env.NODE_ENV)) {
           throw new Error('it is impossible to find rect position');
         }
+        return false;
       };
 
       const finish = () => {

@@ -1,4 +1,4 @@
-import { FONT_FAMILY } from 'constants/index';
+import { FONT_FAMILY, FONT_Y_FACTOR } from 'constants/index';
 
 import { TwoDimensionalMapMetaT, TwoDimensionalMapT, RectAreaT } from 'types/types';
 
@@ -154,7 +154,7 @@ export function getGlyphsMap(
   ctx.font = `${fontSize}px "${fontFamily}"`;
 
   // TODO use opentype.js
-  ctx.fillText(word, xOffset, height * 0.8);
+  ctx.fillText(word, xOffset, height * FONT_Y_FACTOR);
 
   const sx = 0;
   const sy = 0;
