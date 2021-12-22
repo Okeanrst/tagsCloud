@@ -749,7 +749,7 @@ export function calcTagsPositions(
       let isPreviousRotated = true;
 
       const performWork = (rect: TagRectT, index: number, tryRotated: boolean = true): boolean => {
-        const isShouldRotate = !isPreviousRotated;
+        const shouldRotate = !isPreviousRotated;
 
         const { map: rectAreaMap } = rectAreaMapByIdMap.get(rect.id) ?? {};
         if (!rectAreaMap) {
@@ -757,11 +757,11 @@ export function calcTagsPositions(
             `rectAreaMap for rect with id: "${rect.id}" is not found`,
           );
         }
-        const rectArea = isShouldRotate
+        const rectArea = shouldRotate
           ? rotateRectArea(getRectAreaOfRectMap(rectAreaMap))
           : getRectAreaOfRectMap(rectAreaMap);
 
-        const isRotated = isShouldRotate;
+        const isRotated = shouldRotate;
 
         isPreviousRotated = isRotated;
 
@@ -857,10 +857,13 @@ export function calcTagsPositions(
         }
 
         if (options?.shouldTryRotated && tryRotated) {
+          const isPreviousRotatedBeforeTry = isPreviousRotated;
           // try to rotate the rect before putting it outside the scene
           if (performWork(rect, index, false)) {
             return true;
           }
+          // recover value after not successful try
+          isPreviousRotated = isPreviousRotatedBeforeTry;
         } else if (options?.shouldTryRotated) {
           // return to continue the initial try (just below this place to placeRectOutsideScene)
           return false;
