@@ -547,12 +547,7 @@ export function calcTagsPositions(
         rectAreaMap: TwoDimensionalMapT,
         isRectAreaRotated: boolean,
       ) => {
-        const affectedPositions: [number, number][] = [];
-        const recoverClosedVacanciesState = () => {
-          affectedPositions.forEach(position =>
-            sceneMap.releasePosition(...position),
-          );
-        };
+        const positionsToUpdate: [number, number, any][] = [];
 
         const rectArea = getRectAreaOfRectMap(rectAreaMap);
 
@@ -619,8 +614,7 @@ export function calcTagsPositions(
                 : getDataAtPosition(innerRow, innerCol);
 
               if (rectAreaMapValue) {
-                sceneMap.setDataAtPosition(col, row);
-                affectedPositions.push([col, row]);
+                positionsToUpdate.push([col, row, true]);
               }
               innerCol++;
               lastInnerColPlusOne = innerCol;
@@ -647,12 +641,10 @@ export function calcTagsPositions(
           ) {
             logDebugInformation([`IntersectionError: ${err.message}`]);
           }
-
-          if (err instanceof IntersectionError) {
-            recoverClosedVacanciesState();
-          }
           throw err;
         }
+
+        sceneMap.bulkUpdate(positionsToUpdate);
 
         needVacanciesRebuild = true;
 

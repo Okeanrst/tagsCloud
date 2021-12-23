@@ -130,6 +130,27 @@ export class SceneMap {
     this._setDataAtPosition(x, y, val);
   }
 
+  bulkUpdate(positionsToUpdate: [number, number, any][]) {
+    const affectedPositions: [number, number][] = [];
+    const recoverClosedVacanciesState = () => {
+      affectedPositions.forEach(position =>
+        this.releasePosition(...position),
+      );
+    };
+
+    positionsToUpdate.forEach(([col, row, value]) => {
+      try {
+        this.setDataAtPosition(col, row, value);
+        affectedPositions.push([col, row]);
+      } catch (err) {
+        if (err instanceof IntersectionError) {
+          recoverClosedVacanciesState();
+        }
+        throw err;
+      }
+    });
+  }
+
   releasePosition(x: number, y: number): void {
     this._setDataAtPosition(x, y, false);
   }
