@@ -4,10 +4,8 @@ export function splitAndPerformWork<T>(
 ): Promise<T[]> {
   return new Promise(async (resolve, reject) => {
     const iterable = workGenerator();
-    const getAndPerformWork = ():
-      | { done: false; value: T }
-      | { done: true } => {
-      const { done, value } = iterable.next();
+    const getAndPerformWork = (prevValue?: T): ({ done: false; value: T } | { done: true }) => {
+      const { done, value } = iterable.next(prevValue);
       if (done) {
         return { done: true };
       } else {
@@ -16,16 +14,17 @@ export function splitAndPerformWork<T>(
       }
     };
 
-    const withDelay = (): Promise<ReturnType<typeof getAndPerformWork>> =>
-      new Promise((resolve, reject) => {
+    const withDelay = (prevValue?: T): Promise<ReturnType<typeof getAndPerformWork>> => {
+      return new Promise((resolve, reject) => {
         setTimeout(() => {
           try {
-            resolve(getAndPerformWork());
+            resolve(getAndPerformWork(prevValue));
           } catch (err) {
             reject(err);
           }
         }, 0);
       });
+    };
 
     let restTime = allowedDuration;
     const start = Date.now();
@@ -34,16 +33,24 @@ export function splitAndPerformWork<T>(
     try {
       let done = false;
 
+      let result;
       while (!done) {
-        let result;
         const spent = Date.now() - start;
+
+        let prevCallReturnValue;
+        if (result && !result?.done) {
+          prevCallReturnValue = result.value;
+        }
+
         if (spent >= restTime) {
           restTime = allowedDuration;
-          result = await withDelay();
+
+          result = await withDelay(prevCallReturnValue);
           ({ done } = result);
         } else {
           restTime = restTime - spent;
-          result = getAndPerformWork();
+
+          result = getAndPerformWork(prevCallReturnValue);
           ({ done } = result);
         }
         if (!result.done) {

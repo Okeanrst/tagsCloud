@@ -34,7 +34,7 @@ export type Options = Readonly<{
   addIfEmptyIndex?: number;
   drawStepMap?: boolean;
   drawVacanciesMap?: boolean;
-  shouldTryRotated?: boolean;
+  shouldTryAnotherAngle?: boolean;
 }>;
 
 const { TOP, RIGHT, BOTTOM, LEFT } = EDGE;
@@ -53,6 +53,9 @@ type LoopParamsT = {
   [ASC]: LoopOrderParamT;
   [DESC]: LoopOrderParamT;
 };
+
+type PerformWorkT = (rect: TagRectT, parameters: { index: number, shouldTryAnotherAngle?: boolean, isRotated: boolean })
+  => { status: true, isRotated: boolean } | { status: false };
 
 function creatRawPositionedTagRect(
   rect: TagRectT,
@@ -76,11 +79,17 @@ function isVacancyLargeEnoughToFitRect(
 
 function createWorkGenerator(
   rectsData: ReadonlyArray<TagRectT>,
-  performWork: (rect: TagRectT, index: number) => void,
-): () => Generator<void> {
+  performWork: PerformWorkT,
+): () => Generator<ReturnType<PerformWorkT>, any, ReturnType<PerformWorkT>> {
   return function* workGenerator() {
+    let isPreviousRotated = true;
     for (let i = 0; i < rectsData.length; i++) {
-      yield performWork(rectsData[i], i);
+      const result: ReturnType<PerformWorkT> = yield performWork(rectsData[i], { index: i, shouldTryAnotherAngle: true, isRotated: !isPreviousRotated });
+      if (result && !result.status) {
+        throw new Error('performWork return status false');
+      } else if (result) {
+        isPreviousRotated = result.isRotated;
+      }
     }
   };
 }
@@ -746,24 +755,16 @@ export function calcTagsPositions(
         }
       };
 
-      let isPreviousRotated = true;
-
-      const performWork = (rect: TagRectT, index: number, tryRotated: boolean = true): boolean => {
-        const shouldRotate = !isPreviousRotated;
-
+      const performWork: PerformWorkT = (rect, { index, shouldTryAnotherAngle = true, isRotated }) => {
         const { map: rectAreaMap } = rectAreaMapByIdMap.get(rect.id) ?? {};
         if (!rectAreaMap) {
           throw new Error(
             `rectAreaMap for rect with id: "${rect.id}" is not found`,
           );
         }
-        const rectArea = shouldRotate
+        const rectArea = isRotated
           ? rotateRectArea(getRectAreaOfRectMap(rectAreaMap))
           : getRectAreaOfRectMap(rectAreaMap);
-
-        const isRotated = shouldRotate;
-
-        isPreviousRotated = isRotated;
 
         if (index === 0) {
           const { rows, cols } = rectArea;
@@ -780,7 +781,7 @@ export function calcTagsPositions(
             creatRawPositionedTagRect(rect, rectPosition, isRotated),
           );
 
-          return true;
+          return { status: true, isRotated };
         }
 
         const isShouldCreateVacancyIfNoSuchKind: boolean =
@@ -816,7 +817,7 @@ export function calcTagsPositions(
         };
 
         if (tryPickClosedVacancy()) {
-          return true;
+          return { status: true, isRotated };
         }
 
         const INIT_THRESHOLD = 0.75;
@@ -846,7 +847,7 @@ export function calcTagsPositions(
                 );
 
                 rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
-                return true;
+                return { status: true, isRotated };
               } catch (e) {
                 if (!(e instanceof IntersectionError)) {
                   throw e;
@@ -856,17 +857,14 @@ export function calcTagsPositions(
           }
         }
 
-        if (options?.shouldTryRotated && tryRotated) {
-          const isPreviousRotatedBeforeTry = isPreviousRotated;
+        if (options?.shouldTryAnotherAngle && shouldTryAnotherAngle) {
           // try to rotate the rect before putting it outside the scene
-          if (performWork(rect, index, false)) {
-            return true;
+          if (performWork(rect, { index, shouldTryAnotherAngle: false, isRotated: !isRotated }).status) {
+            return { status: true, isRotated };
           }
-          // recover value after not successful try
-          isPreviousRotated = isPreviousRotatedBeforeTry;
-        } else if (options?.shouldTryRotated) {
+        } else if (options?.shouldTryAnotherAngle && !shouldTryAnotherAngle) {
           // return to continue the initial try (just below this place to placeRectOutsideScene)
-          return false;
+          return { status: false };
         }
 
         {
@@ -884,7 +882,7 @@ export function calcTagsPositions(
 
             rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
             edgesManager.confirmEdgeUsage(edge);
-            return true;
+            return { status: true, isRotated };
           } catch (e) {
             if (!(e instanceof IntersectionError)) {
               throw e;
@@ -895,7 +893,7 @@ export function calcTagsPositions(
         if (!['production', 'test'].includes(process.env.NODE_ENV)) {
           throw new Error('it is impossible to find rect position');
         }
-        return false;
+        return { status: false };
       };
 
       const finish = () => {
@@ -950,7 +948,7 @@ export function calcTagsPositions(
         resolve(positionedRectsData as PositionedTagRectT[]);
       };
 
-      splitAndPerformWork<void>(createWorkGenerator(rectsData, performWork), 50)
+      splitAndPerformWork<ReturnType<PerformWorkT>>(createWorkGenerator(rectsData, performWork), 50)
         .then(finish)
         .catch(error => reject(error));
     } catch (e) {

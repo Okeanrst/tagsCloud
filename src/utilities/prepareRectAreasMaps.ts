@@ -22,6 +22,7 @@ export function prepareRectAreasMaps(
           yield { id, map, mapMeta: meta };
         }
       };
+
     splitAndPerformWork<IdRectAreaMapT>(workGenerator, 50)
       .then(resolve)
       .catch(reject);

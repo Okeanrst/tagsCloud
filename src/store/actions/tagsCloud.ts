@@ -36,7 +36,7 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
         return calcTagsPositions(preparedData, tagsRectAreasMaps, {
           drawVacanciesMap: false,
           drawStepMap: false,
-          shouldTryRotated: false,
+          shouldTryAnotherAngle: false,
         });
       })
       .then(preparedDataWithPositions => {
