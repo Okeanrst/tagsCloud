@@ -51,7 +51,8 @@
     "eject": "react-scripts eject",
     "lint": "eslint .",
     "type-check": "tsc --build tsconfig.json",
-    "prettier:fix": "prettier --write ."
+    "prettier:fix": "prettier --write .",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -70,5 +71,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "husky": "^7.0.4"
   }
 }
