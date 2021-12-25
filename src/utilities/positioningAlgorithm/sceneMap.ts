@@ -205,45 +205,57 @@ export class SceneMap {
     return mapVal * sceneMapUnitSize;
   }
 
-  static countPositions(begin: number, end: number): number {
-    if (begin > end) {
+  // opposite to changePosition
+  static countPositions(beginPosition: number, endPosition: number): number {
+    if (beginPosition > endPosition) {
       throw new Error('countPositions error: can not be begin > end');
     }
-    if (begin === 0 || end === 0) {
+    if (beginPosition === 0 || endPosition === 0) {
       throw new Error('countPositions error: begin, end can not be zero');
     }
-    return begin < 0 && end > 0 ? end - begin : end - begin + 1;
+    return beginPosition < 0 && endPosition > 0 ? endPosition - beginPosition : endPosition - beginPosition + 1;
   }
 
-  static takePositionsFromFirst(firstPosition: number, count: number) {
-    if (count <= 0) throw new Error('"count" must be positive');
-    if (firstPosition === 0) throw new Error('"first" can not be zero');
-    if (count === 1) return firstPosition;
-    let res = firstPosition + count;
-    if (!(firstPosition < 0 && res >= 0)) {
+  static changePosition(currentPosition: number, diff: number): number {
+    if (currentPosition === 0) {
+      throw new Error('currentPosition can not be zero');
+    }
+    let res = currentPosition + diff;
+    if (currentPosition > 0 && res <= 0) {
       res--;
     }
-    return res;
-  }
-
-  static takePositionsFromLast(lastPosition: number, count: number): number {
-    if (count <= 0) throw new Error('"count" must be positive');
-    if (lastPosition === 0) throw new Error('"last" can not be zero');
-    if (count === 1) return lastPosition;
-
-    let res = lastPosition - count;
-    if (res >= 0 || lastPosition < 0) {
+    if (currentPosition < 0 && res >= 0) {
       res++;
     }
     return res;
   }
 
+  static countPositionsFroward(startPosition: number, count: number): number {
+    if (count <= 0) {
+      throw new Error('count must be positive');
+    }
+    if (startPosition === 0) {
+      throw new Error('startPosition can not be zero');
+    }
+    return SceneMap.changePosition(startPosition, count - 1);
+  }
+
+  static countPositionsBackwards(startPosition: number, count: number): number {
+    if (count <= 0) {
+      throw new Error('count must be positive');
+    }
+    if (startPosition === 0) {
+      throw new Error('startPosition can not be zero');
+    }
+    return SceneMap.changePosition(startPosition, -(count - 1));
+  }
+
   static nextPosition(currentPosition: number): number {
-    return currentPosition === -1 ? currentPosition + 2 : currentPosition + 1;
+    return SceneMap.changePosition(currentPosition, 1);
   }
 
   static prevPosition(currentPosition: number): number {
-    return currentPosition === 1 ? currentPosition - 2 : currentPosition - 1;
+    return SceneMap.changePosition(currentPosition, -1);
   }
 
   static calcNextPositionFromEdge(edge: number): number {
@@ -252,18 +264,6 @@ export class SceneMap {
 
   static calcPrevPositionFromPositionEdge(edge: number): number {
     return edge <= 0 ? edge - 1 : edge;
-  }
-
-  static changePosition(cur: number, diff: number): number {
-    if (cur === 0) throw new Error('"cur" can not be zero');
-    let res = cur + diff;
-    if (cur > 0 && res <= 0) {
-      res--;
-    }
-    if (cur < 0 && res >= 0) {
-      res++;
-    }
-    return res;
   }
 }
 

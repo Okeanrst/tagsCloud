@@ -176,8 +176,8 @@ export function calcTagsPositions(
           return;
         }
 
-        const takePositionsFromFirst = SceneMap.takePositionsFromFirst;
-        const takePositionsFromLast = SceneMap.takePositionsFromLast;
+        const countPositionsFroward = SceneMap.countPositionsFroward;
+        const countPositionsBackwards = SceneMap.countPositionsBackwards;
 
         // vacancy square to rectArea square ratio limit to put at the center of a vacancy
         const SQUARE_RATION_LIMIT = 1.9;
@@ -195,19 +195,19 @@ export function calcTagsPositions(
             Math.abs(suitableVacancy.right) > Math.abs(suitableVacancy.left)
           ) {
             left = suitableVacancy.left;
-            right = takePositionsFromFirst(suitableVacancy.left, rectArea.cols);
+            right = countPositionsFroward(suitableVacancy.left, rectArea.cols);
           } else {
             right = suitableVacancy.right;
-            left = takePositionsFromLast(right, rectArea.cols);
+            left = countPositionsBackwards(right, rectArea.cols);
           }
           if (
             Math.abs(suitableVacancy.bottom) > Math.abs(suitableVacancy.top)
           ) {
             top = suitableVacancy.top;
-            bottom = takePositionsFromLast(top, rectArea.rows);
+            bottom = countPositionsBackwards(top, rectArea.rows);
           } else {
             bottom = suitableVacancy.bottom;
-            top = takePositionsFromFirst(bottom, rectArea.rows);
+            top = countPositionsFroward(bottom, rectArea.rows);
           }
         } else {
           // center
@@ -219,8 +219,8 @@ export function calcTagsPositions(
           );
           top = SceneMap.changePosition(suitableVacancy.top, -rowsDiffHalf);
           right = SceneMap.changePosition(suitableVacancy.right, -colsDiffHalf);
-          bottom = takePositionsFromLast(top, rectArea.rows);
-          left = takePositionsFromLast(right, rectArea.cols);
+          bottom = countPositionsBackwards(top, rectArea.rows);
+          left = countPositionsBackwards(right, rectArea.cols);
         }
         vacanciesManager.removeClosedVacancy(vacancyIndex);
         return { top, bottom, right, left };
@@ -246,8 +246,8 @@ export function calcTagsPositions(
           edge === TOP || edge === BOTTOM ? rectArea.cols : rectArea.rows;
         const oppositeSize =
           edge === TOP || edge === BOTTOM ? rectArea.rows : rectArea.cols;
-        const takePositionsFromFirst = SceneMap.takePositionsFromFirst;
-        const takePositionsFromLast = SceneMap.takePositionsFromLast;
+        const countPositionsFroward = SceneMap.countPositionsFroward;
+        const countPositionsBackwards = SceneMap.countPositionsBackwards;
         const countPositions = SceneMap.countPositions;
 
         const howOpposStandForEdge = (begin: number, end: number) =>
@@ -312,7 +312,7 @@ export function calcTagsPositions(
                     Math.abs(preparedTopEdgeVacancy.left)
                   ) {
                     left = preparedTopEdgeVacancy.left;
-                    right = takePositionsFromFirst(left, baseSize);
+                    right = countPositionsFroward(left, baseSize);
 
                     if (
                       !force &&
@@ -325,7 +325,7 @@ export function calcTagsPositions(
                     }
                   } else {
                     right = preparedTopEdgeVacancy.right;
-                    left = takePositionsFromLast(right, baseSize);
+                    left = countPositionsBackwards(right, baseSize);
 
                     if (
                       !force &&
@@ -339,7 +339,7 @@ export function calcTagsPositions(
                   }
                 }
                 return {
-                  top: takePositionsFromFirst(
+                  top: countPositionsFroward(
                     preparedTopEdgeVacancy.bottom,
                     oppositeSize,
                   ),
@@ -375,7 +375,7 @@ export function calcTagsPositions(
                     Math.abs(preparedBottomEdgeVacancy.left)
                   ) {
                     left = preparedBottomEdgeVacancy.left;
-                    right = takePositionsFromFirst(left, baseSize);
+                    right = countPositionsFroward(left, baseSize);
 
                     if (
                       !force &&
@@ -388,7 +388,7 @@ export function calcTagsPositions(
                     }
                   } else {
                     right = preparedBottomEdgeVacancy.right;
-                    left = takePositionsFromLast(right, baseSize);
+                    left = countPositionsBackwards(right, baseSize);
 
                     if (
                       !force &&
@@ -404,7 +404,7 @@ export function calcTagsPositions(
                 return {
                   top: preparedBottomEdgeVacancy.top,
                   right,
-                  bottom: takePositionsFromLast(
+                  bottom: countPositionsBackwards(
                     preparedBottomEdgeVacancy.top,
                     oppositeSize,
                   ),
@@ -438,7 +438,7 @@ export function calcTagsPositions(
                     Math.abs(preparedRightEdgeVacancy.top)
                   ) {
                     top = preparedRightEdgeVacancy.top;
-                    bottom = takePositionsFromLast(top, baseSize);
+                    bottom = countPositionsBackwards(top, baseSize);
 
                     if (
                       !force &&
@@ -451,7 +451,7 @@ export function calcTagsPositions(
                     }
                   } else {
                     bottom = preparedRightEdgeVacancy.bottom;
-                    top = takePositionsFromFirst(bottom, baseSize);
+                    top = countPositionsFroward(bottom, baseSize);
 
                     if (
                       !force &&
@@ -466,7 +466,7 @@ export function calcTagsPositions(
                 }
                 return {
                   top,
-                  right: takePositionsFromFirst(
+                  right: countPositionsFroward(
                     preparedRightEdgeVacancy.left,
                     oppositeSize,
                   ),
@@ -501,7 +501,7 @@ export function calcTagsPositions(
                     Math.abs(preparedLeftEdgeVacancy.top)
                   ) {
                     top = preparedLeftEdgeVacancy.top;
-                    bottom = takePositionsFromLast(top, baseSize);
+                    bottom = countPositionsBackwards(top, baseSize);
 
                     if (
                       !force &&
@@ -514,7 +514,7 @@ export function calcTagsPositions(
                     }
                   } else {
                     bottom = preparedLeftEdgeVacancy.bottom;
-                    top = takePositionsFromFirst(bottom, baseSize);
+                    top = countPositionsFroward(bottom, baseSize);
 
                     if (
                       !force &&
@@ -531,7 +531,7 @@ export function calcTagsPositions(
                   top,
                   right: preparedLeftEdgeVacancy.right,
                   bottom,
-                  left: takePositionsFromLast(
+                  left: countPositionsBackwards(
                     preparedLeftEdgeVacancy.right,
                     oppositeSize,
                   ),
@@ -662,8 +662,8 @@ export function calcTagsPositions(
         const leftBorder = -sceneSize[Dimensions.MINUS_X];
         const rightBorder = sceneSize[Dimensions.X];
 
-        const takePositionsFromFirst = SceneMap.takePositionsFromFirst;
-        const takePositionsFromLast = SceneMap.takePositionsFromLast;
+        const countPositionsFroward = SceneMap.countPositionsFroward;
+        const countPositionsBackwards = SceneMap.countPositionsBackwards;
         const next = SceneMap.calcNextPositionFromEdge;
         const prev = SceneMap.calcPrevPositionFromPositionEdge;
 
@@ -672,18 +672,18 @@ export function calcTagsPositions(
           case TOP: {
             const bottom = next(topBorder);
             const rectPos = {
-              top: takePositionsFromFirst(bottom, rectArea.rows),
+              top: countPositionsFroward(bottom, rectArea.rows),
               right: rightBorder,
               bottom,
-              left: takePositionsFromLast(rightBorder, rectArea.cols),
+              left: countPositionsBackwards(rightBorder, rectArea.cols),
             };
             return rectPos;
           }
           case RIGHT: {
             const left = next(rightBorder);
             const rectPos = {
-              top: takePositionsFromFirst(bottomBorder, rectArea.rows),
-              right: takePositionsFromFirst(left, rectArea.cols),
+              top: countPositionsFroward(bottomBorder, rectArea.rows),
+              right: countPositionsFroward(left, rectArea.cols),
               bottom: bottomBorder,
               left,
             };
@@ -693,8 +693,8 @@ export function calcTagsPositions(
             const top = prev(bottomBorder);
             const rectPos = {
               top,
-              right: takePositionsFromFirst(leftBorder, rectArea.cols),
-              bottom: takePositionsFromLast(top, rectArea.rows),
+              right: countPositionsFroward(leftBorder, rectArea.cols),
+              bottom: countPositionsBackwards(top, rectArea.rows),
               left: leftBorder,
             };
             return rectPos;
@@ -704,8 +704,8 @@ export function calcTagsPositions(
             const rectPos = {
               top: topBorder,
               right,
-              bottom: takePositionsFromLast(topBorder, rectArea.rows),
-              left: takePositionsFromLast(right, rectArea.cols),
+              bottom: countPositionsBackwards(topBorder, rectArea.rows),
+              left: countPositionsBackwards(right, rectArea.cols),
             };
             return rectPos;
           }
