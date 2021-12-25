@@ -40,15 +40,35 @@ function deduplicateBaseLines(lines: Array<LineT>) {
 }
 
 export class VacanciesManager {
-  closedVacancies: Array<ClosedVacancyT | void> = [];
-  topEdgeVacancies: PreparedTopEdgeVacancyT[] = [];
-  rightEdgeVacancies: PreparedRightEdgeVacancyT[] = [];
-  bottomEdgeVacancies: PreparedBottomEdgeVacancyT[] = [];
-  leftEdgeVacancies: PreparedLeftEdgeVacancyT[] = [];
+  private _closedVacancies: Array<ClosedVacancyT | void> = [];
+  private _topEdgeVacancies: PreparedTopEdgeVacancyT[] = [];
+  private _rightEdgeVacancies: PreparedRightEdgeVacancyT[] = [];
+  private _bottomEdgeVacancies: PreparedBottomEdgeVacancyT[] = [];
+  private _leftEdgeVacancies: PreparedLeftEdgeVacancyT[] = [];
   private sceneMap: SceneMap;
 
   constructor(sceneMap: SceneMap) {
     this.sceneMap = sceneMap;
+  }
+
+  get closedVacancies() {
+    return this._closedVacancies;
+  }
+
+  get topEdgeVacancies() {
+    return this._topEdgeVacancies;
+  }
+
+  get rightEdgeVacancies() {
+    return this._rightEdgeVacancies;
+  }
+
+  get bottomEdgeVacancies() {
+    return this._bottomEdgeVacancies;
+  }
+
+  get leftEdgeVacancies() {
+    return this._leftEdgeVacancies;
   }
 
   buildVacanciesMap(isShouldCreateVacancyIfNoSuchKind = false) {
@@ -244,48 +264,48 @@ export class VacanciesManager {
     }
 
     rawClosedVacancies.forEach(v => prepareClosedVacancy(v));
-    const closedVacancies = rawClosedVacancies as ClosedVacancyT[];
-    closedVacancies.sort((a, b) => a.square - b.square);
-    this.closedVacancies = closedVacancies;
+    const _closedVacancies = rawClosedVacancies as ClosedVacancyT[];
+    _closedVacancies.sort((a, b) => a.square - b.square);
+    this._closedVacancies = _closedVacancies;
 
     rawTopEdgeVacancies.forEach(v => {
       v.baseSize = calcEdgeVacancyBaseSize(v);
     });
-    this.topEdgeVacancies = rawTopEdgeVacancies as PreparedTopEdgeVacancyT[];
-    this.topEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+    this._topEdgeVacancies = rawTopEdgeVacancies as PreparedTopEdgeVacancyT[];
+    this._topEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
 
     rawRightEdgeVacancies.forEach(v => {
       v.baseSize = calcEdgeVacancyBaseSize(v, false);
     });
-    this.rightEdgeVacancies =
+    this._rightEdgeVacancies =
       rawRightEdgeVacancies as PreparedRightEdgeVacancyT[];
-    this.rightEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+    this._rightEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
 
     rawBottomEdgeVacancies.forEach(v => {
       v.baseSize = calcEdgeVacancyBaseSize(v);
     });
-    this.bottomEdgeVacancies =
+    this._bottomEdgeVacancies =
       rawBottomEdgeVacancies as PreparedBottomEdgeVacancyT[];
-    this.bottomEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+    this._bottomEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
 
     rawLeftEdgeVacancies.forEach(v => {
       v.baseSize = calcEdgeVacancyBaseSize(v, false);
     });
-    this.leftEdgeVacancies = rawLeftEdgeVacancies as PreparedLeftEdgeVacancyT[];
-    this.leftEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+    this._leftEdgeVacancies = rawLeftEdgeVacancies as PreparedLeftEdgeVacancyT[];
+    this._leftEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
   }
 
   removeClosedVacancy(index: number) {
-    if (!this.closedVacancies[index]) {
+    if (!this._closedVacancies[index]) {
       throw new Error(`vacancy index ${index} does not exist`);
     }
-    this.closedVacancies[index] = undefined;
+    this._closedVacancies[index] = undefined;
   }
 
   filterUnsuitableClosedVacancies(
     vacancyFilter: (vacancy: ClosedVacancyT | void) => boolean,
   ) {
-    this.closedVacancies = this.closedVacancies.filter(vacancy =>
+    this._closedVacancies = this._closedVacancies.filter(vacancy =>
       vacancyFilter(vacancy),
     );
   }
