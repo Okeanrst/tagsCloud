@@ -61,11 +61,15 @@ export class SceneMap {
     };
   }
 
+  rebuildMap(): void {
+    // TODO if needed implement cutting of released position
+  }
+
   calcSceneSize(): void {
     // TODO
     // it is a bad idea to calc sceneSize using array.length
-    // because releasePosition uses undefined to reset cell value which lead to
-    // [undefined, undefined].length === 2
+    // because releasePosition uses false to reset cell value which lead to
+    // [false, false].length === 2
     // Y
     if (this.sceneMap[TOP_RIGHT_QUARTER].length - 1 > this.sizeY) {
       this.sizeY = this.sceneMap[TOP_RIGHT_QUARTER].length - 1;
@@ -94,7 +98,7 @@ export class SceneMap {
       }
     });
     // -X
-    this.sceneMap['-xy'].forEach((row: Array<boolean>) => {
+    this.sceneMap[TOP_LEFT_QUARTER].forEach((row: Array<boolean>) => {
       if (row.length - 1 > this.sizeMinusX) {
         this.sizeMinusX = row.length - 1;
       }
@@ -205,7 +209,6 @@ export class SceneMap {
     return mapVal * sceneMapUnitSize;
   }
 
-  // opposite to changePosition
   static countPositions(beginPosition: number, endPosition: number): number {
     if (beginPosition > endPosition) {
       throw new Error('countPositions error: can not be begin > end');

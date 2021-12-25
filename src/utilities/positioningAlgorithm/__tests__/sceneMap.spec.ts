@@ -1,4 +1,5 @@
 import { SceneMap } from '../sceneMap';
+import IntersectionError from '../IntersectionError';
 
 describe('SceneMap tests', () => {
   describe('rectSizeToSceneMapUnits tests', () => {
@@ -142,6 +143,91 @@ describe('SceneMap tests', () => {
       expect(() => {
         SceneMap.countPositionsBackwards(10, 0)
       }).toThrowError(/^count must be positive$/);
+    });
+  });
+
+  describe('calcSceneSize and getSceneSize tests', () => {
+    let sceneMap: SceneMap;
+    beforeEach(() => {
+      sceneMap = new SceneMap();
+    });
+
+    it('getSceneSize should return correct value for init sceneMap state', () => {
+      expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 0, '-y': 0, 'x': 0, 'y': 0});
+    });
+    it('getSceneSize should return correct value after setting data at position', () => {
+      sceneMap.setDataAtPosition(1, 1, true);
+      expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 0, '-y': 0, 'x': 0, 'y': 0});
+      sceneMap.calcSceneSize();
+      expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 0, '-y': 0, 'x': 1, 'y': 1});
+    });
+    it('getSceneSize should return correct value after setting data at position and releasing some of them', () => {
+      sceneMap.setDataAtPosition(2, 2, true);
+      sceneMap.setDataAtPosition(-2, 2, true);
+      sceneMap.setDataAtPosition(2, -2, true);
+      sceneMap.setDataAtPosition(-2, -2, true);
+      sceneMap.calcSceneSize();
+      expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 2, '-y': 2, 'x': 2, 'y': 2});
+      sceneMap.releasePosition(1, 1);
+      sceneMap.calcSceneSize();
+      expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 2, '-y': 2, 'x': 2, 'y': 2});
+      sceneMap.releasePosition(2, 2);
+      sceneMap.releasePosition(-2, 2);
+      sceneMap.calcSceneSize();
+      // not expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 2, '-y': 2, 'x': 1, 'y': 2});
+      // map rebuild is required
+      expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 2, '-y': 2, 'x': 2, 'y': 2});
+    });
+    it('getSceneSize should return correct values after successful bulkUpdate', () => {
+      sceneMap.bulkUpdate([[1, 1, true], [2, 1, true], [3, 1, true]]);
+      sceneMap.calcSceneSize();
+      expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 0, '-y': 0, 'x': 3, 'y': 1});
+    });
+    it('getDataAtPosition should return correct value after unsuccessful bulkUpdate', () => {
+      sceneMap.setDataAtPosition(3, 1, true);
+      expect(() => {
+        sceneMap.bulkUpdate([[1, 1, true], [2, 1, true], [3, 1, true]]);
+      }).toThrowError(IntersectionError);
+      expect(sceneMap.getDataAtPosition(3, 1)).toBe(true);
+      expect(sceneMap.getDataAtPosition(2, 1)).toBe(false);
+    });
+  });
+
+  describe('setDataAtPosition and getDataAtPosition tests', () => {
+    let sceneMap: SceneMap;
+    let position: {x: number, y: number};
+    beforeEach(() => {
+      sceneMap = new SceneMap();
+      position = {
+        x: Math.ceil(Math.random() * 100),
+        y: Math.ceil(Math.random() * 100),
+      };
+    });
+    it('getDataAtPosition should return correct value after it is set with setDataAtPosition', () => {
+      const { x,y } = position;
+      const value = true;
+      sceneMap.setDataAtPosition(x, y, value);
+      expect(sceneMap.getDataAtPosition(x, y)).toBe(value);
+    });
+    it('position should not have value after in is released', () => {
+      const { x,y } = position;
+      const value = true;
+      sceneMap.setDataAtPosition(x, y, value);
+      sceneMap.releasePosition(x, y);
+      expect(sceneMap.getDataAtPosition(x, y)).not.toBe(value);
+    });
+    it('should throw an error when try to set data at occupied position', () => {
+      const { x,y } = position;
+      const value = true;
+      sceneMap.setDataAtPosition(x, y, value);
+      expect(() => {
+        sceneMap.setDataAtPosition(x, y, value);
+      }).toThrowError(/^The position \(x: [\d]+, y: [\d]+\) is occupied$/);
+    });
+    it('should throw an error when try to set data at position with incorrect coordinates', () => {
+      expect(() => {
+        sceneMap.setDataAtPosition(0, 0, true);
+      }).toThrowError(/^setDataAtPosition error: x === 0 \|\| y === 0$/);
     });
   });
 });
