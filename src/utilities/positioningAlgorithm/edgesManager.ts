@@ -16,7 +16,7 @@ type EdgesStatisticsT = {
 
 export const edgesOrder: ReadonlyArray<EDGE> = [TOP, RIGHT, BOTTOM, LEFT];
 
-class EdgesManager {
+export class EdgesManager {
   private edgesStatistics: EdgesStatisticsT = {
     [TOP]: 0,
     [RIGHT]: 0,
@@ -68,5 +68,3 @@ class EdgesManager {
     return edge;
   }
 }
-
-export default EdgesManager;
