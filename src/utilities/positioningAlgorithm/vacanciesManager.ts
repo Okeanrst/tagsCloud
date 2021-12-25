@@ -39,13 +39,13 @@ function deduplicateBaseLines(lines: Array<LineT>) {
   });
 }
 
-export default class VacanciesManager {
+export class VacanciesManager {
   closedVacancies: Array<ClosedVacancyT | void> = [];
   topEdgeVacancies: PreparedTopEdgeVacancyT[] = [];
   rightEdgeVacancies: PreparedRightEdgeVacancyT[] = [];
   bottomEdgeVacancies: PreparedBottomEdgeVacancyT[] = [];
   leftEdgeVacancies: PreparedLeftEdgeVacancyT[] = [];
-  sceneMap: SceneMap;
+  private sceneMap: SceneMap;
 
   constructor(sceneMap: SceneMap) {
     this.sceneMap = sceneMap;
@@ -60,10 +60,10 @@ export default class VacanciesManager {
 
     const sceneSize = this.sceneMap.getSceneSize();
     // bottom to top, left to right
-    const sceneTopRow = sceneSize[Y];
-    const sceneBottomRow = -sceneSize[MINUS_Y];
-    const sceneLeftCol = -sceneSize[MINUS_X];
-    const sceneRightCol = sceneSize[X];
+    const sceneTopRow = SceneMap.calcPrevPositionFromPositionEdge(sceneSize[Y]);
+    const sceneBottomRow = SceneMap.calcNextPositionFromEdge(-sceneSize[MINUS_Y]);
+    const sceneLeftCol = SceneMap.calcNextPositionFromEdge(-sceneSize[MINUS_X]);
+    const sceneRightCol = SceneMap.calcPrevPositionFromPositionEdge(sceneSize[X]);
 
     const accumulated: { [key: number]: any } = {};
 
@@ -71,7 +71,7 @@ export default class VacanciesManager {
     const prev = SceneMap.prevPosition;
     const change = SceneMap.changePosition;
 
-    function extractVacancies(columnsToClose: number[], curRow: number) {
+    function extractVacancies(columnsToClose: number[], curRow: number): void {
       // отфильтровываем рядом стоящие, идущие на закрытие (будет сохранена самая правая колонка)
       const deduplicatedColumnsToClose = columnsToClose.filter(
         (curItemCol: number, index: number) => {
@@ -276,6 +276,9 @@ export default class VacanciesManager {
   }
 
   removeClosedVacancy(index: number) {
+    if (!this.closedVacancies[index]) {
+      throw new Error(`vacancy index ${index} does not exist`);
+    }
     this.closedVacancies[index] = undefined;
   }
 
@@ -298,7 +301,7 @@ export function drawVacancy(vacancy: VacancyT, sceneSize: SceneSizeT): void {
   ) {
     return;
   }
-  // сверху вниз
+  // from top to down
   const sceneTopRow = sceneSize[Y];
   const sceneBottomRow = -sceneSize[MINUS_Y];
   const sceneLeftCol = -sceneSize[MINUS_X];

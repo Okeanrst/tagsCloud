@@ -40,16 +40,16 @@ export type SceneSizeT = {
 };
 
 export class SceneMap {
-  sceneMap: SceneMapT = {
+  private sceneMap: SceneMapT = {
     [TOP_RIGHT_QUARTER]: [],
     [BOTTOM_RIGHT_QUARTER]: [],
     [BOTTOM_LEFT_QUARTER]: [],
     [TOP_LEFT_QUARTER]: [],
   };
-  sizeX = 0;
-  sizeMinusX = 0;
-  sizeY = 0;
-  sizeMinusY = 0;
+  private sizeX = 0;
+  private sizeMinusX = 0;
+  private sizeY = 0;
+  private sizeMinusY = 0;
 
   getSceneSize(): SceneSizeT {
     const { sizeX, sizeMinusX, sizeY, sizeMinusY } = this;
@@ -110,7 +110,7 @@ export class SceneMap {
     });
   }
 
-  _setDataAtPosition(x: number, y: number, val: boolean): void {
+  private _setDataAtPosition(x: number, y: number, val: boolean): void {
     const xIsPositive = x >= 0;
     const yIsPositive = y >= 0;
     const quarter = calcQuarter(xIsPositive, yIsPositive);

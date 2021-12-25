@@ -17,14 +17,14 @@ type EdgesStatisticsT = {
 export const edgesOrder: ReadonlyArray<EDGE> = [TOP, RIGHT, BOTTOM, LEFT];
 
 class EdgesManager {
-  edgesStatistics: EdgesStatisticsT = {
+  private edgesStatistics: EdgesStatisticsT = {
     [TOP]: 0,
     [RIGHT]: 0,
     [BOTTOM]: 0,
     [LEFT]: 0,
   };
 
-  vacanciesEdgesStatistics = {
+  private vacanciesEdgesStatistics = {
     [TOP]: 0,
     [RIGHT]: 0,
     [BOTTOM]: 0,

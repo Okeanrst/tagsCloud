@@ -2,7 +2,7 @@ import { SCENE_MAP_RESOLUTION } from 'constants/index';
 import { splitAndPerformWork } from '../common/splitAndPerformWork';
 import { SceneMap, Dimensions } from './sceneMap';
 import EdgesManager, { edgesOrder, EDGE } from './edgesManager';
-import VacanciesManager, { drawVacancy } from './vacanciesManager';
+import { VacanciesManager, drawVacancy } from './vacanciesManager';
 import IntersectionError from './IntersectionError';
 import { getRectAreaOfRectMap } from '../getGlyphsMap';
 
