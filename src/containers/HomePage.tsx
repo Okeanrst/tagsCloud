@@ -6,7 +6,7 @@ import SvgTagsCloud from 'components/SvgTagsCloud';
 import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { PENDING, PRISTINE, SUCCESS } from 'constants/queryStatuses';
-import { Checkbox } from 'ui/checkbox/checkbox';
+import { Checkbox } from 'ui/checkbox/Checkbox';
 
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';

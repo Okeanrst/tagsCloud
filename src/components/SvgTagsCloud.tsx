@@ -1,11 +1,14 @@
+import { useCallback, useState, useMemo } from 'react';
 import { withStyles, createStyles } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import { getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 import { FONT_FAMILY, SCENE_MAP_RESOLUTION } from 'constants/index';
+import { Checkbox } from 'ui/checkbox/Checkbox';
+import { Collapse } from 'components/Collapse';
 
 import React from 'react';
-import type { PositionedTagRectT } from 'types/types';
+import type { PositionedTagRectT, ClassesT } from 'types/types';
 import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
 import type { ViewBoxT } from 'utilities/tagsCloud/tagsCloud';
 
@@ -14,10 +17,7 @@ type PropsT = {
   width: number;
   height: number;
   onTagClick: (id: string) => void;
-  classes: {
-    container: string;
-    text: string;
-  };
+  classes: ClassesT;
 };
 
 const PADDING = 16;
@@ -37,6 +37,28 @@ const styles = createStyles({
   text: {
     'white-space': 'pre',
   },
+  settingsControlsWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'absolute',
+    right: `${PADDING}px`,
+    zIndex: 3,
+  },
+  toggleIsSettingsControlsButton: {
+    position: 'absolute',
+    top: 0,
+    right: '-20px',
+    width: '20px',
+    height: '16px',
+    lineHeight: '16px',
+    border: 'none',
+  },
+  settingsControls: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '8px',
+    backgroundColor: '#d2d2d2',
+  },
 });
 
 const SvgTagsCloud = ({
@@ -46,7 +68,28 @@ const SvgTagsCloud = ({
   onTagClick,
   classes,
 }: PropsT) => {
-  const tagsSvgData = getTagsSvgData(tagData);
+  const [isCoordinateGridShown, setIsCoordinateGridShown] = useState(false);
+  const [isReactAreasShown, setIsReactAreasShown] = useState(false);
+  const [isAxlesShown, setIsAxlesShown] = useState(false);
+  const [isSettingsControlsShown, setIsSettingsControlsShown] = useState(false);
+
+  const toggleIsCoordinateGridShown = useCallback(() => {
+    setIsCoordinateGridShown((value) => !value);
+  }, [setIsCoordinateGridShown]);
+
+  const toggleIsReactAreasShown = useCallback(() => {
+    setIsReactAreasShown((value) => !value);
+  }, [setIsReactAreasShown]);
+
+  const toggleIsAxlesShown = useCallback(() => {
+    setIsAxlesShown((value) => !value);
+  }, [setIsAxlesShown]);
+
+  const toggleIsSettingsControlsShown = useCallback(() => {
+    setIsSettingsControlsShown((value) => !value);
+  }, [setIsSettingsControlsShown]);
+
+  const tagsSvgData = useMemo(() => getTagsSvgData(tagData), [tagData]);
 
   if (!tagsSvgData) {
     return null;
@@ -69,8 +112,35 @@ const SvgTagsCloud = ({
 
   return (
     <div className={classes.container}>
-      {false && drawCoordinateGrid(svgSize, viewBox)}
-      {false && drawReactAreas(tagData, svgSize, viewBox, transform)}
+      <div className={classes.settingsControlsWrapper}>
+        <button
+          className={classes.toggleIsSettingsControlsButton}
+          onClick={toggleIsSettingsControlsShown}
+        >
+          {isSettingsControlsShown ? '-' : '+'}
+        </button>
+        <Collapse isOpen={isSettingsControlsShown} >
+          <div className={classes.settingsControls}>
+            <Checkbox
+              checked={isCoordinateGridShown}
+              label="draw coordinate grid"
+              onChange={toggleIsCoordinateGridShown}
+            />
+            <Checkbox
+              checked={isReactAreasShown}
+              label="draw react areas"
+              onChange={toggleIsReactAreasShown}
+            />
+            <Checkbox
+              checked={isAxlesShown}
+              label="draw axles"
+              onChange={toggleIsAxlesShown}
+            />
+          </div>
+        </Collapse>
+      </div>
+      {isCoordinateGridShown && drawCoordinateGrid(svgSize, viewBox)}
+      {isReactAreasShown && drawReactAreas(tagData, svgSize, viewBox, transform)}
       <svg
         id="small_cloud"
         {...svgSize}
@@ -140,7 +210,7 @@ const SvgTagsCloud = ({
               );
             })}
           </TransitionGroup>
-          {false && drawAxles(svgSize)}
+          {isAxlesShown && drawAxles(svgSize)}
         </g>
       </svg>
     </div>
