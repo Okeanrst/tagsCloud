@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
 }
@@ -13,7 +14,7 @@ html, body {
   --footer-color: #9ec2f1;
 }
 
-[data-color-scheme="dark"] {
+[data-color-scheme='dark'] {
   --navbar-color: #212529;
   --footer-color: #23313e;
 }

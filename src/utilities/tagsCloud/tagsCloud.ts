@@ -112,9 +112,7 @@ export function getBorderCoordinates(
   return { top: maxTop, bottom: minBottom, right: maxRight, left: minLeft };
 }
 
-export function getTagsSvgData(
-  data: ReadonlyArray<PositionedTagRectT>,
-): {
+export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
   transform: string;
   viewBox: ViewBoxT;
   aspectRatio: number;
@@ -139,12 +137,8 @@ export function getTagsSvgData(
     const middleX = tagData.rectLeft + diffX / 2;
     const middleY = tagData.rectBottom + diffY / 2;
 
-    const rectTranslateX = tagData.rotate
-      ? (middleX - diffX * 0.3)
-      : middleX;
-    const rectTranslateY = tagData.rotate
-      ? -middleY
-      : -(middleY - diffY * 0.3);
+    const rectTranslateX = tagData.rotate ? middleX - diffX * 0.3 : middleX;
+    const rectTranslateY = tagData.rotate ? -middleY : -(middleY - diffY * 0.3);
 
     return {
       ...tagData,

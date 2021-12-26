@@ -35,15 +35,17 @@ describe('VacanciesManager tests', () => {
     ]);
     sceneMap.calcSceneSize();
     vacanciesManager.buildVacanciesMap();
-    expect(vacanciesManager.closedVacancies).toStrictEqual([{
-      bottom: 2,
-      cols: 1,
-      left: 2,
-      right: 2,
-      rows: 1,
-      square: 1,
-      top: 2,
-    }]);
+    expect(vacanciesManager.closedVacancies).toStrictEqual([
+      {
+        bottom: 2,
+        cols: 1,
+        left: 2,
+        right: 2,
+        rows: 1,
+        square: 1,
+        top: 2,
+      },
+    ]);
     expect(vacanciesManager.topEdgeVacancies).toStrictEqual([]);
     expect(vacanciesManager.rightEdgeVacancies).toStrictEqual([]);
     expect(vacanciesManager.bottomEdgeVacancies).toStrictEqual([]);
@@ -74,12 +76,12 @@ describe('VacanciesManager tests', () => {
     vacanciesManager.buildVacanciesMap();
     const bottomRightEdgeVacancy = {
       baseSize: Infinity,
-        bottom: -Infinity,
-        bottomEdge: -2,
-        left: 2,
-        right: Infinity,
-        rightEdge: 2,
-        top: -2,
+      bottom: -Infinity,
+      bottomEdge: -2,
+      left: 2,
+      right: Infinity,
+      rightEdge: 2,
+      top: -2,
     };
     expect(vacanciesManager.closedVacancies).toStrictEqual([]);
     expect(vacanciesManager.topEdgeVacancies).toStrictEqual([]);

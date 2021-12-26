@@ -35,7 +35,9 @@ describe('positioningAlgorithm tests', () => {
   describe('prepareRectAreasMaps tests', () => {
     it(`should return array with correct value (right shape)`, async () => {
       const tagsRectAreasMaps = await prepareRectAreasMaps(preparedData, 2);
-      expect(tagsRectAreasMaps).toStrictEqual(preparedData.map(({id}) => ({id, map: null, mapMeta: null})));
+      expect(tagsRectAreasMaps).toStrictEqual(
+        preparedData.map(({ id }) => ({ id, map: null, mapMeta: null })),
+      );
     });
   });
 
@@ -50,7 +52,7 @@ describe('positioningAlgorithm tests', () => {
 
       let intersection = 0;
       const map = new Map();
-      tagsPositions.forEach(({rectTop, rectBottom, rectRight, rectLeft}) => {
+      tagsPositions.forEach(({ rectTop, rectBottom, rectRight, rectLeft }) => {
         const firstRow = SceneMap.calcPrevPositionFromPositionEdge(rectTop);
         const lastRow = SceneMap.calcNextPositionFromEdge(rectBottom);
         const firstCol = SceneMap.calcNextPositionFromEdge(rectLeft);

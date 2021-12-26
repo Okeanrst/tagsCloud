@@ -39,7 +39,13 @@ const styles = createStyles({
   },
 });
 
-const SvgTagsCloud = ({ tagData, width, height, onTagClick, classes }: PropsT) => {
+const SvgTagsCloud = ({
+  tagData,
+  width,
+  height,
+  onTagClick,
+  classes,
+}: PropsT) => {
   const tagsSvgData = getTagsSvgData(tagData);
 
   if (!tagsSvgData) {
@@ -145,7 +151,7 @@ const coordinateGridStyle: React.CSSProperties = {
   position: 'absolute',
   top: `${PADDING}px`,
   left: `${PADDING}px`,
-  outline: '1px solid'
+  outline: '1px solid',
 };
 
 function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
@@ -160,10 +166,10 @@ function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < columns; col++) {
-      const translateX = (col) * sceneMapUnitSize;
-      const translateY = (row) * sceneMapUnitSize;
+      const translateX = col * sceneMapUnitSize;
+      const translateY = row * sceneMapUnitSize;
 
-      cells.push((
+      cells.push(
         <rect
           fill="purple"
           fillOpacity="0"
@@ -175,8 +181,8 @@ function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
           width={sceneMapUnitSize}
           x={translateX}
           y={translateY}
-        />
-      ));
+        />,
+      );
     }
   }
 
@@ -247,7 +253,9 @@ function drawAxles({ width, height }: SizeT) {
       textAnchor="middle"
       transform={`translate(${0},${0})rotate(${0})`}
     >
-      {Array.from({ length: Math.floor(width/fontSize) }).fill('–').join('')}
+      {Array.from({ length: Math.floor(width / fontSize) })
+        .fill('–')
+        .join('')}
     </text>,
     <text
       key={`y`}
@@ -255,7 +263,9 @@ function drawAxles({ width, height }: SizeT) {
       textAnchor="middle"
       transform={`translate(${0},${0})rotate(${90})`}
     >
-      {Array.from({ length: Math.floor(height/fontSize) }).fill('–').join('')}
+      {Array.from({ length: Math.floor(height / fontSize) })
+        .fill('–')
+        .join('')}
     </text>,
   ];
 }

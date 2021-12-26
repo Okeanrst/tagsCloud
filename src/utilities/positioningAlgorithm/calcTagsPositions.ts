@@ -54,15 +54,24 @@ type LoopParamsT = {
   [DESC]: LoopOrderParamT;
 };
 
-type PerformWorkT = (rect: TagRectT, parameters: { index: number, shouldTryAnotherAngle?: boolean, isRotated: boolean })
-  => { status: true, isRotated: boolean } | { status: false };
+type PerformWorkT = (
+  rect: TagRectT,
+  parameters: {
+    index: number;
+    shouldTryAnotherAngle?: boolean;
+    isRotated: boolean;
+  },
+) => { status: true; isRotated: boolean } | { status: false };
 
 function creatRawPositionedTagRect(
   rect: TagRectT,
   { top, right, bottom, left }: RectPositionT,
   isRotated: boolean,
 ): RawPositionedTagRectT {
-  if (!['production', 'test'].includes(process.env.NODE_ENV) && (top < bottom || left > right)) {
+  if (
+    !['production', 'test'].includes(process.env.NODE_ENV) &&
+    (top < bottom || left > right)
+  ) {
     throw new Error(
       'creatRawPositionedTagRect error: top < bottom || left > right',
     );
@@ -84,7 +93,11 @@ function createWorkGenerator(
   return function* workGenerator() {
     let isPreviousRotated = true;
     for (let i = 0; i < rectsData.length; i++) {
-      const result: ReturnType<PerformWorkT> = yield performWork(rectsData[i], { index: i, shouldTryAnotherAngle: true, isRotated: !isPreviousRotated });
+      const result: ReturnType<PerformWorkT> = yield performWork(rectsData[i], {
+        index: i,
+        shouldTryAnotherAngle: true,
+        isRotated: !isPreviousRotated,
+      });
       if (result && !result.status) {
         throw new Error('performWork return status false');
       } else if (result) {
@@ -747,7 +760,10 @@ export function calcTagsPositions(
         }
       };
 
-      const performWork: PerformWorkT = (rect, { index, shouldTryAnotherAngle = true, isRotated }) => {
+      const performWork: PerformWorkT = (
+        rect,
+        { index, shouldTryAnotherAngle = true, isRotated },
+      ) => {
         const { map: rectAreaMap } = rectAreaMapByIdMap.get(rect.id) ?? {};
         if (!rectAreaMap) {
           throw new Error(
@@ -892,7 +908,7 @@ export function calcTagsPositions(
         if (options?.drawFinishMap) {
           sceneMap.drawItself();
         }
-        positionedRectsData.forEach((tagData) => {
+        positionedRectsData.forEach(tagData => {
           const top = tagData.top > 0 ? tagData.top : tagData.top + 1;
           const bottom =
             tagData.bottom > 0 ? tagData.bottom - 1 : tagData.bottom;
@@ -940,7 +956,10 @@ export function calcTagsPositions(
         resolve(positionedRectsData as PositionedTagRectT[]);
       };
 
-      splitAndPerformWork<ReturnType<PerformWorkT>>(createWorkGenerator(rectsData, performWork), 50)
+      splitAndPerformWork<ReturnType<PerformWorkT>>(
+        createWorkGenerator(rectsData, performWork),
+        50,
+      )
         .then(finish)
         .catch(error => reject(error));
     } catch (e) {

@@ -1,6 +1,10 @@
 import { FONT_FAMILY, FONT_Y_FACTOR } from 'constants/index';
 
-import { TwoDimensionalMapMetaT, TwoDimensionalMapT, RectAreaT } from 'types/types';
+import {
+  TwoDimensionalMapMetaT,
+  TwoDimensionalMapT,
+  RectAreaT,
+} from 'types/types';
 
 export function getRectAreaMap(
   canvas: HTMLCanvasElement,
@@ -403,7 +407,10 @@ function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
   };
 }
 
-function visualizeMap(map: TwoDimensionalMapT, rowLength: number = 250): string {
+function visualizeMap(
+  map: TwoDimensionalMapT,
+  rowLength: number = 250,
+): string {
   let res = '';
   const { cols, rows } = getRectAreaOfRectMap(map);
   const maxCol = rowLength < cols ? rowLength : cols;

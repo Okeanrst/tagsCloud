@@ -137,9 +137,7 @@ export class SceneMap {
   bulkUpdate(positionsToUpdate: [number, number, any][]) {
     const affectedPositions: [number, number][] = [];
     const recoverClosedVacanciesState = () => {
-      affectedPositions.forEach(position =>
-        this.releasePosition(...position),
-      );
+      affectedPositions.forEach(position => this.releasePosition(...position));
     };
 
     positionsToUpdate.forEach(([col, row, value]) => {
@@ -216,7 +214,9 @@ export class SceneMap {
     if (beginPosition === 0 || endPosition === 0) {
       throw new Error('countPositions error: begin, end can not be zero');
     }
-    return beginPosition < 0 && endPosition > 0 ? endPosition - beginPosition : endPosition - beginPosition + 1;
+    return beginPosition < 0 && endPosition > 0
+      ? endPosition - beginPosition
+      : endPosition - beginPosition + 1;
   }
 
   static changePosition(currentPosition: number, diff: number): number {
