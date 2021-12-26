@@ -6,6 +6,7 @@ import SvgTagsCloud from 'components/SvgTagsCloud';
 import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { PENDING, PRISTINE, SUCCESS } from 'constants/queryStatuses';
+import { Checkbox } from 'ui/checkbox/checkbox';
 
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
@@ -57,10 +58,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'relative',
     flexGrow: 12,
   },
-  checkbox: {
+  controls: {
     position: 'absolute',
     top: '20px',
-    left: '20px',
     zIndex: 3,
   },
 };
@@ -170,18 +170,12 @@ class HomePage extends Component<PropsT, StateT> {
     return (
       <div style={styles.pageContainer}>
         {this.renderLoader(loading)}
-        <div
-          className="form-group form-check"
-          style={styles.checkbox}
-        >
-          <input
+        <div style={styles.controls}>
+          <Checkbox
             checked={useCanvas}
-            className="form-check-input"
-            id="useCanvas"
-            type="checkbox"
+            label="use canvas"
             onChange={toggleUseCanvas}
           />
-          <label htmlFor="useCanvas">use canvas</label>
         </div>
         <div
           ref={this.tagsCloudSceneRef}

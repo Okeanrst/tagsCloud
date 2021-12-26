@@ -1,3 +1,5 @@
+export type ClassesT = {[key: string]: string};
+
 export type TagSentimentT = Readonly<{
   negative?: number;
   neutral?: number;

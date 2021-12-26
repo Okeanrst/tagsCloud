@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { PENDING, FAILURE, SUCCESS } from 'constants/queryStatuses';
 
-import { TagDataT } from '../types/types';
+import { TagDataT, ClassesT } from '../types/types';
 import { RootStateT } from '../store/types';
 import { connect, ConnectedProps } from 'react-redux';
 
@@ -56,8 +56,6 @@ const useStyles = makeStyles({
     marginLeft: '1.5em',
   },
 });
-
-type ClassesT = ReturnType<typeof useStyles>;
 
 const renderCell = (it: ListItemsColumnItemT) => {
   return typeof it === 'function' ? it() : it ?? null;

@@ -4,6 +4,7 @@ import Downshift from 'downshift';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
+import type { ClassesT } from 'types/types';
 
 type SuggestionT = {
   id: string;
@@ -11,8 +12,6 @@ type SuggestionT = {
 };
 
 type SuggestionsT = ReadonlyArray<SuggestionT>;
-
-type ClassesT = { [key: string]: string };
 
 type IntegrationDownshiftPropsT = {
   suggestions: SuggestionsT;
