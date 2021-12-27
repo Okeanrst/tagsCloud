@@ -46,6 +46,7 @@ export class VacanciesManager {
   private _bottomEdgeVacancies: PreparedBottomEdgeVacancyT[] = [];
   private _leftEdgeVacancies: PreparedLeftEdgeVacancyT[] = [];
   private sceneMap: SceneMap;
+  needVacanciesRebuild = false;
 
   constructor(sceneMap: SceneMap) {
     this.sceneMap = sceneMap;
@@ -80,10 +81,10 @@ export class VacanciesManager {
 
     const sceneSize = this.sceneMap.getSceneSize();
     // bottom to top, left to right
-    const sceneTopRow = SceneMap.calcPrevPositionFromPositionEdge(sceneSize[Y]);
+    const sceneTopRow = SceneMap.calcPrevPositionFromEdge(sceneSize[Y]);
     const sceneBottomRow = SceneMap.calcNextPositionFromEdge(-sceneSize[MINUS_Y]);
     const sceneLeftCol = SceneMap.calcNextPositionFromEdge(-sceneSize[MINUS_X]);
-    const sceneRightCol = SceneMap.calcPrevPositionFromPositionEdge(sceneSize[X]);
+    const sceneRightCol = SceneMap.calcPrevPositionFromEdge(sceneSize[X]);
 
     const accumulated: { [key: number]: any } = {};
 
@@ -293,6 +294,8 @@ export class VacanciesManager {
     });
     this._leftEdgeVacancies = rawLeftEdgeVacancies as PreparedLeftEdgeVacancyT[];
     this._leftEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+
+    this.needVacanciesRebuild = false;
   }
 
   removeClosedVacancy(index: number) {

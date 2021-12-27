@@ -53,10 +53,10 @@ describe('positioningAlgorithm tests', () => {
       let intersection = 0;
       const map = new Map();
       tagsPositions.forEach(({ rectTop, rectBottom, rectRight, rectLeft }) => {
-        const firstRow = SceneMap.calcPrevPositionFromPositionEdge(rectTop);
+        const firstRow = SceneMap.calcPrevPositionFromEdge(rectTop);
         const lastRow = SceneMap.calcNextPositionFromEdge(rectBottom);
         const firstCol = SceneMap.calcNextPositionFromEdge(rectLeft);
-        const lastCol = SceneMap.calcPrevPositionFromPositionEdge(rectRight);
+        const lastCol = SceneMap.calcPrevPositionFromEdge(rectRight);
         for (let row = firstRow; row >= lastRow; row--) {
           for (let col = firstCol; col <= lastCol; col++) {
             const key = `${row},${col}`;

@@ -29,15 +29,15 @@ describe('SceneMap tests', () => {
     });
   });
 
-  describe('calcPrevPositionFromPositionEdge tests', () => {
+  describe('calcPrevPositionFromEdge tests', () => {
     it('should return correct result for negative edge', () => {
-      expect(SceneMap.calcPrevPositionFromPositionEdge(-2)).toBe(-3);
+      expect(SceneMap.calcPrevPositionFromEdge(-2)).toBe(-3);
     });
     it('should return correct result for positive edge', () => {
-      expect(SceneMap.calcPrevPositionFromPositionEdge(3)).toBe(3);
+      expect(SceneMap.calcPrevPositionFromEdge(3)).toBe(3);
     });
     it('should return correct result for 0 edge', () => {
-      expect(SceneMap.calcPrevPositionFromPositionEdge(0)).toBe(-1);
+      expect(SceneMap.calcPrevPositionFromEdge(0)).toBe(-1);
     });
   });
 

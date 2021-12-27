@@ -296,6 +296,11 @@ export function calcTagsPositions(
           const vacancy = vacancies[i];
 
           if (vacancy.baseSize >= baseSize) {
+            let top;
+            let bottom;
+            let right;
+            let left;
+
             // put in the corner that is closer to the center of the coordinates
             switch (edge) {
               case TOP: {
@@ -310,8 +315,7 @@ export function calcTagsPositions(
                 ) {
                   continue;
                 }
-                let right;
-                let left;
+
                 if (
                   !Number.isFinite(preparedTopEdgeVacancy.right) &&
                   !Number.isFinite(preparedTopEdgeVacancy.left)
@@ -351,15 +355,16 @@ export function calcTagsPositions(
                     }
                   }
                 }
-                return {
-                  top: countPositionsFroward(
-                    preparedTopEdgeVacancy.bottom,
-                    oppositeSize,
-                  ),
-                  right,
-                  bottom: vacancy.bottom,
-                  left,
-                };
+
+                if (Number.isFinite(preparedTopEdgeVacancy.bottom)) {
+                  bottom = preparedTopEdgeVacancy.bottom;
+                } else {
+                  // because vacancy is top edge then both top and bottom are infinite
+                  const sceneSize = sceneMap.getSceneSize();
+                  bottom = SceneMap.calcNextPositionFromEdge(-sceneSize[Dimensions.MINUS_Y]);
+                }
+                top = countPositionsFroward(bottom, oppositeSize);
+                break;
               }
               case BOTTOM: {
                 const preparedBottomEdgeVacancy =
@@ -373,8 +378,7 @@ export function calcTagsPositions(
                 ) {
                   continue;
                 }
-                let right;
-                let left;
+
                 if (
                   !Number.isFinite(preparedBottomEdgeVacancy.right) &&
                   !Number.isFinite(preparedBottomEdgeVacancy.left)
@@ -414,15 +418,16 @@ export function calcTagsPositions(
                     }
                   }
                 }
-                return {
-                  top: preparedBottomEdgeVacancy.top,
-                  right,
-                  bottom: countPositionsBackwards(
-                    preparedBottomEdgeVacancy.top,
-                    oppositeSize,
-                  ),
-                  left,
-                };
+
+                if (Number.isFinite(vacancy.top)) {
+                  top = preparedBottomEdgeVacancy.top;
+                } else {
+                  // because vacancy is bottom edge then both top and bottom are infinite
+                  const sceneSize = sceneMap.getSceneSize();
+                  top = SceneMap.calcPrevPositionFromEdge(sceneSize[Dimensions.Y]);
+                }
+                bottom = countPositionsBackwards(top, oppositeSize);
+                break;
               }
               case RIGHT: {
                 const preparedRightEdgeVacancy =
@@ -436,8 +441,7 @@ export function calcTagsPositions(
                 ) {
                   continue;
                 }
-                let top;
-                let bottom;
+
                 if (
                   !Number.isFinite(preparedRightEdgeVacancy.bottom) &&
                   !Number.isFinite(preparedRightEdgeVacancy.top)
@@ -477,15 +481,16 @@ export function calcTagsPositions(
                     }
                   }
                 }
-                return {
-                  top,
-                  right: countPositionsFroward(
-                    preparedRightEdgeVacancy.left,
-                    oppositeSize,
-                  ),
-                  bottom,
-                  left: preparedRightEdgeVacancy.left,
-                };
+
+                if (Number.isFinite(preparedRightEdgeVacancy.left)) {
+                  left = preparedRightEdgeVacancy.left;
+                } else {
+                  // because vacancy is right edge then both right and left are infinite
+                  const sceneSize = sceneMap.getSceneSize();
+                  left = SceneMap.calcNextPositionFromEdge(sceneSize[Dimensions.MINUS_X]);
+                }
+                right = countPositionsFroward(left, oppositeSize);
+                break;
               }
               case LEFT: {
                 const preparedLeftEdgeVacancy =
@@ -499,8 +504,7 @@ export function calcTagsPositions(
                 ) {
                   continue;
                 }
-                let top;
-                let bottom;
+
                 if (
                   !Number.isFinite(preparedLeftEdgeVacancy.bottom) &&
                   !Number.isFinite(preparedLeftEdgeVacancy.top)
@@ -540,17 +544,20 @@ export function calcTagsPositions(
                     }
                   }
                 }
-                return {
-                  top,
-                  right: preparedLeftEdgeVacancy.right,
-                  bottom,
-                  left: countPositionsBackwards(
-                    preparedLeftEdgeVacancy.right,
-                    oppositeSize,
-                  ),
-                };
+
+                if (Number.isFinite(preparedLeftEdgeVacancy.right)) {
+                  right = preparedLeftEdgeVacancy.right;
+                } else {
+                  // because vacancy is left edge then both left and right are infinite
+                  const sceneSize = sceneMap.getSceneSize();
+                  right = SceneMap.calcPrevPositionFromEdge(sceneSize[Dimensions.X]);
+                }
+                left = countPositionsBackwards(right, oppositeSize);
+                break;
               }
             }
+
+            return { top, right, bottom, left };
           }
         }
       };
@@ -565,6 +572,10 @@ export function calcTagsPositions(
         const rectArea = getRectAreaOfRectMap(rectAreaMap);
 
         const logDebugInformation = (mainInformation: string[] = []) => {
+          if (['production', 'test'].includes(process.env.NODE_ENV)) {
+            return;
+          }
+
           // eslint-disable-next-line no-console
           console.log('updateSceneMap --------start');
           mainInformation.forEach(information => {
@@ -585,16 +596,15 @@ export function calcTagsPositions(
 
         const getDataAtPosition = (row: number, column: number) => {
           if (
-            !['production', 'test'].includes(process.env.NODE_ENV) &&
             !Array.isArray(rectAreaMap[row])
           ) {
             logDebugInformation([
               'getDataAtPosition invariant: try to access rectAreaMap at row is out of range',
               `row: ${row}`,
             ]);
+            throw new Error('Try to access rectAreaMap at row is out of range');
           }
           if (
-            !['production', 'test'].includes(process.env.NODE_ENV) &&
             Array.isArray(rectAreaMap[row]) &&
             rectAreaMap[row].length <= column
           ) {
@@ -602,6 +612,7 @@ export function calcTagsPositions(
               'getDataAtPosition invariant: try to access rectAreaMap at row is out of range',
               `row: ${row}, column: ${column}`,
             ]);
+            throw new Error('Try to access rectAreaMap at row is out of range');
           }
           return rectAreaMap[row] && rectAreaMap[row][column];
         };
@@ -637,7 +648,6 @@ export function calcTagsPositions(
           }
 
           if (
-            !['production', 'test'].includes(process.env.NODE_ENV) &&
             ((!isRectAreaRotated &&
               Array.isArray(rectAreaMap[lastInnerRowPlusOne])) ||
               (isRectAreaRotated &&
@@ -649,7 +659,6 @@ export function calcTagsPositions(
           }
         } catch (err) {
           if (
-            !['production', 'test'].includes(process.env.NODE_ENV) &&
             err instanceof IntersectionError
           ) {
             logDebugInformation([`IntersectionError: ${err.message}`]);
@@ -659,7 +668,7 @@ export function calcTagsPositions(
 
         sceneMap.bulkUpdate(positionsToUpdate);
 
-        needVacanciesRebuild = true;
+        vacanciesManager.needVacanciesRebuild = true;
 
         sceneMap.calcSceneSize();
 
@@ -678,7 +687,7 @@ export function calcTagsPositions(
         const countPositionsFroward = SceneMap.countPositionsFroward;
         const countPositionsBackwards = SceneMap.countPositionsBackwards;
         const next = SceneMap.calcNextPositionFromEdge;
-        const prev = SceneMap.calcPrevPositionFromPositionEdge;
+        const prev = SceneMap.calcPrevPositionFromEdge;
 
         // stick to the right edge, we can make it randomly
         switch (edge) {
@@ -725,15 +734,12 @@ export function calcTagsPositions(
         }
       };
 
-      let needVacanciesRebuild = false;
       const rebuildVacanciesMap = (
         isShouldCreateVacancyIfNoSuchKind: boolean,
       ) => {
         vacanciesManager.buildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
 
         // vacanciesManager.filterUnsuitableClosedVacancies(vacancyFilter);
-
-        needVacanciesRebuild = false;
 
         if (options?.drawVacanciesMap) {
           const sceneSize = sceneMap.getSceneSize();
@@ -797,7 +803,7 @@ export function calcTagsPositions(
 
         const tryPickClosedVacancy = (): boolean => {
           let rectPosition = pickClosedVacancy(rectArea);
-          if (!rectPosition && needVacanciesRebuild) {
+          if (!rectPosition && vacanciesManager.needVacanciesRebuild) {
             rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
             rectPosition = pickClosedVacancy(rectArea);
           }
@@ -809,10 +815,8 @@ export function calcTagsPositions(
                 creatRawPositionedTagRect(rect, rectPosition, isRotated),
               );
             } catch (e) {
-              if (e instanceof IntersectionError) {
-                if (needVacanciesRebuild) {
-                  rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
-                }
+              if (e instanceof IntersectionError && vacanciesManager.needVacanciesRebuild) {
+                rebuildVacanciesMap(isShouldCreateVacancyIfNoSuchKind);
                 return tryPickClosedVacancy();
               } else {
                 throw e;

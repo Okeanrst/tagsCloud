@@ -265,7 +265,7 @@ export class SceneMap {
     return edge >= 0 ? edge + 1 : edge;
   }
 
-  static calcPrevPositionFromPositionEdge(edge: number): number {
+  static calcPrevPositionFromEdge(edge: number): number {
     return edge <= 0 ? edge - 1 : edge;
   }
 }
