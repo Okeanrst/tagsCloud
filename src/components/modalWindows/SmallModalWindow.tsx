@@ -7,16 +7,17 @@ type PropsT = {
   children: React.ReactNode;
 };
 
-const SmallModalWindow = ({ style, children }: PropsT) => {
+const SmallModalWindow = React.forwardRef<HTMLDivElement, PropsT>(({ style, children }: PropsT, ref) => {
   return (
     <div
       className="fullScreenModalWindow"
+      ref={ref}
       style={style}
     >
       {children}
     </div>
   );
-};
+});
 
 const SmallModalWindowWithModalWindowContainer =
   withModalWindowContainer<PropsT>(SmallModalWindow);
