@@ -257,4 +257,155 @@ describe('VacanciesManager tests', () => {
       vacanciesManager.removeClosedVacancy(1);
     }).toThrowError(/^vacancy index [\d]+ does not exist$/);
   });
+  it('should return correct vacancies for sceneMap 1', () => {
+    sceneMap.bulkUpdate([
+      [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
+      [1, 2, true], [2, 2, true], [3, 2, true], [6, 2, true],
+      [1, 3, true], [2, 3, true], [6, 3, true],
+      [1, 4, true], [6, 4, true],
+      [1, 5, true], [2, 5, true], [3, 5, true], [4, 5, true], [6, 5, true],
+    ]);
+    sceneMap.calcSceneEdges();
+    vacanciesManager.buildVacanciesMap();
+    const {
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    } = vacanciesManager;
+    expect({
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    }).toMatchSnapshot();
+  });
+  it('should return correct vacancies for sceneMap 2', () => {
+    sceneMap.bulkUpdate([
+      [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
+      [1, 2, true], [2, 2, true], [3, 2, true], [6, 2, true],
+      [1, 3, true], [2, 3, true], [6, 3, true],
+      [1, 4, true], [6, 4, true],
+      [1, 5, true], [2, 5, true], [3, 5, true], [6, 5, true],
+    ]);
+    sceneMap.calcSceneEdges();
+    vacanciesManager.buildVacanciesMap();
+    const {
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    } = vacanciesManager;
+    expect({
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    }).toMatchSnapshot();
+  });
+  it('should return correct vacancies for sceneMap 3', () => {
+    sceneMap.bulkUpdate([
+      [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
+      [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true], [6, 2, true],
+      [1, 3, true], [2, 3, true], [6, 3, true],
+      [1, 4, true], [6, 4, true],
+      [1, 5, true], [2, 5, true], [3, 5, true], [5, 5, true], [6, 5, true],
+    ]);
+    sceneMap.calcSceneEdges();
+    vacanciesManager.buildVacanciesMap();
+    const {
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    } = vacanciesManager;
+    expect({
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    }).toMatchSnapshot();
+  });
+  it('should return correct vacancies for sceneMap 4', () => {
+    sceneMap.bulkUpdate([
+      [1, -1, true], [6, -1, true],
+      [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
+      [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true], [6, 2, true],
+      [1, 3, true], [2, 3, true], [6, 3, true],
+      [1, 4, true], [6, 4, true],
+      [1, 5, true], [2, 5, true], [3, 5, true], [5, 5, true], [6, 5, true],
+    ]);
+    sceneMap.calcSceneEdges();
+    vacanciesManager.buildVacanciesMap();
+    const {
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    } = vacanciesManager;
+    expect({
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    }).toMatchSnapshot();
+  });
+  it('should return correct vacancies for sceneMap 5', () => {
+    sceneMap.bulkUpdate([
+      [-1, 1, true], [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true],
+      [-1, 2, true], [5, 2, true],
+      [-1, 3, true], [2, 3, true],
+      [-1, 4, true], [2, 4, true], [3, 4, true], [5, 4, true],
+      [-1, 5, true], [1, 5, true], [2, 5, true], [3, 5, true], [4, 5, true], [5, 5, true],
+    ]);
+    sceneMap.calcSceneEdges();
+    vacanciesManager.buildVacanciesMap();
+    const {
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    } = vacanciesManager;
+    expect({
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    }).toMatchSnapshot();
+  });
+  it('should return correct vacancies for sceneMap 6', () => {
+    sceneMap.bulkUpdate([
+      [-2, 2, true], [-1, 2, true], [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true],
+      [-2, 1, true], [4, 1, true],
+      [-2, -1, true], [-1, -1, true], [4, -1, true],
+      [-2, -2, true], [3, -2, true], [4, -2, true],
+      [-2, -3, true], [4, -3, true],
+    ]);
+    sceneMap.calcSceneEdges();
+    vacanciesManager.buildVacanciesMap();
+    const {
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    } = vacanciesManager;
+    expect({
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    }).toMatchSnapshot();
+  });
 });
