@@ -1,31 +1,42 @@
-import { SceneMap, Dimensions } from './sceneMap';
+import type { SceneEdgesT } from './sceneMap';
+import { Dimensions, SceneMap } from './sceneMap';
+import { SortingClosedVacanciesStrategies, SortingEdgeVacanciesStrategies } from 'constants/index';
 
 import type {
-  VacancyT,
-  PreparedTopEdgeVacancyT,
+  ClosedVacancyT,
+  CoordinatePointT,
   PreparedBottomEdgeVacancyT,
+  PreparedEdgeVacancyT,
   PreparedLeftEdgeVacancyT,
   PreparedRightEdgeVacancyT,
-  ClosedVacancyT,
+  PreparedTopEdgeVacancyT,
+  VacancyT,
 } from './types';
-import type { SceneSizeT } from './sceneMap';
+
+type OptionsT = {
+  sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies;
+  sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies;
+  shouldCreateVacancyIfNoSuchKind: boolean;
+  shouldDeduplicate: boolean;
+};
 
 type LineT = { begin: number; end: number };
 
-type OppositeLineT = LineT & { val: any };
+type VacancyRectAreaT = { beginColumn: number; endColumn: number, rows: any };
 
 type RawPreparedVacancyT = VacancyT & {
   baseSize?: number;
-  topEdge?: number;
-  rightEdge?: number;
-  bottomEdge?: number;
-  leftEdge?: number;
+  distanceFromCenter?: number;
+  topEdgeRow?: number;
+  rightEdgeColumn?: number;
+  bottomEdgeRow?: number;
+  leftEdgeColumn?: number;
 };
 type RawClosedVacancyT = VacancyT & Partial<ClosedVacancyT>;
 
 const { Y, X, MINUS_Y, MINUS_X } = Dimensions;
 
-function deduplicateBaseLines(lines: Array<LineT>) {
+function deduplicateLines(lines: Array<LineT>) {
   const DELIMITER = '***';
 
   const linesAddresses = lines.map(({ begin, end }) => {
@@ -34,10 +45,29 @@ function deduplicateBaseLines(lines: Array<LineT>) {
 
   return Array.from(new Set(linesAddresses)).map(str => {
     const parts = str.split(DELIMITER);
-    // restore
     return { begin: +parts[0], end: +parts[1] };
   });
 }
+
+function deduplicateVacancyRectAreas(vacancyRectArea: VacancyRectAreaT[]): VacancyRectAreaT[] {
+  const DELIMITER = '***';
+
+  const linesAddresses = vacancyRectArea.map(({ beginColumn, endColumn, rows }) => {
+    return `${beginColumn}${DELIMITER}${endColumn}${DELIMITER}${rows}`;
+  });
+
+  return Array.from(new Set(linesAddresses)).map(str => {
+    const parts = str.split(DELIMITER);
+    return { beginColumn: +parts[0], endColumn: +parts[1], rows: +parts[2] };
+  });
+}
+
+const DEFAULT_OPTIONS = {
+  sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER,
+  sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies.DISTANCE_FROM_CENTER,
+  shouldCreateVacancyIfNoSuchKind: false,
+  shouldDeduplicate: true
+};
 
 export class VacanciesManager {
   private _closedVacancies: Array<ClosedVacancyT | void> = [];
@@ -46,10 +76,12 @@ export class VacanciesManager {
   private _bottomEdgeVacancies: PreparedBottomEdgeVacancyT[] = [];
   private _leftEdgeVacancies: PreparedLeftEdgeVacancyT[] = [];
   private sceneMap: SceneMap;
+  private readonly _options: OptionsT = DEFAULT_OPTIONS;
   needVacanciesRebuild = false;
 
-  constructor(sceneMap: SceneMap) {
+  constructor(sceneMap: SceneMap, options?: Partial<OptionsT>) {
     this.sceneMap = sceneMap;
+    this._options = { ...DEFAULT_OPTIONS, ...(options ?? {}) };
   }
 
   get closedVacancies() {
@@ -72,39 +104,40 @@ export class VacanciesManager {
     return this._leftEdgeVacancies;
   }
 
-  buildVacanciesMap(isShouldCreateVacancyIfNoSuchKind = false) {
+  buildVacanciesMap(options?: Partial<OptionsT>) {
+    const {
+      shouldCreateVacancyIfNoSuchKind,
+      shouldDeduplicate,
+      sortingClosedVacanciesStrategy,
+      sortingEdgeVacanciesStrategy,
+    } = { ...this._options, ...options };
+
     const rawClosedVacancies: Array<RawClosedVacancyT> = [];
     const rawTopEdgeVacancies: Array<RawPreparedVacancyT> = [];
     const rawRightEdgeVacancies: Array<RawPreparedVacancyT> = [];
     const rawBottomEdgeVacancies: Array<RawPreparedVacancyT> = [];
     const rawLeftEdgeVacancies: Array<RawPreparedVacancyT> = [];
 
-    const sceneSize = this.sceneMap.getSceneSize();
+    const sceneEdges = this.sceneMap.getSceneEdges();
     // bottom to top, left to right
-    const sceneTopRow = SceneMap.calcPrevPositionFromEdge(sceneSize[Y]);
-    const sceneBottomRow = SceneMap.calcNextPositionFromEdge(-sceneSize[MINUS_Y]);
-    const sceneLeftCol = SceneMap.calcNextPositionFromEdge(-sceneSize[MINUS_X]);
-    const sceneRightCol = SceneMap.calcPrevPositionFromEdge(sceneSize[X]);
-
-    const accumulated: { [key: number]: any } = {};
+    const sceneTopRow = SceneMap.calcPrevPositionFromEdge(sceneEdges[Y]);
+    const sceneBottomRow = SceneMap.calcNextPositionFromEdge(sceneEdges[MINUS_Y]);
+    const sceneLeftCol = SceneMap.calcNextPositionFromEdge(sceneEdges[MINUS_X]);
+    const sceneRightCol = SceneMap.calcPrevPositionFromEdge(sceneEdges[X]);
 
     const next = SceneMap.nextPosition;
     const prev = SceneMap.prevPosition;
-    const change = SceneMap.changePosition;
+    const countPositionsBackwards = SceneMap.countPositionsBackwards;
 
-    function extractVacancies(columnsToClose: number[], curRow: number): void {
-      // отфильтровываем рядом стоящие, идущие на закрытие (будет сохранена самая правая колонка)
-      const deduplicatedColumnsToClose = columnsToClose.filter(
-        (curItemCol: number, index: number) => {
-          const nextItemCol = columnsToClose[index + 1];
-          return nextItemCol !== next(curItemCol);
-        },
-      );
+    const accumulated: { [key: number]: number } = {};
 
-      const baseLines: Array<LineT> = [];
+    function extractVacancies(columnsToClose: number[], row: number): void {
+      const columnsToCloseSet = new Set(columnsToClose);
+      const deduplicatedColumnsToClose = [...columnsToCloseSet];
 
-      const spreadLine = (begin: number, end: number): LineT => {
+      const spreadHorizontalLine = (begin: number, end: number): LineT => {
         const line: LineT = { begin, end };
+
         begin = prev(begin);
         while (accumulated[begin]) {
           line.begin = begin;
@@ -118,71 +151,76 @@ export class VacanciesManager {
         return line;
       };
 
-      deduplicatedColumnsToClose.forEach(column => {
-        baseLines.push(spreadLine(column, column));
+      const horizontalLines: Array<LineT> = deduplicatedColumnsToClose.filter(column => !!accumulated[column]).map(column => {
+        return spreadHorizontalLine(column, column);
       });
 
-      const deduplicatedBaseLines = deduplicateBaseLines(baseLines);
+      const deduplicatedHorizontalLines = deduplicateLines(horizontalLines);
 
-      const oppositeLines: Array<OppositeLineT> = [];
-      deduplicatedBaseLines.forEach(line => {
-        let begin = line.begin;
-        let end = line.end;
-        let prevColVal = accumulated[begin];
+      const vacancyRectAreas: Array<VacancyRectAreaT> = [];
+      deduplicatedHorizontalLines.forEach(line => {
+        let beginColumn = line.begin;
+        let endColumn = line.end;
+        let prevColVal = accumulated[beginColumn];
         for (let col = line.begin; col <= line.end; col = next(col)) {
           if (accumulated[col] !== prevColVal) {
-            oppositeLines.push({ begin, end, val: prevColVal });
-            begin = col;
+            vacancyRectAreas.push({ beginColumn, endColumn, rows: prevColVal });
+            if (!columnsToCloseSet.has(col)) {
+              break;
+            }
+            beginColumn = col;
           }
           prevColVal = accumulated[col];
-          end = col;
+          endColumn = col;
         }
 
-        oppositeLines.push({ begin, end, val: prevColVal });
+        vacancyRectAreas.push({ beginColumn, endColumn, rows: prevColVal });
       });
 
-      // spread opposite line
-      oppositeLines.forEach(line => {
-        let begin = prev(line.begin);
-        while (accumulated[begin] >= line.val) {
-          line.begin = begin;
-          begin = prev(begin);
+      const deduplicatedVacancyRectAreas = deduplicateVacancyRectAreas(vacancyRectAreas);
+
+      // to spread rect area horizontally
+      deduplicatedVacancyRectAreas.forEach(line => {
+        let beginColumn = prev(line.beginColumn);
+        while (accumulated[beginColumn] >= line.rows) {
+          line.beginColumn = beginColumn;
+          beginColumn = prev(beginColumn);
         }
-        let end = next(line.end);
-        while (accumulated[end] >= line.val) {
-          line.end = end;
-          end = next(end);
+        let endColumn = next(line.endColumn);
+        while (accumulated[endColumn] >= line.rows) {
+          line.endColumn = endColumn;
+          endColumn = next(endColumn);
         }
       });
 
-      oppositeLines.forEach(line => {
-        let top = prev(curRow);
-        let right = line.end;
-        let bottom = change(curRow, -line.val);
-        let left = line.begin;
+      deduplicatedVacancyRectAreas.forEach(vacancyRectArea => {
+        let top = row;
+        let right = vacancyRectArea.endColumn;
+        let bottom = countPositionsBackwards(row, vacancyRectArea.rows);
+        let left = vacancyRectArea.beginColumn;
         const vacancy: RawPreparedVacancyT = { top, right, bottom, left };
 
         let closed = true;
         if (top === sceneTopRow) {
-          vacancy.topEdge = sceneTopRow;
+          vacancy.topEdgeRow = sceneTopRow;
           vacancy.top = Infinity;
           rawTopEdgeVacancies.push(vacancy);
           closed = false;
         }
         if (right === sceneRightCol) {
-          vacancy.rightEdge = sceneRightCol;
+          vacancy.rightEdgeColumn = sceneRightCol;
           vacancy.right = Infinity;
           rawRightEdgeVacancies.push(vacancy);
           closed = false;
         }
         if (bottom === sceneBottomRow) {
-          vacancy.bottomEdge = sceneBottomRow;
+          vacancy.bottomEdgeRow = sceneBottomRow;
           vacancy.bottom = -Infinity;
           rawBottomEdgeVacancies.push(vacancy);
           closed = false;
         }
         if (left === sceneLeftCol) {
-          vacancy.leftEdge = sceneLeftCol;
+          vacancy.leftEdgeColumn = sceneLeftCol;
           vacancy.left = -Infinity;
           rawLeftEdgeVacancies.push(vacancy);
           closed = false;
@@ -193,9 +231,11 @@ export class VacanciesManager {
       });
     }
 
+    // set init value to each column
     for (let col = sceneLeftCol; col <= sceneRightCol; col = next(col)) {
       accumulated[col] = 0;
     }
+    let prevRow: number;
     for (let row = sceneBottomRow; row <= sceneTopRow; row = next(row)) {
       const currentRow: { [key: number]: boolean | void } = {};
       const columnsToClose: number[] = [];
@@ -206,7 +246,12 @@ export class VacanciesManager {
         }
       }
 
-      extractVacancies(columnsToClose, row);
+      // @ts-ignore
+      if (typeof prevRow !== 'undefined' && columnsToClose.length) {
+        // works with data since previous row is processed
+        extractVacancies(columnsToClose, prevRow);
+      }
+      prevRow = row;
 
       for (let col = sceneLeftCol; col <= sceneRightCol; col = next(col)) {
         if (currentRow[col]) {
@@ -217,22 +262,21 @@ export class VacanciesManager {
       }
     }
 
-    const toCloseCols = [];
+    // to process all accumulated vacancies
+    const columnsToClose = [];
     for (let col = sceneLeftCol; col <= sceneRightCol; col = next(col)) {
-      if (accumulated[col]) {
-        toCloseCols.push(col);
-      }
+      columnsToClose.push(col);
     }
-    extractVacancies(toCloseCols, next(sceneTopRow));
+    extractVacancies(columnsToClose, sceneTopRow);
 
-    if (isShouldCreateVacancyIfNoSuchKind) {
+    if (shouldCreateVacancyIfNoSuchKind) {
       if (!rawTopEdgeVacancies.length) {
         rawTopEdgeVacancies.push({
           top: Infinity,
           bottom: next(sceneTopRow),
           right: Infinity,
           left: -Infinity,
-          topEdge: sceneTopRow,
+          topEdgeRow: sceneTopRow,
         });
       }
       if (!rawBottomEdgeVacancies.length) {
@@ -241,7 +285,7 @@ export class VacanciesManager {
           bottom: -Infinity,
           right: Infinity,
           left: -Infinity,
-          bottomEdge: sceneBottomRow,
+          bottomEdgeRow: sceneBottomRow,
         });
       }
       if (!rawRightEdgeVacancies.length) {
@@ -250,7 +294,7 @@ export class VacanciesManager {
           bottom: -Infinity,
           right: Infinity,
           left: next(sceneRightCol),
-          rightEdge: sceneRightCol,
+          rightEdgeColumn: sceneRightCol,
         });
       }
       if (!rawLeftEdgeVacancies.length) {
@@ -259,41 +303,52 @@ export class VacanciesManager {
           bottom: -Infinity,
           right: prev(sceneLeftCol),
           left: -Infinity,
-          leftEdge: sceneLeftCol,
+          leftEdgeColumn: sceneLeftCol,
         });
       }
     }
 
-    rawClosedVacancies.forEach(v => prepareClosedVacancy(v));
-    const _closedVacancies = rawClosedVacancies as ClosedVacancyT[];
-    _closedVacancies.sort((a, b) => a.square - b.square);
+    const sceneCenter = SceneMap.calcSceneCenter(sceneEdges);
+
+    const deduplicatedRawClosedVacancies = shouldDeduplicate ? deduplicateVacancies(rawClosedVacancies) : rawClosedVacancies;
+    deduplicatedRawClosedVacancies.forEach(v => prepareClosedVacancy(v, sceneCenter));
+    const _closedVacancies = deduplicatedRawClosedVacancies as ClosedVacancyT[];
+
+    if (sortingClosedVacanciesStrategy === SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER) {
+      _closedVacancies.sort((a, b) => a.distanceFromCenter - b.distanceFromCenter);
+    } else if (sortingClosedVacanciesStrategy === SortingClosedVacanciesStrategies.SQUARE) {
+      _closedVacancies.sort((a, b) => a.square - b.square);
+    }
     this._closedVacancies = _closedVacancies;
 
-    rawTopEdgeVacancies.forEach(v => {
-      v.baseSize = calcEdgeVacancyBaseSize(v);
-    });
-    this._topEdgeVacancies = rawTopEdgeVacancies as PreparedTopEdgeVacancyT[];
-    this._topEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+    const processRawEdgeVacancies = (rawEdgeVacancies: RawPreparedVacancyT[]) => {
+      const deduplicatedRawEdgeVacancies = shouldDeduplicate ? deduplicateVacancies(rawEdgeVacancies) : rawEdgeVacancies;
+      deduplicatedRawEdgeVacancies.forEach(v => {
+        v.baseSize = calcEdgeVacancyBaseSize(v);
+        v.distanceFromCenter = calcEdgeVacancyDistanceFromCenter(v, sceneCenter);
+      });
+      return deduplicatedRawEdgeVacancies;
+    };
 
-    rawRightEdgeVacancies.forEach(v => {
-      v.baseSize = calcEdgeVacancyBaseSize(v, false);
-    });
-    this._rightEdgeVacancies =
-      rawRightEdgeVacancies as PreparedRightEdgeVacancyT[];
-    this._rightEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+    const sortEdgeVacancies = (edgeVacancies: PreparedEdgeVacancyT[]) => {
+      if (sortingEdgeVacanciesStrategy === SortingEdgeVacanciesStrategies.BASE_SIZE) {
+        edgeVacancies.sort(compareEdgeVacanciesByBaseSize);
+      } else if (sortingEdgeVacanciesStrategy === SortingEdgeVacanciesStrategies.DISTANCE_FROM_CENTER) {
+        edgeVacancies.sort((a, b) => a.distanceFromCenter - b.distanceFromCenter);
+      }
+    };
 
-    rawBottomEdgeVacancies.forEach(v => {
-      v.baseSize = calcEdgeVacancyBaseSize(v);
-    });
-    this._bottomEdgeVacancies =
-      rawBottomEdgeVacancies as PreparedBottomEdgeVacancyT[];
-    this._bottomEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+    this._topEdgeVacancies = processRawEdgeVacancies(rawTopEdgeVacancies) as PreparedTopEdgeVacancyT[];
+    sortEdgeVacancies(this._topEdgeVacancies);
 
-    rawLeftEdgeVacancies.forEach(v => {
-      v.baseSize = calcEdgeVacancyBaseSize(v, false);
-    });
-    this._leftEdgeVacancies = rawLeftEdgeVacancies as PreparedLeftEdgeVacancyT[];
-    this._leftEdgeVacancies.sort((a, b) => a.baseSize - b.baseSize);
+    this._rightEdgeVacancies = processRawEdgeVacancies(rawRightEdgeVacancies) as PreparedRightEdgeVacancyT[];
+    sortEdgeVacancies(this._rightEdgeVacancies);
+
+    this._bottomEdgeVacancies = processRawEdgeVacancies(rawBottomEdgeVacancies) as PreparedBottomEdgeVacancyT[];
+    sortEdgeVacancies(this._bottomEdgeVacancies);
+
+    this._leftEdgeVacancies = processRawEdgeVacancies(rawLeftEdgeVacancies) as PreparedLeftEdgeVacancyT[];
+    sortEdgeVacancies(this._leftEdgeVacancies);
 
     this.needVacanciesRebuild = false;
   }
@@ -314,25 +369,20 @@ export class VacanciesManager {
   }
 }
 
-export function drawVacancy(vacancy: VacancyT, sceneSize: SceneSizeT): void {
+export function drawVacancy(vacancy: VacancyT, sceneEdges: SceneEdgesT): void {
   if (!vacancy) return;
 
   const v = vacancy;
-  const isInfinite = (n: number) => !Number.isFinite(n);
-  if (
-    [v.top, v.bottom, v.left, v.right].filter(i => isInfinite(i)).length >= 3
-  ) {
-    return;
-  }
+
   // from top to down
-  const sceneTopRow = sceneSize[Y];
-  const sceneBottomRow = -sceneSize[MINUS_Y];
-  const sceneLeftCol = -sceneSize[MINUS_X];
-  const sceneRightCol = sceneSize[X];
+  const sceneTopRow = sceneEdges[Y];
+  const sceneBottomRow = sceneEdges[MINUS_Y];
+  const sceneLeftCol = sceneEdges[MINUS_X];
+  const sceneRightCol = sceneEdges[X];
 
   let res = '';
 
-  const isBelongVacancy = (x: number, y: number) => {
+  const isBelongToVacancy = (x: number, y: number) => {
     return v.top >= y && v.bottom <= y && v.left <= x && v.right >= x;
   };
 
@@ -341,7 +391,7 @@ export function drawVacancy(vacancy: VacancyT, sceneSize: SceneSizeT): void {
       if (row === 0) {
         res += '';
       } else {
-        res += col === 0 ? '|' : isBelongVacancy(col, row) ? '⬛' : '⬜';
+        res += col === 0 ? '|' : isBelongToVacancy(col, row) ? '⬛' : '⬜';
       }
     }
     res += '\n';
@@ -355,12 +405,11 @@ const calcEdgeVacancyBaseSize = (
   vacancy: VacancyT,
   isHorizontal: boolean = true,
 ) => {
-  return isHorizontal
-    ? vacancy.right - vacancy.left + 1
-    : vacancy.top - vacancy.bottom + 1;
+  const countPositions = SceneMap.countPositions;
+  return isHorizontal ? countPositions(vacancy.left, vacancy.right) : countPositions(vacancy.bottom, vacancy.top);
 };
 
-function prepareClosedVacancy(vacancy: VacancyT): ClosedVacancyT {
+function prepareClosedVacancy(vacancy: VacancyT, sceneCenter: CoordinatePointT): ClosedVacancyT {
   const v = vacancy;
   const debug = process.env.NODE_ENV !== 'production';
   if (
@@ -373,9 +422,58 @@ function prepareClosedVacancy(vacancy: VacancyT): ClosedVacancyT {
   }
   const rows = SceneMap.countPositions(vacancy.bottom, vacancy.top);
   const cols = SceneMap.countPositions(vacancy.left, vacancy.right);
+  const distanceFromCenter = calcClosedVacancyDistanceFromCenter(vacancy, sceneCenter);
 
   if (debug && (rows <= 0 || cols <= 0)) {
     throw new Error('prepareClosedVacancy error: rows <= 0 || cols <= 0');
   }
-  return Object.assign(vacancy, { rows, cols, square: rows * cols });
+  return Object.assign(vacancy, { rows, cols, square: rows * cols, distanceFromCenter });
+}
+
+function compareEdgeVacanciesByBaseSize(a: PreparedEdgeVacancyT, b: PreparedEdgeVacancyT) {
+  return a.baseSize - b.baseSize;
+}
+
+function calcDistance(a: CoordinatePointT, b: CoordinatePointT): number {
+  return ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** 0.5;
+}
+
+function calcClosedVacancyDistanceFromCenter(vacancy: VacancyT, center: CoordinatePointT): number {
+  const { left, right, bottom, top } = vacancy;
+  const vacancyCenter = {
+    x: left + (right - left) / 2,
+    y: bottom + (top - bottom) / 2,
+  };
+  return calcDistance(vacancyCenter, center);
+}
+
+function calcShiftFromCenter(begin: number, end: number) {
+  const isBeginFinite = Number.isFinite(begin);
+  const isEndFinite = Number.isFinite(end);
+  if (!isBeginFinite && !isEndFinite) {
+    return 0;
+  } else if (isBeginFinite && isEndFinite) {
+    return begin + (end - begin) / 2;
+  } else if (isBeginFinite) {
+    return begin;
+  } else {
+    return end;
+  }
+}
+
+function calcEdgeVacancyDistanceFromCenter(vacancy: VacancyT, center: CoordinatePointT): number {
+  const { left, right, bottom, top } = vacancy;
+  const vacancyCenter = {
+    x: calcShiftFromCenter(left, right),
+    y: calcShiftFromCenter(bottom, top),
+  };
+  return calcDistance(vacancyCenter, center);
+}
+
+function deduplicateVacancies<T extends VacancyT>(vacancies: T[]): T[] {
+  const map = new Map<string, T>(vacancies.map((vacancy): [string, T] => {
+    const { left, right, bottom, top } = vacancy;
+    return [`${left},${right},${bottom},${top}`, vacancy];
+  }));
+  return [...map.values()];
 }

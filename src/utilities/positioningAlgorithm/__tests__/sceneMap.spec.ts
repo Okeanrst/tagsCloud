@@ -146,72 +146,72 @@ describe('SceneMap tests', () => {
     });
   });
 
-  describe('calcSceneSize and getSceneSize tests', () => {
+  describe('calcSceneEdges and getSceneEdges tests', () => {
     let sceneMap: SceneMap;
     beforeEach(() => {
       sceneMap = new SceneMap();
     });
 
-    it('getSceneSize should return correct value for init sceneMap state', () => {
-      expect(sceneMap.getSceneSize()).toStrictEqual({
+    it('getSceneEdges should return correct value for init sceneMap state', () => {
+      expect(sceneMap.getSceneEdges()).toStrictEqual({
         '-x': 0,
         '-y': 0,
         x: 0,
         y: 0,
       });
     });
-    it('getSceneSize should return correct value after setting data at position', () => {
+    it('getSceneEdges should return correct value after setting data at position', () => {
       sceneMap.setDataAtPosition(1, 1, true);
-      expect(sceneMap.getSceneSize()).toStrictEqual({
+      expect(sceneMap.getSceneEdges()).toStrictEqual({
         '-x': 0,
         '-y': 0,
         x: 0,
         y: 0,
       });
-      sceneMap.calcSceneSize();
-      expect(sceneMap.getSceneSize()).toStrictEqual({
+      sceneMap.calcSceneEdges();
+      expect(sceneMap.getSceneEdges()).toStrictEqual({
         '-x': 0,
         '-y': 0,
         x: 1,
         y: 1,
       });
     });
-    it('getSceneSize should return correct value after setting data at position and releasing some of them', () => {
+    it('getSceneEdges should return correct value after setting data at position and releasing some of them', () => {
       sceneMap.setDataAtPosition(2, 2, true);
       sceneMap.setDataAtPosition(-2, 2, true);
       sceneMap.setDataAtPosition(2, -2, true);
       sceneMap.setDataAtPosition(-2, -2, true);
-      sceneMap.calcSceneSize();
-      expect(sceneMap.getSceneSize()).toStrictEqual({
-        '-x': 2,
-        '-y': 2,
+      sceneMap.calcSceneEdges();
+      expect(sceneMap.getSceneEdges()).toStrictEqual({
+        '-x': -2,
+        '-y': -2,
         x: 2,
         y: 2,
       });
       sceneMap.releasePosition(1, 1);
-      sceneMap.calcSceneSize();
-      expect(sceneMap.getSceneSize()).toStrictEqual({
-        '-x': 2,
-        '-y': 2,
+      sceneMap.calcSceneEdges();
+      expect(sceneMap.getSceneEdges()).toStrictEqual({
+        '-x': -2,
+        '-y': -2,
         x: 2,
         y: 2,
       });
       sceneMap.releasePosition(2, 2);
       sceneMap.releasePosition(-2, 2);
-      sceneMap.calcSceneSize();
-      // not expect(sceneMap.getSceneSize()).toStrictEqual({'-x': 2, '-y': 2, 'x': 1, 'y': 2});
+      sceneMap.calcSceneEdges();
+      // not expect(sceneMap.getSceneEdges()).toStrictEqual({'-x': -2, '-y': -2, 'x': 1, 'y': 2});
       // map rebuild is required
-      expect(sceneMap.getSceneSize()).toStrictEqual({
-        '-x': 2,
-        '-y': 2,
+      expect(sceneMap.getSceneEdges()).toStrictEqual({
+        '-x': -2,
+        '-y': -2,
         x: 2,
         y: 2,
       });
     });
-    it('getSceneSize should return correct values after successful bulkUpdate', () => {
+    it('getSceneEdges should return correct values after successful bulkUpdate', () => {
       sceneMap.bulkUpdate([[1, 1, true], [2, 1, true], [3, 1, true]]);
-      sceneMap.calcSceneSize();
-      expect(sceneMap.getSceneSize()).toStrictEqual({
+      sceneMap.calcSceneEdges();
+      expect(sceneMap.getSceneEdges()).toStrictEqual({
         '-x': 0,
         '-y': 0,
         x: 3,

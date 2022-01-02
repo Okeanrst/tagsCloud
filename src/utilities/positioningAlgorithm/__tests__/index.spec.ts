@@ -6,7 +6,6 @@ import entryData from './entryData.json';
 import preparedData from './preparedData.json';
 import tagsRectAreasMaps from './rectAreasMaps.json';
 import fullSizeFilledRectAreasMaps from './fullSizeFilledRectAreasMaps.json';
-import preparedDataWithPositions from './preparedDataWithPositions.json';
 
 jest.mock('utilities/common/getRandomRGBColor', () => {
   return {
@@ -44,7 +43,7 @@ describe('positioningAlgorithm tests', () => {
   describe('calcTagsPositions tests', () => {
     it(`return result is equal to snapshot`, async () => {
       const tagsPositions = await calcTagsPositions(preparedData, tagsRectAreasMaps);
-      expect(tagsPositions).toStrictEqual(preparedDataWithPositions);
+      expect(tagsPositions).toMatchSnapshot();
     });
 
     it(`no intersection`, async () => {

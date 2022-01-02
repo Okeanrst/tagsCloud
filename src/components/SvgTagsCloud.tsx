@@ -286,7 +286,7 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
         key={id}
         stroke={color}
         strokeOpacity="0.5"
-        strokeWidth="1"
+        strokeWidth="0.2"
         style={{ position: 'relative', zIndex: 1 }}
         width={width}
         x={x}
