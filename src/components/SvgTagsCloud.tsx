@@ -227,33 +227,40 @@ const coordinateGridStyle: React.CSSProperties = {
 function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
   const sceneMapUnitSize = SCENE_MAP_RESOLUTION;
 
-  const [minX, minY, width, height] = viewBox;
+  const [,, width, height] = viewBox;
 
-  const columns = (width - minX) / sceneMapUnitSize;
-  const rows = (height - minY ?? 0) / sceneMapUnitSize;
+  const columns = width / sceneMapUnitSize;
+  const rows = (height ?? 0) / sceneMapUnitSize;
 
-  const cells = [];
+  const lines = [];
 
   for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      const translateX = col * sceneMapUnitSize;
-      const translateY = row * sceneMapUnitSize;
+    const translateY = row * sceneMapUnitSize;
+    lines.push(
+      <line
+        key={`row${row}`}
+        stroke="black"
+        x1="0"
+        x2={width}
+        y1={translateY}
+        y2={translateY}
+      />
+    );
+  }
 
-      cells.push(
-        <rect
-          fill="purple"
-          fillOpacity="0"
-          height={sceneMapUnitSize}
-          key={`${row},${col}`}
-          stroke="blue"
-          strokeOpacity="0.25"
-          strokeWidth="0.5"
-          width={sceneMapUnitSize}
-          x={translateX}
-          y={translateY}
-        />,
-      );
-    }
+  for (let col = 0; col < columns; col++) {
+    const translateX = col * sceneMapUnitSize;
+
+    lines.push(
+      <line
+        key={`col${col}`}
+        stroke="blue"
+        x1={translateX}
+        x2={translateX}
+        y1="0"
+        y2={height}
+      />
+    );
   }
 
   return (
@@ -264,10 +271,15 @@ function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
       viewBox={viewBox.join(' ')}
     >
       <g>
-        {cells}
+        {lines}
       </g>
     </svg>
   );
+}
+
+function calcZoom(svgSize: SizeT, viewBox: ViewBoxT) {
+  const [,, width] = viewBox;
+  return svgSize.width / width;
 }
 
 function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT, transform: string) {
@@ -286,7 +298,6 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
         key={id}
         stroke={color}
         strokeOpacity="0.5"
-        strokeWidth="0.2"
         style={{ position: 'relative', zIndex: 1 }}
         width={width}
         x={x}
