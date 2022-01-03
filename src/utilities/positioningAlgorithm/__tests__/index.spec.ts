@@ -27,7 +27,7 @@ jest.mock('utilities/getGlyphsMap', () => {
 describe('positioningAlgorithm tests', () => {
   describe('prepareData tests', () => {
     it(`should return correct result`, () => {
-      expect(prepareData(entryData)).toStrictEqual(preparedData);
+      expect(prepareData(entryData, {minFontSize: 6, maxFontSize: 36})).toMatchSnapshot();
     });
   });
 

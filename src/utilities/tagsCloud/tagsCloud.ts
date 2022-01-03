@@ -21,8 +21,8 @@ export type BorderCoordinatesT = {
 
 export type ViewBoxT = [number, number, number, number];
 
-const DEFAULT_MIN_FONT_SIZE = 6;
-const DEFAULT_MAX_FONT_SIZE = 36;
+const DEFAULT_MIN_FONT_SIZE = 8;
+const DEFAULT_MAX_FONT_SIZE = 300;
 
 export function prepareData(
   data: ReadonlyArray<TagDataT>,
@@ -33,34 +33,19 @@ export function prepareData(
     maxFontSize = DEFAULT_MAX_FONT_SIZE,
   } = options;
 
-  let minSentimentScore: number = Infinity;
   let maxSentimentScore: number = -Infinity;
+
   data.forEach(item => {
-    if (
-      minSentimentScore > item.sentimentScore ||
-      minSentimentScore === undefined
-    ) {
-      minSentimentScore = item.sentimentScore;
-    }
-    if (
-      maxSentimentScore < item.sentimentScore ||
-      maxSentimentScore === undefined
-    ) {
+    if (item.sentimentScore > maxSentimentScore) {
       maxSentimentScore = item.sentimentScore;
     }
   });
 
-  const fontSizeToSentimentScoreRatio =
-    (maxFontSize - minFontSize) / (maxSentimentScore - minSentimentScore);
+  const fontSizeRation = minFontSize / maxFontSize;
+  const minSentimentScoreThreshold = maxSentimentScore * fontSizeRation;
 
   return data.map(item => {
-    const fontSize = Number.isFinite(fontSizeToSentimentScoreRatio)
-      ? minFontSize +
-        Math.round(
-          (item.sentimentScore - minSentimentScore) *
-            fontSizeToSentimentScoreRatio,
-        )
-      : minFontSize + (maxFontSize - minFontSize) / 2;
+    const fontSize = item.sentimentScore <= minSentimentScoreThreshold ? minFontSize : Math.round(maxFontSize * item.sentimentScore / maxSentimentScore);
 
     return {
       ...item,
