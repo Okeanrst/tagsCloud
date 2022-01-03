@@ -5,40 +5,44 @@ export interface VacancyT {
   right: number;
 }
 
-export interface PreparedTopEdgeVacancyT extends VacancyT {
+export interface PreparedEdgeVacancyT extends VacancyT {
   baseSize: number;
-  topEdge: number;
-  rightEdge?: number;
-  bottomEdge?: number;
-  leftEdge?: number;
+  distanceFromCenter: number;
 }
 
-export interface PreparedBottomEdgeVacancyT extends VacancyT {
-  baseSize: number;
-  bottomEdge: number;
-  topEdge?: number;
-  rightEdge?: number;
-  leftEdge?: number;
+export interface PreparedTopEdgeVacancyT extends PreparedEdgeVacancyT {
+  topEdgeRow: number;
+  rightEdgeColumn?: number;
+  bottomEdgeRow?: number;
+  leftEdgeColumn?: number;
 }
 
-export interface PreparedLeftEdgeVacancyT extends VacancyT {
-  baseSize: number;
-  leftEdge: number;
-  topEdge?: number;
-  rightEdge?: number;
-  bottomEdge?: number;
+export interface PreparedBottomEdgeVacancyT extends PreparedEdgeVacancyT {
+  bottomEdgeRow: number;
+  topEdgeRow?: number;
+  rightEdgeColumn?: number;
+  leftEdgeColumn?: number;
 }
 
-export interface PreparedRightEdgeVacancyT extends VacancyT {
-  baseSize: number;
-  rightEdge: number;
-  topEdge?: number;
-  bottomEdge?: number;
-  leftEdge?: number;
+export interface PreparedLeftEdgeVacancyT extends PreparedEdgeVacancyT {
+  leftEdgeColumn: number;
+  topEdgeRow?: number;
+  rightEdgeColumn?: number;
+  bottomEdgeRow?: number;
+}
+
+export interface PreparedRightEdgeVacancyT extends PreparedEdgeVacancyT {
+  rightEdgeColumn: number;
+  topEdgeRow?: number;
+  bottomEdgeRow?: number;
+  leftEdgeColumn?: number;
 }
 
 export interface ClosedVacancyT extends VacancyT {
   square: number;
   rows: number;
   cols: number;
+  distanceFromCenter: number;
 }
+
+export type CoordinatePointT = { x: number; y: number };

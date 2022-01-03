@@ -1,6 +1,11 @@
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
-import { SCENE_MAP_RESOLUTION } from 'constants/index';
+import {
+  SCENE_MAP_RESOLUTION,
+  PickingStrategies,
+  SortingClosedVacanciesStrategies,
+  SortingEdgeVacanciesStrategies
+} from 'constants/index';
 import { calcTagsPositions } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { prepareData } from 'utilities/tagsCloud/tagsCloud';
 import { prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
@@ -34,9 +39,15 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
     return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
         return calcTagsPositions(preparedData, tagsRectAreasMaps, {
+          drawFinishMap: false,
           drawVacanciesMap: false,
           drawStepMap: false,
           shouldTryAnotherAngle: false,
+          addIfEmptyIndex: 5,
+          pickingClosedVacancyStrategy: PickingStrategies.ASC,
+          pickingEdgeVacancyStrategy: PickingStrategies.ASC,
+          sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER,
+          sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies.DISTANCE_FROM_CENTER,
         });
       })
       .then(preparedDataWithPositions => {

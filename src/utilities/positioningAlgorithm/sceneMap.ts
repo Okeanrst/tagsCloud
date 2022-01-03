@@ -1,4 +1,5 @@
 import IntersectionError from './IntersectionError';
+import type { CoordinatePointT } from './types';
 
 enum QuarterType {
   TOP_RIGHT_QUARTER = 'xy',
@@ -32,7 +33,7 @@ type SceneMapT = {
   [TOP_LEFT_QUARTER]: Array<RowT>;
 };
 
-export type SceneSizeT = {
+export type SceneEdgesT = {
   [X]: number;
   [MINUS_X]: number;
   [Y]: number;
@@ -46,68 +47,107 @@ export class SceneMap {
     [BOTTOM_LEFT_QUARTER]: [],
     [TOP_LEFT_QUARTER]: [],
   };
-  private sizeX = 0;
-  private sizeMinusX = 0;
-  private sizeY = 0;
-  private sizeMinusY = 0;
+  private rightEdge = 0;
+  private leftEdge = 0;
+  private topEdge = 0;
+  private bottomEdge = 0;
+  isSceneSizeFresh = true;
 
-  getSceneSize(): SceneSizeT {
-    const { sizeX, sizeMinusX, sizeY, sizeMinusY } = this;
+  constructor(positions: [number, number, any][] = []) {
+    if (!positions.length) {
+      return;
+    }
+    this.bulkUpdate(positions);
+    this.calcSceneEdges();
+  }
+
+  getSceneEdges(): SceneEdgesT {
+    const { rightEdge, leftEdge, topEdge, bottomEdge } = this;
     return {
-      [X]: sizeX,
-      [MINUS_X]: sizeMinusX,
-      [Y]: sizeY,
-      [MINUS_Y]: sizeMinusY,
+      [X]: rightEdge,
+      [MINUS_X]: leftEdge,
+      [Y]: topEdge,
+      [MINUS_Y]: bottomEdge,
     };
   }
 
-  rebuildMap(): void {
-    // TODO if needed implement cutting of released position
+  cutOffEmptyRows() {
+    // does not cut empty columns
+    // TODO
+    const getMapLastNotEmptyRowIndex = (map: RowT[]) => {
+      let lastNotEmptyRowIndex = map.length - 1;
+      for (let rowIndex = map.length - 1; rowIndex >= 0; rowIndex--) {
+        if (map[rowIndex] && map[rowIndex].some(position => position)) {
+          lastNotEmptyRowIndex = rowIndex;
+          break;
+        }
+      }
+      return lastNotEmptyRowIndex;
+    };
+    const processQuarterMap = (map: RowT[]) => {
+      const lastNotEmptyRowIndex = getMapLastNotEmptyRowIndex(map);
+      map.length = lastNotEmptyRowIndex + 1;
+    };
+    [TOP_RIGHT_QUARTER, BOTTOM_RIGHT_QUARTER, BOTTOM_LEFT_QUARTER, TOP_LEFT_QUARTER].forEach(quarter => {
+      processQuarterMap(this.sceneMap[quarter]);
+    });
   }
 
-  calcSceneSize(): void {
-    // TODO
-    // it is a bad idea to calc sceneSize using array.length
-    // because releasePosition uses false to reset cell value which lead to
+  calcSceneEdges(): void {
+    // it is a bad idea to calc sceneEdges using array.length
+    // because releasePosition uses false to reset position value which lead to
     // [false, false].length === 2
+    this.cutOffEmptyRows();
+
+    let topSize = 0;
+    let bottomSize = 0;
+    let leftSize = 0;
+    let rightSize = 0;
+
     // Y
-    if (this.sceneMap[TOP_RIGHT_QUARTER].length - 1 > this.sizeY) {
-      this.sizeY = this.sceneMap[TOP_RIGHT_QUARTER].length - 1;
+    if (this.sceneMap[TOP_RIGHT_QUARTER].length - 1 > topSize) {
+      topSize = this.sceneMap[TOP_RIGHT_QUARTER].length - 1;
     }
-    if (this.sceneMap[TOP_LEFT_QUARTER].length - 1 > this.sizeY) {
-      this.sizeY = this.sceneMap[TOP_LEFT_QUARTER].length - 1;
+    if (this.sceneMap[TOP_LEFT_QUARTER].length - 1 > topSize) {
+      topSize = this.sceneMap[TOP_LEFT_QUARTER].length - 1;
     }
+    this.topEdge = topSize;
 
     // -Y
-    if (this.sceneMap[BOTTOM_RIGHT_QUARTER].length - 1 > this.sizeMinusY) {
-      this.sizeMinusY = this.sceneMap[BOTTOM_RIGHT_QUARTER].length - 1;
+    if (this.sceneMap[BOTTOM_RIGHT_QUARTER].length - 1 > bottomSize) {
+      bottomSize = this.sceneMap[BOTTOM_RIGHT_QUARTER].length - 1;
     }
-    if (this.sceneMap[BOTTOM_LEFT_QUARTER].length - 1 > this.sizeMinusY) {
-      this.sizeMinusY = this.sceneMap[BOTTOM_LEFT_QUARTER].length - 1;
+    if (this.sceneMap[BOTTOM_LEFT_QUARTER].length - 1 > bottomSize) {
+      bottomSize = this.sceneMap[BOTTOM_LEFT_QUARTER].length - 1;
     }
+    this.bottomEdge = !!bottomSize ? -bottomSize : 0;
 
     // X
     this.sceneMap[TOP_RIGHT_QUARTER].forEach((row: RowT) => {
-      if (row.length - 1 > this.sizeX) {
-        this.sizeX = row.length - 1;
+      if (row.length - 1 > rightSize) {
+        rightSize = row.length - 1;
       }
     });
     this.sceneMap[BOTTOM_RIGHT_QUARTER].forEach((row: RowT) => {
-      if (row.length - 1 > this.sizeX) {
-        this.sizeX = row.length - 1;
+      if (row.length - 1 > rightSize) {
+        rightSize = row.length - 1;
       }
     });
+    this.rightEdge = rightSize;
     // -X
     this.sceneMap[TOP_LEFT_QUARTER].forEach((row: Array<boolean>) => {
-      if (row.length - 1 > this.sizeMinusX) {
-        this.sizeMinusX = row.length - 1;
+      if (row.length - 1 > leftSize) {
+        leftSize = row.length - 1;
       }
     });
     this.sceneMap[BOTTOM_LEFT_QUARTER].forEach((row: RowT) => {
-      if (row.length - 1 > this.sizeMinusX) {
-        this.sizeMinusX = row.length - 1;
+      if (row.length - 1 > leftSize) {
+        leftSize = row.length - 1;
       }
     });
+    this.leftEdge = !!leftSize ? -leftSize : 0;
+
+    this.isSceneSizeFresh = true;
   }
 
   private _setDataAtPosition(x: number, y: number, val: boolean): void {
@@ -132,6 +172,7 @@ export class SceneMap {
       );
     }
     this._setDataAtPosition(x, y, val);
+    this.isSceneSizeFresh = false;
   }
 
   bulkUpdate(positionsToUpdate: [number, number, any][]) {
@@ -151,6 +192,7 @@ export class SceneMap {
         throw err;
       }
     });
+    this.isSceneSizeFresh = false;
   }
 
   releasePosition(x: number, y: number): void {
@@ -171,29 +213,56 @@ export class SceneMap {
   }
 
   drawItself() {
-    // from to bottom
-    const sceneSize = this.getSceneSize();
-    const topRow = sceneSize[Y];
-    const bottomRow = -sceneSize[MINUS_Y];
-    const leftCol = -sceneSize[MINUS_X];
-    const rightCol = sceneSize[X];
+    if (!this.isSceneSizeFresh) {
+      this.calcSceneEdges();
+    }
 
     let res = '';
 
-    for (let row = topRow; row >= bottomRow; row--) {
-      for (let col = leftCol; col <= rightCol; col++) {
-        if (row === 0) {
-          res += '';
-        } else {
-          res +=
-            col === 0 ? '|' : this.getDataAtPosition(col, row) ? '⬛' : '⬜';
-        }
+    let prevRow: number;
+    SceneMap.traverseSceneMap(this, (row, col) => {
+      if (typeof prevRow !== 'undefined' && prevRow !== row) {
+        res += '\n';
       }
-      res += '\n';
-    }
+      prevRow = row;
+      if (row === 0) {
+        res += '';
+      } else {
+        res += col === 0 ? '|' : this.getDataAtPosition(col, row) ? '⬛' : '⬜';
+      }
+    });
 
     // eslint-disable-next-line no-console
     console.log(res, '\n\n');
+  }
+
+  measureOwnDensity() {
+    if (!this.isSceneSizeFresh) {
+      this.calcSceneEdges();
+    }
+    let totalPositionCount = 0;
+    let occupiedPositionCount = 0;
+    SceneMap.traverseSceneMap(this, (row, col) => {
+      if (row === 0 || col === 0) {
+        return;
+      }
+      totalPositionCount++;
+      if (this.getDataAtPosition(col, row)) {
+        occupiedPositionCount++;
+      }
+    });
+    return occupiedPositionCount / totalPositionCount;
+  }
+
+  static traverseSceneMap(map: SceneMap, cb: (row: number, column: number) => void) {
+    // from to bottom
+    const sceneEdges = map.getSceneEdges();
+    const { [X]: rightCol, [MINUS_X]: leftCol, [Y]: topRow, [MINUS_Y]: bottomRow } = sceneEdges;
+    for (let row = topRow; row >= bottomRow; row--) {
+      for (let col = leftCol; col <= rightCol; col++) {
+        cb(row, col);
+      }
+    }
   }
 
   static rectSizeToSceneMapUnits(
@@ -265,8 +334,14 @@ export class SceneMap {
     return edge >= 0 ? edge + 1 : edge;
   }
 
-  static calcPrevPositionFromPositionEdge(edge: number): number {
+  static calcPrevPositionFromEdge(edge: number): number {
     return edge <= 0 ? edge - 1 : edge;
+  }
+
+  // result is not edge o position. It is a set of float numbers
+  static calcSceneCenter(sceneEdges: SceneEdgesT): CoordinatePointT {
+    const { [X]: rightEdge, [MINUS_X]: leftEdge, [Y]: topEdge, [MINUS_Y]: bottomEdge } = sceneEdges;
+    return { x: leftEdge + (rightEdge - leftEdge) / 2, y: bottomEdge + (topEdge - bottomEdge) / 2 };
   }
 }
 
