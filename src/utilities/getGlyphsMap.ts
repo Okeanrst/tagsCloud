@@ -123,7 +123,7 @@ export function getRectAreaMap(
     },
   } = cutOffMapEmptyArea(fullSizeRectAreaMap);
 
-  if (!false) {
+  if (false) {
     // eslint-disable-next-line no-console
     console.log('getRectAreaMap');
     // eslint-disable-next-line no-console
