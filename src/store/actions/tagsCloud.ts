@@ -50,6 +50,7 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
           pickingEdgeVacancyStrategy: PickingStrategies.ASC,
           sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER,
           sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies.DISTANCE_FROM_CENTER,
+          sceneMapResolution: SCENE_MAP_RESOLUTION,
         });
       })
       .then(preparedDataWithPositions => {

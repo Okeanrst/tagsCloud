@@ -1,5 +1,4 @@
 import {
-  SCENE_MAP_RESOLUTION,
   PickingStrategies,
   SortingClosedVacanciesStrategies,
   SortingEdgeVacanciesStrategies
@@ -37,6 +36,7 @@ export type Options = Readonly<{
   shouldTryAnotherAngle?: boolean;
   sortingClosedVacanciesStrategy?: SortingClosedVacanciesStrategies;
   sortingEdgeVacanciesStrategy?: SortingEdgeVacanciesStrategies;
+  sceneMapResolution: number;
 }>;
 
 const { TOP, RIGHT, BOTTOM, LEFT } = EDGE;
@@ -116,7 +116,7 @@ const rotateRectArea = (rectArea: RectAreaT) => {
 export function calcTagsPositions(
   tagsData: ReadonlyArray<PreparedTagDataT>,
   tagsRectAreasMaps: ReadonlyArray<IdRectAreaMapT>,
-  options?: Options,
+  options: Options,
 ): Promise<PositionedTagRectT[]> {
   return new Promise((resolve, reject) => {
     const rectAreaMapByIdMap = new Map(
@@ -129,9 +129,8 @@ export function calcTagsPositions(
         pickingEdgeVacancyStrategy = ASC,
         sortingEdgeVacanciesStrategy,
         sortingClosedVacanciesStrategy,
-      } = options ?? {};
-
-      const sceneMapUnitSize = SCENE_MAP_RESOLUTION;
+        sceneMapResolution: sceneMapUnitSize,
+      } = options;
 
       const rectsData: ReadonlyArray<TagRectT> = tagsData
         .map(tagData => {
@@ -978,16 +977,16 @@ export function calcTagsPositions(
           Object.assign(tagData, {
             rectTop:
               SceneMap.sceneMapUnitsToRect(top, sceneMapUnitSize) +
-              marginTop * SCENE_MAP_RESOLUTION,
+              marginTop * sceneMapUnitSize,
             rectBottom:
               SceneMap.sceneMapUnitsToRect(bottom, sceneMapUnitSize) -
-              marginBottom * SCENE_MAP_RESOLUTION,
+              marginBottom * sceneMapUnitSize,
             rectRight:
               SceneMap.sceneMapUnitsToRect(right, sceneMapUnitSize) +
-              marginRight * SCENE_MAP_RESOLUTION,
+              marginRight * sceneMapUnitSize,
             rectLeft:
               SceneMap.sceneMapUnitsToRect(left, sceneMapUnitSize) -
-              marginLeft * SCENE_MAP_RESOLUTION,
+              marginLeft * sceneMapUnitSize,
           });
         });
 
