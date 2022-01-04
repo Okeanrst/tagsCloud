@@ -21,11 +21,8 @@ type StateT = {
   clearParams?: [number, number, number, number];
 };
 
-const PADDING = 16;
-
 const styles = {
   container: {
-    padding: `${PADDING}px`,
     lineHeight: 0,
   },
 };
@@ -56,11 +53,9 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       return;
     }
 
-    const { left, right, top, bottom } = e.target.getBoundingClientRect();
-    const width = right - left;
-    const height = bottom - top;
-    const sceneX = e.clientX - left - (width * (PADDING - 1)) / 2;
-    const sceneY = e.clientY - top - (height * (PADDING - 1)) / 2;
+    const { left, top } = e.target.getBoundingClientRect();
+    const sceneX = e.clientX - left;
+    const sceneY = e.clientY - top;
     if (sceneX < 0 || sceneY < 0) return;
 
     const scale = this.state.scale;
@@ -101,13 +96,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       ctx.translate(...this.state.restoreCoords);
     }
 
-    const availableWidth = width - PADDING * 2;
-    const availableHeight = height - PADDING * 2;
-
-    const drawResult = drawOnCanvas(this.props.tagData, canvas, {
-      width: availableWidth,
-      height: availableHeight,
-    });
+    const drawResult = drawOnCanvas(this.props.tagData, canvas, { width, height });
 
     if (!drawResult) {
       return;

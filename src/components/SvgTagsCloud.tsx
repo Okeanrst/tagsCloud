@@ -1,7 +1,7 @@
 import { useCallback, useState, useMemo } from 'react';
 import { withStyles, createStyles } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
-import { getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
+import { getBorderCoordinates, getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 import { FONT_FAMILY, SCENE_MAP_RESOLUTION } from 'constants/index';
 import { Checkbox } from 'ui/checkbox/Checkbox';
@@ -20,8 +20,6 @@ type PropsT = {
   classes: ClassesT;
 };
 
-const PADDING = 16;
-
 const DURATION = 500;
 
 const DEFAULT_STYLE = {
@@ -31,8 +29,8 @@ const DEFAULT_STYLE = {
 
 const styles = createStyles({
   container: {
-    position: 'relative',
-    padding: `${PADDING}px`,
+    width: '100%',
+    textAlign: 'center',
   },
   text: {
     'white-space': 'pre',
@@ -41,7 +39,7 @@ const styles = createStyles({
     display: 'flex',
     flexDirection: 'column',
     position: 'absolute',
-    right: `${PADDING}px`,
+    right: 0,
     zIndex: 3,
   },
   toggleIsSettingsControlsButton: {
@@ -57,8 +55,13 @@ const styles = createStyles({
     display: 'flex',
     flexDirection: 'column',
     padding: '8px',
+    textAlign: 'left',
     backgroundColor: '#d2d2d2',
   },
+  canvasWrapper: {
+    display: 'inline-block',
+    position: 'relative',
+  }
 });
 
 const SvgTagsCloud = ({
@@ -70,7 +73,6 @@ const SvgTagsCloud = ({
 }: PropsT) => {
   const [isCoordinateGridShown, setIsCoordinateGridShown] = useState(false);
   const [isReactAreasShown, setIsReactAreasShown] = useState(false);
-  const [isAxlesShown, setIsAxlesShown] = useState(false);
   const [isSettingsControlsShown, setIsSettingsControlsShown] = useState(false);
 
   const toggleIsCoordinateGridShown = useCallback(() => {
@@ -80,10 +82,6 @@ const SvgTagsCloud = ({
   const toggleIsReactAreasShown = useCallback(() => {
     setIsReactAreasShown((value) => !value);
   }, [setIsReactAreasShown]);
-
-  const toggleIsAxlesShown = useCallback(() => {
-    setIsAxlesShown((value) => !value);
-  }, [setIsAxlesShown]);
 
   const toggleIsSettingsControlsShown = useCallback(() => {
     setIsSettingsControlsShown((value) => !value);
@@ -102,13 +100,7 @@ const SvgTagsCloud = ({
     data: positionedTagSvgData,
   } = tagsSvgData;
 
-  const availableWidth = width - PADDING * 2;
-  const availableHeight = height - PADDING * 2;
-
-  const svgSize = getSuitableSize(
-    { width: availableWidth, height: availableHeight },
-    aspectRatio,
-  );
+  const svgSize = getSuitableSize({ width, height }, aspectRatio);
 
   return (
     <div className={classes.container}>
@@ -131,115 +123,118 @@ const SvgTagsCloud = ({
               label="draw react areas"
               onChange={toggleIsReactAreasShown}
             />
-            <Checkbox
-              checked={isAxlesShown}
-              label="draw axles"
-              onChange={toggleIsAxlesShown}
-            />
           </div>
         </Collapse>
       </div>
-      {isCoordinateGridShown && drawCoordinateGrid(svgSize, viewBox)}
-      {isReactAreasShown && drawReactAreas(tagData, svgSize, viewBox, transform)}
-      <svg
-        id="small_cloud"
-        {...svgSize}
-        style={{ position: 'relative', zIndex: 2 }}
-        viewBox={viewBox.join(' ')}
-      >
-        <g transform={transform}>
-          <TransitionGroup
-            appear
-            enter
-            className="tagsCloud"
-            component={null}
-            exite={false}
-          >
-            {positionedTagSvgData.map((i, index: number) => {
-              const style = {
-                fontSize: `${i.adaptFontSize}px`,
-                fontFamily: FONT_FAMILY,
-                fill: i.color,
-              };
-              const transitionStyles: { [key: string]: React.CSSProperties } = {
-                exited: {
-                  opacity: 0,
-                  transform: `translate(${i.rectTranslateX}px,${
-                    i.rectTranslateY
-                  }px) rotate(${i.rotate ? 90 : 0}deg) scale(1)`,
-                },
-                entering: {
-                  opacity: 0,
-                  transform: `translate(${i.rectTranslateX}px,${
-                    i.rectTranslateY
-                  }px) rotate(${i.rotate ? 90 : 0}deg) scale(0.1)`,
-                },
-                entered: {
-                  opacity: 1,
-                  transform: `translate(${i.rectTranslateX}px,${
-                    i.rectTranslateY
-                  }px) rotate(${i.rotate ? 90 : 0}deg) scale(1)`,
-                },
-              };
+      <div className={classes.canvasWrapper}>
+        {isCoordinateGridShown && drawCoordinateGrid(tagData, svgSize, viewBox)}
+        {isReactAreasShown && drawReactAreas(tagData, svgSize, viewBox, transform)}
+        <svg
+          id="small_cloud"
+          {...svgSize}
+          style={{ position: 'relative', zIndex: 2 }}
+          viewBox={viewBox.join(' ')}
+        >
+          <g transform={transform}>
+            <TransitionGroup
+              appear
+              enter
+              className="tagsCloud"
+              component={null}
+              exite={false}
+            >
+              {positionedTagSvgData.map((i, index: number) => {
+                const style = {
+                  fontSize: `${i.adaptFontSize}px`,
+                  fontFamily: FONT_FAMILY,
+                  fill: i.color,
+                };
+                const transitionStyles: { [key: string]: React.CSSProperties } = {
+                  exited: {
+                    opacity: 0,
+                    transform: `translate(${i.rectTranslateX}px,${
+                      i.rectTranslateY
+                    }px) rotate(${i.rotate ? 90 : 0}deg) scale(1)`,
+                  },
+                  entering: {
+                    opacity: 0,
+                    transform: `translate(${i.rectTranslateX}px,${
+                      i.rectTranslateY
+                    }px) rotate(${i.rotate ? 90 : 0}deg) scale(0.1)`,
+                  },
+                  entered: {
+                    opacity: 1,
+                    transform: `translate(${i.rectTranslateX}px,${
+                      i.rectTranslateY
+                    }px) rotate(${i.rotate ? 90 : 0}deg) scale(1)`,
+                  },
+                };
 
-              return (
-                <Transition
-                  key={i.id}
-                  timeout={DURATION}
-                  // classNames="tagText"
-                >
-                  {state => {
-                    return (
-                      <text
-                        className={classes.text}
-                        key={`${i.id}_${index}`}
-                        style={{
-                          ...style,
-                          ...DEFAULT_STYLE,
-                          ...transitionStyles[state],
-                        }}
-                        // transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
-                        textAnchor="middle"
-                        onClick={() => onTagClick(i.id)}
-                      >
-                        {i.label}
-                      </text>
-                    );
-                  }}
-                </Transition>
-              );
-            })}
-          </TransitionGroup>
-          {isAxlesShown && drawAxles(svgSize)}
-        </g>
-      </svg>
+                return (
+                  <Transition
+                    key={i.id}
+                    timeout={DURATION}
+                    // classNames="tagText"
+                  >
+                    {state => {
+                      return (
+                        <text
+                          className={classes.text}
+                          key={`${i.id}_${index}`}
+                          style={{
+                            ...style,
+                            ...DEFAULT_STYLE,
+                            ...transitionStyles[state],
+                          }}
+                          // transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
+                          textAnchor="middle"
+                          onClick={() => onTagClick(i.id)}
+                        >
+                          {i.label}
+                        </text>
+                      );
+                    }}
+                  </Transition>
+                );
+              })}
+            </TransitionGroup>
+          </g>
+        </svg>
+      </div>
     </div>
   );
 };
 
 const coordinateGridStyle: React.CSSProperties = {
   position: 'absolute',
-  top: `${PADDING}px`,
-  left: `${PADDING}px`,
+  top: 0,
+  left: 0,
   outline: '1px solid',
 };
 
-function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
+function drawCoordinateGrid(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT) {
   const sceneMapUnitSize = SCENE_MAP_RESOLUTION;
+  const zoom = calcZoom(svgSize, viewBox);
 
   const [,, width, height] = viewBox;
 
-  const columns = width / sceneMapUnitSize;
-  const rows = (height ?? 0) / sceneMapUnitSize;
+  const borderCoordinates = getBorderCoordinates(tagData);
+
+  if (!borderCoordinates) {
+    return null;
+  }
+
+  const { left, right, top, bottom } = borderCoordinates;
 
   const lines = [];
 
-  for (let row = 0; row < rows; row++) {
-    const translateY = row * sceneMapUnitSize;
+  for (let row = bottom + sceneMapUnitSize; row < top; row = row + sceneMapUnitSize) {
+    const translateY = top - row;
     lines.push(
       <line
         key={`row${row}`}
         stroke="black"
+        strokeWidth={row === 0 ? 2 / zoom : 1 / zoom}
         x1="0"
         x2={width}
         y1={translateY}
@@ -248,13 +243,14 @@ function drawCoordinateGrid(svgSize: SizeT, viewBox: ViewBoxT) {
     );
   }
 
-  for (let col = 0; col < columns; col++) {
-    const translateX = col * sceneMapUnitSize;
+  for (let col = left + sceneMapUnitSize; col < right; col = col + sceneMapUnitSize) {
+    const translateX = -left + col;
 
     lines.push(
       <line
         key={`col${col}`}
         stroke="blue"
+        strokeWidth={col === 0 ? 2 / zoom : 1 / zoom}
         x1={translateX}
         x2={translateX}
         y1="0"
@@ -283,6 +279,7 @@ function calcZoom(svgSize: SizeT, viewBox: ViewBoxT) {
 }
 
 function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT, transform: string) {
+  const zoom = calcZoom(svgSize, viewBox);
   const rects = tagData.map(({ id, color, rectRight, rectTop, rectLeft, rectBottom }) => {
     const x = rectLeft;
     const y = -rectTop;
@@ -298,6 +295,7 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
         key={id}
         stroke={color}
         strokeOpacity="0.5"
+        strokeWidth={3 / zoom}
         style={{ position: 'relative', zIndex: 1 }}
         width={width}
         x={x}
@@ -317,38 +315,6 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
       </g>
     </svg>
   );
-}
-
-function drawAxles({ width, height }: SizeT) {
-  const fontSize = 2;
-  const style = {
-    fontSize: `${fontSize}px`,
-    fontFamily: FONT_FAMILY,
-    fill: 'rgb(0, 0, 0)',
-  };
-
-  return [
-    <text
-      key={`x`}
-      style={style}
-      textAnchor="middle"
-      transform={`translate(${0},${0})rotate(${0})`}
-    >
-      {Array.from({ length: Math.floor(width / fontSize) })
-        .fill('–')
-        .join('')}
-    </text>,
-    <text
-      key={`y`}
-      style={style}
-      textAnchor="middle"
-      transform={`translate(${0},${0})rotate(${90})`}
-    >
-      {Array.from({ length: Math.floor(height / fontSize) })
-        .fill('–')
-        .join('')}
-    </text>,
-  ];
 }
 
 export default withStyles(styles)(SvgTagsCloud);
