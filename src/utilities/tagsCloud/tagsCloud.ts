@@ -7,9 +7,8 @@ import {
 } from 'types/types';
 
 export type PrepareDataOptionsT = {
-  minFontSize?: number;
-  maxFontSize?: number;
-  fontFamily?: string;
+  minFontSize: number;
+  maxFontSize: number;
 };
 
 export type BorderCoordinatesT = {
@@ -21,17 +20,11 @@ export type BorderCoordinatesT = {
 
 export type ViewBoxT = [number, number, number, number];
 
-const DEFAULT_MIN_FONT_SIZE = 8;
-const DEFAULT_MAX_FONT_SIZE = 300;
-
 export function prepareData(
   data: ReadonlyArray<TagDataT>,
-  options: PrepareDataOptionsT = {},
+  options: PrepareDataOptionsT,
 ): ReadonlyArray<PreparedTagDataT> {
-  const {
-    minFontSize = DEFAULT_MIN_FONT_SIZE,
-    maxFontSize = DEFAULT_MAX_FONT_SIZE,
-  } = options;
+  const { minFontSize, maxFontSize } = options;
 
   let maxSentimentScore: number = -Infinity;
 

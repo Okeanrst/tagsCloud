@@ -4,7 +4,9 @@ import {
   SCENE_MAP_RESOLUTION,
   PickingStrategies,
   SortingClosedVacanciesStrategies,
-  SortingEdgeVacanciesStrategies
+  SortingEdgeVacanciesStrategies,
+  DEFAULT_MIN_FONT_SIZE,
+  DEFAULT_MAX_FONT_SIZE,
 } from 'constants/index';
 import { calcTagsPositions } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { prepareData } from 'utilities/tagsCloud/tagsCloud';
@@ -35,7 +37,7 @@ export function getData() {
 export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT) => {
     dispatch(createAction(actionTypes.PROCESS_DATA_REQUEST));
-    const preparedData = prepareData(data);
+    const preparedData = prepareData(data, { minFontSize: DEFAULT_MIN_FONT_SIZE, maxFontSize: DEFAULT_MAX_FONT_SIZE });
     return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
         return calcTagsPositions(preparedData, tagsRectAreasMaps, {

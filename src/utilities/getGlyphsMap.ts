@@ -6,20 +6,15 @@ import {
   RectAreaT,
 } from 'types/types';
 
-export function getRectAreaMap(
+type RectAreaSize = { width: number; height: number };
+
+function calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily }: {
   canvas: HTMLCanvasElement,
-  {
-    word,
-    fontSize,
-    resolution,
-    fontFamily = FONT_FAMILY,
-  }: {
-    word: string;
-    fontSize: number;
-    resolution: number;
-    fontFamily?: string;
-  },
-) {
+  word: string;
+  fontSize: number;
+  resolution: number;
+  fontFamily?: string;
+}): ([RectAreaT, RectAreaSize, number] | null) {
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
@@ -36,9 +31,39 @@ export function getRectAreaMap(
     rows: height / resolution,
     cols: width / resolution,
   };
+  return [rectArea, { width, height }, wordWidth];
+}
 
-  if (false) {
+export function getRectAreaMap(
+  canvas: HTMLCanvasElement,
+  {
+    word,
+    fontSize,
+    resolution,
+    fontFamily = FONT_FAMILY,
+  }: {
+    word: string;
+    fontSize: number;
+    resolution: number;
+    fontFamily?: string;
+  },
+  {
+    returnFakeRectAreaMap,
+    returnFullSizeRectAreaMap,
+  }: {
+    returnFakeRectAreaMap: boolean;
+    returnFullSizeRectAreaMap: boolean;
+  } = { returnFakeRectAreaMap: false, returnFullSizeRectAreaMap: false }
+) {
+  if (returnFakeRectAreaMap) {
     // for debug
+    const rectAreaSize = calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily });
+
+    if (!rectAreaSize) {
+      return null;
+    }
+
+    const [rectArea] = rectAreaSize;
 
     const fakeRectMap: TwoDimensionalMapT = [];
 
@@ -65,22 +90,20 @@ export function getRectAreaMap(
   const glyphsMap = getGlyphsMap(canvas, {
     word,
     fontSize,
-    width,
-    height,
     fontFamily,
-    xOffset: (width - wordWidth) / 2,
+    resolution,
   });
 
   if (!glyphsMap) {
     return null;
   }
 
-  const fullSizeRectMap = glyphsMapToRectMap(glyphsMap.map, rectArea, false);
+  const fullSizeRectAreaMap = glyphsMap.map;
 
-  if (false) {
+  if (returnFullSizeRectAreaMap) {
     // for debug
     return {
-      map: fullSizeRectMap,
+      map: fullSizeRectAreaMap,
       meta: {
         marginTop: 0,
         marginBottom: 0,
@@ -91,16 +114,16 @@ export function getRectAreaMap(
   }
 
   const {
-    rectMap,
+    map: rectAreaMap,
     meta: {
       topCutOffRows,
       bottomCutOffRows,
       leftCutOffColumns,
       rightCutOffColumns,
     },
-  } = cutOffMapEmptyArea(fullSizeRectMap);
+  } = cutOffMapEmptyArea(fullSizeRectAreaMap);
 
-  if (false) {
+  if (!false) {
     // eslint-disable-next-line no-console
     console.log('getRectAreaMap');
     // eslint-disable-next-line no-console
@@ -108,13 +131,13 @@ export function getRectAreaMap(
     // eslint-disable-next-line no-console
     console.log('fontSize', fontSize);
     // eslint-disable-next-line no-console
-    console.log(visualizeMap(fullSizeRectMap));
+    console.log(visualizeMap(fullSizeRectAreaMap));
     // eslint-disable-next-line no-console
-    console.log(visualizeMap(rectMap));
+    console.log(visualizeMap(rectAreaMap));
   }
 
   return {
-    map: rectMap,
+    map: rectAreaMap,
     meta: {
       marginTop: topCutOffRows,
       marginBottom: bottomCutOffRows,
@@ -125,6 +148,145 @@ export function getRectAreaMap(
 }
 
 export function getGlyphsMap(
+  canvas: HTMLCanvasElement,
+  {
+    word,
+    fontSize,
+    resolution,
+    fontFamily,
+  }: {
+    word: string;
+    fontSize: number;
+    resolution: number;
+    fontFamily: string;
+  },
+): ({
+  map: TwoDimensionalMapT;
+  rectArea: RectAreaT;
+  meta: TwoDimensionalMapMetaT;
+} | null) {
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    return null;
+  }
+
+  const rectAreaSize = calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily });
+
+  if (!Array.isArray(rectAreaSize)) {
+    return null;
+  }
+
+  const [rectArea, { width, height }, wordWidth] = rectAreaSize;
+
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = `${fontSize}px "${fontFamily}"`;
+  const xOffset = (width - wordWidth) / 2;
+
+  // TODO use opentype.js
+  ctx.fillText(word, xOffset, height * FONT_Y_FACTOR);
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  const { rows, cols } = rectArea;
+
+  const glyphsMap: TwoDimensionalMapT = [];
+
+  const emptyRows = Array.from({ length: rows }).fill(true);
+  const emptyColumns = Array.from({ length: cols }).fill(true);
+
+  const bytePerPixel = 4;
+  const oneColShift = resolution * bytePerPixel;
+  const oneRowShift = oneColShift * resolution * cols;
+  const oneSubRowShift = oneColShift * cols;
+
+  for (let row = 0; row < rows; row++) {
+    const rowShift = oneRowShift * row;
+    for (let col = 0; col < cols; col++) {
+      const colShift = oneColShift * col;
+      let checkIsPositionOccupied = false;
+      subRowLoop:
+      for (let subRow = 0; subRow < resolution; subRow++) {
+        const subRowShift = oneSubRowShift * subRow;
+        for (let subCol = 0; subCol < resolution; subCol++) {
+          const subColShift = subCol * bytePerPixel;
+          const shift = rowShift + colShift + subRowShift + subColShift;
+          if (data[shift + 3]) {
+            checkIsPositionOccupied = true;
+            break subRowLoop;
+          }
+        }
+      }
+
+      if (!glyphsMap[row]) {
+        glyphsMap[row] = [];
+      }
+      glyphsMap[row][col] = checkIsPositionOccupied;
+      if (glyphsMap[row][col]) {
+        emptyRows[row] = false;
+        emptyColumns[col] = false;
+      }
+    }
+  }
+
+  let firstNotEmptyRow: number = 0;
+  // Rows: forward direction
+  for (let i = 0; i < emptyRows.length; i++) {
+    if (!emptyRows[i]) {
+      // till meet the first not empty position
+      firstNotEmptyRow = i;
+      break;
+    }
+  }
+  let lastNotEmptyRow: number = emptyRows.length - 1;
+  // Rows: reverse direction
+  for (let i = emptyRows.length - 1; i >= 0; i--) {
+    if (!emptyRows[i]) {
+      lastNotEmptyRow = i;
+      break;
+    }
+  }
+
+  // Columns: forward direction
+  let firstNotEmptyColumn: number = 0;
+  for (let i = 0; i < emptyColumns.length; i++) {
+    if (!emptyColumns[i]) {
+      // till meet the first not empty position
+      firstNotEmptyColumn = i;
+      break;
+    }
+  }
+  // Columns: reverse direction
+  let lastNotEmptyColumn: number = emptyColumns.length - 1;
+  for (let i = emptyColumns.length - 1; i >= 0; i--) {
+    if (!emptyColumns[i]) {
+      lastNotEmptyColumn = i;
+      break;
+    }
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  return {
+    map: glyphsMap,
+    meta: {
+      firstNotEmptyRow,
+      lastNotEmptyRow,
+      firstNotEmptyColumn,
+      lastNotEmptyColumn,
+    },
+    rectArea,
+  };
+}
+
+// not in use any more
+// const glyphsMap = getHighResolutionGlyphsMap(...)
+// const fullSizeRectMap = glyphsMapToRectMap(glyphsMap.map, rectArea, false);
+export function getHighResolutionGlyphsMap(
   canvas: HTMLCanvasElement,
   {
     word,
@@ -263,7 +425,8 @@ export function getGlyphsMap(
   };
 }
 
-export function glyphsMapToRectMap(
+// not in use any more
+function glyphsMapToRectMap(
   glyphsMap: TwoDimensionalMapT,
   rectArea: RectAreaT,
   rotate: boolean,
@@ -282,7 +445,6 @@ export function glyphsMapToRectMap(
     const colStart = Math.floor(vertRatio * rectCol);
     let colFinish = Math.floor(vertRatio * (rectCol + 1));
 
-    // if (rowFinish > glyphsRows || colFinish > glyphsCols) debugger
     if (rowFinish > glyphsRows) {
       rowFinish = glyphsRows + 1;
     }
@@ -323,7 +485,7 @@ export function getRectAreaOfRectMap(map: Array<Array<boolean>>) {
 }
 
 function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
-  rectMap: Array<Array<boolean>>;
+  map: Array<Array<boolean>>;
   meta: {
     topCutOffRows: number;
     bottomCutOffRows: number;
@@ -331,8 +493,7 @@ function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
     rightCutOffColumns: number;
   };
 } {
-  const { rows: entryMapRows, cols: entryMapCols } =
-    getRectAreaOfRectMap(entryMap);
+  const { rows: entryMapRows, cols: entryMapCols } = getRectAreaOfRectMap(entryMap);
 
   const emptyRows = Array.from({ length: entryMapRows }).fill(true);
   const emptyColumns = Array.from({ length: entryMapCols }).fill(true);
@@ -397,7 +558,7 @@ function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
   }
 
   return {
-    rectMap: map,
+    map,
     meta: {
       topCutOffRows: firstNotEmptyRow,
       bottomCutOffRows: entryMapRows - 1 - lastNotEmptyRow,
