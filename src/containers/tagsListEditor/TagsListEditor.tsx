@@ -24,9 +24,9 @@ import { withStyles } from '@material-ui/core';
 
 type CreatedTagDataT = Partial<Omit<TagDataT, 'id'>>;
 
-const getTagsRawData = (state: RootStateT) => state.rawData.data;
+const getTagsData = (state: RootStateT) => state.tagsData.data;
 const getSearchAutocompleteSuggestions = createSelector(
-  [getTagsRawData],
+  [getTagsData],
   tagsRawData =>
     tagsRawData
       ? tagsRawData.map(item => ({ id: item.id, label: item.label }))
@@ -34,9 +34,9 @@ const getSearchAutocompleteSuggestions = createSelector(
 );
 
 const mapStateToProps = (state: RootStateT) => {
-  const { rawData } = state;
+  const { tagsData } = state;
   const searchAutocompleteSuggestions = getSearchAutocompleteSuggestions(state);
-  return { rawData, searchAutocompleteSuggestions };
+  return { tagsData, searchAutocompleteSuggestions };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatchT) =>
@@ -45,7 +45,7 @@ const mapDispatchToProps = (dispatch: AppDispatchT) =>
       deleteTag: actions.deleteDataItem,
       addTag: actions.addDataItem,
       editTag: actions.editDataItem,
-      uploadCloudRawDataFile: uploadRawTagsCloudDataFile,
+      uploadTagsDataFile: uploadRawTagsCloudDataFile,
     },
     dispatch,
   );
@@ -148,7 +148,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
     );
   };
 
-  uploadCloudRawDataFile = (e: SyntheticEvent<HTMLInputElement>) => {
+  uploadTagsDataFile = (e: SyntheticEvent<HTMLInputElement>) => {
     if (
       !(e.target instanceof HTMLInputElement) ||
       !e.target.files ||
@@ -157,7 +157,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
       return;
     }
 
-    this.props.uploadCloudRawDataFile(e.target.files[0]);
+    this.props.uploadTagsDataFile(e.target.files[0]);
   };
 
   renderFileUploader = (disabled: boolean) => {
@@ -175,22 +175,22 @@ class TagsListEditor extends Component<PropsT, StateT> {
           disabled={disabled}
           id="cloud_conf_upload"
           type="file"
-          onChange={this.uploadCloudRawDataFile}
+          onChange={this.uploadTagsDataFile}
         />
       </div>
     );
   };
 
-  downloadCloudRawDataFile = () => {
-    const tagsCloudData = this.props.rawData.data;
-    if (!tagsCloudData) return;
-    downloadRawTagsCloudDataFile(tagsCloudData);
+  downloadTagsDataFile = () => {
+    const tagsData = this.props.tagsData.data;
+    if (!tagsData) return;
+    downloadRawTagsCloudDataFile(tagsData);
   };
 
   renderFileDownloader = (disabled: boolean) => (
     <button
       disabled={disabled}
-      onClick={this.downloadCloudRawDataFile}
+      onClick={this.downloadTagsDataFile}
     >
       Download tags cloud as a file
     </button>
@@ -272,8 +272,8 @@ class TagsListEditor extends Component<PropsT, StateT> {
     }
 
     const targetId = e.target.dataset.id;
-    const { rawData } = this.props;
-    const targetTagData = rawData.data?.find(item => item.id === targetId);
+    const { tagsData } = this.props;
+    const targetTagData = tagsData.data?.find(item => item.id === targetId);
 
     if (!targetTagData) {
       return;
@@ -295,8 +295,8 @@ class TagsListEditor extends Component<PropsT, StateT> {
     }
 
     const id = e.target.dataset.id;
-    const { rawData } = this.props;
-    const editedTagData = rawData.data?.find(item => item.id === id);
+    const { tagsData } = this.props;
+    const editedTagData = tagsData.data?.find(item => item.id === id);
     this.setState({ editedTagData });
   };
 
@@ -306,7 +306,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
   onSearch = (target: string | null) => {
     const {
-      rawData: { data },
+      tagsData: { data },
     } = this.props;
     const index =
       target && data ? data.findIndex(item => target === item.label) : -1;
@@ -387,9 +387,9 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   render() {
-    const { rawData, searchAutocompleteSuggestions, classes } = this.props;
+    const { tagsData, searchAutocompleteSuggestions, classes } = this.props;
     const { tagsListHeight, editedTagData, createdTagData } = this.state;
-    const loading = rawData.status === PENDING;
+    const loading = tagsData.status === PENDING;
     const tagFormData = createdTagData || editedTagData;
 
     return (
@@ -401,7 +401,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
           ref={this.confFilesRef}
         >
           {this.renderFileUploader(loading)}
-          {this.renderFileDownloader(!rawData.data || loading)}
+          {this.renderFileDownloader(!tagsData.data || loading)}
           <button onClick={this.onAdd}>Add new</button>
           <SearchWithAutocomplete
             placeholder="Search a tag by label"
@@ -410,7 +410,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
           />
         </div>
         {tagFormData && this.renderTagForm(tagFormData)}
-        {rawData.data && this.renderList(rawData.data, tagsListHeight)}
+        {tagsData.data && this.renderList(tagsData.data, tagsListHeight)}
         {this.state.tagIdToDelete !== undefined &&
           this.renderConfirmDelete(this.state.tagIdToDelete)}
       </div>

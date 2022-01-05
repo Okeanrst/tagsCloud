@@ -12,13 +12,13 @@ import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
 
 const mapStateToProps = (state: RootStateT) => {
-  const { tagsCloud, useCanvas, fontLoaded, rawData } = state;
-  return { tagsCloud, useCanvas, fontLoaded, rawData };
+  const { tagsCloud, useCanvas, fontLoaded, tagsData } = state;
+  return { tagsCloud, useCanvas, fontLoaded, tagsData };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatchT) => ({
-  buildTagsCloud(rawData: NonNullable<RootStateT['rawData']['data']>) {
-    dispatch(actions.buildTagsCloud(rawData));
+  buildTagsCloud(tagsData: NonNullable<RootStateT['tagsData']['data']>) {
+    dispatch(actions.buildTagsCloud(tagsData));
   },
   toggleUseCanvas() {
     dispatch(actions.toggleUseCanvas());
@@ -73,16 +73,16 @@ class HomePage extends Component<PropsT, StateT> {
   resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
 
   componentDidMount() {
-    const { rawData, tagsCloud, fontLoaded, buildTagsCloud } = this.props;
+    const { tagsData, tagsCloud, fontLoaded, buildTagsCloud } = this.props;
 
     if (
       fontLoaded.status === SUCCESS &&
       fontLoaded.data &&
-      rawData.status === SUCCESS &&
-      rawData.data &&
+      tagsData.status === SUCCESS &&
+      tagsData.data &&
       tagsCloud.status === PRISTINE
     ) {
-      buildTagsCloud(rawData.data);
+      buildTagsCloud(tagsData.data);
     }
     window.addEventListener('resize', this.handleResize);
 
@@ -104,16 +104,16 @@ class HomePage extends Component<PropsT, StateT> {
   }
 
   componentDidUpdate(prevProps: PropsT, prevState: StateT) {
-    const { fontLoaded, rawData, tagsCloud, buildTagsCloud } = this.props;
+    const { fontLoaded, tagsData, tagsCloud, buildTagsCloud } = this.props;
 
     if (
       fontLoaded.data &&
-      rawData.status === SUCCESS &&
-      rawData.data &&
+      tagsData.status === SUCCESS &&
+      tagsData.data &&
       !tagsCloud.data &&
       tagsCloud.status === PRISTINE
     ) {
-      buildTagsCloud(rawData.data);
+      buildTagsCloud(tagsData.data);
     }
   }
 
@@ -158,10 +158,10 @@ class HomePage extends Component<PropsT, StateT> {
 
   render() {
     const { tagsCloudSceneSize } = this.state;
-    const { useCanvas, rawData, tagsCloud, toggleUseCanvas, fontLoaded } =
+    const { useCanvas, tagsData, tagsCloud, toggleUseCanvas, fontLoaded } =
       this.props;
     const loading = [
-      rawData.status,
+      tagsData.status,
       tagsCloud.status,
       fontLoaded.status,
     ].includes(PENDING);

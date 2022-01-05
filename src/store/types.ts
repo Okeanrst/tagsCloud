@@ -5,7 +5,7 @@ import { QueryStatusesT } from 'constants/queryStatuses';
 import type { PositionedTagRectT, TagDataT } from 'types/types';
 
 export type RootStateT = {
-  rawData: {
+  tagsData: {
     data?: ReadonlyArray<TagDataT>;
     status: QueryStatusesT;
   };

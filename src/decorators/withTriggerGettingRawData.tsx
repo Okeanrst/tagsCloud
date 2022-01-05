@@ -10,15 +10,15 @@ function withTriggerGettingRawData<T>(
   WrappedComponent: React.ComponentType<T>,
 ) {
   const EnhancedComponent = (props: T) => {
-    const { rawData } = useSelector(
-      (state: RootStateT): { rawData: RootStateT['rawData'] } => {
-        return { rawData: state.rawData };
+    const { tagsData } = useSelector(
+      (state: RootStateT): { tagsData: RootStateT['tagsData'] } => {
+        return { tagsData: state.tagsData };
       },
     );
     const dispatch = useDispatch();
 
     useEffect(() => {
-      if (!rawData.data && rawData.status !== PENDING) {
+      if (!tagsData.data && tagsData.status !== PENDING) {
         dispatch(actions.getData());
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps

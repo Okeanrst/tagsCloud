@@ -10,8 +10,8 @@ import { RootStateT } from '../store/types';
 import { connect, ConnectedProps } from 'react-redux';
 
 const mapStateToProps = (state: RootStateT) => {
-  const { rawData } = state;
-  return { rawData };
+  const { tagsData } = state;
+  return { tagsData };
 };
 
 const connector = connect(mapStateToProps);
@@ -196,13 +196,13 @@ const getInformationListRenderers = (
 };
 
 const TagInformation = (props: PropsT) => {
-  const { rawData } = props;
+  const { tagsData } = props;
   const navigate = useNavigate();
   const { id: tagId } = useParams();
   const [shouldShowDays, setShouldShowDays] = useState<boolean>(true);
   const classes = useStyles();
 
-  const tagData = rawData.data ? rawData.data.find(i => i.id === tagId) : null;
+  const tagData = tagsData.data ? tagsData.data.find(i => i.id === tagId) : null;
 
   const toggleShowingDays = useCallback(() => {
     setShouldShowDays(currentValue => !currentValue);
@@ -211,11 +211,11 @@ const TagInformation = (props: PropsT) => {
   useEffect(() => {
     if (
       !tagData &&
-      (rawData.status === FAILURE || rawData.status === SUCCESS)
+      (tagsData.status === FAILURE || tagsData.status === SUCCESS)
     ) {
       navigate('/notFound', { replace: true });
     }
-  }, [tagData, rawData.status, navigate]);
+  }, [tagData, tagsData.status, navigate]);
 
   if (!tagData) return null;
 
@@ -226,7 +226,7 @@ const TagInformation = (props: PropsT) => {
     classes,
   );
 
-  const loading = rawData.status === PENDING;
+  const loading = tagsData.status === PENDING;
 
   return (
     <div className={classes.root}>
