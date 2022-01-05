@@ -265,4 +265,19 @@ describe('SceneMap tests', () => {
       }).toThrowError(/^setDataAtPosition error: x === 0 \|\| y === 0$/);
     });
   });
+
+  describe('toPositions tests', () => {
+    let sceneMap: SceneMap;
+    beforeEach(() => {
+      sceneMap = new SceneMap();
+    });
+    it('should return the same positions', () => {
+      const originPositions: [number, number][] = [
+        [-1, 1], [-1, 2], [-1, 3], [-2, 3], [1, -1], [1, -2], [1, -3],
+        [1, 1], [1, 2], [1, 3], [2, 3], [3, 3], [-1, -1], [-1, -2], [-1, -3]
+      ];
+      sceneMap.bulkUpdate(originPositions);
+      expect(sceneMap.toPositions()).toStrictEqual(originPositions);
+    });
+  });
 });

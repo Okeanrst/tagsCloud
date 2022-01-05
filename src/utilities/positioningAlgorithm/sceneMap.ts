@@ -53,7 +53,7 @@ export class SceneMap {
   private bottomEdge = 0;
   isSceneSizeFresh = true;
 
-  constructor(positions: [number, number, any][] = []) {
+  constructor(positions: [number, number, boolean][] | [number, number][] = []) {
     if (!positions.length) {
       return;
     }
@@ -175,13 +175,13 @@ export class SceneMap {
     this.isSceneSizeFresh = false;
   }
 
-  bulkUpdate(positionsToUpdate: [number, number, any][]) {
+  bulkUpdate(positionsToUpdate: [number, number, boolean][] | [number, number][]) {
     const affectedPositions: [number, number][] = [];
     const recoverClosedVacanciesState = () => {
       affectedPositions.forEach(position => this.releasePosition(...position));
     };
 
-    positionsToUpdate.forEach(([col, row, value]) => {
+    positionsToUpdate.forEach(([col, row, value = true]) => {
       try {
         this.setDataAtPosition(col, row, value);
         affectedPositions.push([col, row]);
@@ -210,6 +210,29 @@ export class SceneMap {
       return;
     }
     return this.sceneMap[quarter][row][col];
+  }
+
+  toPositions() {
+    const positions: [number, number][] = [];
+    const coordinateSignByQuarter = {
+      [TOP_RIGHT_QUARTER]: { row: 1, column: 1 },
+      [BOTTOM_RIGHT_QUARTER]: { row: -1, column: 1 },
+      [BOTTOM_LEFT_QUARTER]: { row: -1, column: -1 },
+      [TOP_LEFT_QUARTER]: { row: 1, column: -1 },
+    };
+    [TOP_LEFT_QUARTER, BOTTOM_RIGHT_QUARTER, TOP_RIGHT_QUARTER, BOTTOM_LEFT_QUARTER].forEach(quarter => {
+      const quarterMap = this.sceneMap[quarter];
+      const rowSign = coordinateSignByQuarter[quarter].row;
+      const columnSign = coordinateSignByQuarter[quarter].column;
+      for (let row = 1; row < quarterMap.length; row++) {
+        for (let col = 1; col < quarterMap[row]?.length ?? 0; col++) {
+          if (quarterMap[row][col]) {
+            positions.push([col * columnSign, row * rowSign]);
+          }
+        }
+      }
+    });
+    return positions;
   }
 
   drawItself() {
