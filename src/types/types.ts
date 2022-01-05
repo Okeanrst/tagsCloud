@@ -47,6 +47,8 @@ export type TwoDimensionalMapMetaT = {
   lastNotEmptyRow: number;
   firstNotEmptyColumn: number;
   lastNotEmptyColumn: number;
+  glyphsXOffset: number;
+  glyphsYOffset: number;
 };
 
 export type RectAreaT = {
@@ -62,6 +64,8 @@ export type IdRectAreaMapT = {
     marginBottom: number;
     marginLeft: number;
     marginRight: number;
+    glyphsXOffset: number;
+    glyphsYOffset: number;
   } | null;
 };
 
@@ -78,6 +82,8 @@ export type RectPositionT = {
   rectBottom?: number;
   rectLeft?: number;
   rectRight?: number;
+  glyphsXOffset?: number;
+  glyphsYOffset?: number;
 };
 
 export type PositionedTagRectT = TagRectT &

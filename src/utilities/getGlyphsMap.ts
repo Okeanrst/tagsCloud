@@ -1,4 +1,5 @@
 import { FONT_FAMILY, FONT_Y_FACTOR } from 'constants/index';
+import openSansGlyphsByChars from './glyphsByChars/openSans.json';
 
 import {
   TwoDimensionalMapMetaT,
@@ -7,6 +8,12 @@ import {
 } from 'types/types';
 
 type RectAreaSize = { width: number; height: number };
+
+type GlyphsByCharsT = {[key: string]: {xMin: number, yMin: number, xMax: number, yMax: number}};
+
+const glyphsByCharsMap: {[key: string]: GlyphsByCharsT} = {
+  [FONT_FAMILY]: openSansGlyphsByChars,
+};
 
 function calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily }: {
   canvas: HTMLCanvasElement,
@@ -83,6 +90,8 @@ export function getRectAreaMap(
         marginBottom: 0,
         marginLeft: 0,
         marginRight: 0,
+        glyphsXOffset: 0,
+        glyphsYOffset: 0,
       },
     };
   }
@@ -98,6 +107,8 @@ export function getRectAreaMap(
     return null;
   }
 
+  const { glyphsXOffset, glyphsYOffset }= glyphsMap.meta;
+
   const fullSizeRectAreaMap = glyphsMap.map;
 
   if (returnFullSizeRectAreaMap) {
@@ -109,6 +120,8 @@ export function getRectAreaMap(
         marginBottom: 0,
         marginLeft: 0,
         marginRight: 0,
+        glyphsXOffset,
+        glyphsYOffset,
       },
     };
   }
@@ -118,8 +131,6 @@ export function getRectAreaMap(
     meta: {
       topCutOffRows,
       bottomCutOffRows,
-      leftCutOffColumns,
-      rightCutOffColumns,
     },
   } = cutOffMapEmptyArea(fullSizeRectAreaMap);
 
@@ -141,8 +152,10 @@ export function getRectAreaMap(
     meta: {
       marginTop: topCutOffRows,
       marginBottom: bottomCutOffRows,
-      marginLeft: leftCutOffColumns,
-      marginRight: rightCutOffColumns,
+      marginLeft: 0,
+      marginRight: 0,
+      glyphsXOffset,
+      glyphsYOffset,
     },
   };
 }
@@ -177,17 +190,42 @@ export function getGlyphsMap(
     return null;
   }
 
-  const [rectArea, { width, height }, wordWidth] = rectAreaSize;
+  const [originRectArea, originSize] = rectAreaSize;
+
+  const glyphsByChars = glyphsByCharsMap[fontFamily];
+
+  const firstChar = word[0];
+
+  const glyphProps = glyphsByChars?.[firstChar];
+
+  const { xMin = 0, xMax = 0 } = glyphProps ?? {};
+
+  let glyphsXOffset = 0;
+  let leftExtraColumns = 1;
+  let rightExtraColumns = 1;
+
+  if (xMin < 0 && Math.abs(xMin / (-xMin + xMax)) > 0.1) {
+    ctx.font = `${fontSize}px "${fontFamily}"`;
+    const firstCharWidth = ctx.measureText(firstChar).width;
+    glyphsXOffset = -xMin / (-xMin + xMax) * firstCharWidth;
+    leftExtraColumns = Math.ceil(glyphsXOffset / resolution) + 1;
+    rightExtraColumns = leftExtraColumns > 0 ? 0 : rightExtraColumns;
+  }
+
+  const extraColumns = leftExtraColumns + rightExtraColumns;
+  const rectArea = { ...originRectArea, cols: originRectArea.cols + extraColumns };
+
+  const { height } = originSize;
+  const width = originSize.width + extraColumns * resolution;
+
 
   canvas.width = width;
   canvas.height = height;
 
   ctx.textBaseline = 'alphabetic';
   ctx.font = `${fontSize}px "${fontFamily}"`;
-  const xOffset = (width - wordWidth) / 2;
 
-  // TODO use opentype.js
-  ctx.fillText(word, xOffset, height * FONT_Y_FACTOR);
+  ctx.fillText(word, leftExtraColumns * resolution, height * FONT_Y_FACTOR);
 
   const imageData = ctx.getImageData(0, 0, width, height);
   const data = imageData.data;
@@ -278,6 +316,8 @@ export function getGlyphsMap(
       lastNotEmptyRow,
       firstNotEmptyColumn,
       lastNotEmptyColumn,
+      glyphsXOffset,
+      glyphsYOffset: 0,
     },
     rectArea,
   };
@@ -421,6 +461,8 @@ export function getHighResolutionGlyphsMap(
       lastNotEmptyRow,
       firstNotEmptyColumn,
       lastNotEmptyColumn,
+      glyphsXOffset: 0,
+      glyphsYOffset: 0,
     },
   };
 }

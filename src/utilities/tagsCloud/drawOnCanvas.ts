@@ -92,12 +92,12 @@ export function drawOnCanvas(
       const dY = -item.rectTop * scale;
       ctx.translate(dX, dY);
       rotate(90);
-      const xOffset = (height * scale - wordWidth) / 2;
+      const xOffset = (height * scale - wordWidth) / 2 + item.glyphsXOffset * scale;
       ctx.fillText(item.label, xOffset, width * FONT_Y_FACTOR * scale);
       rotate(-90);
       ctx.translate(-dX, -dY);
     } else {
-      const xOffset = (width * scale - wordWidth) / 2;
+      const xOffset =  (width * scale - wordWidth) / 2 + item.glyphsXOffset * scale;
       ctx.fillText(
         item.label,
         item.rectLeft * scale + xOffset,

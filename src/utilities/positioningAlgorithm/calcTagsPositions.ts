@@ -947,8 +947,7 @@ export function calcTagsPositions(
         }
         positionedRectsData.forEach(tagData => {
           const top = tagData.top > 0 ? tagData.top : tagData.top + 1;
-          const bottom =
-            tagData.bottom > 0 ? tagData.bottom - 1 : tagData.bottom;
+          const bottom = tagData.bottom > 0 ? tagData.bottom - 1 : tagData.bottom;
           const right = tagData.right > 0 ? tagData.right : tagData.right + 1;
           const left = tagData.left > 0 ? tagData.left - 1 : tagData.left;
 
@@ -987,6 +986,8 @@ export function calcTagsPositions(
             rectLeft:
               SceneMap.sceneMapUnitsToRect(left, sceneMapUnitSize) -
               marginLeft * sceneMapUnitSize,
+            glyphsXOffset: rectAreaMapMeta?.glyphsXOffset ?? 0,
+            glyphsYOffset: rectAreaMapMeta?.glyphsYOffset ?? 0,
           });
         });
 
