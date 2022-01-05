@@ -1,4 +1,4 @@
-import { FONT_FAMILY, FONT_Y_FACTOR } from 'constants/index';
+import { FONT_FAMILY, FONT_Y_FACTOR, FONT_SIZE_TO_GLYPH_HEIGHT_RATIO } from 'constants/index';
 import openSansGlyphsByChars from './glyphsByChars/openSans.json';
 
 import {
@@ -28,7 +28,7 @@ function calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily }: {
     return null;
   }
 
-  const height = Math.ceil(fontSize / resolution) * resolution;
+  const height = Math.ceil(fontSize * FONT_SIZE_TO_GLYPH_HEIGHT_RATIO / resolution) * resolution;
 
   ctx.font = `${fontSize}px "${fontFamily}"`;
   const wordWidth = ctx.measureText(word).width;

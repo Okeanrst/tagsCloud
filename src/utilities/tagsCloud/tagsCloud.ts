@@ -1,3 +1,4 @@
+import { FONT_Y_FACTOR } from 'constants/index';
 import { getRandomRGBColor } from 'utilities/common/getRandomRGBColor';
 import {
   TagDataT,
@@ -109,6 +110,8 @@ export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
     left: borderLeft,
   } = borderCoordinates;
 
+  const yFactor = FONT_Y_FACTOR - 0.5;
+
   const positionedTagSvgData = data.map(tagData => {
     const diffX = tagData.rectRight - tagData.rectLeft;
     const diffY = tagData.rectTop - tagData.rectBottom;
@@ -116,8 +119,8 @@ export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
     const middleY = tagData.rectBottom + diffY / 2;
     const { glyphsXOffset, glyphsYOffset } = tagData;
 
-    const rectTranslateX = tagData.rotate ? middleX - diffX * 0.3 + glyphsYOffset : middleX + glyphsXOffset;
-    const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * 0.3) + glyphsYOffset;
+    const rectTranslateX = tagData.rotate ? middleX - diffX * yFactor + glyphsYOffset : middleX + glyphsXOffset;
+    const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * yFactor) + glyphsYOffset;
 
     return {
       ...tagData,
