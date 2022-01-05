@@ -116,8 +116,8 @@ export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
     const middleY = tagData.rectBottom + diffY / 2;
     const { glyphsXOffset, glyphsYOffset } = tagData;
 
-    const rectTranslateX = tagData.rotate ? middleX - diffX * 0.3 : middleX + glyphsXOffset;
-    const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * 0.3);
+    const rectTranslateX = tagData.rotate ? middleX - diffX * 0.3 + glyphsYOffset : middleX + glyphsXOffset;
+    const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * 0.3) + glyphsYOffset;
 
     return {
       ...tagData,
