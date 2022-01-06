@@ -273,8 +273,8 @@ describe('SceneMap tests', () => {
     });
     it('should return the same positions', () => {
       const originPositions: [number, number][] = [
-        [-1, 1], [-1, 2], [-1, 3], [-2, 3], [1, -1], [1, -2], [1, -3],
-        [1, 1], [1, 2], [1, 3], [2, 3], [3, 3], [-1, -1], [-1, -2], [-1, -3]
+        [-2, 3], [-1, 3], [1, 3], [2, 3], [3, 3], [-1, 2], [1, 2], [-1, 1], [1, 1],
+        [-1, -1], [1, -1], [-1, -2], [1, -2], [-1, -3], [1, -3]
       ];
       sceneMap.bulkUpdate(originPositions);
       expect(sceneMap.toPositions()).toStrictEqual(originPositions);

@@ -40,6 +40,8 @@ export type SceneEdgesT = {
   [MINUS_Y]: number;
 };
 
+export type PositionT = [x: number, y: number, value: boolean] | [x: number, y: number];
+
 export class SceneMap {
   private sceneMap: SceneMapT = {
     [TOP_RIGHT_QUARTER]: [],
@@ -53,7 +55,7 @@ export class SceneMap {
   private bottomEdge = 0;
   isSceneSizeFresh = true;
 
-  constructor(positions: [number, number, boolean][] | [number, number][] = []) {
+  constructor(positions: PositionT[] = []) {
     if (!positions.length) {
       return;
     }
@@ -175,7 +177,7 @@ export class SceneMap {
     this.isSceneSizeFresh = false;
   }
 
-  bulkUpdate(positionsToUpdate: [number, number, boolean][] | [number, number][]) {
+  bulkUpdate(positionsToUpdate: PositionT[]) {
     const affectedPositions: [number, number][] = [];
     const recoverClosedVacanciesState = () => {
       affectedPositions.forEach(position => this.releasePosition(...position));
@@ -212,24 +214,19 @@ export class SceneMap {
     return this.sceneMap[quarter][row][col];
   }
 
-  toPositions() {
+  toPositions(): PositionT[] {
     const positions: [number, number][] = [];
-    const coordinateSignByQuarter = {
-      [TOP_RIGHT_QUARTER]: { row: 1, column: 1 },
-      [BOTTOM_RIGHT_QUARTER]: { row: -1, column: 1 },
-      [BOTTOM_LEFT_QUARTER]: { row: -1, column: -1 },
-      [TOP_LEFT_QUARTER]: { row: 1, column: -1 },
-    };
-    [TOP_LEFT_QUARTER, BOTTOM_RIGHT_QUARTER, TOP_RIGHT_QUARTER, BOTTOM_LEFT_QUARTER].forEach(quarter => {
-      const quarterMap = this.sceneMap[quarter];
-      const rowSign = coordinateSignByQuarter[quarter].row;
-      const columnSign = coordinateSignByQuarter[quarter].column;
-      for (let row = 1; row < quarterMap.length; row++) {
-        for (let col = 1; col < quarterMap[row]?.length ?? 0; col++) {
-          if (quarterMap[row][col]) {
-            positions.push([col * columnSign, row * rowSign]);
-          }
-        }
+
+    if (!this.isSceneSizeFresh) {
+      this.calcSceneEdges();
+    }
+
+    SceneMap.traverseSceneMap(this, (row, col) => {
+      if (row === 0 || col === 0) {
+        return;
+      }
+      if (this.getDataAtPosition(col, row)) {
+        positions.push([col, row]);
       }
     });
     return positions;
