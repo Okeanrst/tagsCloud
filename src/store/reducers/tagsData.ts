@@ -18,23 +18,23 @@ export const tagsDataReducer = (
 ) => {
   switch (action.type) {
     case FETCH_DATA_REQUEST:
-      return { ...state, status: PENDING };
+      return { status: PENDING, data: null };
     case FETCH_DATA_SUCCESS:
-      return { ...state, status: SUCCESS, data: action.data };
+      return { status: SUCCESS, data: action.payload };
     case FETCH_DATA_FAILURE:
-      return { ...state, status: FAILURE };
+      return { status: FAILURE, data: null };
     case DELETE_DATA_ITEM:
       if (state.status !== SUCCESS) {
         return state;
       }
-      const idToDelete = action.data;
+      const idToDelete = action.payload;
       const data = state.data.filter(item => item.id !== idToDelete);
       return { ...state, data };
     case EDIT_DATA_ITEM: {
       if (state.status !== SUCCESS) {
         return state;
       }
-      const itemData = action.data;
+      const itemData = action.payload;
       const itemIndex = state.data.findIndex(item => item.id === itemData.id) ?? -1;
       let nextStateData = state.data;
       if (itemIndex > -1) {
@@ -50,7 +50,7 @@ export const tagsDataReducer = (
       if (state.status !== SUCCESS) {
         return state;
       }
-      return { ...state, data: [...state.data, action.data] };
+      return { ...state, data: [...state.data, action.payload] };
     }
     default:
       return state;

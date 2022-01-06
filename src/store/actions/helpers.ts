@@ -1,1 +1,1 @@
-export const createAction = (type: string, data?: any) => ({ type, data });
+export const createAction = (type: string, payload?: any) => ({ type, payload });

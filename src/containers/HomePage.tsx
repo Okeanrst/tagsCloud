@@ -180,7 +180,7 @@ class HomePage extends Component<PropsT, StateT> {
           ref={this.tagsCloudSceneRef}
           style={styles.tagsCloudScene}
         >
-          {tagsCloudSceneSize && tagsCloud.tagsPositions && (
+          {tagsCloudSceneSize && tagsCloud.status === SUCCESS && (
             <TagsCloudComponent
               height={tagsCloudSceneSize.height}
               tagData={tagsCloud.tagsPositions}

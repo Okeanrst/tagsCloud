@@ -8,11 +8,18 @@ export type RootStateT = {
   tagsData: {
     data: ReadonlyArray<TagDataT>;
     status: QueryStatuses.SUCCESS;
-  } | { data: null; status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE };
+  } | {
+    data: null;
+    status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE
+  };
   tagsCloud: {
-    tagsPositions?: ReadonlyArray<PositionedTagRectT>;
-    sceneMap?: [number, number, boolean] | [number, number];
-    status: QueryStatuses;
+    tagsPositions: ReadonlyArray<PositionedTagRectT>;
+    sceneMap: [number, number, boolean] | [number, number];
+    status: QueryStatuses.SUCCESS;
+  } | {
+    tagsPositions: null;
+    sceneMap: null;
+    status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE;
   };
   useCanvas: boolean;
   fontLoaded: {
