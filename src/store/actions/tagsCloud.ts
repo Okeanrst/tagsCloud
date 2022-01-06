@@ -15,7 +15,7 @@ import { createAction } from './helpers';
 import validateTagsCloudRawData from './rawDataValidator';
 
 import { TagDataT } from 'types/types';
-import { AppDispatchT } from '../types';
+import { AppDispatchT, RootStateT } from '../types';
 
 export function getData() {
   return (dispatch: AppDispatchT) => {
@@ -34,24 +34,26 @@ export function getData() {
   };
 }
 
+const calcTagsPositionsOptions = {
+  drawFinishMap: false,
+  drawVacanciesMap: false,
+  drawStepMap: false,
+  shouldTryAnotherAngle: false,
+  addIfEmptyIndex: 5,
+  pickingClosedVacancyStrategy: PickingStrategies.ASC,
+  pickingEdgeVacancyStrategy: PickingStrategies.ASC,
+  sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER,
+  sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies.DISTANCE_FROM_CENTER,
+  sceneMapResolution: SCENE_MAP_RESOLUTION,
+};
+
 export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT) => {
     dispatch(createAction(actionTypes.BUILD_TAGS_CLOUD_REQUEST));
     const preparedData = prepareData(data, { minFontSize: DEFAULT_MIN_FONT_SIZE, maxFontSize: DEFAULT_MAX_FONT_SIZE });
     return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
-        return calcTagsPositions(preparedData, tagsRectAreasMaps, [], {
-          drawFinishMap: false,
-          drawVacanciesMap: false,
-          drawStepMap: false,
-          shouldTryAnotherAngle: false,
-          addIfEmptyIndex: 5,
-          pickingClosedVacancyStrategy: PickingStrategies.ASC,
-          pickingEdgeVacancyStrategy: PickingStrategies.ASC,
-          sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER,
-          sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies.DISTANCE_FROM_CENTER,
-          sceneMapResolution: SCENE_MAP_RESOLUTION,
-        });
+        return calcTagsPositions(preparedData, tagsRectAreasMaps, [], calcTagsPositionsOptions);
       })
       .then(({ tagsPositions , sceneMapPositions }) => {
         dispatch(
@@ -63,6 +65,31 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
       })
       .catch(() => {
         dispatch(createAction(actionTypes.BUILD_TAGS_CLOUD_FAILURE));
+      });
+  };
+}
+
+export function incrementallyBuildTagsCloud(data: ReadonlyArray<TagDataT>) {
+  return (dispatch: AppDispatchT, getState: () => RootStateT) => {
+    // ?
+    // dispatch(createAction(actionTypes.BUILD_TAGS_CLOUD_REQUEST));
+    const preparedData = prepareData(data, { minFontSize: DEFAULT_MIN_FONT_SIZE, maxFontSize: DEFAULT_MAX_FONT_SIZE });
+    return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
+      .then(tagsRectAreasMaps => {
+        const sceneMap = getState().tagsCloud.sceneMap ?? [];
+        return calcTagsPositions(preparedData, tagsRectAreasMaps, sceneMap, calcTagsPositionsOptions);
+      })
+      .then(({ tagsPositions , sceneMapPositions }) => {
+        /* dispatch(
+          createAction(
+            actionTypes.BUILD_TAGS_CLOUD_SUCCESS,
+            { tagsPositions, sceneMap: sceneMapPositions },
+          ),
+        );*/
+      })
+      .catch(() => {
+        // ?
+        // dispatch(createAction(actionTypes.BUILD_TAGS_CLOUD_FAILURE));
       });
   };
 }

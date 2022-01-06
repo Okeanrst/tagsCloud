@@ -14,7 +14,7 @@ export type RootStateT = {
   };
   tagsCloud: {
     tagsPositions: ReadonlyArray<PositionedTagRectT>;
-    sceneMap: [number, number, boolean] | [number, number];
+    sceneMap: [number, number, boolean][] | [number, number][];
     status: QueryStatuses.SUCCESS;
   } | {
     tagsPositions: null;
