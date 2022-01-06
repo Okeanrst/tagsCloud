@@ -57,7 +57,7 @@ export type RectAreaT = {
 };
 
 export type IdRectAreaMapT = {
-  id: string;
+  key: string;
   map: TwoDimensionalMapT | null;
   mapMeta: {
     marginTop: number;

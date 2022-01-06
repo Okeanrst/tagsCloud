@@ -2,6 +2,10 @@ import { IdRectAreaMapT, PreparedTagDataT } from '../types/types';
 import { getRectAreaMap } from './getGlyphsMap';
 import { splitAndPerformWork } from './common/splitAndPerformWork';
 
+export function formRectAreaMapKey(word: string, fontSize: number) {
+  return `${word}_${fontSize}`;
+}
+
 export function prepareRectAreasMaps(
   tagsData: ReadonlyArray<PreparedTagDataT>,
   resolution: number,
@@ -9,22 +13,36 @@ export function prepareRectAreasMaps(
   return new Promise(function (resolve, reject) {
     const canvas = document.createElement('canvas');
 
-    const workGenerator: () => Generator<IdRectAreaMapT> =
+    const rectAreasMaps = new Map<string, IdRectAreaMapT>();
+
+    const workGenerator: () => Generator<void> =
       function* workGenerator() {
         for (let i = 0; i < tagsData.length; i++) {
-          const { id, label, fontSize } = tagsData[i];
+          const { label, fontSize } = tagsData[i];
+          const key = formRectAreaMapKey(label, fontSize);
+
+          if (rectAreasMaps.has(key)) {
+            yield;
+            continue;
+          }
+
           const { map = null, meta = null } =
             getRectAreaMap(canvas, {
               word: label,
               resolution,
               fontSize,
             }) ?? {};
-          yield { id, map, mapMeta: meta };
+
+          rectAreasMaps.set(key, { key , map, mapMeta: meta });
+
+          yield;
         }
       };
 
-    splitAndPerformWork<IdRectAreaMapT>(workGenerator, 50)
-      .then(resolve)
+    splitAndPerformWork<void>(workGenerator, 50)
+      .then(() => {
+        resolve([...rectAreasMaps.values()]);
+      })
       .catch(reject);
   });
 }

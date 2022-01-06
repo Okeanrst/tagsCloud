@@ -1,6 +1,6 @@
 [
   {
-    "id": "1751295897__Odessa",
+    "key": "Odessa_8",
     "map": [
       [
         true,
@@ -59,7 +59,7 @@
     }
   },
   {
-    "id": "1751295897__DJ",
+    "key": "DJ_8",
     "map": [
       [true, true, true, true],
       [true, false, true, true],
@@ -74,7 +74,7 @@
     }
   },
   {
-    "id": "1751295897__Ostgut Ton",
+    "key": "Ostgut Ton_8",
     "map": [
       [
         true,
@@ -177,7 +177,7 @@
     }
   },
   {
-    "id": "1751295897__Hammered",
+    "key": "Hammered_7",
     "map": [
       [
         true,
@@ -251,7 +251,7 @@
     }
   },
   {
-    "id": "1751295897__Code",
+    "key": "Code_8",
     "map": [
       [true, true, true, false, false, false, true, true, false, false],
       [true, true, true, true, true, true, true, true, true, true],
@@ -265,7 +265,7 @@
     }
   },
   {
-    "id": "1751295897__Quantified Drunk",
+    "key": "Quantified Drunk_8",
     "map": [
       [
         true,
@@ -416,7 +416,7 @@
     }
   },
   {
-    "id": "1751295897__Berghain resident",
+    "key": "Berghain resident_8",
     "map": [
       [
         true,
@@ -571,7 +571,7 @@
     }
   },
   {
-    "id": "1751295897__San Soda's Panorama Bar",
+    "key": "San Soda's Panorama Bar_8",
     "map": [
       [
         true,
@@ -732,7 +732,7 @@
     }
   },
   {
-    "id": "1751295897__Germany",
+    "key": "Germany_9",
     "map": [
       [
         false,
@@ -853,7 +853,7 @@
     }
   },
   {
-    "id": "1751295897__Amsterdam",
+    "key": "Amsterdam_9",
     "map": [
       [
         false,
@@ -972,7 +972,7 @@
     }
   },
   {
-    "id": "1751295897__Kantine am Berghain",
+    "key": "Kantine am Berghain_8",
     "map": [
       [
         true,
@@ -1151,7 +1151,7 @@
     }
   },
   {
-    "id": "1751295897__London",
+    "key": "London_6",
     "map": [
       [
         true,
@@ -1177,7 +1177,7 @@
     }
   },
   {
-    "id": "1751295897__UK",
+    "key": "UK_8",
     "map": [
       [true, true, true, true, true, true],
       [true, true, true, true, true, true],
@@ -1191,7 +1191,7 @@
     }
   },
   {
-    "id": "1751295897__Marcel Dettmann",
+    "key": "Marcel Dettmann_9",
     "map": [
       [
         true,
@@ -1358,7 +1358,7 @@
     }
   },
   {
-    "id": "1751295897__Disco",
+    "key": "Disco_8",
     "map": [
       [true, true, true, true, true, false, false, false, false, false, false],
       [true, true, true, true, true, true, true, true, true, true, true],
@@ -1372,7 +1372,7 @@
     }
   },
   {
-    "id": "1751295897__Barcelona",
+    "key": "Barcelona_8",
     "map": [
       [
         true,
@@ -1446,7 +1446,7 @@
     }
   },
   {
-    "id": "1751295897__Watergate",
+    "key": "Watergate_8",
     "map": [
       [
         true,
@@ -1545,7 +1545,7 @@
     }
   },
   {
-    "id": "1751295897__debut LP",
+    "key": "debut LP_9",
     "map": [
       [
         false,
@@ -1640,7 +1640,7 @@
     }
   },
   {
-    "id": "1751295897__Patrick Gräser",
+    "key": "Patrick Gräser_9",
     "map": [
       [
         true,
@@ -1779,7 +1779,7 @@
     }
   },
   {
-    "id": "1751295897__Panorama Bar in Berlin",
+    "key": "Panorama Bar in Berlin_9",
     "map": [
       [
         true,
@@ -1994,7 +1994,7 @@
     }
   },
   {
-    "id": "1751295897__legendary nightclub",
+    "key": "legendary nightclub_11",
     "map": [
       [
         true,
@@ -2270,7 +2270,7 @@
     }
   },
   {
-    "id": "1751295897__Ben Klock",
+    "key": "Ben Klock_8",
     "map": [
       [
         true,
@@ -2344,7 +2344,7 @@
     }
   },
   {
-    "id": "1751295897__Mixes",
+    "key": "Mixes_36",
     "map": [
       [
         true,
@@ -3055,7 +3055,7 @@
     }
   },
   {
-    "id": "1751295897__Panorama Bar Music",
+    "key": "Panorama Bar Music_8",
     "map": [
       [
         true,
@@ -3189,7 +3189,7 @@
     }
   },
   {
-    "id": "1751295897__Terrace Sundae",
+    "key": "Terrace Sundae_8",
     "map": [
       [
         true,
@@ -3296,7 +3296,7 @@
     }
   },
   {
-    "id": "1751295897__Jun",
+    "key": "Jun_8",
     "map": [
       [true, false, false, false, false, false],
       [true, true, true, true, true, true],
@@ -3311,7 +3311,7 @@
     }
   },
   {
-    "id": "1751295897__Live set",
+    "key": "Live set_9",
     "map": [
       [
         true,
@@ -3394,7 +3394,7 @@
     }
   },
   {
-    "id": "1751295897__dance music",
+    "key": "dance music_6",
     "map": [
       [
         false,
@@ -3465,7 +3465,7 @@
     }
   },
   {
-    "id": "1751295897__club culture",
+    "key": "club culture_8",
     "map": [
       [
         false,
@@ -3551,7 +3551,7 @@
     }
   },
   {
-    "id": "1751295897__D/B Presents",
+    "key": "D/B Presents_8",
     "map": [
       [
         true,

@@ -4,6 +4,7 @@ import {
   SortingEdgeVacanciesStrategies
 } from 'constants/index';
 import { splitAndPerformWork } from '../common/splitAndPerformWork';
+import { formRectAreaMapKey } from '../prepareRectAreasMaps';
 import { SceneMap, Dimensions, PositionT } from './sceneMap';
 import { EdgesManager, edgesOrder, EDGE } from './edgesManager';
 import { VacanciesManager, drawVacancy } from './vacanciesManager';
@@ -120,8 +121,8 @@ export function calcTagsPositions(
   options: Options,
 ): Promise<{ tagsPositions: PositionedTagRectT[]; sceneMapPositions: PositionT[] }> {
   return new Promise((resolve, reject) => {
-    const rectAreaMapByIdMap = new Map(
-      tagsRectAreasMaps.map(({ id, map, mapMeta }) => [id, { map, mapMeta }]),
+    const rectAreaMapByKey = new Map(
+      tagsRectAreasMaps.map(({ key, map, mapMeta }) => [key, { map, mapMeta }]),
     );
 
     try {
@@ -135,7 +136,7 @@ export function calcTagsPositions(
 
       const rectsData: ReadonlyArray<TagRectT> = tagsData
         .map(tagData => {
-          const { map: rectAreaMap } = rectAreaMapByIdMap.get(tagData.id) ?? {};
+          const { map: rectAreaMap } = rectAreaMapByKey.get(formRectAreaMapKey(tagData.label, tagData.fontSize)) ?? {};
 
           if (!rectAreaMap) {
             throw new Error(
@@ -804,7 +805,7 @@ export function calcTagsPositions(
         rect,
         { index, shouldTryAnotherAngle = true, isRotated },
       ) => {
-        const { map: rectAreaMap } = rectAreaMapByIdMap.get(rect.id) ?? {};
+        const { map: rectAreaMap } = rectAreaMapByKey.get(formRectAreaMapKey(rect.label, rect.fontSize)) ?? {};
         if (!rectAreaMap) {
           throw new Error(
             `rectAreaMap for rect with id: "${rect.id}" is not found`,
@@ -953,7 +954,7 @@ export function calcTagsPositions(
           const left = tagData.left > 0 ? tagData.left - 1 : tagData.left;
 
           const { mapMeta: rectAreaMapMeta } =
-            rectAreaMapByIdMap.get(tagData.id) ?? {};
+            rectAreaMapByKey.get(formRectAreaMapKey(tagData.label, tagData.fontSize)) ?? {};
           let marginRight;
           let marginLeft;
           let marginTop;

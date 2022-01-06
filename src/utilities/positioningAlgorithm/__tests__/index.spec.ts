@@ -1,5 +1,6 @@
 import { prepareData } from 'utilities/tagsCloud/tagsCloud';
-import { prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
+import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
+import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
 import { calcTagsPositions } from '../calcTagsPositions';
 import { SceneMap } from '../sceneMap';
 import entryData from './entryData.json';
@@ -27,7 +28,8 @@ jest.mock('utilities/getGlyphsMap', () => {
 describe('positioningAlgorithm tests', () => {
   describe('prepareData tests', () => {
     it(`should return correct result`, () => {
-      expect(prepareData(entryData, {minFontSize: 6, maxFontSize: 36})).toMatchSnapshot();
+      const maxSentimentScore = getMaxSentimentScore(entryData);
+      expect(prepareData(entryData, {minFontSize: 6, maxFontSize: 36, maxSentimentScore})).toMatchSnapshot();
     });
   });
 
@@ -35,7 +37,7 @@ describe('positioningAlgorithm tests', () => {
     it(`should return array with correct value (right shape)`, async () => {
       const tagsRectAreasMaps = await prepareRectAreasMaps(preparedData, 2);
       expect(tagsRectAreasMaps).toStrictEqual(
-        preparedData.map(({ id }) => ({ id, map: null, mapMeta: null })),
+        preparedData.map(({ label, fontSize }) => ({ key: formRectAreaMapKey(label, fontSize), map: null, mapMeta: null })),
       );
     });
   });
