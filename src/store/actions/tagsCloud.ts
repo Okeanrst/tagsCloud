@@ -40,7 +40,7 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
     const preparedData = prepareData(data, { minFontSize: DEFAULT_MIN_FONT_SIZE, maxFontSize: DEFAULT_MAX_FONT_SIZE });
     return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
-        return calcTagsPositions(preparedData, tagsRectAreasMaps, {
+        return calcTagsPositions(preparedData, tagsRectAreasMaps, [], {
           drawFinishMap: false,
           drawVacanciesMap: false,
           drawStepMap: false,

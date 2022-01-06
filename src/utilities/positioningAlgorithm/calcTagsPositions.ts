@@ -4,7 +4,7 @@ import {
   SortingEdgeVacanciesStrategies
 } from 'constants/index';
 import { splitAndPerformWork } from '../common/splitAndPerformWork';
-import { SceneMap, Dimensions } from './sceneMap';
+import { SceneMap, Dimensions, PositionT } from './sceneMap';
 import { EdgesManager, edgesOrder, EDGE } from './edgesManager';
 import { VacanciesManager, drawVacancy } from './vacanciesManager';
 import IntersectionError from './IntersectionError';
@@ -116,6 +116,7 @@ const rotateRectArea = (rectArea: RectAreaT) => {
 export function calcTagsPositions(
   tagsData: ReadonlyArray<PreparedTagDataT>,
   tagsRectAreasMaps: ReadonlyArray<IdRectAreaMapT>,
+  sceneMapPositions: PositionT[],
   options: Options,
 ): Promise<PositionedTagRectT[]> {
   return new Promise((resolve, reject) => {
@@ -150,7 +151,7 @@ export function calcTagsPositions(
         })
         .sort((a, b) => b.square - a.square);
 
-      const sceneMap = new SceneMap();
+      const sceneMap = new SceneMap(sceneMapPositions);
       const vacanciesManager = new VacanciesManager(sceneMap, {
         sortingEdgeVacanciesStrategy,
         sortingClosedVacanciesStrategy,
