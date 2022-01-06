@@ -3,7 +3,7 @@ import {
   FETCH_DATA_REQUEST,
   FETCH_DATA_SUCCESS,
   FETCH_DATA_FAILURE,
-  RESET_TAGS_CLOUD_DATA,
+  RESET_TAGS_CLOUD,
 } from './actionTypes';
 import { createAction } from './helpers';
 import validateTagsCloudRawData from './rawDataValidator';
@@ -17,7 +17,7 @@ export function uploadRawTagsCloudDataFile(file: File) {
 
     parseRawTagsCloudDataFile(file)
       .then(fileContent => {
-        dispatch(createAction(RESET_TAGS_CLOUD_DATA));
+        dispatch(createAction(RESET_TAGS_CLOUD));
         dispatch(createAction(FETCH_DATA_SUCCESS, fileContent));
       })
       .catch(() => {

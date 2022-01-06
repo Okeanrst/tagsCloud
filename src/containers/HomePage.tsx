@@ -110,7 +110,7 @@ class HomePage extends Component<PropsT, StateT> {
       fontLoaded.data &&
       tagsData.status === SUCCESS &&
       tagsData.data &&
-      !tagsCloud.data &&
+      !tagsCloud.tagsPositions &&
       tagsCloud.status === PRISTINE
     ) {
       buildTagsCloud(tagsData.data);
@@ -181,10 +181,10 @@ class HomePage extends Component<PropsT, StateT> {
           ref={this.tagsCloudSceneRef}
           style={styles.tagsCloudScene}
         >
-          {tagsCloudSceneSize && tagsCloud.data && (
+          {tagsCloudSceneSize && tagsCloud.tagsPositions && (
             <TagsCloudComponent
               height={tagsCloudSceneSize.height}
-              tagData={tagsCloud.data}
+              tagData={tagsCloud.tagsPositions}
               width={tagsCloudSceneSize.width}
               onTagClick={this.onTagClick}
             />

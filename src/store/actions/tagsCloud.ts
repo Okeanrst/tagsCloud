@@ -36,7 +36,7 @@ export function getData() {
 
 export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT) => {
-    dispatch(createAction(actionTypes.PROCESS_DATA_REQUEST));
+    dispatch(createAction(actionTypes.BUILD_CLOUD_REQUEST));
     const preparedData = prepareData(data, { minFontSize: DEFAULT_MIN_FONT_SIZE, maxFontSize: DEFAULT_MAX_FONT_SIZE });
     return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
@@ -53,16 +53,16 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
           sceneMapResolution: SCENE_MAP_RESOLUTION,
         });
       })
-      .then(preparedDataWithPositions => {
+      .then(({ tagsPositions , sceneMapPositions }) => {
         dispatch(
           createAction(
-            actionTypes.PROCESS_DATA_SUCCESS,
-            preparedDataWithPositions,
+            actionTypes.BUILD_CLOUD_SUCCESS,
+            { tagsPositions, sceneMap: sceneMapPositions },
           ),
         );
       })
       .catch(() => {
-        dispatch(createAction(actionTypes.PROCESS_DATA_FAILURE));
+        dispatch(createAction(actionTypes.BUILD_CLOUD_FAILURE));
       });
   };
 }
@@ -74,14 +74,14 @@ export function toggleUseCanvas() {
 export function deleteDataItem(id: string) {
   return (dispatch: AppDispatchT) => {
     dispatch(createAction(actionTypes.DELETE_DATA_ITEM, id));
-    dispatch(createAction(actionTypes.RESET_TAGS_CLOUD_DATA));
+    dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
   };
 }
 
 export function editDataItem(data: TagDataT) {
   return (dispatch: AppDispatchT) => {
     dispatch(createAction(actionTypes.EDIT_DATA_ITEM, data));
-    dispatch(createAction(actionTypes.RESET_TAGS_CLOUD_DATA));
+    dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
   };
 }
 
@@ -89,6 +89,6 @@ export function addDataItem(data: Partial<Omit<TagDataT, 'id'>>) {
   return (dispatch: AppDispatchT) => {
     const id = data.label + '_' + Date.now() + (Math.random() + '').slice(-3);
     dispatch(createAction(actionTypes.ADD_DATA_ITEM, { ...data, id }));
-    dispatch(createAction(actionTypes.RESET_TAGS_CLOUD_DATA));
+    dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
   };
 }

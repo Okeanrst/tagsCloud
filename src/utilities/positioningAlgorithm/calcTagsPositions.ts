@@ -118,7 +118,7 @@ export function calcTagsPositions(
   tagsRectAreasMaps: ReadonlyArray<IdRectAreaMapT>,
   sceneMapPositions: PositionT[],
   options: Options,
-): Promise<PositionedTagRectT[]> {
+): Promise<{ tagsPositions: PositionedTagRectT[]; sceneMapPositions: PositionT[] }> {
   return new Promise((resolve, reject) => {
     const rectAreaMapByIdMap = new Map(
       tagsRectAreasMaps.map(({ id, map, mapMeta }) => [id, { map, mapMeta }]),
@@ -992,7 +992,10 @@ export function calcTagsPositions(
           });
         });
 
-        resolve(positionedRectsData as PositionedTagRectT[]);
+        resolve({
+          tagsPositions: positionedRectsData as PositionedTagRectT[],
+          sceneMapPositions: sceneMap.toPositions(),
+        });
       };
 
       splitAndPerformWork<ReturnType<PerformWorkT>>(

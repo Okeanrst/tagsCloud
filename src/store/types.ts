@@ -10,7 +10,8 @@ export type RootStateT = {
     status: QueryStatusesT;
   };
   tagsCloud: {
-    data?: ReadonlyArray<PositionedTagRectT>;
+    tagsPositions?: ReadonlyArray<PositionedTagRectT>;
+    sceneMap?: [number, number, boolean] | [number, number];
     status: QueryStatusesT;
   };
   useCanvas: boolean;
