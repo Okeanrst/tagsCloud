@@ -16,13 +16,15 @@ import {
 } from 'store/actions/tagsCloudDataFile';
 import { TagForm } from './TagForm';
 import SearchWithAutocomplete from './searchWithAutocomplete';
-import { PENDING } from 'constants/queryStatuses';
+import { QueryStatuses } from 'constants/queryStatuses';
 
 import type { TagDataT } from 'types/types';
 import type { RootStateT, AppDispatchT } from 'store/types';
 import { withStyles } from '@material-ui/core';
 
 type CreatedTagDataT = Partial<Omit<TagDataT, 'id'>>;
+
+const { PENDING } = QueryStatuses;
 
 const getTagsData = (state: RootStateT) => state.tagsData.data;
 const getSearchAutocompleteSuggestions = createSelector(

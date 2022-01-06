@@ -1,23 +1,23 @@
 import { ThunkDispatch } from 'redux-thunk';
 import { Action } from 'redux';
-import { QueryStatusesT } from 'constants/queryStatuses';
+import { QueryStatuses } from 'constants/queryStatuses';
 
 import type { PositionedTagRectT, TagDataT } from 'types/types';
 
 export type RootStateT = {
   tagsData: {
-    data?: ReadonlyArray<TagDataT>;
-    status: QueryStatusesT;
-  };
+    data: ReadonlyArray<TagDataT>;
+    status: QueryStatuses.SUCCESS;
+  } | { data: null; status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE };
   tagsCloud: {
     tagsPositions?: ReadonlyArray<PositionedTagRectT>;
     sceneMap?: [number, number, boolean] | [number, number];
-    status: QueryStatusesT;
+    status: QueryStatuses;
   };
   useCanvas: boolean;
   fontLoaded: {
     data: boolean;
-    status: QueryStatusesT;
+    status: QueryStatuses;
   };
 };
 

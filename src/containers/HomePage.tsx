@@ -5,11 +5,14 @@ import * as actions from 'store/actions/tagsCloud';
 import SvgTagsCloud from 'components/SvgTagsCloud';
 import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
-import { PENDING, PRISTINE, SUCCESS } from 'constants/queryStatuses';
+import { QueryStatuses } from 'constants/queryStatuses';
 import { Checkbox } from 'ui/checkbox/Checkbox';
 
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
+import { TagDataT } from 'types/types';
+
+const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
 
 const mapStateToProps = (state: RootStateT) => {
   const { tagsCloud, useCanvas, fontLoaded, tagsData } = state;
@@ -17,7 +20,7 @@ const mapStateToProps = (state: RootStateT) => {
 };
 
 const mapDispatchToProps = (dispatch: AppDispatchT) => ({
-  buildTagsCloud(tagsData: NonNullable<RootStateT['tagsData']['data']>) {
+  buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
     dispatch(actions.buildTagsCloud(tagsData));
   },
   toggleUseCanvas() {
@@ -77,9 +80,7 @@ class HomePage extends Component<PropsT, StateT> {
 
     if (
       fontLoaded.status === SUCCESS &&
-      fontLoaded.data &&
       tagsData.status === SUCCESS &&
-      tagsData.data &&
       tagsCloud.status === PRISTINE
     ) {
       buildTagsCloud(tagsData.data);
@@ -109,8 +110,6 @@ class HomePage extends Component<PropsT, StateT> {
     if (
       fontLoaded.data &&
       tagsData.status === SUCCESS &&
-      tagsData.data &&
-      !tagsCloud.tagsPositions &&
       tagsCloud.status === PRISTINE
     ) {
       buildTagsCloud(tagsData.data);

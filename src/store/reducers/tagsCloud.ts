@@ -1,5 +1,5 @@
 import { RootStateT } from '../types';
-import { FAILURE, PENDING, PRISTINE, SUCCESS } from 'constants/queryStatuses';
+import { QueryStatuses } from 'constants/queryStatuses';
 import { AnyAction } from 'redux';
 import {
   BUILD_TAGS_CLOUD_FAILURE,
@@ -7,6 +7,8 @@ import {
   BUILD_TAGS_CLOUD_SUCCESS,
   RESET_TAGS_CLOUD,
 } from '../actions/actionTypes';
+
+const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
 
 export const tagsCloudReducer = (
   state: RootStateT['tagsCloud'] = { status: PRISTINE },

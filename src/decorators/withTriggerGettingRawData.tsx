@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import getDisplayName from 'react-display-name';
 import { useSelector, useDispatch } from 'react-redux';
 import * as actions from 'store/actions/tagsCloud';
-import { PENDING } from 'constants/queryStatuses';
+import { QueryStatuses } from 'constants/queryStatuses';
 
 import type { RootStateT } from 'store/types';
+
+const { PENDING } = QueryStatuses;
 
 function withTriggerGettingRawData<T>(
   WrappedComponent: React.ComponentType<T>,

@@ -4,9 +4,11 @@ import {
   FONT_LOAD_SUCCESS,
   FONT_LOAD_FAILURE,
 } from '../actions/actionTypes';
-import { PRISTINE, SUCCESS, FAILURE, PENDING } from 'constants/queryStatuses';
+import { QueryStatuses } from 'constants/queryStatuses';
 
 import type { RootStateT } from '../types';
+
+const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
 
 const fontLoaded = (
   state: RootStateT['fontLoaded'] = { status: PRISTINE, data: false },

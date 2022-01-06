@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { makeStyles } from '@material-ui/core';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
-import { PENDING, FAILURE, SUCCESS } from 'constants/queryStatuses';
+import { QueryStatuses } from 'constants/queryStatuses';
 
 import { TagDataT, ClassesT } from '../types/types';
 import { RootStateT } from '../store/types';
 import { connect, ConnectedProps } from 'react-redux';
+
+const { PENDING, FAILURE, SUCCESS } = QueryStatuses;
 
 const mapStateToProps = (state: RootStateT) => {
   const { tagsData } = state;
