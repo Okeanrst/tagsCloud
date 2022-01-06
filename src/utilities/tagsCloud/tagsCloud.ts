@@ -10,6 +10,7 @@ import {
 export type PrepareDataOptionsT = {
   minFontSize: number;
   maxFontSize: number;
+  maxSentimentScore: number;
 };
 
 export type BorderCoordinatesT = {
@@ -22,27 +23,20 @@ export type BorderCoordinatesT = {
 export type ViewBoxT = [number, number, number, number];
 
 export function prepareData(
-  data: ReadonlyArray<TagDataT>,
+  tagsData: ReadonlyArray<TagDataT>,
   options: PrepareDataOptionsT,
 ): ReadonlyArray<PreparedTagDataT> {
-  const { minFontSize, maxFontSize } = options;
-
-  let maxSentimentScore: number = -Infinity;
-
-  data.forEach(item => {
-    if (item.sentimentScore > maxSentimentScore) {
-      maxSentimentScore = item.sentimentScore;
-    }
-  });
+  const { minFontSize, maxFontSize, maxSentimentScore } = options;
 
   const fontSizeRation = minFontSize / maxFontSize;
   const minSentimentScoreThreshold = maxSentimentScore * fontSizeRation;
 
-  return data.map(item => {
-    const fontSize = item.sentimentScore <= minSentimentScoreThreshold ? minFontSize : Math.round(maxFontSize * item.sentimentScore / maxSentimentScore);
+  return tagsData.map(tagData => {
+    const { sentimentScore } = tagData;
+    const fontSize = sentimentScore <= minSentimentScoreThreshold ? minFontSize : Math.round(maxFontSize * sentimentScore / maxSentimentScore);
 
     return {
-      ...item,
+      ...tagData,
       fontSize,
       color: getRandomRGBColor(),
     };

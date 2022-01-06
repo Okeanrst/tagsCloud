@@ -10,6 +10,7 @@ import {
 } from 'constants/index';
 import { calcTagsPositions } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { prepareData } from 'utilities/tagsCloud/tagsCloud';
+import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
 import { prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { createAction } from './helpers';
 import validateTagsCloudRawData from './rawDataValidator';
@@ -47,10 +48,15 @@ const calcTagsPositionsOptions = {
   sceneMapResolution: SCENE_MAP_RESOLUTION,
 };
 
-export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
+export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT) => {
     dispatch(createAction(actionTypes.BUILD_TAGS_CLOUD_REQUEST));
-    const preparedData = prepareData(data, { minFontSize: DEFAULT_MIN_FONT_SIZE, maxFontSize: DEFAULT_MAX_FONT_SIZE });
+    const maxSentimentScore = getMaxSentimentScore(tagsData);
+    const preparedData = prepareData(tagsData, {
+      minFontSize: DEFAULT_MIN_FONT_SIZE,
+      maxFontSize: DEFAULT_MAX_FONT_SIZE,
+      maxSentimentScore
+    });
     return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
         return calcTagsPositions(preparedData, tagsRectAreasMaps, [], calcTagsPositionsOptions);
@@ -69,11 +75,17 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
   };
 }
 
-export function incrementallyBuildTagsCloud(data: ReadonlyArray<TagDataT>) {
+export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT, getState: () => RootStateT) => {
     // ?
     // dispatch(createAction(actionTypes.BUILD_TAGS_CLOUD_REQUEST));
-    const preparedData = prepareData(data, { minFontSize: DEFAULT_MIN_FONT_SIZE, maxFontSize: DEFAULT_MAX_FONT_SIZE });
+    // TODO
+    const maxSentimentScore = -Infinity;
+    const preparedData = prepareData(tagsData, {
+      minFontSize: DEFAULT_MIN_FONT_SIZE,
+      maxFontSize: DEFAULT_MAX_FONT_SIZE,
+      maxSentimentScore
+    });
     return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
         const sceneMap = getState().tagsCloud.sceneMap ?? [];
