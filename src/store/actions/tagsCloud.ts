@@ -36,7 +36,7 @@ export function getData() {
 
 export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT) => {
-    dispatch(createAction(actionTypes.BUILD_CLOUD_REQUEST));
+    dispatch(createAction(actionTypes.BUILD_TAGS_CLOUD_REQUEST));
     const preparedData = prepareData(data, { minFontSize: DEFAULT_MIN_FONT_SIZE, maxFontSize: DEFAULT_MAX_FONT_SIZE });
     return prepareRectAreasMaps(preparedData, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
@@ -56,13 +56,13 @@ export function buildTagsCloud(data: ReadonlyArray<TagDataT>) {
       .then(({ tagsPositions , sceneMapPositions }) => {
         dispatch(
           createAction(
-            actionTypes.BUILD_CLOUD_SUCCESS,
+            actionTypes.BUILD_TAGS_CLOUD_SUCCESS,
             { tagsPositions, sceneMap: sceneMapPositions },
           ),
         );
       })
       .catch(() => {
-        dispatch(createAction(actionTypes.BUILD_CLOUD_FAILURE));
+        dispatch(createAction(actionTypes.BUILD_TAGS_CLOUD_FAILURE));
       });
   };
 }
