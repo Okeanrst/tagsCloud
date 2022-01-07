@@ -5,7 +5,7 @@ import { ADD_RECT_AREAS_MAPS, DELETE_RECT_AREA_MAP } from '../actions/actionType
 export const rectAreasMapsDataReducer = (state: RootStateT['rectAreasMapsData'] = [], action: AnyAction) => {
   switch (action.type) {
     case ADD_RECT_AREAS_MAPS:
-      return [...state, ...action.payload];
+      return [...(new Map([...state, ...action.payload].map(map => ([map.key, map]))).values())];
     case DELETE_RECT_AREA_MAP:
       const keyToDelete = action.payload;
       return state.filter(item => item.key !== keyToDelete);

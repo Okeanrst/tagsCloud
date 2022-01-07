@@ -21,9 +21,21 @@ import { TagDataT } from 'types/types';
 import { AppDispatchT, RootStateT } from '../types';
 import { AnyAction } from 'redux';
 
+type GetStateT = () => RootStateT;
+
 function selectMaxSentimentScore(state: RootStateT) {
   return getMaxSentimentScore(state.tagsData?.data ?? []);
 }
+
+const filterPreparedTagsDataWithoutRectAreasMaps = (
+  preparedTagsData: ReturnType<typeof prepareTagsData>,
+  rectAreasMapsData: RootStateT['rectAreasMapsData'],
+) => {
+  const rectAreasMapsKeys = new Set(rectAreasMapsData.map(({ key }) => key));
+  return  preparedTagsData.filter(({ label, fontSize }) => {
+    return !rectAreasMapsKeys.has(formRectAreaMapKey(label, fontSize));
+  });
+};
 
 export function getData() {
   return (dispatch: AppDispatchT) => {
@@ -61,17 +73,19 @@ const calcTagsPositionsOptions = {
 };
 
 export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
-  return (dispatch: AppDispatchT) => {
+  return (dispatch: AppDispatchT, getState: GetStateT) => {
     dispatch(createAction(actionTypes.TAGS_CLOUD_BUILD_REQUEST));
     const maxSentimentScore = getMaxSentimentScore(tagsData);
     const preparedTagsData = prepareTagsData(tagsData, {
       ...preparedTagsDataOptions,
       maxSentimentScore
     });
-    return prepareRectAreasMaps(preparedTagsData, SCENE_MAP_RESOLUTION)
+    const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
+    return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
         dispatch(createAction(actionTypes.ADD_RECT_AREAS_MAPS, tagsRectAreasMaps));
-        return calcTagsPositions(preparedTagsData, tagsRectAreasMaps, [], calcTagsPositionsOptions);
+        const fullRectAreasMapsData = getState().rectAreasMapsData;
+        return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, [], calcTagsPositionsOptions);
       })
       .then(({ tagsPositions , sceneMapPositions }) => {
         dispatch(
@@ -88,7 +102,7 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
 }
 
 export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
-  return (dispatch: AppDispatchT, getState: () => RootStateT) => {
+  return (dispatch: AppDispatchT, getState: GetStateT) => {
     dispatch(createAction(actionTypes.INCREMENTAL_BUILD_TAGS_CLOUD_REQUEST));
 
     const maxSentimentScore = selectMaxSentimentScore(getState());
@@ -96,10 +110,7 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
       ...preparedTagsDataOptions,
       maxSentimentScore
     });
-    const rectAreasMapsKeys = new Set(getState().rectAreasMapsData.map(({ key }) => key));
-    const preparedTagsDataWithoutRectAreasMaps = preparedTagsData.filter(({ label, fontSize }) => {
-      return !rectAreasMapsKeys.has(formRectAreaMapKey(label, fontSize));
-    });
+    const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
     return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
         dispatch(createAction(actionTypes.ADD_RECT_AREAS_MAPS, tagsRectAreasMaps));
@@ -128,7 +139,7 @@ export function toggleUseCanvas() {
   return createAction(actionTypes.USE_CANVAS_TOGGLE);
 }
 
-const createRemoveTagAction = (targetId: string, getState: () => RootStateT): AnyAction | null => {
+const createRemoveTagAction = (targetId: string, getState: GetStateT): AnyAction | null => {
   const targetTagPosition = getState().tagsCloud.tagsPositions?.find(({ id }) => id === targetId);
   if (!targetTagPosition) {
     return null;
@@ -157,7 +168,7 @@ const createRemoveTagAction = (targetId: string, getState: () => RootStateT): An
 };
 
 export function deleteDataItem(targetId: string) {
-  return (dispatch: AppDispatchT, getState: () => RootStateT) => {
+  return (dispatch: AppDispatchT, getState: GetStateT) => {
     const targetTagDataItem = selectTargetTagDataItem(getState(), targetId);
 
     dispatch(createAction(actionTypes.INCREMENTAL_BUILD_REMOVE_TAG_ID, targetId));
@@ -183,7 +194,7 @@ export function deleteDataItem(targetId: string) {
 }
 
 export function editDataItem(tagData: TagDataT) {
-  return (dispatch: AppDispatchT, getState: () => RootStateT) => {
+  return (dispatch: AppDispatchT, getState: GetStateT) => {
     const currentTagDataItem = selectTargetTagDataItem(getState(), tagData.id);
     if (!currentTagDataItem) {
       return;
@@ -209,7 +220,7 @@ export function editDataItem(tagData: TagDataT) {
 }
 
 export function addDataItem(data: Omit<TagDataT, 'id'>) {
-  return (dispatch: AppDispatchT, getState: () => RootStateT) => {
+  return (dispatch: AppDispatchT, getState: GetStateT) => {
     const maxSentimentScore = selectMaxSentimentScore(getState());
     const shouldResetTagsCloud = maxSentimentScore < data.sentimentScore;
 
