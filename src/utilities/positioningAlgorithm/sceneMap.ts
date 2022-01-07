@@ -59,7 +59,7 @@ export class SceneMap {
     if (!positions.length) {
       return;
     }
-    this.bulkUpdate(positions);
+    this.bulkOccupyPosition(positions);
     this.calcSceneEdges();
   }
 
@@ -164,28 +164,31 @@ export class SceneMap {
     this.sceneMap[quarter][row][col] = val;
   }
 
-  setDataAtPosition(x: number, y: number, val: boolean = true): void {
+  occupyPosition(x: number, y: number): void {
     if (x === 0 || y === 0) {
-      throw new Error('setDataAtPosition error: x === 0 || y === 0');
+      throw new Error('occupyPosition error: x === 0 || y === 0');
     }
     if (this.getDataAtPosition(x, y)) {
       throw new IntersectionError(
         `The position (x: ${x}, y: ${y}) is occupied`,
       );
     }
-    this._setDataAtPosition(x, y, val);
+    this._setDataAtPosition(x, y, true);
     this.isSceneSizeFresh = false;
   }
 
-  bulkUpdate(positionsToUpdate: PositionT[]) {
+  bulkOccupyPosition(positionsToUpdate: PositionT[]) {
     const affectedPositions: [number, number][] = [];
+    const initIsSceneSizeFresh = this.isSceneSizeFresh;
+    let isSceneSizeFresh = false;
     const recoverClosedVacanciesState = () => {
       affectedPositions.forEach(position => this.releasePosition(...position));
+      isSceneSizeFresh = initIsSceneSizeFresh;
     };
 
-    positionsToUpdate.forEach(([col, row, value = true]) => {
+    positionsToUpdate.forEach(([col, row]) => {
       try {
-        this.setDataAtPosition(col, row, value);
+        this.occupyPosition(col, row);
         affectedPositions.push([col, row]);
       } catch (err) {
         if (err instanceof IntersectionError) {
@@ -194,11 +197,12 @@ export class SceneMap {
         throw err;
       }
     });
-    this.isSceneSizeFresh = false;
+    this.isSceneSizeFresh = isSceneSizeFresh;
   }
 
   releasePosition(x: number, y: number): void {
     this._setDataAtPosition(x, y, false);
+    this.isSceneSizeFresh = false;
   }
 
   getDataAtPosition(x: number, y: number): boolean | void {

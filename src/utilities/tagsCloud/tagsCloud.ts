@@ -22,7 +22,7 @@ export type BorderCoordinatesT = {
 
 export type ViewBoxT = [number, number, number, number];
 
-export function prepareData(
+export function prepareTagsData(
   tagsData: ReadonlyArray<TagDataT>,
   options: PrepareDataOptionsT,
 ): ReadonlyArray<PreparedTagDataT> {

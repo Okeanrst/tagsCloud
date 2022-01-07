@@ -2,7 +2,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { Action } from 'redux';
 import { QueryStatuses } from 'constants/queryStatuses';
 
-import type { PositionedTagRectT, TagDataT } from 'types/types';
+import type { PositionedTagRectT, TagDataT, IdRectAreaMapT } from 'types/types';
 
 export type RootStateT = {
   tagsData: {
@@ -25,6 +25,11 @@ export type RootStateT = {
   fontLoaded: {
     data: boolean;
     status: QueryStatuses;
+  };
+  rectAreasMapsData: ReadonlyArray<IdRectAreaMapT>;
+  incrementalBuild: {
+    status: QueryStatuses;
+    tagsIds: string[];
   };
 };
 

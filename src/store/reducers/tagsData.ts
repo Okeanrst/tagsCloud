@@ -12,6 +12,10 @@ import {
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
 
+export const selectTargetTagDataItem = (state: RootStateT, targetId: string) => {
+  return (state.tagsData?.data ?? []).find(({ id }) => id === targetId);
+};
+
 export const tagsDataReducer = (
   state: RootStateT['tagsData'] = { status: PRISTINE, data: null },
   action: AnyAction,

@@ -83,7 +83,7 @@ export class TagForm extends Component<PropsT, StateT> {
     const {
       values: { label, volume, type, sentimentScore },
     } = this.state;
-    onSubmit({ id, label, volume, type, sentimentScore });
+    onSubmit({ id, label, volume: Number(volume), type, sentimentScore: Number(sentimentScore) });
   };
 
   render() {

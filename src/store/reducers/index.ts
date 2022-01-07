@@ -2,7 +2,9 @@ import { combineReducers, AnyAction } from 'redux';
 import { USE_CANVAS_TOGGLE } from '../actions/actionTypes';
 import { tagsDataReducer } from './tagsData';
 import { tagsCloudReducer } from './tagsCloud';
+import { incrementalBuildReducer } from './incrementalBuild';
 import fontLoaded from './fontLoaded';
+import { rectAreasMapsDataReducer } from './rectAreasMapsData';
 
 import type { RootStateT } from '../types';
 
@@ -19,4 +21,6 @@ export default combineReducers({
   tagsCloud: tagsCloudReducer,
   useCanvas: useCanvasReducer,
   fontLoaded,
+  rectAreasMapsData: rectAreasMapsDataReducer,
+  incrementalBuild: incrementalBuildReducer,
 });

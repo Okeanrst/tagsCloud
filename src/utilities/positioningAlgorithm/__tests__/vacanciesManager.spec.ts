@@ -18,7 +18,7 @@ describe('VacanciesManager tests', () => {
     expect(vacanciesManager.leftEdgeVacancies).toStrictEqual([]);
   });
   it('correct vacancies for one rect laid at sceneMap', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [1, 1, true],
       [2, 1, true],
       [1, 2, true],
@@ -33,7 +33,7 @@ describe('VacanciesManager tests', () => {
     expect(vacanciesManager.leftEdgeVacancies).toStrictEqual([]);
   });
   it('correct vacancies for one rect laid at sceneMap', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [1, 1, true], [2, 1, true], [3, 1, true],
       [1, 2, true], [3, 2, true],
       [1, 3, true], [2, 3, true], [3, 3, true],
@@ -58,7 +58,7 @@ describe('VacanciesManager tests', () => {
     expect(vacanciesManager.leftEdgeVacancies).toStrictEqual([]);
   });
   it('correct vacancies in the top right conner of the sceneMap', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [1, 1, true],
       [2, 1, true],
       [1, 2, true],
@@ -86,7 +86,7 @@ describe('VacanciesManager tests', () => {
     expect(vacanciesManager.leftEdgeVacancies).toStrictEqual([]);
   });
   it('correct vacancies in the bottom right conner of the sceneMap', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [1, -1, true],
       [2, -1, true],
       [1, -2, true],
@@ -114,7 +114,7 @@ describe('VacanciesManager tests', () => {
     expect(vacanciesManager.leftEdgeVacancies).toStrictEqual([]);
   });
   it('correct vacancies in the bottom left conner of the sceneMap', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [-1, -1, true],
       [-2, -1, true],
       [-1, -2, true],
@@ -142,7 +142,7 @@ describe('VacanciesManager tests', () => {
     ]);
   });
   it('correct vacancies in the top left conner of the sceneMap', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [-1, 1, true],
       [-2, 1, true],
       [-1, 2, true],
@@ -170,7 +170,7 @@ describe('VacanciesManager tests', () => {
     ]);
   });
   it('correct vacancy at 1, 1 position of the sceneMap', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [2, 1, true],
       [1, 2, true],
       [2, 2, true],
@@ -198,7 +198,7 @@ describe('VacanciesManager tests', () => {
     ]);
   });
   it('two closed vacancies, test removeClosedVacancy', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [-1, -1, true], [1, -1, true], [2, -1, true], [3, -1, true], [4, -1, true],
       [-1, 1, true], [4, 1, true],
       [-1, 2, true], [3, 2, true], [4, 2, true],
@@ -258,7 +258,7 @@ describe('VacanciesManager tests', () => {
     }).toThrowError(/^vacancy index [\d]+ does not exist$/);
   });
   it('should return correct vacancies for sceneMap 1', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
       [1, 2, true], [2, 2, true], [3, 2, true], [6, 2, true],
       [1, 3, true], [2, 3, true], [6, 3, true],
@@ -283,7 +283,7 @@ describe('VacanciesManager tests', () => {
     }).toMatchSnapshot();
   });
   it('should return correct vacancies for sceneMap 2', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
       [1, 2, true], [2, 2, true], [3, 2, true], [6, 2, true],
       [1, 3, true], [2, 3, true], [6, 3, true],
@@ -308,7 +308,7 @@ describe('VacanciesManager tests', () => {
     }).toMatchSnapshot();
   });
   it('should return correct vacancies for sceneMap 3', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
       [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true], [6, 2, true],
       [1, 3, true], [2, 3, true], [6, 3, true],
@@ -333,7 +333,7 @@ describe('VacanciesManager tests', () => {
     }).toMatchSnapshot();
   });
   it('should return correct vacancies for sceneMap 4', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [1, -1, true], [6, -1, true],
       [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
       [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true], [6, 2, true],
@@ -359,7 +359,7 @@ describe('VacanciesManager tests', () => {
     }).toMatchSnapshot();
   });
   it('should return correct vacancies for sceneMap 5', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [-1, 1, true], [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true],
       [-1, 2, true], [5, 2, true],
       [-1, 3, true], [2, 3, true],
@@ -384,7 +384,7 @@ describe('VacanciesManager tests', () => {
     }).toMatchSnapshot();
   });
   it('should return correct vacancies for sceneMap 6', () => {
-    sceneMap.bulkUpdate([
+    sceneMap.bulkOccupyPosition([
       [-2, 2, true], [-1, 2, true], [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true],
       [-2, 1, true], [4, 1, true],
       [-2, -1, true], [-1, -1, true], [4, -1, true],

@@ -1,4 +1,4 @@
-import { prepareData } from 'utilities/tagsCloud/tagsCloud';
+import { prepareTagsData } from 'utilities/tagsCloud/tagsCloud';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
 import { calcTagsPositions } from '../calcTagsPositions';
@@ -29,7 +29,7 @@ describe('positioningAlgorithm tests', () => {
   describe('prepareData tests', () => {
     it(`should return correct result`, () => {
       const maxSentimentScore = getMaxSentimentScore(entryData);
-      expect(prepareData(entryData, {minFontSize: 6, maxFontSize: 36, maxSentimentScore})).toMatchSnapshot();
+      expect(prepareTagsData(entryData, {minFontSize: 6, maxFontSize: 36, maxSentimentScore})).toMatchSnapshot();
     });
   });
 

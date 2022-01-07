@@ -66,6 +66,100 @@ type PerformWorkT = (
   },
 ) => { status: true; isRotated: boolean } | { status: false };
 
+export const mapRectAreaMapOnRectPosition = (
+  rectPosition: RectPositionT,
+  rectAreaMap: TwoDimensionalMapT,
+  isRectAreaRotated: boolean,
+) => {
+  const mappedPositions: [number, number, any][] = [];
+  const rectArea = getRectAreaOfRectMap(rectAreaMap);
+
+  const logDebugInformation = (mainInformation: string[] = []) => {
+    if (['production', 'test'].includes(process.env.NODE_ENV)) {
+      return;
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('updateSceneMap --------start');
+    mainInformation.forEach(information => {
+      // eslint-disable-next-line no-console
+      console.log(information);
+    });
+    // eslint-disable-next-line no-console
+    console.log('rectPosition:', rectPosition);
+    // eslint-disable-next-line no-console
+    console.log('rectAreaMap:', rectAreaMap);
+    // eslint-disable-next-line no-console
+    console.log('rectArea:', rectArea);
+    // eslint-disable-next-line no-console
+    console.log('isRectAreaRotated:', isRectAreaRotated);
+    // eslint-disable-next-line no-console
+    console.log('updateSceneMap --------end');
+  };
+
+  const getDataAtPosition = (row: number, column: number) => {
+    if (
+      !Array.isArray(rectAreaMap[row])
+    ) {
+      logDebugInformation([
+        'getDataAtPosition invariant: try to access rectAreaMap at row is out of range',
+        `row: ${row}`,
+      ]);
+      throw new Error('Try to access rectAreaMap at row is out of range');
+    }
+    if (
+      Array.isArray(rectAreaMap[row]) &&
+      rectAreaMap[row].length <= column
+    ) {
+      logDebugInformation([
+        'getDataAtPosition invariant: try to access rectAreaMap at row is out of range',
+        `row: ${row}, column: ${column}`,
+      ]);
+      throw new Error('Try to access rectAreaMap at row is out of range');
+    }
+    return rectAreaMap[row] && rectAreaMap[row][column];
+  };
+
+  const { top, right, bottom, left } = rectPosition;
+
+  let innerRow = 0;
+  let lastInnerRowPlusOne = 0;
+  let lastInnerColPlusOne = 0;
+  for (let row = top; row >= bottom; row--) {
+    if (row === 0) {
+      continue;
+    }
+    let innerCol = 0;
+    for (let col = left; col <= right; col++) {
+      if (col === 0) {
+        continue;
+      }
+
+      const rectAreaMapValue = isRectAreaRotated
+        ? getDataAtPosition(rectArea.rows - 1 - innerCol, innerRow)
+        : getDataAtPosition(innerRow, innerCol);
+
+      mappedPositions.push([col, row, rectAreaMapValue]);
+      innerCol++;
+      lastInnerColPlusOne = innerCol;
+    }
+    innerRow++;
+    lastInnerRowPlusOne = innerRow;
+  }
+
+  if (
+    ((!isRectAreaRotated &&
+        Array.isArray(rectAreaMap[lastInnerRowPlusOne])) ||
+      (isRectAreaRotated &&
+        Array.isArray(
+          rectAreaMap[rectArea.rows - 1 - lastInnerColPlusOne],
+        )))
+  ) {
+    logDebugInformation(['Not all rectAreaMap rows is used']);
+  }
+  return mappedPositions;
+};
+
 function creatRawPositionedTagRect(
   rect: TagRectT,
   { top, right, bottom, left }: RectPositionT,
@@ -125,6 +219,8 @@ export function calcTagsPositions(
       tagsRectAreasMaps.map(({ key, map, mapMeta }) => [key, { map, mapMeta }]),
     );
 
+    const isFromScratch = !sceneMapPositions.length;
+
     try {
       const {
         pickingClosedVacancyStrategy = DESC,
@@ -156,7 +252,11 @@ export function calcTagsPositions(
       const vacanciesManager = new VacanciesManager(sceneMap, {
         sortingEdgeVacanciesStrategy,
         sortingClosedVacanciesStrategy,
+        shouldCreateVacancyIfNoSuchKind: 0 < (options?.addIfEmptyIndex ?? 5),
       });
+      if (!isFromScratch) {
+        vacanciesManager.buildVacanciesMap();
+      }
       const edgesManager = new EdgesManager();
 
       const positionedRectsData: RawPositionedTagRectT[] = [];
@@ -608,106 +708,9 @@ export function calcTagsPositions(
         rectAreaMap: TwoDimensionalMapT,
         isRectAreaRotated: boolean,
       ) => {
-        const positionsToUpdate: [number, number, any][] = [];
+        const mappedPositions = mapRectAreaMapOnRectPosition(rectPosition, rectAreaMap, isRectAreaRotated);
 
-        const rectArea = getRectAreaOfRectMap(rectAreaMap);
-
-        const logDebugInformation = (mainInformation: string[] = []) => {
-          if (['production', 'test'].includes(process.env.NODE_ENV)) {
-            return;
-          }
-
-          // eslint-disable-next-line no-console
-          console.log('updateSceneMap --------start');
-          mainInformation.forEach(information => {
-            // eslint-disable-next-line no-console
-            console.log(information);
-          });
-          // eslint-disable-next-line no-console
-          console.log('rectPosition:', rectPosition);
-          // eslint-disable-next-line no-console
-          console.log('rectAreaMap:', rectAreaMap);
-          // eslint-disable-next-line no-console
-          console.log('rectArea:', rectArea);
-          // eslint-disable-next-line no-console
-          console.log('isRectAreaRotated:', isRectAreaRotated);
-          // eslint-disable-next-line no-console
-          console.log('updateSceneMap --------end');
-        };
-
-        const getDataAtPosition = (row: number, column: number) => {
-          if (
-            !Array.isArray(rectAreaMap[row])
-          ) {
-            logDebugInformation([
-              'getDataAtPosition invariant: try to access rectAreaMap at row is out of range',
-              `row: ${row}`,
-            ]);
-            throw new Error('Try to access rectAreaMap at row is out of range');
-          }
-          if (
-            Array.isArray(rectAreaMap[row]) &&
-            rectAreaMap[row].length <= column
-          ) {
-            logDebugInformation([
-              'getDataAtPosition invariant: try to access rectAreaMap at row is out of range',
-              `row: ${row}, column: ${column}`,
-            ]);
-            throw new Error('Try to access rectAreaMap at row is out of range');
-          }
-          return rectAreaMap[row] && rectAreaMap[row][column];
-        };
-
-        try {
-          const { top, right, bottom, left } = rectPosition;
-
-          let innerRow = 0;
-          let lastInnerRowPlusOne = 0;
-          let lastInnerColPlusOne = 0;
-          for (let row = top; row >= bottom; row--) {
-            if (row === 0) {
-              continue;
-            }
-            let innerCol = 0;
-            for (let col = left; col <= right; col++) {
-              if (col === 0) {
-                continue;
-              }
-
-              const rectAreaMapValue = isRectAreaRotated
-                ? getDataAtPosition(rectArea.rows - 1 - innerCol, innerRow)
-                : getDataAtPosition(innerRow, innerCol);
-
-              if (rectAreaMapValue) {
-                positionsToUpdate.push([col, row, true]);
-              }
-              innerCol++;
-              lastInnerColPlusOne = innerCol;
-            }
-            innerRow++;
-            lastInnerRowPlusOne = innerRow;
-          }
-
-          if (
-            ((!isRectAreaRotated &&
-              Array.isArray(rectAreaMap[lastInnerRowPlusOne])) ||
-              (isRectAreaRotated &&
-                Array.isArray(
-                  rectAreaMap[rectArea.rows - 1 - lastInnerColPlusOne],
-                )))
-          ) {
-            logDebugInformation(['Not all rectAreaMap rows is used']);
-          }
-        } catch (err) {
-          if (
-            err instanceof IntersectionError
-          ) {
-            logDebugInformation([`IntersectionError: ${err.message}`]);
-          }
-          throw err;
-        }
-
-        sceneMap.bulkUpdate(positionsToUpdate);
+        sceneMap.bulkOccupyPosition(mappedPositions.filter(([,, value]) => value));
 
         vacanciesManager.needVacanciesRebuild = true;
 
@@ -815,7 +818,7 @@ export function calcTagsPositions(
           ? rotateRectArea(getRectAreaOfRectMap(rectAreaMap))
           : getRectAreaOfRectMap(rectAreaMap);
 
-        if (index === 0) {
+        if (index === 0 && isFromScratch) {
           const { rows, cols } = rectArea;
 
           const top = Math.ceil(rows / 2);
