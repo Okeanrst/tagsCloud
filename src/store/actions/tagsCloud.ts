@@ -37,6 +37,19 @@ const filterPreparedTagsDataWithoutRectAreasMaps = (
   });
 };
 
+const findUnusedRectAreasMapsKeys = (state: RootStateT) => {
+  const usedKeys = new Set(state.tagsCloud?.tagsPositions?.map(({ label, fontSize }) => {
+    return formRectAreaMapKey(label, fontSize);
+  }) ?? []);
+  const unusedKeys: string[] = [];
+  state.rectAreasMapsData.forEach(({ key }) => {
+    if (!usedKeys.has(key)) {
+      unusedKeys.push(key);
+    }
+  });
+  return unusedKeys;
+};
+
 export function getData() {
   return (dispatch: AppDispatchT) => {
     dispatch(createAction(actionTypes.FETCH_DATA_REQUEST));
@@ -83,7 +96,7 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
     const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
     return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
-        dispatch(createAction(actionTypes.ADD_RECT_AREAS_MAPS, tagsRectAreasMaps));
+        dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, [], calcTagsPositionsOptions);
       })
@@ -94,6 +107,7 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
             { tagsPositions, sceneMap: sceneMapPositions },
           ),
         );
+        dispatch(createAction(actionTypes.RECT_AREAS_MAPS_REMOVE_MAPS, findUnusedRectAreasMapsKeys(getState())));
       })
       .catch(() => {
         dispatch(createAction(actionTypes.TAGS_CLOUD_BUILD_FAILURE));
@@ -113,7 +127,7 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
     const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
     return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
-        dispatch(createAction(actionTypes.ADD_RECT_AREAS_MAPS, tagsRectAreasMaps));
+        dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         const sceneMap = getState().tagsCloud.sceneMap ?? [];
         return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, sceneMap, {

@@ -1,14 +1,14 @@
 import { RootStateT } from '../types';
 import { AnyAction } from 'redux';
-import { ADD_RECT_AREAS_MAPS, DELETE_RECT_AREA_MAP } from '../actions/actionTypes';
+import { RECT_AREAS_MAPS_ADD_MAPS, RECT_AREAS_MAPS_REMOVE_MAPS } from '../actions/actionTypes';
 
 export const rectAreasMapsDataReducer = (state: RootStateT['rectAreasMapsData'] = [], action: AnyAction) => {
   switch (action.type) {
-    case ADD_RECT_AREAS_MAPS:
+    case RECT_AREAS_MAPS_ADD_MAPS:
       return [...(new Map([...state, ...action.payload].map(map => ([map.key, map]))).values())];
-    case DELETE_RECT_AREA_MAP:
-      const keyToDelete = action.payload;
-      return state.filter(item => item.key !== keyToDelete);
+    case RECT_AREAS_MAPS_REMOVE_MAPS:
+      const unusedKeys = new Set(action.payload);
+      return state.filter(item => !unusedKeys.has(item.key));
     default:
       return state;
   }
