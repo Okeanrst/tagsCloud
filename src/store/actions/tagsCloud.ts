@@ -103,8 +103,8 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
     return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, SCENE_MAP_RESOLUTION)
       .then(tagsRectAreasMaps => {
         dispatch(createAction(actionTypes.ADD_RECT_AREAS_MAPS, tagsRectAreasMaps));
-        const sceneMap = getState().tagsCloud.sceneMap ?? [];
         const fullRectAreasMapsData = getState().rectAreasMapsData;
+        const sceneMap = getState().tagsCloud.sceneMap ?? [];
         return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, sceneMap, {
           ...calcTagsPositionsOptions,
           addIfEmptyIndex: calcTagsPositionsOptions.addIfEmptyIndex - (getState().tagsCloud.tagsPositions?.length ?? 0),
@@ -193,8 +193,7 @@ export function editDataItem(tagData: TagDataT) {
     let shouldResetTagsCloud = currentMaxSentimentScore < tagData.sentimentScore;
     dispatch(createAction(actionTypes.EDIT_DATA_ITEM, tagData));
 
-    shouldResetTagsCloud = shouldResetTagsCloud
-      || (currentMaxSentimentScore === tagData.sentimentScore && selectMaxSentimentScore(getState()) !== currentMaxSentimentScore);
+    shouldResetTagsCloud = shouldResetTagsCloud || selectMaxSentimentScore(getState()) !== currentMaxSentimentScore;
 
     if (shouldResetTagsCloud) {
       dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
