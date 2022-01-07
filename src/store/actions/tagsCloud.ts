@@ -100,11 +100,11 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, [], calcTagsPositionsOptions);
       })
-      .then(({ tagsPositions , sceneMapPositions }) => {
+      .then(({ tagsPositions , sceneMapPositions, vacancies }) => {
         dispatch(
           createAction(
             actionTypes.TAGS_CLOUD_BUILD_SUCCESS,
-            { tagsPositions, sceneMap: sceneMapPositions },
+            { tagsPositions, sceneMap: sceneMapPositions, vacancies },
           ),
         );
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_REMOVE_MAPS, findUnusedRectAreasMapsKeys(getState())));
@@ -135,11 +135,11 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
           addIfEmptyIndex: calcTagsPositionsOptions.addIfEmptyIndex - (getState().tagsCloud.tagsPositions?.length ?? 0),
         });
       })
-      .then(({ tagsPositions , sceneMapPositions }) => {
+      .then(({ tagsPositions , sceneMapPositions, vacancies }) => {
         dispatch(
           createAction(
             actionTypes.INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS,
-            { tagsPositions, sceneMap: sceneMapPositions },
+            { tagsPositions, sceneMap: sceneMapPositions, vacancies },
           ),
         );
       })

@@ -213,7 +213,17 @@ export function calcTagsPositions(
   tagsRectAreasMaps: ReadonlyArray<IdRectAreaMapT>,
   sceneMapPositions: PositionT[],
   options: Options,
-): Promise<{ tagsPositions: PositionedTagRectT[]; sceneMapPositions: PositionT[] }> {
+): Promise<{
+  tagsPositions: PositionedTagRectT[];
+  sceneMapPositions: PositionT[];
+  vacancies: {
+    closedVacancies: ClosedVacancyT[];
+    topEdgeVacancies: PreparedTopEdgeVacancyT[];
+    bottomEdgeVacancies: PreparedBottomEdgeVacancyT[];
+    leftEdgeVacancies: PreparedLeftEdgeVacancyT[];
+    rightEdgeVacancies: PreparedRightEdgeVacancyT[];
+  };
+}> {
   return new Promise((resolve, reject) => {
     const rectAreaMapByKey = new Map(
       tagsRectAreasMaps.map(({ key, map, mapMeta }) => [key, { map, mapMeta }]),
@@ -996,9 +1006,22 @@ export function calcTagsPositions(
           });
         });
 
+        if (vacanciesManager.needVacanciesRebuild) {
+          vacanciesManager.buildVacanciesMap();
+        }
+
+        const vacancies = {
+          closedVacancies: vacanciesManager.closedVacancies.filter(v => !!v) as ClosedVacancyT[],
+          topEdgeVacancies: vacanciesManager.topEdgeVacancies,
+          bottomEdgeVacancies: vacanciesManager.bottomEdgeVacancies,
+          leftEdgeVacancies: vacanciesManager.leftEdgeVacancies,
+          rightEdgeVacancies: vacanciesManager.rightEdgeVacancies,
+        };
+
         resolve({
           tagsPositions: positionedRectsData as PositionedTagRectT[],
           sceneMapPositions: sceneMap.toPositions(),
+          vacancies,
         });
       };
 
