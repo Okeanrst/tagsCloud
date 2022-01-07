@@ -29,6 +29,9 @@ const mapDispatchToProps = (dispatch: AppDispatchT) => ({
   incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
     dispatch(actions.incrementallyBuildTagsCloud(tagsData));
   },
+  triggerRebuild() {
+    dispatch(actions.resetTagsCloud());
+  }
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -67,8 +70,17 @@ const styles: { [key: string]: React.CSSProperties } = {
   controls: {
     position: 'absolute',
     top: '20px',
-    zIndex: 3,
+    zIndex: 5,
   },
+  rebuildButtonContainer: {
+    justifyContent: 'center',
+    display: 'flex',
+    position: 'absolute',
+    top: '20px',
+    left: '50%',
+    right: '50%',
+    zIndex: 3,
+  }
 };
 
 const getTagsDataByTagsIds = (tagsIds: string[], tagsData: ReadonlyArray<TagDataT>) => {
@@ -177,9 +189,20 @@ class HomePage extends Component<PropsT, StateT> {
     </div>
   );
 
+  renderRebuildButton = (onClick: () => void, disabled: boolean) => (
+    <div style={styles.rebuildButtonContainer}>
+      <button
+        disabled={disabled}
+        onClick={onClick}
+      >
+        Rebuild
+      </button>
+    </div>
+  );
+
   render() {
     const { tagsCloudSceneSize } = this.state;
-    const { useCanvas, tagsData, tagsCloud, toggleUseCanvas, fontLoaded, incrementalBuild } =
+    const { useCanvas, tagsData, tagsCloud, toggleUseCanvas, fontLoaded, incrementalBuild, triggerRebuild } =
       this.props;
     const loading = [
       tagsData.status,
@@ -192,6 +215,7 @@ class HomePage extends Component<PropsT, StateT> {
     return (
       <div style={styles.pageContainer}>
         {this.renderLoader(loading)}
+        {this.renderRebuildButton(triggerRebuild, loading)}
         <div style={styles.controls}>
           <Checkbox
             checked={useCanvas}

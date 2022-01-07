@@ -247,3 +247,7 @@ export function addDataItem(data: Omit<TagDataT, 'id'>) {
     }
   };
 }
+
+export function resetTagsCloud() {
+  return createAction(actionTypes.RESET_TAGS_CLOUD);
+}
