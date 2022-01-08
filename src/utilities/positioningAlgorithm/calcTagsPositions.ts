@@ -66,7 +66,7 @@ type PerformWorkT = (
   },
 ) => { status: true; isRotated: boolean } | { status: false };
 
-export const mapRectAreaMapOnRectPosition = (
+const mapRectAreaMapOnRectPosition = (
   rectPosition: RectPositionT,
   rectAreaMap: TwoDimensionalMapT,
   isRectAreaRotated: boolean,
@@ -158,6 +158,24 @@ export const mapRectAreaMapOnRectPosition = (
     logDebugInformation(['Not all rectAreaMap rows is used']);
   }
   return mappedPositions;
+};
+
+export const releaseRectAreaPositionsOnSceneMap = (
+  sceneMapPositions: PositionT[],
+  targetTagPosition: PositionedTagRectT,
+  rectAreaMap: TwoDimensionalMapT,
+) => {
+  const sceneMap = new SceneMap(sceneMapPositions);
+
+  const mappedPositions = mapRectAreaMapOnRectPosition(targetTagPosition, rectAreaMap, targetTagPosition.rotate);
+
+  mappedPositions.forEach((mappedPosition) => {
+    if (mappedPosition[2]) {
+      const [x, y] = mappedPosition;
+      sceneMap.releasePosition(x, y);
+    }
+  });
+  return sceneMap.toPositions();
 };
 
 function creatRawPositionedTagRect(

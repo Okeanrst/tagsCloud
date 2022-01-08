@@ -8,8 +8,7 @@ import {
   DEFAULT_MIN_FONT_SIZE,
   DEFAULT_MAX_FONT_SIZE,
 } from 'constants/index';
-import { calcTagsPositions, mapRectAreaMapOnRectPosition } from 'utilities/positioningAlgorithm/calcTagsPositions';
-import { SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
+import { calcTagsPositions, releaseRectAreaPositionsOnSceneMap } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { prepareTagsData } from 'utilities/tagsCloud/tagsCloud';
 import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
@@ -168,17 +167,10 @@ const createRemoveTagAction = (targetId: string, getState: GetStateT): AnyAction
   if (!sceneMapPositions || !sceneMapPositions.length) {
     return null;
   }
-  const sceneMap = new SceneMap(sceneMapPositions);
 
-  const mappedPositions = mapRectAreaMapOnRectPosition(targetTagPosition, rectAreaMap.map, targetTagPosition.rotate);
+  const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, targetTagPosition, rectAreaMap.map);
 
-  mappedPositions.forEach((mappedPosition) => {
-    if (mappedPosition[2]) {
-      const [x, y] = mappedPosition;
-      sceneMap.releasePosition(x, y);
-    }
-  });
-  return createAction(actionTypes.TAGS_CLOUD_REMOVE_TAG, { tagId: targetId, sceneMap: sceneMap.toPositions() });
+  return createAction(actionTypes.TAGS_CLOUD_REMOVE_TAG, { tagId: targetId, sceneMap });
 };
 
 export function deleteDataItem(targetId: string) {
