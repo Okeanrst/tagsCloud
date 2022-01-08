@@ -201,6 +201,93 @@ function isVacancyLargeEnoughToFitRect(
   return rectArea.rows <= vacancy.rows && rectArea.cols <= vacancy.cols;
 }
 
+const pickClosedVacancy = (
+  rectArea: RectAreaT,
+  vacancies: (ClosedVacancyT | void)[],
+  { pickingStrategy }: {pickingStrategy: PickingStrategies}
+): { rectPosition: RectPositionT, vacancyIndex: number } | void => {
+  const loopParams = {
+    [ASC]: {
+      from: 0,
+      condition: (i: number) => i < vacancies.length,
+      diff: 1,
+    },
+    [DESC]: {
+      from: vacancies.length - 1,
+      condition: (i: number) => i >= 0,
+      diff: -1,
+    },
+  };
+  const { from, condition, diff } =
+    loopParams[pickingStrategy];
+
+  let suitableVacancy;
+  let vacancyIndex: number = -1;
+  for (let i = from; condition(i); i += diff) {
+    const possiblySuitableVacancy = vacancies[i];
+    if (
+      possiblySuitableVacancy &&
+      isVacancyLargeEnoughToFitRect(rectArea, possiblySuitableVacancy)
+    ) {
+      suitableVacancy = vacancies[i];
+      vacancyIndex = i;
+      break;
+    }
+  }
+
+  if (vacancyIndex === -1 || !suitableVacancy) {
+    return;
+  }
+
+  const countPositionsFroward = SceneMap.countPositionsFroward;
+  const countPositionsBackwards = SceneMap.countPositionsBackwards;
+
+  // vacancy square to rectArea square ratio limit to put at the center of a vacancy
+  const SQUARE_RATION_LIMIT = 1.9;
+
+  let left: number;
+  let right: number;
+  let top: number;
+  let bottom: number;
+
+  const rectAreaSquare = rectArea.rows * rectArea.cols;
+
+  if (suitableVacancy.square / rectAreaSquare > SQUARE_RATION_LIMIT) {
+    // from edge
+    if (
+      Math.abs(suitableVacancy.right) > Math.abs(suitableVacancy.left)
+    ) {
+      left = suitableVacancy.left;
+      right = countPositionsFroward(suitableVacancy.left, rectArea.cols);
+    } else {
+      right = suitableVacancy.right;
+      left = countPositionsBackwards(right, rectArea.cols);
+    }
+    if (
+      Math.abs(suitableVacancy.bottom) > Math.abs(suitableVacancy.top)
+    ) {
+      top = suitableVacancy.top;
+      bottom = countPositionsBackwards(top, rectArea.rows);
+    } else {
+      bottom = suitableVacancy.bottom;
+      top = countPositionsFroward(bottom, rectArea.rows);
+    }
+  } else {
+    // center
+    const rowsDiffHalf = Math.round(
+      (suitableVacancy.rows - rectArea.rows) / 2,
+    );
+    const colsDiffHalf = Math.round(
+      (suitableVacancy.cols - rectArea.cols) / 2,
+    );
+    top = SceneMap.changePosition(suitableVacancy.top, -rowsDiffHalf);
+    right = SceneMap.changePosition(suitableVacancy.right, -colsDiffHalf);
+    bottom = countPositionsBackwards(top, rectArea.rows);
+    left = countPositionsBackwards(right, rectArea.cols);
+  }
+  return { rectPosition: { top, bottom, right, left }, vacancyIndex };
+};
+
 function createWorkGenerator(
   rectsData: ReadonlyArray<TagRectT>,
   performWork: PerformWorkT,
@@ -288,92 +375,6 @@ export function calcTagsPositions(
       const edgesManager = new EdgesManager();
 
       const positionedRectsData: RawPositionedTagRectT[] = [];
-
-      const pickClosedVacancy = (rectArea: RectAreaT): RectPositionT | void => {
-        const vacancies = vacanciesManager.closedVacancies;
-
-        const loopParams = {
-          [ASC]: {
-            from: 0,
-            condition: (i: number) => i < vacancies.length,
-            diff: 1,
-          },
-          [DESC]: {
-            from: vacancies.length - 1,
-            condition: (i: number) => i >= 0,
-            diff: -1,
-          },
-        };
-        const { from, condition, diff } =
-          loopParams[pickingClosedVacancyStrategy];
-
-        let suitableVacancy;
-        let vacancyIndex: number = -1;
-        for (let i = from; condition(i); i += diff) {
-          const possiblySuitableVacancy = vacancies[i];
-          if (
-            possiblySuitableVacancy &&
-            isVacancyLargeEnoughToFitRect(rectArea, possiblySuitableVacancy)
-          ) {
-            suitableVacancy = vacancies[i];
-            vacancyIndex = i;
-            break;
-          }
-        }
-
-        if (vacancyIndex === -1 || !suitableVacancy) {
-          return;
-        }
-
-        const countPositionsFroward = SceneMap.countPositionsFroward;
-        const countPositionsBackwards = SceneMap.countPositionsBackwards;
-
-        // vacancy square to rectArea square ratio limit to put at the center of a vacancy
-        const SQUARE_RATION_LIMIT = 1.9;
-
-        let left: number;
-        let right: number;
-        let top: number;
-        let bottom: number;
-
-        const rectAreaSquare = rectArea.rows * rectArea.cols;
-
-        if (suitableVacancy.square / rectAreaSquare > SQUARE_RATION_LIMIT) {
-          // from edge
-          if (
-            Math.abs(suitableVacancy.right) > Math.abs(suitableVacancy.left)
-          ) {
-            left = suitableVacancy.left;
-            right = countPositionsFroward(suitableVacancy.left, rectArea.cols);
-          } else {
-            right = suitableVacancy.right;
-            left = countPositionsBackwards(right, rectArea.cols);
-          }
-          if (
-            Math.abs(suitableVacancy.bottom) > Math.abs(suitableVacancy.top)
-          ) {
-            top = suitableVacancy.top;
-            bottom = countPositionsBackwards(top, rectArea.rows);
-          } else {
-            bottom = suitableVacancy.bottom;
-            top = countPositionsFroward(bottom, rectArea.rows);
-          }
-        } else {
-          // center
-          const rowsDiffHalf = Math.round(
-            (suitableVacancy.rows - rectArea.rows) / 2,
-          );
-          const colsDiffHalf = Math.round(
-            (suitableVacancy.cols - rectArea.cols) / 2,
-          );
-          top = SceneMap.changePosition(suitableVacancy.top, -rowsDiffHalf);
-          right = SceneMap.changePosition(suitableVacancy.right, -colsDiffHalf);
-          bottom = countPositionsBackwards(top, rectArea.rows);
-          left = countPositionsBackwards(right, rectArea.cols);
-        }
-        vacanciesManager.removeClosedVacancy(vacancyIndex);
-        return { top, bottom, right, left };
-      };
 
       const getEdgeVacanciesByEdge = (edge: EDGE) => {
         return {
@@ -864,17 +865,24 @@ export function calcTagsPositions(
           return { status: true, isRotated };
         }
 
-        const shouldCreateVacancyIfNoSuchKind: boolean =
-          index < (options?.addIfEmptyIndex ?? 5);
+        const shouldCreateVacancyIfNoSuchKind: boolean = index < (options?.addIfEmptyIndex ?? 5);
 
         const tryPickClosedVacancy = (): boolean => {
-          let rectPosition = pickClosedVacancy(rectArea);
+          let rectPosition;
+          let pickedVacancyIndex;
+          ({
+            rectPosition,
+            vacancyIndex: pickedVacancyIndex
+          } = pickClosedVacancy(rectArea, vacanciesManager.closedVacancies, { pickingStrategy: pickingClosedVacancyStrategy }) ?? {});
           if (!rectPosition && vacanciesManager.needVacanciesRebuild) {
             rebuildVacanciesMap(shouldCreateVacancyIfNoSuchKind);
-            rectPosition = pickClosedVacancy(rectArea);
+            ({
+              rectPosition,
+              vacancyIndex: pickedVacancyIndex
+            } = pickClosedVacancy(rectArea, vacanciesManager.closedVacancies, { pickingStrategy: pickingClosedVacancyStrategy }) ?? {});
           }
 
-          if (rectPosition) {
+          if (rectPosition && pickedVacancyIndex) {
             try {
               updateSceneMap(rectPosition, rectAreaMap, isRotated);
               positionedRectsData.push(
@@ -888,6 +896,7 @@ export function calcTagsPositions(
                 throw e;
               }
             }
+            vacanciesManager.removeClosedVacancy(pickedVacancyIndex);
             return true;
           }
 
