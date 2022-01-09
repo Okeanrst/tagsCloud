@@ -19,10 +19,10 @@ describe('VacanciesManager tests', () => {
   });
   it('correct vacancies for one rect laid at sceneMap', () => {
     sceneMap.bulkOccupyPosition([
-      [1, 1, true],
-      [2, 1, true],
-      [1, 2, true],
-      [2, 2, true],
+      [1, 1],
+      [2, 1],
+      [1, 2],
+      [2, 2],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -34,9 +34,9 @@ describe('VacanciesManager tests', () => {
   });
   it('correct vacancies for one rect laid at sceneMap', () => {
     sceneMap.bulkOccupyPosition([
-      [1, 1, true], [2, 1, true], [3, 1, true],
-      [1, 2, true], [3, 2, true],
-      [1, 3, true], [2, 3, true], [3, 3, true],
+      [1, 1], [2, 1], [3, 1],
+      [1, 2], [3, 2],
+      [1, 3], [2, 3], [3, 3],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -59,9 +59,9 @@ describe('VacanciesManager tests', () => {
   });
   it('correct vacancies in the top right conner of the sceneMap', () => {
     sceneMap.bulkOccupyPosition([
-      [1, 1, true],
-      [2, 1, true],
-      [1, 2, true],
+      [1, 1],
+      [2, 1],
+      [1, 2],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -87,9 +87,9 @@ describe('VacanciesManager tests', () => {
   });
   it('correct vacancies in the bottom right conner of the sceneMap', () => {
     sceneMap.bulkOccupyPosition([
-      [1, -1, true],
-      [2, -1, true],
-      [1, -2, true],
+      [1, -1],
+      [2, -1],
+      [1, -2],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -115,9 +115,9 @@ describe('VacanciesManager tests', () => {
   });
   it('correct vacancies in the bottom left conner of the sceneMap', () => {
     sceneMap.bulkOccupyPosition([
-      [-1, -1, true],
-      [-2, -1, true],
-      [-1, -2, true],
+      [-1, -1],
+      [-2, -1],
+      [-1, -2],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -143,9 +143,9 @@ describe('VacanciesManager tests', () => {
   });
   it('correct vacancies in the top left conner of the sceneMap', () => {
     sceneMap.bulkOccupyPosition([
-      [-1, 1, true],
-      [-2, 1, true],
-      [-1, 2, true],
+      [-1, 1],
+      [-2, 1],
+      [-1, 2],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -171,9 +171,9 @@ describe('VacanciesManager tests', () => {
   });
   it('correct vacancy at 1, 1 position of the sceneMap', () => {
     sceneMap.bulkOccupyPosition([
-      [2, 1, true],
-      [1, 2, true],
-      [2, 2, true],
+      [2, 1],
+      [1, 2],
+      [2, 2],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -199,11 +199,11 @@ describe('VacanciesManager tests', () => {
   });
   it('two closed vacancies, test removeClosedVacancy', () => {
     sceneMap.bulkOccupyPosition([
-      [-1, -1, true], [1, -1, true], [2, -1, true], [3, -1, true], [4, -1, true],
-      [-1, 1, true], [4, 1, true],
-      [-1, 2, true], [3, 2, true], [4, 2, true],
-      [-1, 3, true], [3, 3, true], [4, 3, true],
-      [-1, 4, true], [1, 4, true], [2, 4, true], [3, 4, true], [4, 4, true],
+      [-1, -1], [1, -1], [2, -1], [3, -1], [4, -1],
+      [-1, 1], [4, 1],
+      [-1, 2], [3, 2], [4, 2],
+      [-1, 3], [3, 3], [4, 3],
+      [-1, 4], [1, 4], [2, 4], [3, 4], [4, 4],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -259,11 +259,11 @@ describe('VacanciesManager tests', () => {
   });
   it('should return correct vacancies for sceneMap 1', () => {
     sceneMap.bulkOccupyPosition([
-      [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
-      [1, 2, true], [2, 2, true], [3, 2, true], [6, 2, true],
-      [1, 3, true], [2, 3, true], [6, 3, true],
-      [1, 4, true], [6, 4, true],
-      [1, 5, true], [2, 5, true], [3, 5, true], [4, 5, true], [6, 5, true],
+      [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
+      [1, 2], [2, 2], [3, 2], [6, 2],
+      [1, 3], [2, 3], [6, 3],
+      [1, 4], [6, 4],
+      [1, 5], [2, 5], [3, 5], [4, 5], [6, 5],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -284,11 +284,11 @@ describe('VacanciesManager tests', () => {
   });
   it('should return correct vacancies for sceneMap 2', () => {
     sceneMap.bulkOccupyPosition([
-      [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
-      [1, 2, true], [2, 2, true], [3, 2, true], [6, 2, true],
-      [1, 3, true], [2, 3, true], [6, 3, true],
-      [1, 4, true], [6, 4, true],
-      [1, 5, true], [2, 5, true], [3, 5, true], [6, 5, true],
+      [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
+      [1, 2], [2, 2], [3, 2], [6, 2],
+      [1, 3], [2, 3], [6, 3],
+      [1, 4], [6, 4],
+      [1, 5], [2, 5], [3, 5], [6, 5],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -309,11 +309,11 @@ describe('VacanciesManager tests', () => {
   });
   it('should return correct vacancies for sceneMap 3', () => {
     sceneMap.bulkOccupyPosition([
-      [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
-      [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true], [6, 2, true],
-      [1, 3, true], [2, 3, true], [6, 3, true],
-      [1, 4, true], [6, 4, true],
-      [1, 5, true], [2, 5, true], [3, 5, true], [5, 5, true], [6, 5, true],
+      [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
+      [1, 2], [2, 2], [3, 2], [4, 2], [6, 2],
+      [1, 3], [2, 3], [6, 3],
+      [1, 4], [6, 4],
+      [1, 5], [2, 5], [3, 5], [5, 5], [6, 5],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -334,12 +334,12 @@ describe('VacanciesManager tests', () => {
   });
   it('should return correct vacancies for sceneMap 4', () => {
     sceneMap.bulkOccupyPosition([
-      [1, -1, true], [6, -1, true],
-      [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true], [6, 1, true],
-      [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true], [6, 2, true],
-      [1, 3, true], [2, 3, true], [6, 3, true],
-      [1, 4, true], [6, 4, true],
-      [1, 5, true], [2, 5, true], [3, 5, true], [5, 5, true], [6, 5, true],
+      [1, -1], [6, -1],
+      [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
+      [1, 2], [2, 2], [3, 2], [4, 2], [6, 2],
+      [1, 3], [2, 3], [6, 3],
+      [1, 4], [6, 4],
+      [1, 5], [2, 5], [3, 5], [5, 5], [6, 5],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -360,11 +360,11 @@ describe('VacanciesManager tests', () => {
   });
   it('should return correct vacancies for sceneMap 5', () => {
     sceneMap.bulkOccupyPosition([
-      [-1, 1, true], [1, 1, true], [2, 1, true], [3, 1, true], [4, 1, true], [5, 1, true],
-      [-1, 2, true], [5, 2, true],
-      [-1, 3, true], [2, 3, true],
-      [-1, 4, true], [2, 4, true], [3, 4, true], [5, 4, true],
-      [-1, 5, true], [1, 5, true], [2, 5, true], [3, 5, true], [4, 5, true], [5, 5, true],
+      [-1, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1],
+      [-1, 2], [5, 2],
+      [-1, 3], [2, 3],
+      [-1, 4], [2, 4], [3, 4], [5, 4],
+      [-1, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
@@ -385,14 +385,15 @@ describe('VacanciesManager tests', () => {
   });
   it('should return correct vacancies for sceneMap 6', () => {
     sceneMap.bulkOccupyPosition([
-      [-2, 2, true], [-1, 2, true], [1, 2, true], [2, 2, true], [3, 2, true], [4, 2, true],
-      [-2, 1, true], [4, 1, true],
-      [-2, -1, true], [-1, -1, true], [4, -1, true],
-      [-2, -2, true], [3, -2, true], [4, -2, true],
-      [-2, -3, true], [4, -3, true],
+      [-2, 2], [-1, 2], [1, 2], [2, 2], [3, 2], [4, 2],
+      [-2, 1], [4, 1],
+      [-2, -1], [-1, -1], [4, -1],
+      [-2, -2], [3, -2], [4, -2],
+      [-2, -3], [4, -3],
     ]);
     sceneMap.calcSceneEdges();
     vacanciesManager.buildVacanciesMap();
+
     const {
       closedVacancies,
       topEdgeVacancies,
@@ -400,6 +401,59 @@ describe('VacanciesManager tests', () => {
       bottomEdgeVacancies,
       leftEdgeVacancies
     } = vacanciesManager;
+
+    expect({
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    }).toMatchSnapshot();
+  });
+  it('should return correct vacancies for sceneMap 7', () => {
+    sceneMap.bulkOccupyPosition([
+      [1, -1], [2, -1], [3, -1], [4, -1], [5, -1], [6, -1], [7, -1],
+      [1, -2], [2, -2], [3, -2], [5, -2], [6, -2], [7, -2],
+      [1, -3], [2, -3], [6, -3], [7, -3],
+      [1, -4], [7, -4],
+    ]);
+    sceneMap.calcSceneEdges();
+    vacanciesManager.buildVacanciesMap();
+
+    const {
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    } = vacanciesManager;
+
+    expect({
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    }).toMatchSnapshot();
+  });
+  it('should return correct vacancies for sceneMap 8', () => {
+    sceneMap.bulkOccupyPosition([
+      [1, -1], [3, -1],
+      [1, -2],
+      [1, -3], [3, -3],
+      [1, -4], [3, -4],
+    ]);
+    sceneMap.calcSceneEdges();
+    vacanciesManager.buildVacanciesMap();
+
+    const {
+      closedVacancies,
+      topEdgeVacancies,
+      rightEdgeVacancies,
+      bottomEdgeVacancies,
+      leftEdgeVacancies
+    } = vacanciesManager;
+
     expect({
       closedVacancies,
       topEdgeVacancies,

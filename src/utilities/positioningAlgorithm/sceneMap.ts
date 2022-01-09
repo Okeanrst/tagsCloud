@@ -289,15 +289,15 @@ export class SceneMap {
     }
   }
 
-  static rectSizeToSceneMapUnits(
+  static rectSizeToSceneMapSize(
     rectSize: number,
     sceneMapUnitSize: number,
   ): number {
     return Math.ceil(rectSize / sceneMapUnitSize);
   }
 
-  static sceneMapUnitsToRect(mapVal: number, sceneMapUnitSize: number) {
-    return mapVal * sceneMapUnitSize;
+  static sceneMapSizeToRectSize(size: number, sceneMapUnitSize: number) {
+    return size * sceneMapUnitSize;
   }
 
   static countPositions(beginPosition: number, endPosition: number): number {
@@ -354,12 +354,20 @@ export class SceneMap {
     return SceneMap.changePosition(currentPosition, -1);
   }
 
-  static calcNextPositionFromEdge(edge: number): number {
+  static getNextPositionFromEdge(edge: number): number {
     return edge >= 0 ? edge + 1 : edge;
   }
 
-  static calcPrevPositionFromEdge(edge: number): number {
+  static getPrevPositionFromEdge(edge: number): number {
     return edge <= 0 ? edge - 1 : edge;
+  }
+
+  static getPositionRightEdge(position: number): number {
+    return position > 0 ? position : position + 1;
+  }
+
+  static getPositionLeftEdge(position: number): number {
+    return position > 0 ? position - 1 : position;
   }
 
   // result is not edge o position. It is a set of float numbers

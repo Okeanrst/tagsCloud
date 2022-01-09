@@ -230,7 +230,6 @@ class HomePage extends Component<PropsT, StateT> {
           {tagsCloudSceneSize && tagsCloud.status === SUCCESS && (
             <TagsCloudComponent
               height={tagsCloudSceneSize.height}
-              tagData={tagsCloud.tagsPositions}
               width={tagsCloudSceneSize.width}
               onTagClick={this.onTagClick}
             />

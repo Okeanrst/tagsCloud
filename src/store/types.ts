@@ -33,6 +33,7 @@ export type RootStateT = {
   } | {
     tagsPositions: null;
     sceneMap: null;
+    vacancies: null;
     status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE;
   };
   useCanvas: boolean;

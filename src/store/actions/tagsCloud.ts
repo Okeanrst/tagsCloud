@@ -72,9 +72,10 @@ const preparedTagsDataOptions = {
 };
 
 const calcTagsPositionsOptions = {
-  drawFinishMap: false,
-  drawVacanciesMap: false,
-  drawStepMap: false,
+  shouldDrawFinalMap: false,
+  shouldDrawStepMap: false,
+  shouldDrawVacanciesMap: false,
+  shouldDrawFinalVacanciesMap: false,
   shouldTryAnotherAngle: false,
   addIfEmptyIndex: 5,
   pickingClosedVacancyStrategy: PickingStrategies.ASC,
@@ -242,4 +243,12 @@ export function addDataItem(data: Omit<TagDataT, 'id'>) {
 
 export function resetTagsCloud() {
   return createAction(actionTypes.RESET_TAGS_CLOUD);
+}
+
+export function changeTagPosition() {
+  return (dispatch: AppDispatchT, getState: GetStateT) => {
+    // calc new tag position
+    // console.log('changeTagPosition');
+    dispatch(createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG, {}));
+  };
 }

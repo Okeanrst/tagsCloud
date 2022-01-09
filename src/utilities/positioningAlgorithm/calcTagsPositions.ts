@@ -7,7 +7,7 @@ import { splitAndPerformWork } from '../common/splitAndPerformWork';
 import { formRectAreaMapKey } from '../prepareRectAreasMaps';
 import { SceneMap, Dimensions, PositionT, SceneEdgesT } from './sceneMap';
 import { EdgesManager, edgesOrder, EDGE } from './edgesManager';
-import { VacanciesManager, drawVacancy } from './vacanciesManager';
+import { VacanciesManager } from './vacanciesManager';
 import IntersectionError from './IntersectionError';
 import { getRectAreaOfRectMap } from '../getGlyphsMap';
 
@@ -17,6 +17,7 @@ import type {
   TagRectT,
   RectPositionT,
   PositionedTagRectT,
+  RectAreaT,
 } from 'types/types';
 import type {
   ClosedVacancyT,
@@ -24,16 +25,17 @@ import type {
   PreparedTopEdgeVacancyT,
   PreparedLeftEdgeVacancyT,
   PreparedRightEdgeVacancyT,
+  VacancyT,
 } from './types';
-import { RectAreaT } from 'types/types';
 
 export type Options = Readonly<{
   pickingClosedVacancyStrategy?: PickingStrategies;
   pickingEdgeVacancyStrategy?: PickingStrategies;
-  drawFinishMap?: boolean;
+  shouldDrawFinalMap?: boolean;
   addIfEmptyIndex?: number;
-  drawStepMap?: boolean;
-  drawVacanciesMap?: boolean;
+  shouldDrawStepMap?: boolean;
+  shouldDrawVacanciesMap?: boolean;
+  shouldDrawFinalVacanciesMap?: boolean;
   shouldTryAnotherAngle?: boolean;
   sortingClosedVacanciesStrategy?: SortingClosedVacanciesStrategies;
   sortingEdgeVacanciesStrategy?: SortingEdgeVacanciesStrategies;
@@ -194,7 +196,15 @@ function creatRawPositionedTagRect(
   return { ...rect, top, right, bottom, left, rotate: isRotated };
 }
 
-function isVacancyLargeEnoughToFitRect(
+export function isVacancyLargeEnoughToFitRect(
+  rectArea: RectAreaT,
+  vacancy: VacancyT,
+) {
+  return SceneMap.changePosition(vacancy.left, rectArea.cols) <= vacancy.right
+    && SceneMap.changePosition(vacancy.bottom, rectArea.rows) <= vacancy.top;
+}
+
+function isClosedVacancyLargeEnoughToFitRect(
   rectArea: RectAreaT,
   vacancy: ClosedVacancyT,
 ) {
@@ -226,7 +236,7 @@ const pickClosedVacancy = (
     const possiblySuitableVacancy = vacancies[i];
     if (
       possiblySuitableVacancy &&
-      isVacancyLargeEnoughToFitRect(rectArea, possiblySuitableVacancy)
+      isClosedVacancyLargeEnoughToFitRect(rectArea, possiblySuitableVacancy)
     ) {
       suitableVacancy = vacancies[i];
       vacancyIndex = i;
@@ -417,7 +427,7 @@ const pickEdgeVacancy = <T extends Array<PreparedTopEdgeVacancyT | PreparedRight
         } else {
           // because vacancy is top edge then both top and bottom are infinite
 
-          bottom = SceneMap.calcNextPositionFromEdge(sceneEdges[Dimensions.MINUS_Y]);
+          bottom = SceneMap.getNextPositionFromEdge(sceneEdges[Dimensions.MINUS_Y]);
         }
         top = countPositionsFroward(bottom, oppositeSize);
         break;
@@ -485,7 +495,7 @@ const pickEdgeVacancy = <T extends Array<PreparedTopEdgeVacancyT | PreparedRight
           top = preparedBottomEdgeVacancy.top;
         } else {
           // because vacancy is bottom edge then both top and bottom are infinite
-          top = SceneMap.calcPrevPositionFromEdge(sceneEdges[Dimensions.Y]);
+          top = SceneMap.getPrevPositionFromEdge(sceneEdges[Dimensions.Y]);
         }
         bottom = countPositionsBackwards(top, oppositeSize);
         break;
@@ -553,7 +563,7 @@ const pickEdgeVacancy = <T extends Array<PreparedTopEdgeVacancyT | PreparedRight
           left = preparedRightEdgeVacancy.left;
         } else {
           // because vacancy is right edge then both right and left are infinite
-          left = SceneMap.calcNextPositionFromEdge(sceneEdges[Dimensions.MINUS_X]);
+          left = SceneMap.getNextPositionFromEdge(sceneEdges[Dimensions.MINUS_X]);
         }
         right = countPositionsFroward(left, oppositeSize);
         break;
@@ -620,7 +630,7 @@ const pickEdgeVacancy = <T extends Array<PreparedTopEdgeVacancyT | PreparedRight
           right = preparedLeftEdgeVacancy.right;
         } else {
           // because vacancy is left edge then both left and right are infinite
-          right = SceneMap.calcPrevPositionFromEdge(sceneEdges[Dimensions.X]);
+          right = SceneMap.getPrevPositionFromEdge(sceneEdges[Dimensions.X]);
         }
         left = countPositionsBackwards(right, oppositeSize);
         break;
@@ -732,7 +742,7 @@ export function calcTagsPositions(
 
         sceneMap.calcSceneEdges();
 
-        if (options?.drawStepMap) {
+        if (options?.shouldDrawStepMap) {
           sceneMap.drawItself();
         }
       };
@@ -744,8 +754,8 @@ export function calcTagsPositions(
 
         const countPositionsFroward = SceneMap.countPositionsFroward;
         const countPositionsBackwards = SceneMap.countPositionsBackwards;
-        const next = SceneMap.calcNextPositionFromEdge;
-        const prev = SceneMap.calcPrevPositionFromEdge;
+        const next = SceneMap.getNextPositionFromEdge;
+        const prev = SceneMap.getPrevPositionFromEdge;
 
         // stick to the right edge, we can make it randomly
         switch (edge) {
@@ -795,28 +805,8 @@ export function calcTagsPositions(
 
         // vacanciesManager.filterUnsuitableClosedVacancies(vacancyFilter);
 
-        if (options?.drawVacanciesMap) {
-          const sceneEdges = sceneMap.getSceneEdges();
-           vacanciesManager.topEdgeVacancies.forEach(v =>
-            drawVacancy(v, sceneEdges),
-          );
-           vacanciesManager.bottomEdgeVacancies.forEach(v =>
-            drawVacancy(v, sceneEdges),
-          );
-          vacanciesManager.rightEdgeVacancies.forEach(v =>
-            drawVacancy(v, sceneEdges),
-          );
-          vacanciesManager.leftEdgeVacancies.forEach(v =>
-            drawVacancy(v, sceneEdges),
-          );
-
-          vacanciesManager.closedVacancies.forEach(vacancy => {
-            if (!vacancy) {
-              return;
-            }
-            drawVacancy(vacancy, sceneEdges);
-          });
-          // console.log('--------------------------------------------------------------------------------------------');
+        if (options?.shouldDrawVacanciesMap) {
+          vacanciesManager.drawVacanciesMap();
         }
       };
 
@@ -998,14 +988,21 @@ export function calcTagsPositions(
       };
 
       const finish = () => {
-        if (options?.drawFinishMap) {
+        if (vacanciesManager.needVacanciesRebuild) {
+          vacanciesManager.buildVacanciesMap();
+        }
+
+        if (options?.shouldDrawFinalMap) {
           sceneMap.drawItself();
         }
+        if (options?.shouldDrawFinalVacanciesMap) {
+          vacanciesManager.drawVacanciesMap();
+        }
         positionedRectsData.forEach(tagData => {
-          const top = tagData.top > 0 ? tagData.top : tagData.top + 1;
-          const bottom = tagData.bottom > 0 ? tagData.bottom - 1 : tagData.bottom;
-          const right = tagData.right > 0 ? tagData.right : tagData.right + 1;
-          const left = tagData.left > 0 ? tagData.left - 1 : tagData.left;
+          const topEdge = SceneMap.getPositionRightEdge(tagData.top);
+          const bottomEdge = SceneMap.getPositionLeftEdge(tagData.bottom);
+          const rightEdge = SceneMap.getPositionRightEdge(tagData.right);
+          const leftEdge = SceneMap.getPositionLeftEdge(tagData.left);
 
           const { mapMeta: rectAreaMapMeta } =
             rectAreaMapByKey.get(formRectAreaMapKey(tagData.label, tagData.fontSize)) ?? {};
@@ -1031,25 +1028,21 @@ export function calcTagsPositions(
 
           Object.assign(tagData, {
             rectTop:
-              SceneMap.sceneMapUnitsToRect(top, sceneMapUnitSize) +
+              SceneMap.sceneMapSizeToRectSize(topEdge, sceneMapUnitSize) +
               marginTop * sceneMapUnitSize,
             rectBottom:
-              SceneMap.sceneMapUnitsToRect(bottom, sceneMapUnitSize) -
+              SceneMap.sceneMapSizeToRectSize(bottomEdge, sceneMapUnitSize) -
               marginBottom * sceneMapUnitSize,
             rectRight:
-              SceneMap.sceneMapUnitsToRect(right, sceneMapUnitSize) +
+              SceneMap.sceneMapSizeToRectSize(rightEdge, sceneMapUnitSize) +
               marginRight * sceneMapUnitSize,
             rectLeft:
-              SceneMap.sceneMapUnitsToRect(left, sceneMapUnitSize) -
+              SceneMap.sceneMapSizeToRectSize(leftEdge, sceneMapUnitSize) -
               marginLeft * sceneMapUnitSize,
             glyphsXOffset: rectAreaMapMeta?.glyphsXOffset ?? 0,
             glyphsYOffset: rectAreaMapMeta?.glyphsYOffset ?? 0,
           });
         });
-
-        if (vacanciesManager.needVacanciesRebuild) {
-          vacanciesManager.buildVacanciesMap();
-        }
 
         const vacancies = {
           closedVacancies: vacanciesManager.closedVacancies.filter(v => !!v) as ClosedVacancyT[],

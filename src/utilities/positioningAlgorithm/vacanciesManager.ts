@@ -120,10 +120,10 @@ export class VacanciesManager {
 
     const sceneEdges = this.sceneMap.getSceneEdges();
     // bottom to top, left to right
-    const sceneTopRow = SceneMap.calcPrevPositionFromEdge(sceneEdges[Y]);
-    const sceneBottomRow = SceneMap.calcNextPositionFromEdge(sceneEdges[MINUS_Y]);
-    const sceneLeftCol = SceneMap.calcNextPositionFromEdge(sceneEdges[MINUS_X]);
-    const sceneRightCol = SceneMap.calcPrevPositionFromEdge(sceneEdges[X]);
+    const sceneTopRow = SceneMap.getPrevPositionFromEdge(sceneEdges[Y]);
+    const sceneBottomRow = SceneMap.getNextPositionFromEdge(sceneEdges[MINUS_Y]);
+    const sceneLeftCol = SceneMap.getNextPositionFromEdge(sceneEdges[MINUS_X]);
+    const sceneRightCol = SceneMap.getPrevPositionFromEdge(sceneEdges[X]);
 
     const next = SceneMap.nextPosition;
     const prev = SceneMap.prevPosition;
@@ -367,6 +367,35 @@ export class VacanciesManager {
       vacancyFilter(vacancy),
     );
   }
+
+  drawVacanciesMap() {
+    const sceneEdges = this.sceneMap.getSceneEdges();
+
+    this.topEdgeVacancies.forEach(v =>
+      drawVacancy(v, sceneEdges),
+    );
+    this.bottomEdgeVacancies.forEach(v =>
+      drawVacancy(v, sceneEdges),
+    );
+    this.rightEdgeVacancies.forEach(v =>
+      drawVacancy(v, sceneEdges),
+    );
+    this.leftEdgeVacancies.forEach(v =>
+      drawVacancy(v, sceneEdges),
+    );
+
+    this.closedVacancies.forEach(vacancy => {
+      if (!vacancy) {
+        return;
+      }
+      drawVacancy(vacancy, sceneEdges);
+    });
+  }
+
+  static checkIsPointBelongToVacancy = (point: CoordinatePointT, vacancy: VacancyT) => {
+    const v = vacancy;
+    return v.top >= point.y && v.bottom <= point.y && v.left <= point.x && v.right >= point.x;
+  };
 }
 
 export function drawVacancy(vacancy: VacancyT, sceneEdges: SceneEdgesT): void {
@@ -382,16 +411,12 @@ export function drawVacancy(vacancy: VacancyT, sceneEdges: SceneEdgesT): void {
 
   let res = '';
 
-  const isBelongToVacancy = (x: number, y: number) => {
-    return v.top >= y && v.bottom <= y && v.left <= x && v.right >= x;
-  };
-
   for (let row = sceneTopRow; row >= sceneBottomRow; row--) {
     for (let col = sceneLeftCol; col <= sceneRightCol; col++) {
       if (row === 0) {
         res += '';
       } else {
-        res += col === 0 ? '|' : isBelongToVacancy(col, row) ? '⬛' : '⬜';
+        res += col === 0 ? '|' : VacanciesManager.checkIsPointBelongToVacancy({ x: col, y: row }, v) ? '⬛' : '⬜';
       }
     }
     res += '\n';

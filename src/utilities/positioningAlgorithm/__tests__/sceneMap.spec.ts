@@ -2,42 +2,104 @@ import { SceneMap } from '../sceneMap';
 import IntersectionError from '../IntersectionError';
 
 describe('SceneMap tests', () => {
-  describe('rectSizeToSceneMapUnits tests', () => {
+  describe('rectSizeToSceneMapSize tests', () => {
     it('should return correct result', () => {
-      expect(SceneMap.rectSizeToSceneMapUnits(8, 2)).toBe(4);
+      expect(SceneMap.rectSizeToSceneMapSize(8, 2)).toBe(4);
     });
     it('should return correct result (not fractional result)', () => {
-      expect(SceneMap.rectSizeToSceneMapUnits(9, 2)).toBe(5);
+      expect(SceneMap.rectSizeToSceneMapSize(9, 2)).toBe(5);
     });
   });
 
-  describe('sceneMapUnitsToRect tests', () => {
+  describe('sceneMapSizeToRectSize tests', () => {
     it('should return correct result', () => {
-      expect(SceneMap.sceneMapUnitsToRect(8, 2)).toBe(16);
+      expect(SceneMap.sceneMapSizeToRectSize(8, 2)).toBe(16);
     });
   });
 
-  describe('calcNextPositionFromEdge tests', () => {
+  describe('getNextPositionFromEdge tests', () => {
     it('should return correct result for negative edge', () => {
-      expect(SceneMap.calcNextPositionFromEdge(-2)).toBe(-2);
+      expect(SceneMap.getNextPositionFromEdge(-2)).toBe(-2);
     });
     it('should return correct result for positive edge', () => {
-      expect(SceneMap.calcNextPositionFromEdge(1)).toBe(2);
+      expect(SceneMap.getNextPositionFromEdge(1)).toBe(2);
     });
     it('should return correct result for 0 edge', () => {
-      expect(SceneMap.calcNextPositionFromEdge(0)).toBe(1);
+      expect(SceneMap.getNextPositionFromEdge(0)).toBe(1);
     });
   });
 
-  describe('calcPrevPositionFromEdge tests', () => {
+  describe('getPrevPositionFromEdge tests', () => {
     it('should return correct result for negative edge', () => {
-      expect(SceneMap.calcPrevPositionFromEdge(-2)).toBe(-3);
+      expect(SceneMap.getPrevPositionFromEdge(-2)).toBe(-3);
     });
     it('should return correct result for positive edge', () => {
-      expect(SceneMap.calcPrevPositionFromEdge(3)).toBe(3);
+      expect(SceneMap.getPrevPositionFromEdge(3)).toBe(3);
     });
     it('should return correct result for 0 edge', () => {
-      expect(SceneMap.calcPrevPositionFromEdge(0)).toBe(-1);
+      expect(SceneMap.getPrevPositionFromEdge(0)).toBe(-1);
+    });
+  });
+
+  describe('getPositionRightEdge tests', () => {
+    it('should return correct result for position: -2', () => {
+      expect(SceneMap.getPositionRightEdge(-2)).toBe(-1);
+    });
+    it('should return correct result for position: -1', () => {
+      expect(SceneMap.getPositionRightEdge(-1)).toBe(0);
+    });
+    it('should return correct result for position: 3', () => {
+      expect(SceneMap.getPositionRightEdge(3)).toBe(3);
+    });
+  });
+
+  describe('getPositionLeftEdge tests', () => {
+    it('should return correct result for position: -2', () => {
+      expect(SceneMap.getPositionLeftEdge(-2)).toBe(-2);
+    });
+    it('should return correct result for position: 1', () => {
+      expect(SceneMap.getPositionLeftEdge(1)).toBe(0);
+    });
+    it('should return correct result for position: 3', () => {
+      expect(SceneMap.getPositionLeftEdge(3)).toBe(2);
+    });
+  });
+
+  describe('getNextPositionFromEdge and getPositionLeftEdge complex tests', () => {
+    it('should return correct result for negative position', () => {
+      const position = -2;
+      expect(SceneMap.getNextPositionFromEdge(SceneMap.getPositionLeftEdge(position))).toBe(position);
+    });
+    it('should return correct result for negative position', () => {
+      const position = 2;
+      expect(SceneMap.getNextPositionFromEdge(SceneMap.getPositionLeftEdge(position))).toBe(position);
+    });
+    it('should return correct result for negative edge', () => {
+      const edge = -2;
+      expect(SceneMap.getPositionLeftEdge(SceneMap.getNextPositionFromEdge(edge))).toBe(edge);
+    });
+    it('should return correct result for positive edge', () => {
+      const edge = 2;
+      expect(SceneMap.getPositionLeftEdge(SceneMap.getNextPositionFromEdge(edge))).toBe(edge);
+    });
+  });
+
+  describe('getPrevPositionFromEdge and getPositionRightEdge complex tests', () => {
+    it('should return correct result for negative position', () => {
+      const position = -2;
+      expect(SceneMap.getPrevPositionFromEdge(SceneMap.getPositionRightEdge(position))).toBe(position);
+    });
+    it('should return correct result for positive position', () => {
+      const position = 2;
+      expect(SceneMap.getPrevPositionFromEdge(SceneMap.getPositionRightEdge(position))).toBe(position);
+    });
+    it('should return correct result for negative edge', () => {
+      const edge = -2;
+      expect(SceneMap.getPositionRightEdge(SceneMap.getPrevPositionFromEdge(edge))).toBe(edge);
+    });
+    it('should return correct result for positive edge', () => {
+      const edge = 2;
+      expect(SceneMap.getPositionRightEdge(SceneMap.getPrevPositionFromEdge(edge))).toBe(edge);
     });
   });
 
