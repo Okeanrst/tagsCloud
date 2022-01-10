@@ -80,25 +80,42 @@ const styles = createStyles({
   }
 });
 
-const AVATAR_WIDTH = 50;
-const AVATAR_HEIGHT = 50;
-
 const draggableTagAvatarStyle: React.CSSProperties = {
   position: 'absolute',
   display: 'none',
-  width: `${AVATAR_WIDTH}px`,
-  height: `${AVATAR_HEIGHT}px`,
-  border: '1px solid green',
+  justifyContent: 'center',
+  alignItems: 'center',
   zIndex: 10,
+  verticalAlign: 'middle'
 };
 
-const DraggableTagAvatar = React.forwardRef<HTMLDivElement, {}>((props, ref ) => {
+type DraggableTagAvatarProps = {
+  label?: string;
+  rotate?: boolean;
+  color?: string;
+  fontSize?: number;
+  zoom?: number;
+};
+
+const DraggableTagAvatar = React.forwardRef<HTMLDivElement, DraggableTagAvatarProps>((props, ref ) => {
+  const { label = '', rotate = false, color = 'black', fontSize = 8, zoom = 1 } = props;
+  const style = { ...draggableTagAvatarStyle, color, border: `1px solid ${color}`, fontSize };
+  if (rotate) {
+    Object.assign(style, {
+      writingMode: 'vertical-rl',
+      textOrientation: 'mixed',
+    });
+  }
   return (
     <div
       className="DraggableTagAvatar"
       ref={ref}
-      style={draggableTagAvatarStyle}
-    />
+      style={style}
+    >
+      <span style={{ zoom }}>
+        {label}
+      </span>
+    </div>
   );
 });
 
@@ -106,7 +123,6 @@ const activeVacanciesStyle: React.CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
-  outline: '1px solid',
 };
 
 const renderVacancyRect = (vacancy: VacancyT, kind: string, importanceIndex: number) => {
@@ -243,6 +259,7 @@ const SvgTagsCloud = ({
   const draggableTagAvatarRef = useRef<HTMLDivElement | null>(null);
   const preventOnClickHandlingRef = useRef<boolean>(false);
   const handleMouseUpEventRef = useRef(() => {});
+  const zoomRef = useRef(1);
 
   const [isCoordinateGridShown, setIsCoordinateGridShown] = useState(false);
   const [isReactAreasShown, setIsReactAreasShown] = useState(false);
@@ -327,7 +344,9 @@ const SvgTagsCloud = ({
 
       preventOnClickHandlingRef.current = true;
 
-      if (!draggableTagAvatarRef.current || !draggableTagAvatarRef.current.style) {
+      const tagPosition = tagsPositions?.find(({ id }) => id === tagId);
+
+      if (!draggableTagAvatarRef.current || !draggableTagAvatarRef.current.style || !tagPosition) {
         return;
       }
 
@@ -341,11 +360,19 @@ const SvgTagsCloud = ({
         y: moveEvent.pageY
       }, canvasWrapperRect);
 
+      const currentZoom = zoomRef.current;
+      const { rectTop, rectBottom, rectLeft, rectRight } = tagPosition;
+      const tagAvatarWidth = (rectRight - rectLeft) * currentZoom;
+      const tagAvatarHeight = (rectTop - rectBottom) * currentZoom;
+
       const { x: avatarX, y: avatarY } = limitCoordinatesWithCanvasBoundaries(canvasCoordinates, canvasWrapperRect);
 
-      draggableTagAvatarRef.current.style.left = (avatarX - AVATAR_WIDTH / 2) + 'px';
-      draggableTagAvatarRef.current.style.top = avatarY - AVATAR_HEIGHT / 2 + 'px';
-      draggableTagAvatarRef.current.style.display = 'block';
+      draggableTagAvatarRef.current.style.width = tagAvatarWidth + 'px';
+      draggableTagAvatarRef.current.style.height = tagAvatarHeight + 'px';
+      // TODO add shift
+      draggableTagAvatarRef.current.style.left = (avatarX - tagAvatarWidth / 2) + 'px';
+      draggableTagAvatarRef.current.style.top = avatarY - tagAvatarHeight / 2 + 'px';
+      draggableTagAvatarRef.current.style.display = 'flex';
 
       throttledSetDraggableTagPosition({ x: avatarX, y: avatarY });
     };
@@ -368,7 +395,7 @@ const SvgTagsCloud = ({
 
     document.addEventListener('mouseup', onMouseUp);
     document.addEventListener('mousemove', onMouseMove);
-  }, []);
+  }, [tagsPositions]);
 
   if (!tagsPositions || !tagsSvgData) {
     return null;
@@ -382,6 +409,9 @@ const SvgTagsCloud = ({
   } = tagsSvgData;
 
   const svgSize = getSuitableSize({ width, height }, aspectRatio);
+
+  const zoom = calcZoom(svgSize, viewBox) ?? 1;
+  zoomRef.current = zoom;
 
   const activeVacancies = (() => {
     if (!draggableTagPosition || !draggableTagId || !vacancies || !sceneMapEdges) {
@@ -408,8 +438,6 @@ const SvgTagsCloud = ({
       return null;
     }
 
-    const zoom = calcZoom(svgSize, viewBox);
-
     const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, sceneMapEdges, zoom);
 
     return sortActiveVacancies(getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacancies));
@@ -434,6 +462,19 @@ const SvgTagsCloud = ({
       }));
     }
   };
+
+  const draggableTagAvatarProps = (() => {
+    if (!draggableTagId) {
+      return {};
+    }
+    const tagPosition = tagsPositions?.find(({ id }) => id === draggableTagId);
+    if (!tagPosition) {
+      return {};
+    }
+
+    const { label, rotate, color, fontSize } = tagPosition;
+    return { label, rotate, color, fontSize, zoom };
+  })();
 
   return (
     <div className={classes.container}>
@@ -472,7 +513,10 @@ const SvgTagsCloud = ({
       >
         {isCoordinateGridShown && drawCoordinateGrid(tagsPositions, svgSize, viewBox)}
         {isReactAreasShown && drawReactAreas(tagsPositions, svgSize, viewBox, transform)}
-        <DraggableTagAvatar ref={draggableTagAvatarRef} />
+        <DraggableTagAvatar
+          ref={draggableTagAvatarRef}
+          {...draggableTagAvatarProps}
+        />
         <svg
           id="small_cloud"
           {...svgSize}
