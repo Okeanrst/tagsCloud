@@ -1,16 +1,26 @@
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
 import {
-  SCENE_MAP_RESOLUTION,
+  DEFAULT_MAX_FONT_SIZE,
+  DEFAULT_MIN_FONT_SIZE,
   PickingStrategies,
+  SCENE_MAP_RESOLUTION,
   SortingClosedVacanciesStrategies,
   SortingEdgeVacanciesStrategies,
-  DEFAULT_MIN_FONT_SIZE,
-  DEFAULT_MAX_FONT_SIZE,
 } from 'constants/index';
-import { calcTagsPositions, releaseRectAreaPositionsOnSceneMap } from 'utilities/positioningAlgorithm/calcTagsPositions';
+import {
+  calcTagsPositions, creatRawPositionedTagRect, moveRectAreaPositionsOnSceneMap,
+  pickClosedVacancy,
+  pickEdgeVacancy, preparePositionedTagRect,
+  releaseRectAreaPositionsOnSceneMap,
+  rotateRectArea,
+} from 'utilities/positioningAlgorithm/calcTagsPositions';
+import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
 import { prepareTagsData } from 'utilities/tagsCloud/tagsCloud';
 import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
+import { SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
+import { EDGE } from 'utilities/positioningAlgorithm/edgesManager';
+import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { selectTargetTagDataItem } from '../reducers/tagsData';
 import { createAction } from './helpers';
@@ -19,7 +29,15 @@ import validateTagsCloudRawData from './rawDataValidator';
 import { TagDataT } from 'types/types';
 import { AppDispatchT, RootStateT } from '../types';
 import { AnyAction } from 'redux';
-import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
+import {
+  VacancyKinds,
+  VacancyT,
+  ClosedVacancyT,
+  PreparedTopEdgeVacancyT,
+  PreparedRightEdgeVacancyT,
+  PreparedLeftEdgeVacancyT,
+  PreparedBottomEdgeVacancyT,
+} from 'utilities/positioningAlgorithm/types';
 
 type GetStateT = () => RootStateT;
 
@@ -48,6 +66,18 @@ const findUnusedRectAreasMapsKeys = (state: RootStateT) => {
     }
   });
   return unusedKeys;
+};
+
+const getSceneMapVacancies = (sceneMap: SceneMap) => {
+  const vacanciesManager = new VacanciesManager(sceneMap);
+  vacanciesManager.buildVacanciesMap();
+  return  {
+    closedVacancies: vacanciesManager.closedVacancies.filter(v => !!v) as ClosedVacancyT[],
+    topEdgeVacancies: vacanciesManager.topEdgeVacancies,
+    bottomEdgeVacancies: vacanciesManager.bottomEdgeVacancies,
+    leftEdgeVacancies: vacanciesManager.leftEdgeVacancies,
+    rightEdgeVacancies: vacanciesManager.rightEdgeVacancies,
+  };
 };
 
 export function getData() {
@@ -172,7 +202,9 @@ const createRemoveTagAction = (targetId: string, getState: GetStateT): AnyAction
 
   const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, targetTagPosition, rectAreaMap.map);
 
-  return createAction(actionTypes.TAGS_CLOUD_REMOVE_TAG, { tagId: targetId, sceneMap });
+  const vacancies = getSceneMapVacancies(sceneMap);
+
+  return createAction(actionTypes.TAGS_CLOUD_REMOVE_TAG, { tagId: targetId, sceneMap: sceneMap.toPositions(), vacancies });
 };
 
 export function deleteDataItem(targetId: string) {
@@ -246,10 +278,85 @@ export function resetTagsCloud() {
   return createAction(actionTypes.RESET_TAGS_CLOUD);
 }
 
-export function changeTagPosition({ vacancy, vacancyKind }: { vacancy: VacancyT; vacancyKind: VacancyKinds }) {
+export function changeTagPosition({ tagId, vacancy, vacancyKind }: { tagId: string; vacancy: VacancyT; vacancyKind: VacancyKinds }) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
-    // calc new tag position
-    console.log('changeTagPosition', vacancy, vacancyKind);
-    dispatch(createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG, {}));
+    const { tagsCloud: { sceneMap: sceneMapPositions, tagsPositions }, rectAreasMapsData: rectAreasMaps } = getState();
+
+    const currentTagPosition = tagsPositions?.find(({ id }) => id === tagId);
+
+    if (!currentTagPosition || !sceneMapPositions) {
+      return null;
+    }
+
+    const rectAreaMapKey = formRectAreaMapKey(currentTagPosition.label, currentTagPosition.fontSize);
+
+    const rectAreaMap = rectAreasMaps.find(({ key }) => key === rectAreaMapKey);
+
+    if (!rectAreaMap?.map || !rectAreaMap?.mapMeta) {
+      return null;
+    }
+
+    const isRotated = currentTagPosition.rotate;
+
+    const tagRectArea = isRotated ?
+      rotateRectArea(getRectAreaOfRectMap(rectAreaMap.map))
+      : getRectAreaOfRectMap(rectAreaMap.map);
+
+    if (!tagRectArea) {
+      return null;
+    }
+
+    let rectPosition;
+    if (vacancyKind === VacancyKinds.closedVacancies) {
+      ({ rectPosition } = pickClosedVacancy(tagRectArea, [vacancy as ClosedVacancyT], {
+        pickingStrategy: calcTagsPositionsOptions.pickingClosedVacancyStrategy,
+      }) ?? {});
+    } else if ([VacancyKinds.topEdgeVacancies, VacancyKinds.bottomEdgeVacancies, VacancyKinds.rightEdgeVacancies, VacancyKinds.leftEdgeVacancies].includes(vacancyKind)) {
+       const sceneEdges = new SceneMap(sceneMapPositions).getSceneEdges();
+       let edge;
+       let vacancies;
+       switch (vacancyKind) {
+         case VacancyKinds.topEdgeVacancies: {
+           edge = EDGE.TOP;
+           vacancies = [vacancy as PreparedTopEdgeVacancyT];
+           break;
+         }
+         case VacancyKinds.bottomEdgeVacancies: {
+           edge = EDGE.BOTTOM;
+           vacancies = [vacancy as PreparedBottomEdgeVacancyT];
+           break;
+         }
+         case VacancyKinds.leftEdgeVacancies: {
+           edge = EDGE.LEFT;
+           vacancies = [vacancy as PreparedLeftEdgeVacancyT];
+           break;
+         }
+         case VacancyKinds.rightEdgeVacancies: {
+           edge = EDGE.RIGHT;
+           vacancies = [vacancy as PreparedRightEdgeVacancyT];
+           break;
+         }
+       }
+       ({ rectPosition } = pickEdgeVacancy(tagRectArea, vacancies, sceneEdges, edge, {
+         force: true,
+         pickingStrategy: calcTagsPositionsOptions.pickingEdgeVacancyStrategy
+       }) ?? {});
+    }
+
+    if (!rectPosition) {
+      return;
+    }
+
+    const nextRawPositionedTagRect = creatRawPositionedTagRect(currentTagPosition, rectPosition, isRotated);
+
+    const sceneMap = moveRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, nextRawPositionedTagRect, rectAreaMap.map);
+
+    preparePositionedTagRect(nextRawPositionedTagRect, rectAreaMap.mapMeta, calcTagsPositionsOptions.sceneMapResolution);
+
+    dispatch(createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG, {
+      tagPosition: nextRawPositionedTagRect,
+      sceneMap: sceneMap.toPositions(),
+      vacancies: getSceneMapVacancies(sceneMap),
+    }));
   };
 }

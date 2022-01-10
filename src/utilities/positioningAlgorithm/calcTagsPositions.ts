@@ -165,12 +165,12 @@ const mapRectAreaMapOnRectPosition = (
 
 export const releaseRectAreaPositionsOnSceneMap = (
   sceneMapPositions: PositionT[],
-  targetTagPosition: PositionedTagRectT,
+  tagPosition: RawPositionedTagRectT,
   rectAreaMap: TwoDimensionalMapT,
 ) => {
   const sceneMap = new SceneMap(sceneMapPositions);
 
-  const mappedPositions = mapRectAreaMapOnRectPosition(targetTagPosition, rectAreaMap, targetTagPosition.rotate);
+  const mappedPositions = mapRectAreaMapOnRectPosition(tagPosition, rectAreaMap, tagPosition.rotate);
 
   mappedPositions.forEach((mappedPosition) => {
     if (mappedPosition[2]) {
@@ -178,10 +178,24 @@ export const releaseRectAreaPositionsOnSceneMap = (
       sceneMap.releasePosition(x, y);
     }
   });
-  return sceneMap.toPositions();
+  return sceneMap;
 };
 
-function creatRawPositionedTagRect(
+export const moveRectAreaPositionsOnSceneMap = (
+  sceneMapPositions: PositionT[],
+  currentTagPosition: RawPositionedTagRectT,
+  nextTagPosition: RawPositionedTagRectT,
+  rectAreaMap: TwoDimensionalMapT,
+) => {
+  const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, rectAreaMap);
+
+  const mappedPositions = mapRectAreaMapOnRectPosition(nextTagPosition, rectAreaMap, nextTagPosition.rotate);
+
+  sceneMap.bulkOccupyPosition(mappedPositions.filter(([,, value]) => value));
+  return sceneMap;
+};
+
+export function creatRawPositionedTagRect(
   rect: TagRectT,
   { top, right, bottom, left }: RectPositionT,
   isRotated: boolean,
@@ -196,6 +210,56 @@ function creatRawPositionedTagRect(
   }
   return { ...rect, top, right, bottom, left, rotate: isRotated };
 }
+
+// mutate rawPositionedTagRect
+export const preparePositionedTagRect = (
+  rawPositionedTagRect: RawPositionedTagRectT,
+  rectAreaMapMeta: IdRectAreaMapT['mapMeta'],
+  sceneMapUnitSize: number
+) => {
+  const { top, right, bottom, left } = rawPositionedTagRect;
+  const topEdge = SceneMap.getPositionRightEdge(top);
+  const bottomEdge = SceneMap.getPositionLeftEdge(bottom);
+  const rightEdge = SceneMap.getPositionRightEdge(right);
+  const leftEdge = SceneMap.getPositionLeftEdge(left);
+
+  let marginRight;
+  let marginLeft;
+  let marginTop;
+  let marginBottom;
+
+  if (rawPositionedTagRect.rotate) {
+    // clockwise
+    marginRight = rectAreaMapMeta?.marginTop ?? 0;
+    marginLeft = rectAreaMapMeta?.marginBottom ?? 0;
+    marginTop = rectAreaMapMeta?.marginLeft ?? 0;
+    marginBottom = rectAreaMapMeta?.marginRight ?? 0;
+  } else {
+    ({
+      marginRight = 0,
+      marginLeft = 0,
+      marginTop = 0,
+      marginBottom = 0,
+    } = rectAreaMapMeta ?? {});
+  }
+
+  Object.assign(rawPositionedTagRect, {
+    rectTop:
+      SceneMap.sceneMapSizeToRectSize(topEdge, sceneMapUnitSize) +
+      marginTop * sceneMapUnitSize,
+    rectBottom:
+      SceneMap.sceneMapSizeToRectSize(bottomEdge, sceneMapUnitSize) -
+      marginBottom * sceneMapUnitSize,
+    rectRight:
+      SceneMap.sceneMapSizeToRectSize(rightEdge, sceneMapUnitSize) +
+      marginRight * sceneMapUnitSize,
+    rectLeft:
+      SceneMap.sceneMapSizeToRectSize(leftEdge, sceneMapUnitSize) -
+      marginLeft * sceneMapUnitSize,
+    glyphsXOffset: rectAreaMapMeta?.glyphsXOffset ?? 0,
+    glyphsYOffset: rectAreaMapMeta?.glyphsYOffset ?? 0,
+  });
+};
 
 export function isVacancyLargeEnoughToFitRect(
   rectArea: RectAreaT,
@@ -212,7 +276,7 @@ function isClosedVacancyLargeEnoughToFitRect(
   return rectArea.rows <= vacancy.rows && rectArea.cols <= vacancy.cols;
 }
 
-const pickClosedVacancy = (
+export const pickClosedVacancy = (
   rectArea: RectAreaT,
   vacancies: (ClosedVacancyT | void)[],
   { pickingStrategy }: { pickingStrategy: PickingStrategies }
@@ -298,12 +362,12 @@ const pickClosedVacancy = (
   return { rectPosition: { top, bottom, right, left }, vacancyIndex };
 };
 
-const pickEdgeVacancy = <T extends Array<PreparedTopEdgeVacancyT | PreparedRightEdgeVacancyT | PreparedLeftEdgeVacancyT | PreparedBottomEdgeVacancyT>>(
+export const pickEdgeVacancy = <T extends Array<PreparedTopEdgeVacancyT | PreparedRightEdgeVacancyT | PreparedLeftEdgeVacancyT | PreparedBottomEdgeVacancyT>>(
   rectArea: RectAreaT,
   vacancies: T,
   sceneEdges: SceneEdgesT,
   edge: EDGE,
-  { force = false, threshold = 0.5, pickingStrategy }: { force: boolean; threshold: number; pickingStrategy: PickingStrategies },
+  { force = false, threshold = 0.5, pickingStrategy }: { force?: boolean; threshold?: number; pickingStrategy: PickingStrategies },
 ): { rectPosition: RectPositionT, vacancyIndex: number } | void => {
   let pickedVacancyIndex: number;
 
@@ -663,7 +727,7 @@ function createWorkGenerator(
   };
 }
 
-const rotateRectArea = (rectArea: RectAreaT) => {
+export const rotateRectArea = (rectArea: RectAreaT) => {
   return { rows: rectArea.cols, cols: rectArea.rows };
 };
 
@@ -999,50 +1063,13 @@ export function calcTagsPositions(
         if (options?.shouldDrawFinalVacanciesMap) {
           vacanciesManager.drawVacanciesMap();
         }
-        positionedRectsData.forEach(tagData => {
-          const topEdge = SceneMap.getPositionRightEdge(tagData.top);
-          const bottomEdge = SceneMap.getPositionLeftEdge(tagData.bottom);
-          const rightEdge = SceneMap.getPositionRightEdge(tagData.right);
-          const leftEdge = SceneMap.getPositionLeftEdge(tagData.left);
-
+        positionedRectsData.forEach(rawPositionedTagRect => {
           const { mapMeta: rectAreaMapMeta } =
-            rectAreaMapByKey.get(formRectAreaMapKey(tagData.label, tagData.fontSize)) ?? {};
-          let marginRight;
-          let marginLeft;
-          let marginTop;
-          let marginBottom;
-
-          if (tagData.rotate) {
-            // clockwise
-            marginRight = rectAreaMapMeta?.marginTop ?? 0;
-            marginLeft = rectAreaMapMeta?.marginBottom ?? 0;
-            marginTop = rectAreaMapMeta?.marginLeft ?? 0;
-            marginBottom = rectAreaMapMeta?.marginRight ?? 0;
-          } else {
-            ({
-              marginRight = 0,
-              marginLeft = 0,
-              marginTop = 0,
-              marginBottom = 0,
-            } = rectAreaMapMeta ?? {});
+          rectAreaMapByKey.get(formRectAreaMapKey(rawPositionedTagRect.label, rawPositionedTagRect.fontSize)) ?? {};
+          if (!rectAreaMapMeta) {
+            throw new Error(`rectAreaMap for tag with id: "${rawPositionedTagRect.id}" is missing`);
           }
-
-          Object.assign(tagData, {
-            rectTop:
-              SceneMap.sceneMapSizeToRectSize(topEdge, sceneMapUnitSize) +
-              marginTop * sceneMapUnitSize,
-            rectBottom:
-              SceneMap.sceneMapSizeToRectSize(bottomEdge, sceneMapUnitSize) -
-              marginBottom * sceneMapUnitSize,
-            rectRight:
-              SceneMap.sceneMapSizeToRectSize(rightEdge, sceneMapUnitSize) +
-              marginRight * sceneMapUnitSize,
-            rectLeft:
-              SceneMap.sceneMapSizeToRectSize(leftEdge, sceneMapUnitSize) -
-              marginLeft * sceneMapUnitSize,
-            glyphsXOffset: rectAreaMapMeta?.glyphsXOffset ?? 0,
-            glyphsYOffset: rectAreaMapMeta?.glyphsYOffset ?? 0,
-          });
+          preparePositionedTagRect(rawPositionedTagRect, rectAreaMapMeta, sceneMapUnitSize);
         });
 
         const vacancies = {

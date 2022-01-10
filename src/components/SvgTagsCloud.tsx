@@ -6,7 +6,7 @@ import throttle from 'lodash.throttle';
 import * as actions from 'store/actions/tagsCloud';
 import { getBorderCoordinates, getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
-import { isVacancyLargeEnoughToFitRect } from 'utilities/positioningAlgorithm/calcTagsPositions';
+import { isVacancyLargeEnoughToFitRect, rotateRectArea } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { SceneMap, Dimensions } from 'utilities/positioningAlgorithm/sceneMap';
 import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
@@ -376,12 +376,12 @@ const SvgTagsCloud = ({
     if (!draggableTagPosition || !draggableTagId || !vacancies || !sceneMapEdges) {
       return null;
     }
-    const tagData = tagsPositions?.find(({ id }) => id === draggableTagId);
-    if (!tagData) {
+    const tagPosition = tagsPositions?.find(({ id }) => id === draggableTagId);
+    if (!tagPosition) {
       return null;
     }
 
-    const rectAreaMapKey = formRectAreaMapKey(tagData.label, tagData.fontSize);
+    const rectAreaMapKey = formRectAreaMapKey(tagPosition.label, tagPosition.fontSize);
 
     const { map: rectAreaMap } = rectAreasMaps.find(({ key }) => key === rectAreaMapKey) ?? {};
 
@@ -389,7 +389,9 @@ const SvgTagsCloud = ({
       return null;
     }
 
-    const tagRectArea = getRectAreaOfRectMap(rectAreaMap);
+    const tagRectArea = tagPosition.rotate ?
+      rotateRectArea(getRectAreaOfRectMap(rectAreaMap))
+      : getRectAreaOfRectMap(rectAreaMap);
 
     if (!tagRectArea) {
       return null;
@@ -407,14 +409,18 @@ const SvgTagsCloud = ({
     setDraggableTagPosition(null);
     setDraggableTagId(null);
 
-    if (!activeVacancies || !activeVacancies.length) {
+    if (!activeVacancies || !activeVacancies.length || !draggableTagId) {
       return;
     }
 
     const { vacancy: targetVacancy, kind: targetVacancyKind } = activeVacancies[0] ?? {};
 
     if (targetVacancy && targetVacancyKind) {
-      dispatch(actions.changeTagPosition({ vacancy: targetVacancy, vacancyKind: targetVacancyKind }));
+      dispatch(actions.changeTagPosition({
+        tagId: draggableTagId,
+        vacancy: targetVacancy,
+        vacancyKind: targetVacancyKind
+      }));
     }
   };
 

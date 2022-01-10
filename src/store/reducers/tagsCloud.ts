@@ -8,6 +8,7 @@ import {
   TAGS_CLOUD_REMOVE_TAG,
   RESET_TAGS_CLOUD,
   INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS,
+  TAGS_CLOUD_UPDATE_TAG,
 } from '../actions/actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
@@ -35,9 +36,18 @@ export const tagsCloudReducer = (
       return { ...state, status: SUCCESS, ...action.payload, tagsPositions };
     }
     case TAGS_CLOUD_REMOVE_TAG: {
-      const { tagId, sceneMap } = action.payload;
+      const { tagId, sceneMap, vacancies } = action.payload;
       const tagsPositions = state.tagsPositions?.filter(({ id }) => id !== tagId);
-      return { ...state, tagsPositions, sceneMap };
+      return { ...state, tagsPositions, sceneMap, vacancies };
+    }
+    case TAGS_CLOUD_UPDATE_TAG: {
+      const { sceneMap, tagPosition, vacancies } = action.payload;
+      const tagsPositions = state.tagsPositions?.filter(({ id }) => id !== tagPosition.id);
+      if (!tagsPositions) {
+        return state;
+      }
+      tagsPositions.push(tagPosition);
+      return { ...state, tagsPositions, sceneMap, vacancies };
     }
     default:
       return state;
