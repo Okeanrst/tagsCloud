@@ -1,26 +1,41 @@
-import { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { withStyles, createStyles } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
+import throttle from 'lodash.throttle';
+import * as actions from 'store/actions/tagsCloud';
 import { getBorderCoordinates, getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
+import { isVacancyLargeEnoughToFitRect } from 'utilities/positioningAlgorithm/calcTagsPositions';
+import { SceneMap, Dimensions } from 'utilities/positioningAlgorithm/sceneMap';
+import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
+import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
+import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { FONT_FAMILY, SCENE_MAP_RESOLUTION } from 'constants/index';
 import { Checkbox } from 'ui/checkbox/Checkbox';
 import { Collapse } from 'components/Collapse';
 
-import React from 'react';
-import type { PositionedTagRectT, ClassesT } from 'types/types';
+import type { PositionedTagRectT, ClassesT, RectAreaT } from 'types/types';
 import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
 import type { ViewBoxT } from 'utilities/tagsCloud/tagsCloud';
+import { RootStateT } from 'store/types';
+import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
+import { SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap';
 
 type PropsT = {
-  tagData: ReadonlyArray<PositionedTagRectT>;
   width: number;
   height: number;
   onTagClick: (id: string) => void;
   classes: ClassesT;
 };
 
+type CoordinatesT = { x: number; y: number };
+
+type VacanciesT = NonNullable<RootStateT['tagsCloud']['vacancies']>;
+
 const DURATION = 500;
+
+const MOVEMENT_THRESHOLD = 10; // px
 
 const DEFAULT_STYLE = {
   transition: `all ${DURATION}ms ease-in-out`,
@@ -34,6 +49,7 @@ const styles = createStyles({
   },
   text: {
     'white-space': 'pre',
+    'user-select': 'none',
   },
   settingsControlsWrapper: {
     display: 'flex',
@@ -64,16 +80,177 @@ const styles = createStyles({
   }
 });
 
+const AVATAR_WIDTH = 50;
+const AVATAR_HEIGHT = 50;
+
+const draggableTagAvatarStyle: React.CSSProperties = {
+  position: 'absolute',
+  display: 'none',
+  width: `${AVATAR_WIDTH}px`,
+  height: `${AVATAR_HEIGHT}px`,
+  border: '1px solid green',
+  zIndex: 10,
+};
+
+const DraggableTagAvatar = React.forwardRef<HTMLDivElement, {}>((props, ref ) => {
+  return (
+    <div
+      className="DraggableTagAvatar"
+      ref={ref}
+      style={draggableTagAvatarStyle}
+    />
+  );
+});
+
+const activeVacanciesStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  outline: '1px solid',
+};
+
+const renderVacancyRect = (vacancy: VacancyT, kind: string, importanceIndex: number) => {
+  // @ts-ignore
+  const left = Number.isFinite(vacancy.left) ? vacancy.left : vacancy.leftEdgeColumn;
+  // @ts-ignore
+  const right = Number.isFinite(vacancy.right) ? vacancy.right : vacancy.rightEdgeColumn;
+  // @ts-ignore
+  const top = Number.isFinite(vacancy.top) ? vacancy.top : vacancy.topEdgeRow;
+  // @ts-ignore
+  const bottom = Number.isFinite(vacancy.bottom) ? vacancy.bottom : vacancy.bottomEdgeRow;
+
+  if (left > right || top < bottom) {
+    // the case when vacancy is outside the scene
+    return null;
+  }
+
+  return (
+    <rect
+      fill="purple"
+      fillOpacity="0"
+      height={SceneMap.countPositions(bottom, top) * SCENE_MAP_RESOLUTION}
+      key={`${left},${right},${top},${bottom},${kind}`}
+      stroke="blue"
+      strokeOpacity="0.25"
+      strokeWidth={importanceIndex === 0 ? 1 : 0.5}
+      width={SceneMap.countPositions(left, right) * SCENE_MAP_RESOLUTION}
+      x={SceneMap.getPositionLeftEdge(left) * SCENE_MAP_RESOLUTION}
+      y={-SceneMap.getPositionRightEdge(top) * SCENE_MAP_RESOLUTION}
+    />
+  );
+};
+
+type ActiveVacanciesPropsT = { vacancies: VacanciesT | null, svgSize: SizeT; viewBox: ViewBoxT; transform: string }
+const ActiveVacancies = ({ vacancies, svgSize, viewBox, transform }: ActiveVacanciesPropsT) => {
+  const rects: React.ReactNode[] = [];
+  if (vacancies) {
+    const { closedVacancies, topEdgeVacancies, bottomEdgeVacancies, leftEdgeVacancies, rightEdgeVacancies } = vacancies;
+
+    closedVacancies.forEach(vacancy => {
+      rects.push(renderVacancyRect(vacancy, 'closed', rects.length));
+    });
+    topEdgeVacancies.forEach(vacancy => {
+      rects.push(renderVacancyRect(vacancy, 'topEdge', rects.length));
+    });
+    bottomEdgeVacancies.forEach(vacancy => {
+      rects.push(renderVacancyRect(vacancy, 'bottomEdge', rects.length));
+    });
+    leftEdgeVacancies.forEach(vacancy => {
+      rects.push(renderVacancyRect(vacancy, 'leftEdge', rects.length));
+    });
+    rightEdgeVacancies.forEach(vacancy => {
+      rects.push(renderVacancyRect(vacancy, 'rightEdge', rects.length));
+    });
+  }
+
+  return (
+    <svg
+      id="activeVacancies"
+      {...svgSize}
+      style={activeVacanciesStyle}
+      viewBox={viewBox.join(' ')}
+    >
+      <g transform={transform}>
+        {rects}
+      </g>
+    </svg>
+  );
+};
+
+function getActiveVacanciesByCoordinates(point: CoordinatesT, rectArea: RectAreaT, vacancies: VacanciesT): VacanciesT {
+  const { closedVacancies, topEdgeVacancies, bottomEdgeVacancies, leftEdgeVacancies, rightEdgeVacancies } = vacancies;
+
+  function processVacancies<T extends VacancyT>(vacanciesToProcess: T[]) {
+    const suitableVacancies: T[] = [];
+    vacanciesToProcess.forEach(vacancy => {
+      if (!vacancy || !VacanciesManager.checkIsPointBelongToVacancy(point, vacancy)) {
+        return;
+      }
+      if (!isVacancyLargeEnoughToFitRect(rectArea, vacancy)) {
+        return;
+      }
+      // check is big enough
+      suitableVacancies.push(vacancy);
+    });
+    return suitableVacancies;
+  }
+
+  return {
+    closedVacancies: processVacancies(closedVacancies),
+    topEdgeVacancies: processVacancies(topEdgeVacancies),
+    bottomEdgeVacancies: processVacancies(bottomEdgeVacancies),
+    leftEdgeVacancies: processVacancies(leftEdgeVacancies),
+    rightEdgeVacancies: processVacancies(rightEdgeVacancies),
+  };
+}
+
+const documentCoordinatesToCanvasCoordinates = (documentCoordinates: CoordinatesT, canvasRect: DOMRect): CoordinatesT => {
+  const { top, left } = canvasRect;
+  return { x: documentCoordinates.x - left, y: documentCoordinates.y - top };
+};
+
+const limitCoordinatesWithCanvasBoundaries = (coordinates: CoordinatesT, canvasRect: DOMRect): CoordinatesT => {
+  const { width, height } = canvasRect;
+  const { x, y } = coordinates;
+  return {
+    x: Math.min(Math.max(0, x), width),
+    y: Math.min(Math.max(0, y), height),
+  };
+};
+
+const canvasCoordinatesToSceneCoordinates = (canvasCoordinates: CoordinatesT, sceneEdges: SceneEdgesT, zoom: number) => {
+  const { x, y } = canvasCoordinates;
+
+  return {
+    x: (x / zoom + sceneEdges[Dimensions.MINUS_X] * SCENE_MAP_RESOLUTION) / SCENE_MAP_RESOLUTION,
+    y: (sceneEdges[Dimensions.Y] * SCENE_MAP_RESOLUTION - y / zoom) / SCENE_MAP_RESOLUTION,
+  };
+};
+
+const stateSelector = (state: RootStateT) => {
+  const { tagsCloud: { tagsPositions, vacancies, sceneMap: sceneMapPositions }, rectAreasMapsData: rectAreasMaps } = state;
+  return { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions  };
+};
+
 const SvgTagsCloud = ({
-  tagData,
   width,
   height,
   onTagClick,
   classes,
 }: PropsT) => {
+  const { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions } = useSelector(stateSelector);
+  const dispatch = useDispatch();
+
+  const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
+  const draggableTagAvatarRef = useRef<HTMLDivElement | null>(null);
+  const preventOnClickHandlingRef = useRef<boolean>(false);
+  const handleMouseUpEventRef = useRef(() => {});
+
   const [isCoordinateGridShown, setIsCoordinateGridShown] = useState(false);
   const [isReactAreasShown, setIsReactAreasShown] = useState(false);
   const [isSettingsControlsShown, setIsSettingsControlsShown] = useState(false);
+  const [draggableTagId, setDraggableTagId] = useState<string | null>(null);
+  const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
 
   const toggleIsCoordinateGridShown = useCallback(() => {
     setIsCoordinateGridShown((value) => !value);
@@ -87,9 +264,100 @@ const SvgTagsCloud = ({
     setIsSettingsControlsShown((value) => !value);
   }, [setIsSettingsControlsShown]);
 
-  const tagsSvgData = useMemo(() => getTagsSvgData(tagData), [tagData]);
+  const sceneMapEdges = useMemo(() => {
+    if (!sceneMapPositions) {
+      return null;
+    }
+    return new SceneMap(sceneMapPositions).getSceneEdges();
+  }, [sceneMapPositions]);
 
-  if (!tagsSvgData) {
+  const tagsSvgData = useMemo(() => {
+    return tagsPositions && getTagsSvgData(tagsPositions);
+  }, [tagsPositions]);
+
+  const onCanvasWrapperClick = useCallback((e: React.SyntheticEvent<EventTarget>) => {
+    if (!(e.target instanceof SVGTextElement)) {
+      return;
+    }
+    const tagId = e.target.dataset.id;
+
+    if (!tagId) {
+      return;
+    }
+
+    if (!preventOnClickHandlingRef.current) {
+      onTagClick(tagId);
+    }
+  }, [onTagClick]);
+
+  const onCanvasWrapperMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!(e.target instanceof SVGTextElement)) {
+      return;
+    }
+    const tagId = e.target.dataset.id;
+    if (!draggableTagAvatarRef.current || !tagId) {
+      return;
+    }
+
+    const { pageX: initPageX, pageY: initPageY } = e;
+
+    let didDraggingStart = false;
+
+    const throttledSetDraggableTagPosition = throttle(setDraggableTagPosition, 100);
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      if (!didDraggingStart) {
+        didDraggingStart = ((initPageX - moveEvent.pageX) ** 2 + (initPageY - moveEvent.pageY) ** 2) ** 0.5 > MOVEMENT_THRESHOLD;
+        didDraggingStart && setDraggableTagId(tagId);
+      }
+
+      if (!didDraggingStart) {
+        return;
+      }
+
+      preventOnClickHandlingRef.current = true;
+
+      if (!draggableTagAvatarRef.current || !draggableTagAvatarRef.current.style) {
+        return;
+      }
+
+      const canvasWrapperRect = canvasWrapperRef.current?.getBoundingClientRect();
+      if (!canvasWrapperRect) {
+        return;
+      }
+
+      const canvasCoordinates = documentCoordinatesToCanvasCoordinates({ x: e.pageX, y: e.pageY }, canvasWrapperRect);
+
+      const { x: avatarX, y: avatarY } = limitCoordinatesWithCanvasBoundaries(canvasCoordinates, canvasWrapperRect);
+
+      draggableTagAvatarRef.current.style.left = (avatarX - AVATAR_WIDTH / 2) + 'px';
+      draggableTagAvatarRef.current.style.top = avatarY - AVATAR_HEIGHT / 2 + 'px';
+      draggableTagAvatarRef.current.style.display = 'block';
+
+      throttledSetDraggableTagPosition({ x: avatarX, y: avatarY });
+    };
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      if (!didDraggingStart) {
+        return;
+      }
+
+      throttledSetDraggableTagPosition.cancel();
+
+      if (draggableTagAvatarRef.current) {
+        draggableTagAvatarRef.current.style.display = 'none';
+      }
+
+      handleMouseUpEventRef.current();
+    };
+
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
+  }, []);
+
+  if (!tagsPositions || !tagsSvgData) {
     return null;
   }
 
@@ -101,6 +369,71 @@ const SvgTagsCloud = ({
   } = tagsSvgData;
 
   const svgSize = getSuitableSize({ width, height }, aspectRatio);
+
+  const activeVacancies = (() => {
+    if (!draggableTagPosition || !draggableTagId || !vacancies || !sceneMapEdges) {
+      return null;
+    }
+    const tagData = tagsPositions?.find(({ id }) => id === draggableTagId);
+    if (!tagData) {
+      return null;
+    }
+
+    const rectAreaMapKey = formRectAreaMapKey(tagData.label, tagData.fontSize);
+
+    const { map: rectAreaMap } = rectAreasMaps.find(({ key }) => key === rectAreaMapKey) ?? {};
+
+    if (!rectAreaMap) {
+      return null;
+    }
+
+    const tagRectArea = getRectAreaOfRectMap(rectAreaMap);
+
+    if (!tagRectArea) {
+      return null;
+    }
+
+    const zoom = calcZoom(svgSize, viewBox);
+
+    const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, sceneMapEdges, zoom);
+
+    return getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacancies);
+  })();
+
+  handleMouseUpEventRef.current = () => {
+    preventOnClickHandlingRef.current = false;
+    setDraggableTagPosition(null);
+    setDraggableTagId(null);
+
+    if (!activeVacancies) {
+      return;
+    }
+
+    const { closedVacancies, topEdgeVacancies, bottomEdgeVacancies, leftEdgeVacancies, rightEdgeVacancies } = activeVacancies;
+    // TODO switch to mixing and sorting all the vacancy kinds
+    let targetVacancy;
+    let targetVacancyKind;
+    if (closedVacancies[0]) {
+      targetVacancy = closedVacancies[0];
+      targetVacancyKind = VacancyKinds.closedVacancies;
+    } else if (topEdgeVacancies[0]) {
+      targetVacancy = topEdgeVacancies[0];
+      targetVacancyKind = VacancyKinds.topEdgeVacancies;
+    } else if (bottomEdgeVacancies[0]) {
+      targetVacancy = bottomEdgeVacancies[0];
+      targetVacancyKind = VacancyKinds.bottomEdgeVacancies;
+    } else if (leftEdgeVacancies[0]) {
+      targetVacancy = leftEdgeVacancies[0];
+      targetVacancyKind = VacancyKinds.leftEdgeVacancies;
+    } else if (rightEdgeVacancies[0]) {
+      targetVacancy = rightEdgeVacancies[0];
+      targetVacancyKind = VacancyKinds.rightEdgeVacancies;
+    }
+
+    if (targetVacancy && targetVacancyKind) {
+      dispatch(actions.changeTagPosition({ vacancy: targetVacancy, vacancyKind: targetVacancyKind }));
+    }
+  };
 
   return (
     <div className={classes.container}>
@@ -126,9 +459,15 @@ const SvgTagsCloud = ({
           </div>
         </Collapse>
       </div>
-      <div className={classes.canvasWrapper}>
-        {isCoordinateGridShown && drawCoordinateGrid(tagData, svgSize, viewBox)}
-        {isReactAreasShown && drawReactAreas(tagData, svgSize, viewBox, transform)}
+      <div
+        className={classes.canvasWrapper}
+        ref={canvasWrapperRef}
+        onClick={onCanvasWrapperClick}
+        onMouseDown={onCanvasWrapperMouseDown}
+      >
+        {isCoordinateGridShown && drawCoordinateGrid(tagsPositions, svgSize, viewBox)}
+        {isReactAreasShown && drawReactAreas(tagsPositions, svgSize, viewBox, transform)}
+        <DraggableTagAvatar ref={draggableTagAvatarRef} />
         <svg
           id="small_cloud"
           {...svgSize}
@@ -180,15 +519,15 @@ const SvgTagsCloud = ({
                       return (
                         <text
                           className={classes.text}
+                          data-id={i.id}
+                          // transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
                           key={`${i.id}_${index}`}
                           style={{
                             ...style,
                             ...DEFAULT_STYLE,
                             ...transitionStyles[state],
                           }}
-                          // transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
                           textAnchor="middle"
-                          onClick={() => onTagClick(i.id)}
                         >
                           {i.label}
                         </text>
@@ -200,6 +539,12 @@ const SvgTagsCloud = ({
             </TransitionGroup>
           </g>
         </svg>
+        <ActiveVacancies
+          svgSize={svgSize}
+          transform={transform}
+          vacancies={activeVacancies}
+          viewBox={viewBox}
+        />
       </div>
     </div>
   );
@@ -311,7 +656,7 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
       viewBox={viewBox.join(' ')}
     >
       <g transform={transform} >
-        {rects.slice(0)}
+        {rects}
       </g>
     </svg>
   );

@@ -1,12 +1,20 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
 import { withStyles } from '@material-ui/core';
 import { drawOnCanvas } from 'utilities/tagsCloud/drawOnCanvas';
 import { getBorderCoordinates } from 'utilities/tagsCloud/tagsCloud';
+import { RootStateT } from 'store/types';
 
-import type { PositionedTagRectT } from 'types/types';
+const mapStateToProps = (state: RootStateT) => {
+  const { tagsCloud: { tagsPositions } } = state;
+  return { tagsPositions };
+};
 
-type PropsT = {
-  tagData: ReadonlyArray<PositionedTagRectT>;
+const connector = connect(mapStateToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type PropsT = PropsFromRedux & {
   width: number;
   height: number;
   onTagClick: (id: string) => void;
@@ -39,7 +47,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
     return (
       this.props.width !== nextProps.width ||
       this.props.height !== nextProps.height ||
-      this.props.tagData !== nextProps.tagData ||
+      this.props.tagsPositions !== nextProps.tagsPositions ||
       this.props.onTagClick !== nextProps.onTagClick
     );
   }
@@ -53,13 +61,18 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       return;
     }
 
+    const { tagsPositions } = this.props;
+    if (!tagsPositions) {
+      return;
+    }
+
     const { left, top } = e.target.getBoundingClientRect();
     const sceneX = e.clientX - left;
     const sceneY = e.clientY - top;
     if (sceneX < 0 || sceneY < 0) return;
 
     const scale = this.state.scale;
-    const borderCoordinates = getBorderCoordinates(this.props.tagData);
+    const borderCoordinates = getBorderCoordinates(tagsPositions);
 
     if (!borderCoordinates) {
       return;
@@ -67,8 +80,8 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
 
     const { top: maxTop, left: minLeft } = borderCoordinates;
 
-    for (let y = this.props.tagData.length - 1; y >= 0; y--) {
-      const i = this.props.tagData[y];
+    for (let y = tagsPositions.length - 1; y >= 0; y--) {
+      const i = tagsPositions[y];
       if (
         (maxTop - i.rectTop) * scale < sceneY &&
         (maxTop - i.rectBottom) * scale > sceneY &&
@@ -81,7 +94,11 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   };
 
   draw = () => {
-    const { width, height } = this.props;
+    const { width, height, tagsPositions } = this.props;
+
+    if (!tagsPositions) {
+      return;
+    }
 
     const canvas = this.tagCloudCanvasRef.current;
 
@@ -96,7 +113,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       ctx.translate(...this.state.restoreCoords);
     }
 
-    const drawResult = drawOnCanvas(this.props.tagData, canvas, { width, height });
+    const drawResult = drawOnCanvas(tagsPositions, canvas, { width, height });
 
     if (!drawResult) {
       return;
@@ -122,4 +139,4 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   }
 }
 
-export default withStyles(styles)(CanvasTagsCloud);
+export default connector(withStyles(styles)(CanvasTagsCloud));

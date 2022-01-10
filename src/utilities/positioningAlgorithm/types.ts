@@ -1,3 +1,11 @@
+export enum VacancyKinds {
+  closedVacancies = 'closedVacancies',
+  topEdgeVacancies = 'topEdgeVacancies',
+  bottomEdgeVacancies = 'bottomEdgeVacancies',
+  leftEdgeVacancies = 'leftEdgeVacancies',
+  rightEdgeVacancies = 'rightEdgeVacancies',
+}
+
 export interface VacancyT {
   top: number;
   bottom: number;

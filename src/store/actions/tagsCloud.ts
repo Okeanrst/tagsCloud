@@ -19,6 +19,7 @@ import validateTagsCloudRawData from './rawDataValidator';
 import { TagDataT } from 'types/types';
 import { AppDispatchT, RootStateT } from '../types';
 import { AnyAction } from 'redux';
+import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
 
 type GetStateT = () => RootStateT;
 
@@ -245,10 +246,10 @@ export function resetTagsCloud() {
   return createAction(actionTypes.RESET_TAGS_CLOUD);
 }
 
-export function changeTagPosition() {
+export function changeTagPosition({ vacancy, vacancyKind }: { vacancy: VacancyT; vacancyKind: VacancyKinds }) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
     // calc new tag position
-    // console.log('changeTagPosition');
+    console.log('changeTagPosition');
     dispatch(createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG, {}));
   };
 }

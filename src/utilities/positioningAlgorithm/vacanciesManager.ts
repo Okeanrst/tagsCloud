@@ -394,7 +394,8 @@ export class VacanciesManager {
 
   static checkIsPointBelongToVacancy = (point: CoordinatePointT, vacancy: VacancyT) => {
     const v = vacancy;
-    return v.top >= point.y && v.bottom <= point.y && v.left <= point.x && v.right >= point.x;
+    return SceneMap.getPositionRightEdge(v.top) >= point.y && SceneMap.getPositionLeftEdge(v.bottom) <= point.y
+      && SceneMap.getPositionLeftEdge(v.left) <= point.x && SceneMap.getPositionRightEdge(v.right) >= point.x;
   };
 }
 
