@@ -146,7 +146,7 @@ type ActiveVacanciesPropsT = {
   viewBox: ViewBoxT;
   transform: string;
 };
-const ActiveVacancies = ({ vacancies, svgSize, viewBox, transform }: ActiveVacanciesPropsT) => {
+const Vacancies = ({ vacancies, svgSize, viewBox, transform }: ActiveVacanciesPropsT) => {
   const rects: React.ReactNode[] = [];
   if (vacancies) {
     vacancies.forEach(({ vacancy, kind }) => {
@@ -156,7 +156,6 @@ const ActiveVacancies = ({ vacancies, svgSize, viewBox, transform }: ActiveVacan
 
   return (
     <svg
-      id="activeVacancies"
       {...svgSize}
       style={activeVacanciesStyle}
       viewBox={viewBox.join(' ')}
@@ -247,6 +246,7 @@ const SvgTagsCloud = ({
 
   const [isCoordinateGridShown, setIsCoordinateGridShown] = useState(false);
   const [isReactAreasShown, setIsReactAreasShown] = useState(false);
+  const [isVacanciesShown, setIsVacanciesShown] = useState(false);
   const [isSettingsControlsShown, setIsSettingsControlsShown] = useState(false);
   const [draggableTagId, setDraggableTagId] = useState<string | null>(null);
   const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
@@ -263,6 +263,10 @@ const SvgTagsCloud = ({
     setIsSettingsControlsShown((value) => !value);
   }, [setIsSettingsControlsShown]);
 
+  const toggleIsVacanciesShown = useCallback(() => {
+    setIsVacanciesShown((value) => !value);
+  }, [setIsVacanciesShown]);
+
   const sceneMapEdges = useMemo(() => {
     if (!sceneMapPositions) {
       return null;
@@ -273,6 +277,13 @@ const SvgTagsCloud = ({
   const tagsSvgData = useMemo(() => {
     return tagsPositions && getTagsSvgData(tagsPositions);
   }, [tagsPositions]);
+
+  const allVacancies = useMemo(() => {
+    if (!vacancies || !isVacanciesShown) {
+      return null;
+    }
+    return sortActiveVacancies(vacancies);
+  }, [vacancies, isVacanciesShown]);
 
   const onCanvasWrapperClick = useCallback((e: React.SyntheticEvent<EventTarget>) => {
     if (!(e.target instanceof SVGTextElement)) {
@@ -445,6 +456,11 @@ const SvgTagsCloud = ({
               label="draw react areas"
               onChange={toggleIsReactAreasShown}
             />
+            <Checkbox
+              checked={isVacanciesShown}
+              label="draw vacancies"
+              onChange={toggleIsVacanciesShown}
+            />
           </div>
         </Collapse>
       </div>
@@ -528,10 +544,16 @@ const SvgTagsCloud = ({
             </TransitionGroup>
           </g>
         </svg>
-        <ActiveVacancies
+        <Vacancies
           svgSize={svgSize}
           transform={transform}
           vacancies={activeVacancies}
+          viewBox={viewBox}
+        />
+        <Vacancies
+          svgSize={svgSize}
+          transform={transform}
+          vacancies={allVacancies}
           viewBox={viewBox}
         />
       </div>
