@@ -86,7 +86,9 @@ const draggableTagAvatarStyle: React.CSSProperties = {
   justifyContent: 'center',
   alignItems: 'center',
   zIndex: 10,
-  verticalAlign: 'middle'
+  verticalAlign: 'middle',
+  whiteSpace: 'pre',
+  userSelect: 'none',
 };
 
 type DraggableTagAvatarProps = {
@@ -241,6 +243,15 @@ const canvasCoordinatesToSceneCoordinates = (canvasCoordinates: CoordinatesT, sc
   };
 };
 
+const sceneCoordinatesToCanvasCoordinates = (sceneCoordinates: CoordinatesT, sceneEdges: SceneEdgesT, zoom: number) => {
+  const { x, y } = sceneCoordinates;
+
+  return {
+    x: (x - sceneEdges[Dimensions.MINUS_X] * SCENE_MAP_RESOLUTION) * zoom,
+    y: (sceneEdges[Dimensions.Y] * SCENE_MAP_RESOLUTION - y) * zoom,
+  };
+};
+
 const stateSelector = (state: RootStateT) => {
   const { tagsCloud: { tagsPositions, vacancies, sceneMap: sceneMapPositions }, rectAreasMapsData: rectAreasMaps } = state;
   return { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions  };
@@ -322,11 +333,38 @@ const SvgTagsCloud = ({
       return;
     }
     const tagId = e.target.dataset.id;
-    if (!draggableTagAvatarRef.current || !tagId) {
+    if (!draggableTagAvatarRef.current || !tagId || !sceneMapEdges) {
+      return;
+    }
+
+    const tagPosition = tagsPositions?.find(({ id }) => id === tagId);
+
+    if (!tagPosition) {
       return;
     }
 
     const { pageX: initPageX, pageY: initPageY } = e;
+
+    const {
+      x: rectLeftCoordinate,
+      y: rectTopCoordinate
+    } = sceneCoordinatesToCanvasCoordinates({
+      x: tagPosition.rectLeft,
+      y: tagPosition.rectTop
+    }, sceneMapEdges, zoomRef.current);
+
+    const canvasWrapperRect = canvasWrapperRef.current?.getBoundingClientRect();
+    if (!canvasWrapperRect) {
+      return;
+    }
+
+    const initCanvasCoordinates = documentCoordinatesToCanvasCoordinates({
+      x: initPageX,
+      y: initPageY
+    }, canvasWrapperRect);
+
+    const shiftX = initCanvasCoordinates.x - rectLeftCoordinate;
+    const shiftY = initCanvasCoordinates.y - rectTopCoordinate;
 
     let didDraggingStart = false;
 
@@ -344,14 +382,7 @@ const SvgTagsCloud = ({
 
       preventOnClickHandlingRef.current = true;
 
-      const tagPosition = tagsPositions?.find(({ id }) => id === tagId);
-
-      if (!draggableTagAvatarRef.current || !draggableTagAvatarRef.current.style || !tagPosition) {
-        return;
-      }
-
-      const canvasWrapperRect = canvasWrapperRef.current?.getBoundingClientRect();
-      if (!canvasWrapperRect) {
+      if (!draggableTagAvatarRef.current || !draggableTagAvatarRef.current.style || !sceneMapEdges) {
         return;
       }
 
@@ -369,9 +400,8 @@ const SvgTagsCloud = ({
 
       draggableTagAvatarRef.current.style.width = tagAvatarWidth + 'px';
       draggableTagAvatarRef.current.style.height = tagAvatarHeight + 'px';
-      // TODO add shift
-      draggableTagAvatarRef.current.style.left = (avatarX - tagAvatarWidth / 2) + 'px';
-      draggableTagAvatarRef.current.style.top = avatarY - tagAvatarHeight / 2 + 'px';
+      draggableTagAvatarRef.current.style.left = avatarX - shiftX + 'px';
+      draggableTagAvatarRef.current.style.top = avatarY - shiftY + 'px';
       draggableTagAvatarRef.current.style.display = 'flex';
 
       throttledSetDraggableTagPosition({ x: avatarX, y: avatarY });
@@ -395,7 +425,7 @@ const SvgTagsCloud = ({
 
     document.addEventListener('mouseup', onMouseUp);
     document.addEventListener('mousemove', onMouseMove);
-  }, [tagsPositions]);
+  }, [tagsPositions, sceneMapEdges]);
 
   if (!tagsPositions || !tagsSvgData) {
     return null;

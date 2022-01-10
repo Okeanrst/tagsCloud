@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
   navbar: {
     position: 'sticky',
     top: 0,
-    zIndex: 1,
+    zIndex: 20,
     backgroundColor: 'var(--navbar-color)',
   },
   main: {
