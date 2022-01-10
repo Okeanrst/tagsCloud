@@ -249,7 +249,7 @@ export function resetTagsCloud() {
 export function changeTagPosition({ vacancy, vacancyKind }: { vacancy: VacancyT; vacancyKind: VacancyKinds }) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
     // calc new tag position
-    console.log('changeTagPosition');
+    console.log('changeTagPosition', vacancy, vacancyKind);
     dispatch(createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG, {}));
   };
 }

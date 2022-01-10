@@ -27,6 +27,7 @@ import type {
   PreparedRightEdgeVacancyT,
   VacancyT,
 } from './types';
+import { VacancyKinds } from './types';
 
 export type Options = Readonly<{
   pickingClosedVacancyStrategy?: PickingStrategies;
@@ -675,11 +676,11 @@ export function calcTagsPositions(
   tagsPositions: PositionedTagRectT[];
   sceneMapPositions: PositionT[];
   vacancies: {
-    closedVacancies: ClosedVacancyT[];
-    topEdgeVacancies: PreparedTopEdgeVacancyT[];
-    bottomEdgeVacancies: PreparedBottomEdgeVacancyT[];
-    leftEdgeVacancies: PreparedLeftEdgeVacancyT[];
-    rightEdgeVacancies: PreparedRightEdgeVacancyT[];
+    [VacancyKinds.closedVacancies]: ClosedVacancyT[];
+    [VacancyKinds.topEdgeVacancies]: PreparedTopEdgeVacancyT[];
+    [VacancyKinds.bottomEdgeVacancies]: PreparedBottomEdgeVacancyT[];
+    [VacancyKinds.leftEdgeVacancies]: PreparedLeftEdgeVacancyT[];
+    [VacancyKinds.rightEdgeVacancies]: PreparedRightEdgeVacancyT[];
   };
 }> {
   return new Promise((resolve, reject) => {

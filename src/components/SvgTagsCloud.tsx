@@ -140,26 +140,17 @@ const renderVacancyRect = (vacancy: VacancyT, kind: string, importanceIndex: num
   );
 };
 
-type ActiveVacanciesPropsT = { vacancies: VacanciesT | null, svgSize: SizeT; viewBox: ViewBoxT; transform: string }
+type ActiveVacanciesPropsT = {
+  vacancies: { vacancy: VacancyT; kind: VacancyKinds }[] | null;
+  svgSize: SizeT;
+  viewBox: ViewBoxT;
+  transform: string;
+};
 const ActiveVacancies = ({ vacancies, svgSize, viewBox, transform }: ActiveVacanciesPropsT) => {
   const rects: React.ReactNode[] = [];
   if (vacancies) {
-    const { closedVacancies, topEdgeVacancies, bottomEdgeVacancies, leftEdgeVacancies, rightEdgeVacancies } = vacancies;
-
-    closedVacancies.forEach(vacancy => {
-      rects.push(renderVacancyRect(vacancy, 'closed', rects.length));
-    });
-    topEdgeVacancies.forEach(vacancy => {
-      rects.push(renderVacancyRect(vacancy, 'topEdge', rects.length));
-    });
-    bottomEdgeVacancies.forEach(vacancy => {
-      rects.push(renderVacancyRect(vacancy, 'bottomEdge', rects.length));
-    });
-    leftEdgeVacancies.forEach(vacancy => {
-      rects.push(renderVacancyRect(vacancy, 'leftEdge', rects.length));
-    });
-    rightEdgeVacancies.forEach(vacancy => {
-      rects.push(renderVacancyRect(vacancy, 'rightEdge', rects.length));
+    vacancies.forEach(({ vacancy, kind }) => {
+      rects.push(renderVacancyRect(vacancy, kind, rects.length));
     });
   }
 
@@ -177,7 +168,7 @@ const ActiveVacancies = ({ vacancies, svgSize, viewBox, transform }: ActiveVacan
   );
 };
 
-function getActiveVacanciesByCoordinates(point: CoordinatesT, rectArea: RectAreaT, vacancies: VacanciesT): VacanciesT {
+const getActiveVacanciesByCoordinates = (point: CoordinatesT, rectArea: RectAreaT, vacancies: VacanciesT): VacanciesT => {
   const { closedVacancies, topEdgeVacancies, bottomEdgeVacancies, leftEdgeVacancies, rightEdgeVacancies } = vacancies;
 
   function processVacancies<T extends VacancyT>(vacanciesToProcess: T[]) {
@@ -202,7 +193,15 @@ function getActiveVacanciesByCoordinates(point: CoordinatesT, rectArea: RectArea
     leftEdgeVacancies: processVacancies(leftEdgeVacancies),
     rightEdgeVacancies: processVacancies(rightEdgeVacancies),
   };
-}
+};
+
+const sortActiveVacancies = (vacancies: VacanciesT) => {
+  const sortedVacancies: {vacancy: VacancyT, kind: VacancyKinds}[] = [];
+  for (let kind of Object.values(VacancyKinds)) {
+    sortedVacancies.push(...(vacancies[kind].map(vacancy => ({ vacancy, kind }))));
+  }
+  return sortedVacancies;
+};
 
 const documentCoordinatesToCanvasCoordinates = (documentCoordinates: CoordinatesT, canvasRect: DOMRect): CoordinatesT => {
   const { top, left } = canvasRect;
@@ -326,7 +325,10 @@ const SvgTagsCloud = ({
         return;
       }
 
-      const canvasCoordinates = documentCoordinatesToCanvasCoordinates({ x: e.pageX, y: e.pageY }, canvasWrapperRect);
+      const canvasCoordinates = documentCoordinatesToCanvasCoordinates({
+        x: moveEvent.pageX,
+        y: moveEvent.pageY
+      }, canvasWrapperRect);
 
       const { x: avatarX, y: avatarY } = limitCoordinatesWithCanvasBoundaries(canvasCoordinates, canvasWrapperRect);
 
@@ -397,7 +399,7 @@ const SvgTagsCloud = ({
 
     const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, sceneMapEdges, zoom);
 
-    return getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacancies);
+    return sortActiveVacancies(getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacancies));
   })();
 
   handleMouseUpEventRef.current = () => {
@@ -405,30 +407,11 @@ const SvgTagsCloud = ({
     setDraggableTagPosition(null);
     setDraggableTagId(null);
 
-    if (!activeVacancies) {
+    if (!activeVacancies || !activeVacancies.length) {
       return;
     }
 
-    const { closedVacancies, topEdgeVacancies, bottomEdgeVacancies, leftEdgeVacancies, rightEdgeVacancies } = activeVacancies;
-    // TODO switch to mixing and sorting all the vacancy kinds
-    let targetVacancy;
-    let targetVacancyKind;
-    if (closedVacancies[0]) {
-      targetVacancy = closedVacancies[0];
-      targetVacancyKind = VacancyKinds.closedVacancies;
-    } else if (topEdgeVacancies[0]) {
-      targetVacancy = topEdgeVacancies[0];
-      targetVacancyKind = VacancyKinds.topEdgeVacancies;
-    } else if (bottomEdgeVacancies[0]) {
-      targetVacancy = bottomEdgeVacancies[0];
-      targetVacancyKind = VacancyKinds.bottomEdgeVacancies;
-    } else if (leftEdgeVacancies[0]) {
-      targetVacancy = leftEdgeVacancies[0];
-      targetVacancyKind = VacancyKinds.leftEdgeVacancies;
-    } else if (rightEdgeVacancies[0]) {
-      targetVacancy = rightEdgeVacancies[0];
-      targetVacancyKind = VacancyKinds.rightEdgeVacancies;
-    }
+    const { vacancy: targetVacancy, kind: targetVacancyKind } = activeVacancies[0] ?? {};
 
     if (targetVacancy && targetVacancyKind) {
       dispatch(actions.changeTagPosition({ vacancy: targetVacancy, vacancyKind: targetVacancyKind }));

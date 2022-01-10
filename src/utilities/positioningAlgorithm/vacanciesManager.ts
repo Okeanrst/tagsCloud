@@ -2,7 +2,8 @@ import type { SceneEdgesT } from './sceneMap';
 import { Dimensions, SceneMap } from './sceneMap';
 import { SortingClosedVacanciesStrategies, SortingEdgeVacanciesStrategies } from 'constants/index';
 
-import type {
+import {
+  VacancyKinds,
   ClosedVacancyT,
   CoordinatePointT,
   PreparedBottomEdgeVacancyT,
@@ -84,23 +85,23 @@ export class VacanciesManager {
     this._options = { ...DEFAULT_OPTIONS, ...(options ?? {}) };
   }
 
-  get closedVacancies() {
+  get [VacancyKinds.closedVacancies]() {
     return this._closedVacancies;
   }
 
-  get topEdgeVacancies() {
+  get [VacancyKinds.topEdgeVacancies]() {
     return this._topEdgeVacancies;
   }
 
-  get rightEdgeVacancies() {
+  get [VacancyKinds.rightEdgeVacancies]() {
     return this._rightEdgeVacancies;
   }
 
-  get bottomEdgeVacancies() {
+  get [VacancyKinds.bottomEdgeVacancies]() {
     return this._bottomEdgeVacancies;
   }
 
-  get leftEdgeVacancies() {
+  get [VacancyKinds.leftEdgeVacancies]() {
     return this._leftEdgeVacancies;
   }
 

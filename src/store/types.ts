@@ -1,7 +1,7 @@
 import { ThunkDispatch } from 'redux-thunk';
 import { Action } from 'redux';
 import { QueryStatuses } from 'constants/queryStatuses';
-
+import { VacancyKinds } from 'utilities/positioningAlgorithm/types';
 import type { PositionedTagRectT, TagDataT, IdRectAreaMapT } from 'types/types';
 import type {
   ClosedVacancyT,
@@ -23,11 +23,11 @@ export type RootStateT = {
     tagsPositions: ReadonlyArray<PositionedTagRectT>;
     sceneMap: [number, number, boolean][] | [number, number][];
     vacancies: {
-      closedVacancies: ClosedVacancyT[];
-      topEdgeVacancies: PreparedTopEdgeVacancyT[];
-      bottomEdgeVacancies: PreparedBottomEdgeVacancyT[];
-      leftEdgeVacancies: PreparedLeftEdgeVacancyT[];
-      rightEdgeVacancies: PreparedRightEdgeVacancyT[];
+      [VacancyKinds.closedVacancies]: ClosedVacancyT[];
+      [VacancyKinds.topEdgeVacancies]: PreparedTopEdgeVacancyT[];
+      [VacancyKinds.bottomEdgeVacancies]: PreparedBottomEdgeVacancyT[];
+      [VacancyKinds.leftEdgeVacancies]: PreparedLeftEdgeVacancyT[];
+      [VacancyKinds.rightEdgeVacancies]: PreparedRightEdgeVacancyT[];
     };
     status: QueryStatuses.SUCCESS;
   } | {
