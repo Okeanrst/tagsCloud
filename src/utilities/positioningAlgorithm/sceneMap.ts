@@ -225,7 +225,7 @@ export class SceneMap {
       this.calcSceneEdges();
     }
 
-    SceneMap.traverseSceneMap(this, (row, col) => {
+    SceneMap.traverseSceneMap(this, null, (row, col) => {
       if (row === 0 || col === 0) {
         return;
       }
@@ -244,7 +244,7 @@ export class SceneMap {
     let res = '';
 
     let prevRow: number;
-    SceneMap.traverseSceneMap(this, (row, col) => {
+    SceneMap.traverseSceneMap(this, null, (row, col) => {
       if (typeof prevRow !== 'undefined' && prevRow !== row) {
         res += '\n';
       }
@@ -266,7 +266,7 @@ export class SceneMap {
     }
     let totalPositionCount = 0;
     let occupiedPositionCount = 0;
-    SceneMap.traverseSceneMap(this, (row, col) => {
+    SceneMap.traverseSceneMap(this, null,(row, col) => {
       if (row === 0 || col === 0) {
         return;
       }
@@ -278,9 +278,9 @@ export class SceneMap {
     return occupiedPositionCount / totalPositionCount;
   }
 
-  static traverseSceneMap(map: SceneMap, cb: (row: number, column: number) => void) {
+  static traverseSceneMap(map: SceneMap, targetFrameEdges: SceneEdgesT | null, cb: (row: number, column: number) => void) {
     // from to bottom
-    const sceneEdges = map.getSceneEdges();
+    const sceneEdges = targetFrameEdges ?? map.getSceneEdges();
     const { [X]: rightCol, [MINUS_X]: leftCol, [Y]: topRow, [MINUS_Y]: bottomRow } = sceneEdges;
     for (let row = topRow; row >= bottomRow; row--) {
       for (let col = leftCol; col <= rightCol; col++) {

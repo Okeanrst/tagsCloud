@@ -159,6 +159,16 @@ export class VacanciesManager {
 
       const deduplicatedHorizontalLines = deduplicateLines(horizontalLines);
 
+      const checkIsRectAreaVacancy = (rectArea: VacancyRectAreaT) => {
+        const { beginColumn, endColumn } = rectArea;
+        for (let column = beginColumn; column <= endColumn; column++) {
+          if (columnsToCloseSet.has(column)) {
+            return true;
+          }
+        }
+        return false;
+      };
+
       const vacancyRectAreas: Array<VacancyRectAreaT> = [];
       deduplicatedHorizontalLines.forEach(line => {
         let beginColumn = line.begin;
@@ -166,9 +176,8 @@ export class VacanciesManager {
         let prevColVal = accumulated[beginColumn];
         for (let col = line.begin; col <= line.end; col = next(col)) {
           if (accumulated[col] !== prevColVal) {
-            vacancyRectAreas.push({ beginColumn, endColumn, rows: prevColVal });
-            if (!columnsToCloseSet.has(col)) {
-              break;
+            if (checkIsRectAreaVacancy({ beginColumn, endColumn, rows: prevColVal })) {
+              vacancyRectAreas.push({ beginColumn, endColumn, rows: prevColVal });
             }
             beginColumn = col;
           }
@@ -176,7 +185,9 @@ export class VacanciesManager {
           endColumn = col;
         }
 
-        vacancyRectAreas.push({ beginColumn, endColumn, rows: prevColVal });
+        if (checkIsRectAreaVacancy({ beginColumn, endColumn, rows: prevColVal })) {
+          vacancyRectAreas.push({ beginColumn, endColumn, rows: prevColVal });
+        }
       });
 
       const deduplicatedVacancyRectAreas = deduplicateVacancyRectAreas(vacancyRectAreas);

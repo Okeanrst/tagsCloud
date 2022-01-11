@@ -42,10 +42,10 @@ export const tagsCloudReducer = (
     }
     case TAGS_CLOUD_UPDATE_TAG: {
       const { sceneMap, tagPosition, vacancies } = action.payload;
-      const tagsPositions = state.tagsPositions?.filter(({ id }) => id !== tagPosition.id);
-      if (!tagsPositions) {
+      if (!state.tagsPositions) {
         return state;
       }
+      const tagsPositions = state.tagsPositions?.filter(({ id }) => id !== tagPosition.id);
       tagsPositions.push(tagPosition);
       return { ...state, tagsPositions, sceneMap, vacancies };
     }
