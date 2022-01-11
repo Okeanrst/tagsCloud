@@ -436,7 +436,7 @@ describe('VacanciesManager tests', () => {
       leftEdgeVacancies
     }).toMatchSnapshot();
   });
-  it('should return correct vacancies for sceneMap 8', () => {
+  /*it('should return correct vacancies for sceneMap 8', () => {
     sceneMap.bulkOccupyPosition([
       [1, -1], [3, -1],
       [1, -2],
@@ -461,5 +461,5 @@ describe('VacanciesManager tests', () => {
       bottomEdgeVacancies,
       leftEdgeVacancies
     }).toMatchSnapshot();
-  });
+  });*/
 });
