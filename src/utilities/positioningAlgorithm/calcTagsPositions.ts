@@ -195,6 +195,18 @@ export const moveRectAreaPositionsOnSceneMap = (
   return sceneMap;
 };
 
+export const getSceneMapVacancies = (sceneMap: SceneMap) => {
+  const vacanciesManager = new VacanciesManager(sceneMap);
+  vacanciesManager.buildVacanciesMap();
+  return  {
+    [VacancyKinds.closedVacancies]: vacanciesManager.closedVacancies.filter(v => !!v) as ClosedVacancyT[],
+    [VacancyKinds.topEdgeVacancies]: vacanciesManager.topEdgeVacancies,
+    [VacancyKinds.bottomEdgeVacancies]: vacanciesManager.bottomEdgeVacancies,
+    [VacancyKinds.leftEdgeVacancies]: vacanciesManager.leftEdgeVacancies,
+    [VacancyKinds.rightEdgeVacancies]: vacanciesManager.rightEdgeVacancies,
+  };
+};
+
 export function creatRawPositionedTagRect(
   rect: TagRectT,
   { top, right, bottom, left }: RectPositionT,
@@ -265,8 +277,8 @@ export function isVacancyLargeEnoughToFitRect(
   rectArea: RectAreaT,
   vacancy: VacancyT,
 ) {
-  return SceneMap.changePosition(vacancy.left, rectArea.cols) <= vacancy.right
-    && SceneMap.changePosition(vacancy.bottom, rectArea.rows) <= vacancy.top;
+  return SceneMap.countPositions(vacancy.left, vacancy.right) >= rectArea.cols
+    && SceneMap.countPositions(vacancy.bottom, vacancy.top) >= rectArea.rows;
 }
 
 function isClosedVacancyLargeEnoughToFitRect(

@@ -11,16 +11,17 @@ import {
 import {
   calcTagsPositions, creatRawPositionedTagRect, moveRectAreaPositionsOnSceneMap,
   pickClosedVacancy,
-  pickEdgeVacancy, preparePositionedTagRect,
+  pickEdgeVacancy,
+  preparePositionedTagRect,
   releaseRectAreaPositionsOnSceneMap,
   rotateRectArea,
+  getSceneMapVacancies,
 } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
 import { prepareTagsData } from 'utilities/tagsCloud/tagsCloud';
 import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
 import { SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
 import { EDGE } from 'utilities/positioningAlgorithm/edgesManager';
-import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { selectTargetTagDataItem } from '../reducers/tagsData';
 import { createAction } from './helpers';
@@ -66,18 +67,6 @@ const findUnusedRectAreasMapsKeys = (state: RootStateT) => {
     }
   });
   return unusedKeys;
-};
-
-const getSceneMapVacancies = (sceneMap: SceneMap) => {
-  const vacanciesManager = new VacanciesManager(sceneMap);
-  vacanciesManager.buildVacanciesMap();
-  return  {
-    closedVacancies: vacanciesManager.closedVacancies.filter(v => !!v) as ClosedVacancyT[],
-    topEdgeVacancies: vacanciesManager.topEdgeVacancies,
-    bottomEdgeVacancies: vacanciesManager.bottomEdgeVacancies,
-    leftEdgeVacancies: vacanciesManager.leftEdgeVacancies,
-    rightEdgeVacancies: vacanciesManager.rightEdgeVacancies,
-  };
 };
 
 export function getData() {
