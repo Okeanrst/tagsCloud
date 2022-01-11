@@ -624,9 +624,8 @@ const SvgTagsCloud = ({
 
                 return (
                   <Transition
-                    key={i.id}
+                    key={i.id + i.rectLeft + i.rectTop}
                     timeout={DURATION}
-                    // classNames="tagText"
                   >
                     {state => {
                       return (
