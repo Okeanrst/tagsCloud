@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, useRef } from 'react';
+import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { withStyles, createStyles } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
@@ -6,7 +6,12 @@ import throttle from 'lodash.throttle';
 import * as actions from 'store/actions/tagsCloud';
 import { getBorderCoordinates, getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
-import { isVacancyLargeEnoughToFitRect, rotateRectArea } from 'utilities/positioningAlgorithm/calcTagsPositions';
+import {
+  getSceneMapVacancies,
+  isVacancyLargeEnoughToFitRect,
+  releaseRectAreaPositionsOnSceneMap,
+  rotateRectArea,
+} from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { SceneMap, Dimensions } from 'utilities/positioningAlgorithm/sceneMap';
 import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
@@ -278,6 +283,31 @@ const SvgTagsCloud = ({
   const [isSettingsControlsShown, setIsSettingsControlsShown] = useState(false);
   const [draggableTagId, setDraggableTagId] = useState<string | null>(null);
   const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
+  const [tmpVacancies, setTmpVacancies] = useState<VacanciesT | null>(null);
+
+  useEffect(() => {
+    if (!draggableTagId || !sceneMapPositions) {
+      setTmpVacancies(null);
+      return;
+    }
+    const tagPosition = tagsPositions?.find(({ id }) => id === draggableTagId);
+    if (!tagPosition) {
+      setTmpVacancies(null);
+      return;
+    }
+
+    const rectAreaMapKey = formRectAreaMapKey(tagPosition.label, tagPosition.fontSize);
+
+    const { map: rectAreaMap } = rectAreasMaps.find(({ key }) => key === rectAreaMapKey) ?? {};
+
+    if (!rectAreaMap) {
+      setTmpVacancies(null);
+      return;
+    }
+    const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, tagPosition, rectAreaMap);
+
+    setTmpVacancies(getSceneMapVacancies(sceneMap));
+  }, [sceneMapPositions, draggableTagId, rectAreasMaps, tagsPositions]);
 
   const toggleIsCoordinateGridShown = useCallback(() => {
     setIsCoordinateGridShown((value) => !value);
@@ -444,7 +474,8 @@ const SvgTagsCloud = ({
   zoomRef.current = zoom;
 
   const activeVacancies = (() => {
-    if (!draggableTagPosition || !draggableTagId || !vacancies || !sceneMapEdges) {
+    const vacanciesToProcess = tmpVacancies ?? vacancies;
+    if (!draggableTagPosition || !draggableTagId || !vacanciesToProcess || !sceneMapEdges) {
       return null;
     }
     const tagPosition = tagsPositions?.find(({ id }) => id === draggableTagId);
@@ -470,7 +501,7 @@ const SvgTagsCloud = ({
 
     const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, sceneMapEdges, zoom);
 
-    return sortActiveVacancies(getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacancies));
+    return sortActiveVacancies(getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacanciesToProcess));
   })();
 
   handleMouseUpEventRef.current = () => {
@@ -562,11 +593,14 @@ const SvgTagsCloud = ({
               exite={false}
             >
               {positionedTagSvgData.map((i, index: number) => {
-                const style = {
+                const style: React.CSSProperties = {
                   fontSize: `${i.adaptFontSize}px`,
                   fontFamily: FONT_FAMILY,
                   fill: i.color,
                 };
+                if (draggableTagId === i.id) {
+                  style.visibility = 'hidden';
+                }
                 const transitionStyles: { [key: string]: React.CSSProperties } = {
                   exited: {
                     opacity: 0,
