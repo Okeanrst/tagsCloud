@@ -54,3 +54,5 @@ export interface ClosedVacancyT extends VacancyT {
 }
 
 export type CoordinatePointT = { x: number; y: number };
+
+export type PositionT = { col: number; row: number };

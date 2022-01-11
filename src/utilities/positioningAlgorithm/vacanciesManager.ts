@@ -12,6 +12,7 @@ import {
   PreparedRightEdgeVacancyT,
   PreparedTopEdgeVacancyT,
   VacancyT,
+  PositionT,
 } from './types';
 
 type OptionsT = {
@@ -395,8 +396,13 @@ export class VacanciesManager {
 
   static checkIsPointBelongToVacancy = (point: CoordinatePointT, vacancy: VacancyT) => {
     const v = vacancy;
-    return SceneMap.getPositionRightEdge(v.top) >= point.y && SceneMap.getPositionLeftEdge(v.bottom) <= point.y
-      && SceneMap.getPositionLeftEdge(v.left) <= point.x && SceneMap.getPositionRightEdge(v.right) >= point.x;
+    return SceneMap.getPositionLeftEdge(v.bottom) < point.y && point.y < SceneMap.getPositionRightEdge(v.top)
+      && SceneMap.getPositionLeftEdge(v.left) < point.x && point.x < SceneMap.getPositionRightEdge(v.right);
+  };
+
+  static checkIsPositionBelongToVacancy = (position: PositionT, vacancy: VacancyT) => {
+    return vacancy.bottom <= position.row && vacancy.top >= position.row && vacancy.left <= position.col
+      && vacancy.right >= position.col;
   };
 }
 
@@ -418,7 +424,7 @@ export function drawVacancy(vacancy: VacancyT, sceneEdges: SceneEdgesT): void {
       if (row === 0) {
         res += '';
       } else {
-        res += col === 0 ? '|' : VacanciesManager.checkIsPointBelongToVacancy({ x: col, y: row }, v) ? '⬛' : '⬜';
+        res += col === 0 ? '|' : VacanciesManager.checkIsPositionBelongToVacancy({ col, row }, v) ? '⬛' : '⬜';
       }
     }
     res += '\n';
