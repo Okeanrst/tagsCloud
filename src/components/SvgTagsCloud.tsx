@@ -38,7 +38,7 @@ type CoordinatesT = { x: number; y: number };
 
 type VacanciesT = NonNullable<RootStateT['tagsCloud']['vacancies']>;
 
-const DURATION = 500;
+const DURATION = 300;
 
 const MOVEMENT_THRESHOLD = 10; // px
 
@@ -49,9 +49,27 @@ const TAG_AVATAR_CANVAS_Z_INDEX = 10;
 const REACT_AREAS_CANVAS_Z_INDEX = 1;
 const COORDINATE_GRID_CANVAS_Z_INDEX = 1;
 
+const getEventDocumentCoordinates = (event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent | React.SyntheticEvent<any, MouseEvent> | React.SyntheticEvent<any, TouchEvent>/* React.MouseEvent | React.TouchEvent*/) => {
+  let pageX: number | null = null;
+  let pageY: number | null = null;
+  if (event instanceof MouseEvent) {
+    ({ pageX, pageY } = event);
+  } else if (event instanceof TouchEvent) {
+    ({ pageX, pageY } = event.touches[0]);
+  } else if ('nativeEvent' in event && event.nativeEvent instanceof MouseEvent) {
+    // @ts-ignore
+    ({ pageX, pageY } = event);
+  }  else if ('nativeEvent' in event && event.nativeEvent instanceof TouchEvent) {
+    // @ts-ignore
+    ({ pageX, pageY } = event.touches[0]);
+  }
+  return { pageX, pageY };
+};
+
 const tagStyle = {
   transition: `all ${DURATION}ms ease-in-out`,
   opacity: 0,
+  cursor: 'pointer',
 };
 
 const styles = createStyles({
@@ -361,7 +379,7 @@ const SvgTagsCloud = ({
     }
   }, [onTagClick]);
 
-  const onCanvasWrapperMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const onCanvasWrapperMouseDown = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!(e.target instanceof SVGTextElement)) {
       return;
     }
@@ -372,11 +390,11 @@ const SvgTagsCloud = ({
 
     const tagPosition = tagsPositions?.find(({ id }) => id === tagId);
 
-    if (!tagPosition) {
+    const { pageX: initPageX, pageY: initPageY } = getEventDocumentCoordinates(e);
+
+    if (!tagPosition || initPageX === null || initPageY === null) {
       return;
     }
-
-    const { pageX: initPageX, pageY: initPageY } = e;
 
     const {
       x: rectLeftCanvasCoordinate,
@@ -403,9 +421,13 @@ const SvgTagsCloud = ({
 
     const throttledSetDraggableTagPosition = throttle(setDraggableTagPosition, 100);
 
-    const onMouseMove = (moveEvent: MouseEvent) => {
+    const onMouseMove = (moveEvent: MouseEvent | TouchEvent) => {
+      const { pageX, pageY } = getEventDocumentCoordinates(moveEvent);
+      if (pageX === null || pageY === null) {
+        return;
+      }
       if (!didDraggingStart) {
-        didDraggingStart = ((initPageX - moveEvent.pageX) ** 2 + (initPageY - moveEvent.pageY) ** 2) ** 0.5 > MOVEMENT_THRESHOLD;
+        didDraggingStart = ((initPageX - pageX) ** 2 + (initPageY - pageY) ** 2) ** 0.5 > MOVEMENT_THRESHOLD;
         didDraggingStart && setDraggableTagId(tagId);
       }
 
@@ -420,8 +442,8 @@ const SvgTagsCloud = ({
       }
 
       const canvasCoordinates = documentCoordinatesToCanvasCoordinates({
-        x: moveEvent.pageX,
-        y: moveEvent.pageY
+        x: pageX,
+        y: pageY
       }, canvasWrapperRect);
 
       const pointerCanvasCoordinates = limitCoordinatesWithCanvasBoundaries(canvasCoordinates, canvasWrapperRect);
@@ -453,6 +475,9 @@ const SvgTagsCloud = ({
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
 
+      document.removeEventListener('touchmove', onMouseMove);
+      document.removeEventListener('touchend', onMouseUp);
+
       if (!didDraggingStart) {
         return;
       }
@@ -468,6 +493,9 @@ const SvgTagsCloud = ({
 
     document.addEventListener('mouseup', onMouseUp);
     document.addEventListener('mousemove', onMouseMove);
+
+    document.addEventListener('touchend', onMouseUp);
+    document.addEventListener('touchmove', onMouseMove);
   }, [tagsPositions, sceneMapEdges]);
 
   if (!tagsPositions || !tagsSvgData) {
@@ -583,6 +611,7 @@ const SvgTagsCloud = ({
         ref={canvasWrapperRef}
         onClick={onCanvasWrapperClick}
         onMouseDown={onCanvasWrapperMouseDown}
+        onTouchStart={onCanvasWrapperMouseDown}
       >
         {isCoordinateGridShown && drawCoordinateGrid(tagsPositions, svgSize, viewBox)}
         {isReactAreasShown && drawReactAreas(tagsPositions, svgSize, viewBox, transform)}
