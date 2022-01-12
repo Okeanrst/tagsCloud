@@ -306,6 +306,12 @@ const SvgTagsCloud = ({
     setTmpVacancies(getSceneMapVacancies(sceneMap));
   }, [sceneMapPositions, draggableTagId, rectAreasMaps, tagsPositions]);
 
+  useEffect(() => {
+    if (!draggableTagId) {
+      preventOnClickHandlingRef.current = false;
+    }
+  }, [draggableTagId]);
+
   const toggleIsCoordinateGridShown = useCallback(() => {
     setIsCoordinateGridShown((value) => !value);
   }, [setIsCoordinateGridShown]);
@@ -528,7 +534,6 @@ const SvgTagsCloud = ({
         vacancyKind: targetVacancyKind
       }));
     }
-    preventOnClickHandlingRef.current = false;
   };
 
   const draggableTagAvatarProps = (() => {
