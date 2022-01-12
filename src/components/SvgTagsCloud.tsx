@@ -87,6 +87,9 @@ const styles = createStyles({
     top: 0,
     left: 0,
     zIndex: TAG_AVATAR_CANVAS_Z_INDEX,
+    'white-space': 'pre',
+    'user-select': 'none',
+    cursor: 'pointer',
   },
   text: {
     'white-space': 'pre',

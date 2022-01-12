@@ -1,4 +1,9 @@
-import { FONT_FAMILY, FONT_Y_FACTOR, FONT_SIZE_TO_GLYPH_HEIGHT_RATIO } from 'constants/index';
+import {
+  FONT_FAMILY,
+  FONT_Y_FACTOR,
+  FONT_SIZE_TO_GLYPH_HEIGHT_RATIO,
+  OPEN_SANS_FONT,
+} from 'constants/index';
 import openSansGlyphsByChars from './glyphsByChars/openSans.json';
 
 import {
@@ -12,7 +17,7 @@ type RectAreaSize = { width: number; height: number };
 type GlyphsByCharsT = {[key: string]: {xMin: number, yMin: number, xMax: number, yMax: number}};
 
 const glyphsByCharsMap: {[key: string]: GlyphsByCharsT} = {
-  [FONT_FAMILY]: openSansGlyphsByChars,
+  [OPEN_SANS_FONT]: openSansGlyphsByChars,
 };
 
 function calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily }: {
