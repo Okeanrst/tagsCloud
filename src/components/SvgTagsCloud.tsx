@@ -4,7 +4,7 @@ import { withStyles, createStyles } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import throttle from 'lodash.throttle';
 import * as actions from 'store/actions/tagsCloud';
-import { getBorderCoordinates, getTagsSvgData } from 'utilities/tagsCloud/tagsCloud';
+import { getBorderCoordinates, getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 import {
   getSceneMapVacancies,
@@ -16,7 +16,7 @@ import { SceneMap, Dimensions } from 'utilities/positioningAlgorithm/sceneMap';
 import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
 import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
-import { FONT_FAMILY, SCENE_MAP_RESOLUTION } from 'constants/index';
+import { FONT_FAMILY, FONT_Y_FACTOR, SCENE_MAP_RESOLUTION } from 'constants/index';
 import { Checkbox } from 'ui/checkbox/Checkbox';
 import { Collapse } from 'components/Collapse';
 
@@ -42,7 +42,14 @@ const DURATION = 500;
 
 const MOVEMENT_THRESHOLD = 10; // px
 
-const DEFAULT_STYLE = {
+const TAGS_CLOUD_CANVAS_Z_INDEX = 2;
+const SETTINGS_CONTROLS_Z_INDEX = 3;
+const TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX = 1;
+const TAG_AVATAR_CANVAS_Z_INDEX = 10;
+const REACT_AREAS_CANVAS_Z_INDEX = 1;
+const COORDINATE_GRID_CANVAS_Z_INDEX = 1;
+
+const tagStyle = {
   transition: `all ${DURATION}ms ease-in-out`,
   opacity: 0,
 };
@@ -51,6 +58,17 @@ const styles = createStyles({
   container: {
     width: '100%',
     textAlign: 'center',
+  },
+  tagsCloudCanvas: {
+    position: 'relative',
+    zIndex: TAGS_CLOUD_CANVAS_Z_INDEX,
+    fontFamily: FONT_FAMILY,
+  },
+  tagAvatarCanvas: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: TAG_AVATAR_CANVAS_Z_INDEX,
   },
   text: {
     'white-space': 'pre',
@@ -61,7 +79,7 @@ const styles = createStyles({
     flexDirection: 'column',
     position: 'absolute',
     right: 0,
-    zIndex: 3,
+    zIndex: SETTINGS_CONTROLS_Z_INDEX,
   },
   toggleIsSettingsControlsButton: {
     position: 'absolute',
@@ -85,44 +103,23 @@ const styles = createStyles({
   }
 });
 
-const draggableTagAvatarStyle: React.CSSProperties = {
-  position: 'absolute',
-  display: 'none',
-  justifyContent: 'center',
-  alignItems: 'center',
-  zIndex: 10,
-  verticalAlign: 'middle',
-  whiteSpace: 'pre',
-  userSelect: 'none',
-};
-
 type DraggableTagAvatarProps = {
   label?: string;
-  rotate?: boolean;
   color?: string;
   fontSize?: number;
-  zoom?: number;
+  display?: string;
 };
 
-const DraggableTagAvatar = React.forwardRef<HTMLDivElement, DraggableTagAvatarProps>((props, ref ) => {
-  const { label = '', rotate = false, color = 'black', fontSize = 8, zoom = 1 } = props;
-  const style = { ...draggableTagAvatarStyle, color, border: `1px solid ${color}`, fontSize };
-  if (rotate) {
-    Object.assign(style, {
-      writingMode: 'vertical-rl',
-      textOrientation: 'mixed',
-    });
-  }
+const DraggableTagAvatar = React.forwardRef<SVGTextElement, DraggableTagAvatarProps>((props, ref ) => {
+  const { label = '', color = 'black', fontSize = 8, display = 'none' } = props;
   return (
-    <div
-      className="DraggableTagAvatar"
+    <text
       ref={ref}
-      style={style}
+      style={{ fill: color, fontSize, display }}
+      textAnchor="middle"
     >
-      <span style={{ zoom }}>
-        {label}
-      </span>
-    </div>
+      {label}
+    </text>
   );
 });
 
@@ -272,7 +269,7 @@ const SvgTagsCloud = ({
   const dispatch = useDispatch();
 
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
-  const draggableTagAvatarRef = useRef<HTMLDivElement | null>(null);
+  const draggableTagAvatarRef = useRef<SVGTextElement | null>(null);
   const preventOnClickHandlingRef = useRef<boolean>(false);
   const handleMouseUpEventRef = useRef(() => {});
   const zoomRef = useRef(1);
@@ -376,8 +373,8 @@ const SvgTagsCloud = ({
     const { pageX: initPageX, pageY: initPageY } = e;
 
     const {
-      x: rectLeftCoordinate,
-      y: rectTopCoordinate
+      x: rectLeftCanvasCoordinate,
+      y: rectTopCanvasCoordinate
     } = sceneCoordinatesToCanvasCoordinates({
       x: tagPosition.rectLeft,
       y: tagPosition.rectTop
@@ -393,8 +390,8 @@ const SvgTagsCloud = ({
       y: initPageY
     }, canvasWrapperRect);
 
-    const shiftX = initCanvasCoordinates.x - rectLeftCoordinate;
-    const shiftY = initCanvasCoordinates.y - rectTopCoordinate;
+    const shiftX = initCanvasCoordinates.x - rectLeftCanvasCoordinate;
+    const shiftY = initCanvasCoordinates.y - rectTopCanvasCoordinate;
 
     let didDraggingStart = false;
 
@@ -421,20 +418,30 @@ const SvgTagsCloud = ({
         y: moveEvent.pageY
       }, canvasWrapperRect);
 
+      const pointerCanvasCoordinates = limitCoordinatesWithCanvasBoundaries(canvasCoordinates, canvasWrapperRect);
+
       const currentZoom = zoomRef.current;
       const { rectTop, rectBottom, rectLeft, rectRight } = tagPosition;
-      const tagAvatarWidth = (rectRight - rectLeft) * currentZoom;
-      const tagAvatarHeight = (rectTop - rectBottom) * currentZoom;
+      const tagAvatarWidth = rectRight - rectLeft;
+      const tagAvatarHeight = rectTop - rectBottom;
 
-      const { x: avatarX, y: avatarY } = limitCoordinatesWithCanvasBoundaries(canvasCoordinates, canvasWrapperRect);
+      const pointerSceneCoordinates = canvasCoordinatesToSceneCoordinates(pointerCanvasCoordinates, sceneMapEdges, currentZoom);
 
-      draggableTagAvatarRef.current.style.width = tagAvatarWidth + 'px';
-      draggableTagAvatarRef.current.style.height = tagAvatarHeight + 'px';
-      draggableTagAvatarRef.current.style.left = avatarX - shiftX + 'px';
-      draggableTagAvatarRef.current.style.top = avatarY - shiftY + 'px';
-      draggableTagAvatarRef.current.style.display = 'flex';
+      const nextRectTop = pointerSceneCoordinates.y * SCENE_MAP_RESOLUTION  + shiftY / currentZoom;
+      const nextRectLeft = pointerSceneCoordinates.x * SCENE_MAP_RESOLUTION - shiftX / currentZoom;
+      const { rectTranslateX, rectTranslateY } = calcTagSvgData({
+        ...tagPosition,
+        rectTop: nextRectTop,
+        rectBottom: nextRectTop - tagAvatarHeight,
+        rectLeft: nextRectLeft,
+        rectRight: nextRectLeft + tagAvatarWidth,
+      }, FONT_Y_FACTOR - 0.5);
 
-      throttledSetDraggableTagPosition({ x: avatarX, y: avatarY });
+      draggableTagAvatarRef.current.style.transform = `translate(${rectTranslateX}px,${rectTranslateY}px) rotate(${tagPosition.rotate ? 90 : 0}deg) scale(1)`;
+
+      draggableTagAvatarRef.current.style.display = 'block';
+
+      throttledSetDraggableTagPosition({ x: pointerCanvasCoordinates.x, y: pointerCanvasCoordinates.y });
     };
     const onMouseUp = () => {
       document.removeEventListener('mousemove', onMouseMove);
@@ -505,7 +512,6 @@ const SvgTagsCloud = ({
   })();
 
   handleMouseUpEventRef.current = () => {
-    preventOnClickHandlingRef.current = false;
     setDraggableTagPosition(null);
     setDraggableTagId(null);
 
@@ -522,6 +528,7 @@ const SvgTagsCloud = ({
         vacancyKind: targetVacancyKind
       }));
     }
+    preventOnClickHandlingRef.current = false;
   };
 
   const draggableTagAvatarProps = (() => {
@@ -533,8 +540,8 @@ const SvgTagsCloud = ({
       return {};
     }
 
-    const { label, rotate, color, fontSize } = tagPosition;
-    return { label, rotate, color, fontSize, zoom };
+    const { label, color, fontSize } = tagPosition;
+    return { label, color, fontSize, display: 'block' };
   })();
 
   return (
@@ -574,14 +581,9 @@ const SvgTagsCloud = ({
       >
         {isCoordinateGridShown && drawCoordinateGrid(tagsPositions, svgSize, viewBox)}
         {isReactAreasShown && drawReactAreas(tagsPositions, svgSize, viewBox, transform)}
-        <DraggableTagAvatar
-          ref={draggableTagAvatarRef}
-          {...draggableTagAvatarProps}
-        />
         <svg
-          id="small_cloud"
           {...svgSize}
-          style={{ position: 'relative', zIndex: 2 }}
+          className={classes.tagsCloudCanvas}
           viewBox={viewBox.join(' ')}
         >
           <g transform={transform}>
@@ -594,8 +596,7 @@ const SvgTagsCloud = ({
             >
               {positionedTagSvgData.map((i, index: number) => {
                 const style: React.CSSProperties = {
-                  fontSize: `${i.adaptFontSize}px`,
-                  fontFamily: FONT_FAMILY,
+                  fontSize: `${i.fontSize}px`,
                   fill: i.color,
                 };
                 if (draggableTagId === i.id) {
@@ -636,7 +637,7 @@ const SvgTagsCloud = ({
                           key={`${i.id}_${index}`}
                           style={{
                             ...style,
-                            ...DEFAULT_STYLE,
+                            ...tagStyle,
                             ...transitionStyles[state],
                           }}
                           textAnchor="middle"
@@ -663,16 +664,30 @@ const SvgTagsCloud = ({
           vacancies={allVacancies}
           viewBox={viewBox}
         />
+        <svg
+          {...svgSize}
+          className={classes.tagAvatarCanvas}
+          style={{ zIndex: draggableTagId ? TAG_AVATAR_CANVAS_Z_INDEX : TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX }}
+          viewBox={viewBox.join(' ')}
+        >
+          <g transform={transform}>
+            <DraggableTagAvatar
+              ref={draggableTagAvatarRef}
+              {...draggableTagAvatarProps}
+            />
+          </g>
+        </svg>
       </div>
     </div>
   );
 };
 
-const coordinateGridStyle: React.CSSProperties = {
+const coordinateGridCanvasStyle: React.CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
   outline: '1px solid',
+  zIndex: COORDINATE_GRID_CANVAS_Z_INDEX,
 };
 
 function drawCoordinateGrid(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT) {
@@ -724,9 +739,8 @@ function drawCoordinateGrid(tagData: ReadonlyArray<PositionedTagRectT>, svgSize:
 
   return (
     <svg
-      id="coordinateGrid"
       {...svgSize}
-      style={coordinateGridStyle}
+      style={coordinateGridCanvasStyle}
       viewBox={viewBox.join(' ')}
     >
       <g>
@@ -740,6 +754,18 @@ function calcZoom(svgSize: SizeT, viewBox: ViewBoxT) {
   const [,, width] = viewBox;
   return svgSize.width / width;
 }
+
+const reactAreasCanvasStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  outline: '1px solid',
+  zIndex: REACT_AREAS_CANVAS_Z_INDEX,
+};
+
+const reactAreaStyle: React.CSSProperties = {
+  position: 'relative',
+};
 
 function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT, transform: string) {
   const zoom = calcZoom(svgSize, viewBox);
@@ -759,7 +785,7 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
         stroke={color}
         strokeOpacity="0.5"
         strokeWidth={3 / zoom}
-        style={{ position: 'relative', zIndex: 1 }}
+        style={reactAreaStyle}
         width={width}
         x={x}
         y={y}
@@ -768,9 +794,8 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
   });
   return (
     <svg
-      id="reactAreas"
       {...svgSize}
-      style={coordinateGridStyle}
+      style={reactAreasCanvasStyle}
       viewBox={viewBox.join(' ')}
     >
       <g transform={transform} >

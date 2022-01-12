@@ -85,6 +85,23 @@ export function getBorderCoordinates(
   return { top: maxTop, bottom: minBottom, right: maxRight, left: minLeft };
 }
 
+export function calcTagSvgData(tagData: PositionedTagRectT, yFactor: number) {
+  const diffX = tagData.rectRight - tagData.rectLeft;
+  const diffY = tagData.rectTop - tagData.rectBottom;
+  const middleX = tagData.rectLeft + diffX / 2;
+  const middleY = tagData.rectBottom + diffY / 2;
+  const { glyphsXOffset, glyphsYOffset } = tagData;
+
+  const rectTranslateX = tagData.rotate ? middleX - diffX * yFactor + glyphsYOffset : middleX + glyphsXOffset;
+  const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * yFactor) + glyphsYOffset;
+
+  return {
+    ...tagData,
+    rectTranslateX,
+    rectTranslateY,
+  };
+}
+
 export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
   transform: string;
   viewBox: ViewBoxT;
@@ -97,32 +114,18 @@ export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
     return null;
   }
 
+  const yFactor = FONT_Y_FACTOR - 0.5;
+
+  const positionedTagsSvgData = data.map(tagData => {
+    return calcTagSvgData(tagData, yFactor);
+  });
+
   const {
     top: borderTop,
     bottom: borderBottom,
     right: borderRight,
     left: borderLeft,
   } = borderCoordinates;
-
-  const yFactor = FONT_Y_FACTOR - 0.5;
-
-  const positionedTagSvgData = data.map(tagData => {
-    const diffX = tagData.rectRight - tagData.rectLeft;
-    const diffY = tagData.rectTop - tagData.rectBottom;
-    const middleX = tagData.rectLeft + diffX / 2;
-    const middleY = tagData.rectBottom + diffY / 2;
-    const { glyphsXOffset, glyphsYOffset } = tagData;
-
-    const rectTranslateX = tagData.rotate ? middleX - diffX * yFactor + glyphsYOffset : middleX + glyphsXOffset;
-    const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * yFactor) + glyphsYOffset;
-
-    return {
-      ...tagData,
-      rectTranslateX,
-      rectTranslateY,
-      adaptFontSize: tagData.fontSize,
-    };
-  });
 
   const maxRight = borderRight;
   const minLeft = borderLeft;
@@ -136,6 +139,6 @@ export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
     transform: `translate(${-minLeft}, ${maxTop})`,
     viewBox: [0, 0, sceneWidth, sceneHeight],
     aspectRatio: sceneWidth / sceneHeight,
-    data: positionedTagSvgData,
+    data: positionedTagsSvgData,
   };
 }

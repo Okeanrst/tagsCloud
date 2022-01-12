@@ -93,6 +93,5 @@ export type PositionedTagSvgDataT = Readonly<
   PositionedTagRectT & {
     rectTranslateX: number;
     rectTranslateY: number;
-    adaptFontSize: number;
   }
 >;
