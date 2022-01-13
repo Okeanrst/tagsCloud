@@ -1,10 +1,10 @@
 import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 
-import HomePage from 'containers/HomePage';
+import TagsCloud from 'pages/TagsCloud';
 import { NotFoundPage } from 'components/NotFoundPage';
-import TagInformation from 'containers/TagInformation';
-import TagsListEditor from 'containers/tagsListEditor/TagsListEditor';
+import TagInformation from 'pages/TagInformation';
+import TagsListEditor from 'pages/tagsListEditor/TagsListEditor';
 import { Layout } from 'components/Layout';
 
 const Router = () => {
@@ -14,7 +14,7 @@ const Router = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route
-          element={<HomePage navigate={navigate} />}
+          element={<TagsCloud navigate={navigate} />}
           path="/"
         />
         <Route

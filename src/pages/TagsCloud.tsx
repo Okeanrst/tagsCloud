@@ -88,7 +88,7 @@ const getTagsDataByTagsIds = (tagsIds: string[], tagsData: ReadonlyArray<TagData
   return tagsData.filter(({ id }) => targetTagsIds.has(id));
 };
 
-class HomePage extends Component<PropsT, StateT> {
+class TagsCloud extends Component<PropsT, StateT> {
   state: StateT = { tagsCloudSceneSize: null };
 
   tagsCloudSceneRef = React.createRef<HTMLDivElement>();
@@ -243,4 +243,4 @@ class HomePage extends Component<PropsT, StateT> {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withTriggerGettingRawData<PropsT>(HomePage));
+)(withTriggerGettingRawData<PropsT>(TagsCloud));
