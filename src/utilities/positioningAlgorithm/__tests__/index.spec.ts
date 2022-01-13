@@ -35,7 +35,7 @@ describe('positioningAlgorithm tests', () => {
 
   describe('prepareRectAreasMaps tests', () => {
     it(`should return array with correct value (right shape)`, async () => {
-      const tagsRectAreasMaps = await prepareRectAreasMaps(preparedData, 2);
+      const tagsRectAreasMaps = await prepareRectAreasMaps(preparedData, { resolution: 2, fontFamily: 'fontFamily' });
       expect(tagsRectAreasMaps).toStrictEqual(
         preparedData.map(({ label, fontSize }) => ({ key: formRectAreaMapKey(label, fontSize), map: null, mapMeta: null })),
       );

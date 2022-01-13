@@ -1,5 +1,4 @@
 import {
-  FONT_FAMILY,
   FONT_Y_FACTOR,
   FONT_SIZE_TO_GLYPH_HEIGHT_RATIO,
   OPEN_SANS_FONT,
@@ -25,7 +24,7 @@ function calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily }: {
   word: string;
   fontSize: number;
   resolution: number;
-  fontFamily?: string;
+  fontFamily: string;
 }): ([RectAreaT, RectAreaSize, number] | null) {
   const ctx = canvas.getContext('2d');
 
@@ -52,12 +51,12 @@ export function getRectAreaMap(
     word,
     fontSize,
     resolution,
-    fontFamily = FONT_FAMILY,
+    fontFamily,
   }: {
     word: string;
     fontSize: number;
     resolution: number;
-    fontFamily?: string;
+    fontFamily: string;
   },
   {
     returnFakeRectAreaMap,
@@ -338,14 +337,14 @@ export function getHighResolutionGlyphsMap(
     fontSize,
     width,
     height,
-    fontFamily = FONT_FAMILY,
+    fontFamily,
     xOffset = 0,
   }: {
     word: string;
     fontSize: number;
     width: number;
     height: number;
-    fontFamily?: string;
+    fontFamily: string;
     xOffset?: number;
   },
 ): {

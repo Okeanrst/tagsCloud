@@ -7,6 +7,7 @@ import {
   SCENE_MAP_RESOLUTION,
   SortingClosedVacanciesStrategies,
   SortingEdgeVacanciesStrategies,
+  FONT_FAMILY,
 } from 'constants/index';
 import {
   calcTagsPositions, creatRawPositionedTagRect, moveRectAreaPositionsOnSceneMap,
@@ -114,13 +115,16 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
       maxSentimentScore
     });
     const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
-    return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, SCENE_MAP_RESOLUTION)
+    return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, {
+      resolution: SCENE_MAP_RESOLUTION,
+      fontFamily: FONT_FAMILY
+    })
       .then(tagsRectAreasMaps => {
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, [], calcTagsPositionsOptions);
       })
-      .then(({ tagsPositions , sceneMapPositions, vacancies }) => {
+      .then(({ tagsPositions, sceneMapPositions, vacancies }) => {
         dispatch(
           createAction(
             actionTypes.TAGS_CLOUD_BUILD_SUCCESS,
@@ -145,7 +149,10 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
       maxSentimentScore
     });
     const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
-    return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, SCENE_MAP_RESOLUTION)
+    return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, {
+      resolution: SCENE_MAP_RESOLUTION,
+      fontFamily: FONT_FAMILY
+    })
       .then(tagsRectAreasMaps => {
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
         const fullRectAreasMapsData = getState().rectAreasMapsData;

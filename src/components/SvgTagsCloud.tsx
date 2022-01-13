@@ -121,6 +121,7 @@ const styles = createStyles({
   canvasWrapper: {
     display: 'inline-block',
     position: 'relative',
+    touchAction: 'none',
   }
 });
 

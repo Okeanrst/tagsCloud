@@ -8,7 +8,7 @@ export function formRectAreaMapKey(word: string, fontSize: number) {
 
 export function prepareRectAreasMaps(
   tagsData: ReadonlyArray<PreparedTagDataT>,
-  resolution: number,
+  { resolution, fontFamily }: {resolution: number; fontFamily: string},
 ): Promise<ReadonlyArray<IdRectAreaMapT>> {
   return new Promise(function (resolve, reject) {
     const canvas = document.createElement('canvas');
@@ -31,6 +31,7 @@ export function prepareRectAreasMaps(
               word: label,
               resolution,
               fontSize,
+              fontFamily,
             }) ?? {};
 
           rectAreasMaps.set(key, { key , map, mapMeta: meta });
