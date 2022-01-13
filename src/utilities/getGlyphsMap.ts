@@ -13,7 +13,7 @@ import {
 
 type RectAreaSize = { width: number; height: number };
 
-type GlyphsByCharsT = {[key: string]: {xMin: number, yMin: number, xMax: number, yMax: number}};
+type GlyphsByCharsT = {[key: string]: {xMin: number, yMin: number, xMax: number, yMax: number, advanceWidth: number}};
 
 const glyphsByCharsMap: {[key: string]: GlyphsByCharsT} = {
   [OPEN_SANS_FONT]: openSansGlyphsByChars,
@@ -199,19 +199,19 @@ export function getGlyphsMap(
   const glyphsByChars = glyphsByCharsMap[fontFamily];
 
   const firstChar = word[0];
+  const lastChar = word[word.length - 1];
 
-  const glyphProps = glyphsByChars?.[firstChar];
-
-  const { xMin = 0, xMax = 0 } = glyphProps ?? {};
+  const firstCharGlyphProps = glyphsByChars?.[firstChar];
+  const lastCharGlyphProps = glyphsByChars?.[lastChar];
 
   let glyphsXOffset = 0;
   let leftExtraColumns = 1;
   let rightExtraColumns = 1;
 
-  if (xMin < 0 && Math.abs(xMin / (-xMin + xMax)) > 0.1) {
+  if (firstCharGlyphProps && lastCharGlyphProps) {
     ctx.font = `${fontSize}px "${fontFamily}"`;
-    const firstCharWidth = ctx.measureText(firstChar).width;
-    glyphsXOffset = -xMin / (-xMin + xMax) * firstCharWidth;
+    const glyphUnitSize = ctx.measureText(firstChar).width / firstCharGlyphProps.advanceWidth;
+    glyphsXOffset = (lastCharGlyphProps.advanceWidth - lastCharGlyphProps.xMax - firstCharGlyphProps.xMin) / 2 * glyphUnitSize;
     leftExtraColumns = Math.ceil(glyphsXOffset / resolution) + 1;
     rightExtraColumns = leftExtraColumns > 0 ? 0 : rightExtraColumns;
   }

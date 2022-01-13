@@ -3,756 +3,882 @@
     "xMin": 94,
     "yMin": -20,
     "xMax": 971,
-    "yMax": 1114
+    "yMax": 1114,
+    "advanceWidth": 1138
   },
   "б": {
     "xMin": 118,
     "yMin": -20,
     "xMax": 1106,
-    "yMax": 1566
+    "yMax": 1566,
+    "advanceWidth": 1218
   },
   "в": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1083,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1176
   },
   "г": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 840,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 883
   },
   "д": {
     "xMin": 39,
     "yMin": -379,
     "xMax": 1135,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1177
   },
   "е": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 1043,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1150
   },
   "ё": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 1043,
-    "yMax": 1490
+    "yMax": 1490,
+    "advanceWidth": 1150
   },
   "ж": {
     "xMin": 4,
     "yMin": 0,
     "xMax": 1498,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1505
   },
   "з": {
     "xMin": 67,
     "yMin": -20,
     "xMax": 896,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 990
   },
   "и": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1124,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1302
   },
   "й": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1124,
-    "yMax": 1547
+    "yMax": 1547,
+    "advanceWidth": 1302
   },
   "к": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1035,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1058
   },
   "л": {
     "xMin": 13,
     "yMin": -13,
     "xMax": 997,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1172
   },
   "м": {
     "xMin": 174,
     "yMin": 0,
     "xMax": 1332,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1502
   },
   "н": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1119,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1296
   },
   "о": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 1120,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1232
   },
   "п": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1093,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1270
   },
   "р": {
     "xMin": 175,
     "yMin": -490,
     "xMax": 1139,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1253
   },
   "с": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 914,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 981
   },
   "т": {
     "xMin": 41,
     "yMin": 0,
     "xMax": 922,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 964
   },
   "у": {
     "xMin": 2,
     "yMin": -493,
     "xMax": 1026,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1026
   },
   "ф": {
     "xMin": 112,
     "yMin": -492,
     "xMax": 1351,
-    "yMax": 1556
+    "yMax": 1556,
+    "advanceWidth": 1465
   },
   "х": {
     "xMin": 39,
     "yMin": 0,
     "xMax": 1033,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1072
   },
   "ц": {
     "xMin": 175,
     "yMin": -379,
     "xMax": 1242,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1282
   },
   "ч": {
     "xMin": 154,
     "yMin": 0,
     "xMax": 1068,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1243
   },
   "ш": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1645,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1822
   },
   "щ": {
     "xMin": 175,
     "yMin": -377,
     "xMax": 1801,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1838
   },
   "ъ": {
     "xMin": 38,
     "yMin": 0,
     "xMax": 1300,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1407
   },
   "ы": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1398,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1573
   },
   "ь": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1097,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1208
   },
   "э": {
     "xMin": 65,
     "yMin": -20,
     "xMax": 900,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1011
   },
   "ю": {
     "xMin": 175,
     "yMin": -20,
     "xMax": 1584,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1698
   },
   "я": {
     "xMin": 34,
     "yMin": 0,
     "xMax": 959,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1134
   },
   "А": {
     "xMin": 0,
     "yMin": 0,
     "xMax": 1293,
-    "yMax": 1468
+    "yMax": 1468,
+    "advanceWidth": 1295
   },
   "Б": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1143,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1253
   },
   "В": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1212,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1323
   },
   "Г": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1021,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1065
   },
   "Д": {
     "xMin": 12,
     "yMin": -382,
     "xMax": 1354,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1401
   },
   "Е": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1014,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1138
   },
   "Ё": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1014,
-    "yMax": 1857
+    "yMax": 1857,
+    "advanceWidth": 1138
   },
   "Ж": {
     "xMin": 4,
     "yMin": 0,
     "xMax": 1717,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1723
   },
   "З": {
     "xMin": 79,
     "yMin": -20,
     "xMax": 1083,
-    "yMax": 1483
+    "yMax": 1483,
+    "advanceWidth": 1194
   },
   "И": {
     "xMin": 202,
     "yMin": 0,
     "xMax": 1357,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1556
   },
   "Й": {
     "xMin": 202,
     "yMin": 0,
     "xMax": 1357,
-    "yMax": 1914
+    "yMax": 1914,
+    "advanceWidth": 1556
   },
   "К": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1248,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1249
   },
   "Л": {
     "xMin": 1,
     "yMin": -23,
     "xMax": 1240,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1440
   },
   "М": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1642,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1842
   },
   "Н": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1308,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1510
   },
   "О": {
     "xMin": 125,
     "yMin": -20,
     "xMax": 1468,
-    "yMax": 1485
+    "yMax": 1485,
+    "advanceWidth": 1593
   },
   "П": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1289,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1491
   },
   "Р": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1126,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1232
   },
   "С": {
     "xMin": 125,
     "yMin": -20,
     "xMax": 1227,
-    "yMax": 1483
+    "yMax": 1483,
+    "advanceWidth": 1290
   },
   "Т": {
     "xMin": 18,
     "yMin": 0,
     "xMax": 1107,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1128
   },
   "У": {
     "xMin": 22,
     "yMin": -20,
     "xMax": 1265,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1265
   },
   "Ф": {
     "xMin": 105,
     "yMin": -20,
     "xMax": 1525,
-    "yMax": 1483
+    "yMax": 1483,
+    "advanceWidth": 1632
   },
   "Х": {
     "xMin": 6,
     "yMin": 0,
     "xMax": 1176,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1183
   },
   "Ц": {
     "xMin": 200,
     "yMin": -382,
     "xMax": 1464,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1510
   },
   "Ч": {
     "xMin": 167,
     "yMin": 0,
     "xMax": 1219,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1420
   },
   "Ш": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1911,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 2113
   },
   "Щ": {
     "xMin": 200,
     "yMin": -382,
     "xMax": 2060,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 2123
   },
   "Ъ": {
     "xMin": 15,
     "yMin": 0,
     "xMax": 1300,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1405
   },
   "Ы": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1530,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1737
   },
   "Ь": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1192,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1298
   },
   "Э": {
     "xMin": 63,
     "yMin": -20,
     "xMax": 1164,
-    "yMax": 1483
+    "yMax": 1483,
+    "advanceWidth": 1291
   },
   "Ю": {
     "xMin": 200,
     "yMin": -20,
     "xMax": 2019,
-    "yMax": 1485
+    "yMax": 1485,
+    "advanceWidth": 2146
   },
   "Я": {
     "xMin": 46,
     "yMin": 0,
     "xMax": 1095,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1295
   },
   "ґ": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 843,
-    "yMax": 1417
+    "yMax": 1417,
+    "advanceWidth": 888
   },
   "є": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 940,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1010
   },
   "і": {
     "xMin": 160,
     "yMin": 0,
     "xMax": 360,
-    "yMax": 1506
+    "yMax": 1506,
+    "advanceWidth": 517
   },
   "ї": {
     "xMin": -25,
     "yMin": 0,
     "xMax": 540,
-    "yMax": 1490
+    "yMax": 1490,
+    "advanceWidth": 517
   },
   "Ґ": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1036,
-    "yMax": 1763
+    "yMax": 1763,
+    "advanceWidth": 1079
   },
   "Є": {
     "xMin": 125,
     "yMin": -20,
     "xMax": 1250,
-    "yMax": 1485
+    "yMax": 1485,
+    "advanceWidth": 1309
   },
   "І": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 370,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 572
   },
   "Ї": {
     "xMin": 6,
     "yMin": 0,
     "xMax": 571,
-    "yMax": 1857
+    "yMax": 1857,
+    "advanceWidth": 572
   },
   "a": {
     "xMin": 94,
     "yMin": -20,
     "xMax": 971,
-    "yMax": 1114
+    "yMax": 1114,
+    "advanceWidth": 1138
   },
   "b": {
     "xMin": 175,
     "yMin": -20,
     "xMax": 1139,
-    "yMax": 1556
+    "yMax": 1556,
+    "advanceWidth": 1253
   },
   "c": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 914,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 981
   },
   "d": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 1077,
-    "yMax": 1556
+    "yMax": 1556,
+    "advanceWidth": 1253
   },
   "e": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 1043,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1150
   },
   "f": {
     "xMin": 30,
     "yMin": 0,
     "xMax": 782,
-    "yMax": 1567
+    "yMax": 1567,
+    "advanceWidth": 689
   },
   "g": {
     "xMin": 31,
     "yMin": -492,
     "xMax": 1071,
-    "yMax": 1118
+    "yMax": 1118,
+    "advanceWidth": 1112
   },
   "h": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1089,
-    "yMax": 1556
+    "yMax": 1556,
+    "advanceWidth": 1256
   },
   "i": {
     "xMin": 160,
     "yMin": 0,
     "xMax": 360,
-    "yMax": 1506
+    "yMax": 1506,
+    "advanceWidth": 517
   },
   "j": {
     "xMin": -112,
     "yMin": -492,
     "xMax": 360,
-    "yMax": 1506
+    "yMax": 1506,
+    "advanceWidth": 517
   },
   "k": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1060,
-    "yMax": 1556
+    "yMax": 1556,
+    "advanceWidth": 1076
   },
   "l": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 342,
-    "yMax": 1556
+    "yMax": 1556,
+    "advanceWidth": 517
   },
   "m": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1730,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1896
   },
   "n": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 1089,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1256
   },
   "o": {
     "xMin": 114,
     "yMin": -20,
     "xMax": 1120,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1232
   },
   "p": {
     "xMin": 175,
     "yMin": -490,
     "xMax": 1139,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1253
   },
   "q": {
     "xMin": 113,
     "yMin": -490,
     "xMax": 1076,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 1253
   },
   "r": {
     "xMin": 175,
     "yMin": 0,
     "xMax": 806,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 837
   },
   "s": {
     "xMin": 103,
     "yMin": -20,
     "xMax": 884,
-    "yMax": 1116
+    "yMax": 1116,
+    "advanceWidth": 976
   },
   "t": {
     "xMin": 32,
     "yMin": -20,
     "xMax": 683,
-    "yMax": 1350
+    "yMax": 1350,
+    "advanceWidth": 730
   },
   "u": {
     "xMin": 163,
     "yMin": -20,
     "xMax": 1080,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1256
   },
   "v": {
     "xMin": 0,
     "yMin": 0,
     "xMax": 1023,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1023
   },
   "w": {
     "xMin": 24,
     "yMin": 2,
     "xMax": 1563,
-    "yMax": 1098
+    "yMax": 1098,
+    "advanceWidth": 1587
   },
   "x": {
     "xMin": 39,
     "yMin": 0,
     "xMax": 1033,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1072
   },
   "y": {
     "xMin": 2,
     "yMin": -493,
     "xMax": 1026,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 1026
   },
   "z": {
     "xMin": 80,
     "yMin": 0,
     "xMax": 879,
-    "yMax": 1096
+    "yMax": 1096,
+    "advanceWidth": 960
   },
   "A": {
     "xMin": 0,
     "yMin": 0,
     "xMax": 1293,
-    "yMax": 1468
+    "yMax": 1468,
+    "advanceWidth": 1295
   },
   "B": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1212,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1323
   },
   "C": {
     "xMin": 125,
     "yMin": -20,
     "xMax": 1227,
-    "yMax": 1483
+    "yMax": 1483,
+    "advanceWidth": 1290
   },
   "D": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1361,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1486
   },
   "E": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1014,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1138
   },
   "F": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1014,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1057
   },
   "G": {
     "xMin": 125,
     "yMin": -20,
     "xMax": 1336,
-    "yMax": 1483
+    "yMax": 1483,
+    "advanceWidth": 1489
   },
   "H": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1308,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1510
   },
   "I": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 370,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 572
   },
   "J": {
     "xMin": -164,
     "yMin": -385,
     "xMax": 362,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 550
   },
   "K": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1254,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1254
   },
   "L": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1019,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1069
   },
   "M": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1642,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1842
   },
   "N": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1343,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1542
   },
   "O": {
     "xMin": 125,
     "yMin": -20,
     "xMax": 1468,
-    "yMax": 1485
+    "yMax": 1485,
+    "advanceWidth": 1593
   },
   "P": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1126,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1232
   },
   "Q": {
     "xMin": 125,
     "yMin": -348,
     "xMax": 1468,
-    "yMax": 1485
+    "yMax": 1485,
+    "advanceWidth": 1593
   },
   "R": {
     "xMin": 200,
     "yMin": 0,
     "xMax": 1230,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1264
   },
   "S": {
     "xMin": 105,
     "yMin": -20,
     "xMax": 1025,
-    "yMax": 1483
+    "yMax": 1483,
+    "advanceWidth": 1123
   },
   "T": {
     "xMin": 18,
     "yMin": 0,
     "xMax": 1107,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1128
   },
   "U": {
     "xMin": 185,
     "yMin": -20,
     "xMax": 1306,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1493
   },
   "V": {
     "xMin": 0,
     "yMin": 0,
     "xMax": 1221,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1221
   },
   "W": {
     "xMin": 30,
     "yMin": 0,
     "xMax": 1861,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1891
   },
   "X": {
     "xMin": 6,
     "yMin": 0,
     "xMax": 1176,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1183
   },
   "Y": {
     "xMin": 0,
     "yMin": 0,
     "xMax": 1145,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1145
   },
   "Z": {
     "xMin": 78,
     "yMin": 0,
     "xMax": 1093,
-    "yMax": 1462
+    "yMax": 1462,
+    "advanceWidth": 1172
   }
 }
