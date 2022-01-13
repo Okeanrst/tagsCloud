@@ -237,7 +237,7 @@ export function editDataItem(tagData: TagDataT) {
     }
     const currentSentimentScore = currentTagDataItem.sentimentScore;
     const currentMaxSentimentScore = selectMaxSentimentScore(getState());
-    let shouldResetTagsCloud = currentMaxSentimentScore < tagData.sentimentScore;
+    let shouldResetTagsCloud = currentTagDataItem.label !== tagData.label || currentMaxSentimentScore < tagData.sentimentScore;
     dispatch(createAction(actionTypes.EDIT_DATA_ITEM, tagData));
 
     shouldResetTagsCloud = shouldResetTagsCloud || selectMaxSentimentScore(getState()) !== currentMaxSentimentScore;
