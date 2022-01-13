@@ -1,53 +1,72 @@
-import { createStyles } from '@material-ui/core';
+import { createStyles, Theme } from '@material-ui/core';
 
-const styles = () =>
-  createStyles({
-    cloudConfFiles: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '24px',
+const styles = (theme: Theme) => createStyles({
+  cloudConfFiles: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    [theme.breakpoints.down('sm')]: {
+      flexWrap: 'wrap'
     },
-    fileUploader: {},
-    fileUploaderLabel: {
-      display: 'block',
-    },
-    loaderContainer: {
-      position: 'absolute',
-      display: 'flex',
-      justifyContent: 'center',
-      width: '100%',
-    },
-    tagsCloudScene: {
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-    },
-    confirmDelete: {},
-    confirmDeleteQuestion: {},
-    confirmDeleteButtons: {
-      marginTop: '100px',
-      display: 'flex',
-      justifyContent: 'flex-end',
-    },
-    tagsList: {
-      listStyleType: 'none',
-      paddingLeft: 0,
-    },
-    tagsListRow: {
-      display: 'flex',
-      alignItems: 'center',
-    },
-    tagsListLabel: {
-      flexGrow: 12,
-      textOverflow: 'ellipsis',
-    },
-    tagsListScore: { flexShrink: 0, width: '24px', marginLeft: '12px' },
-    tagsListButton: {
-      flexShrink: 0,
-      marginLeft: '12px',
-      minWidth: '100px',
-    },
-  });
+  },
+  fileUploader: {
+    maxWidth: '100%',
+  },
+  fileUploaderLabel: {
+    display: 'block',
+  },
+  downloadButton: {
+    marginTop: '8px',
+  },
+  addNewButton: {
+    marginTop: '8px',
+  },
+  loaderContainer: {
+    position: 'absolute',
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  confirmDelete: {},
+  confirmDeleteQuestion: {},
+  confirmDeleteButtons: {
+    marginTop: '100px',
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  tagsList: {
+    marginTop: '24px',
+  },
+  tagsListRow: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  tagsListLabel: {
+    flexGrow: 12,
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden'
+  },
+  tagsListScore: { flexShrink: 0, width: '24px', marginLeft: '12px' },
+  tagsListButton: {
+    height: '32px',
+    width: '32px',
+    flexShrink: 0,
+    marginLeft: '12px',
+    border: 'none',
+    backgroundColor: 'transparent',
+  },
+  deleteButton: {
+    color: 'var(--danger-color)',
+    fill: 'currentColor',
+  },
+  editButton: {
+    color: 'var(--green900-color)',
+  },
+  cloneButton: {
+    color: 'var(--blue900-color)',
+  },
+});
+
 
 export default styles;

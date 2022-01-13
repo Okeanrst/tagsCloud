@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import { withStyles } from '@material-ui/core';
 
-import { TagDataT } from 'types/types';
+import { TagDataT, ClassesT } from 'types/types';
 
 enum InputFieldName {
   LABEL = 'label',
@@ -15,6 +16,7 @@ type PropsT = {
   onSubmit: (
     data: Omit<TagDataT, 'id'> & Readonly<{ id?: TagDataT['id'] }>,
   ) => void;
+  classes: ClassesT;
 };
 
 type StateT = {
@@ -42,7 +44,7 @@ const inputByTypes = {
   type: 'text',
 };
 
-export class TagForm extends Component<PropsT, StateT> {
+class TagForm extends Component<PropsT, StateT> {
   constructor(props: PropsT) {
     super(props);
 
@@ -87,13 +89,13 @@ export class TagForm extends Component<PropsT, StateT> {
   };
 
   render() {
-    const { onCancel } = this.props;
+    const { onCancel, classes } = this.props;
     const {
       values: { label, volume, type, sentimentScore },
     } = this.state;
     return (
       <form
-        style={styles.form}
+        className={classes.form}
         onSubmit={this.onSubmit}
       >
         <input
@@ -130,10 +132,7 @@ export class TagForm extends Component<PropsT, StateT> {
           value={sentimentScore}
           onChange={this.handleInputChange}
         />
-        <div
-          key="buttons"
-          style={styles.buttons}
-        >
+        <div className={classes.buttons}>
           <button
             key="cancel"
             type="button"
@@ -142,7 +141,7 @@ export class TagForm extends Component<PropsT, StateT> {
             cancel
           </button>
           <input
-            style={styles.submitButton}
+            className={classes.submitButton}
             type="submit"
             value="submit"
           />
@@ -151,3 +150,5 @@ export class TagForm extends Component<PropsT, StateT> {
     );
   }
 }
+
+export default withStyles(styles)(TagForm);

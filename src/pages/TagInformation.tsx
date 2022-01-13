@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
 
-import { TagDataT, ClassesT } from '../types/types';
+import { TagDataT, ClassesT } from 'types/types';
 import { RootStateT } from '../store/types';
 import { connect, ConnectedProps } from 'react-redux';
 

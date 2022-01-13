@@ -6,8 +6,8 @@ import type { Theme } from '@material-ui/core';
 const styles = (theme: Theme) =>
   createStyles({
     root: {
-      height: 250,
       width: 250,
+      marginTop: '8px',
     },
     container: {
       flexGrow: 1,

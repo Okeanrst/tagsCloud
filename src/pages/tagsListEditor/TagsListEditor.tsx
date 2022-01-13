@@ -3,22 +3,25 @@ import { connect, ConnectedProps } from 'react-redux';
 import { createSelector } from 'reselect';
 import { bindActionCreators } from 'redux';
 import { FixedSizeList } from 'react-window';
+import cx from 'classnames';
 import FadeLoader from 'react-spinners/FadeLoader';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { withRestScreenHeight } from 'decorators/withRestScreenHeight';
 import * as actions from 'store/actions/tagsCloud';
 import styles from './styles';
-import SmallModalWindow from 'components/modalWindows/SmallModalWindow';
 import FullScreenModalWindow from 'components/modalWindows/FullScreenModalWindow';
 import {
   downloadRawTagsCloudDataFile,
   uploadRawTagsCloudDataFile,
 } from 'store/actions/tagsCloudDataFile';
-import { TagForm } from './TagForm';
+import TagForm from './TagForm';
 import SearchWithAutocomplete from './searchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
+import editIconSrc from './assets/edit.svg';
+import copyIconSrc from './assets/copy.svg';
+import trashIconSrc from './assets/trash.svg';
 
-import type { TagDataT } from 'types/types';
+import type { TagDataT, ClassesT } from 'types/types';
 import type { RootStateT, AppDispatchT } from 'store/types';
 import { withStyles } from '@material-ui/core';
 
@@ -55,8 +58,6 @@ const mapDispatchToProps = (dispatch: AppDispatchT) =>
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
-
-type ClassesT = { [key: string]: string };
 
 type PropsT = PropsFromRedux & {
   restScreenHeight: number;
@@ -191,6 +192,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
   renderFileDownloader = (disabled: boolean) => (
     <button
+      className={this.props.classes.downloadButton}
       disabled={disabled}
       onClick={this.downloadTagsDataFile}
     >
@@ -240,22 +242,22 @@ class TagsListEditor extends Component<PropsT, StateT> {
     ];
 
     return (
-      <SmallModalWindow onContainerClick={this.resetIdForDelete}>
+      <FullScreenModalWindow onContainerClick={this.resetIdForDelete}>
         <div className={classes.confirmDelete}>
           {modalWindowBody}
         </div>
-      </SmallModalWindow>
+      </FullScreenModalWindow>
     );
   };
 
   onDelete = (e: SyntheticEvent<EventTarget>) => {
     if (
       this.state.tagIdToDelete !== undefined ||
-      !(e.target instanceof HTMLButtonElement)
+      !(e.currentTarget instanceof HTMLButtonElement)
     ) {
       return;
     }
-    const id = e.target.dataset.id;
+    const id = e.currentTarget.dataset.id;
     if (id !== undefined) {
       this.setState({ tagIdToDelete: id });
     }
@@ -269,11 +271,11 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   onClone = (e: SyntheticEvent<EventTarget>) => {
-    if (!(e.target instanceof HTMLButtonElement)) {
+    if (!(e.currentTarget instanceof HTMLButtonElement)) {
       return;
     }
 
-    const targetId = e.target.dataset.id;
+    const targetId = e.currentTarget.dataset.id;
     const { tagsData } = this.props;
     const targetTagData = tagsData.data?.find(item => item.id === targetId);
 
@@ -292,11 +294,11 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   onEdit = (e: SyntheticEvent<EventTarget>) => {
-    if (!(e.target instanceof HTMLButtonElement)) {
+    if (!(e.currentTarget instanceof HTMLButtonElement)) {
       return;
     }
 
-    const id = e.target.dataset.id;
+    const id = e.currentTarget.dataset.id;
     const { tagsData } = this.props;
     const editedTagData = tagsData.data?.find(item => item.id === id);
     this.setState({ editedTagData });
@@ -336,38 +338,47 @@ class TagsListEditor extends Component<PropsT, StateT> {
           className={classes.tagsListRow}
           style={style}
         >
-          <span
+          <div
             className={classes.tagsListLabel}
             key="label"
           >
             {item.label}
-          </span>
-          <span key="sentimentScore">
+          </div>
+          <div>
             {item.sentimentScore}
-          </span>
+          </div>
           <button
-            className={classes.tagsListButton}
+            className={cx(classes.tagsListButton, classes.cloneButton)}
             data-id={item.id}
             key="clone"
             onClick={this.onClone}
           >
-            clone
+            <img
+              alt="clone"
+              src={copyIconSrc}
+            />
           </button>
           <button
-            className={classes.tagsListButton}
+            className={cx(classes.tagsListButton, classes.editButton)}
             data-id={item.id}
             key="edit"
             onClick={this.onEdit}
           >
-            edit
+            <img
+              alt="edit"
+              src={editIconSrc}
+            />
           </button>
           <button
-            className={classes.tagsListButton}
+            className={cx(classes.tagsListButton, classes.deleteButton)}
             data-id={item.id}
             key="delete"
             onClick={this.onDelete}
           >
-            delete
+            <img
+              alt="delete"
+              src={trashIconSrc}
+            />
           </button>
         </li>
       );
@@ -377,6 +388,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
     const { classes } = this.props;
     return (
       <FixedSizeList
+        className={classes.tagsList}
         height={height}
         itemCount={data.length}
         itemSize={TAGS_LIST_ROW_HEIGHT}
@@ -399,12 +411,16 @@ class TagsListEditor extends Component<PropsT, StateT> {
         {this.renderLoader(loading)}
         <div
           className={classes.cloudConfFiles}
-          key="cloudConfFiles"
           ref={this.confFilesRef}
         >
           {this.renderFileUploader(loading)}
           {this.renderFileDownloader(!tagsData.data || loading)}
-          <button onClick={this.onAdd}>Add new</button>
+          <button
+            className={classes.addNewButton}
+            onClick={this.onAdd}
+          >
+            Add new
+          </button>
           <SearchWithAutocomplete
             placeholder="Search a tag by label"
             suggestions={searchAutocompleteSuggestions}

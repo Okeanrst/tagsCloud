@@ -13,9 +13,15 @@ body {
 :root {
   --navbar-color: #e3f2fd;
   --footer-color: #9ec2f1;
+  --danger-color: #b71c1c;
+  --green900-color: #1b5e20;
+  --blue900-color: #01579b;
 }
 
 [data-color-scheme='dark'] {
   --navbar-color: #212529;
   --footer-color: #23313e;
+  --danger-color: #b71c1c;
+  --green900-color: #1b5e20;
+  --blue900-color: #01579b;
 }
