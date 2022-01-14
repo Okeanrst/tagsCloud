@@ -14,7 +14,7 @@ import {
   downloadRawTagsCloudDataFile,
   uploadRawTagsCloudDataFile,
 } from 'store/actions/tagsCloudDataFile';
-import TagForm from './TagForm';
+import TagForm from 'components/TagForm';
 import SearchWithAutocomplete from './searchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
 import editIconSrc from './assets/edit.svg';
