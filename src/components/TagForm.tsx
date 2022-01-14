@@ -10,18 +10,19 @@ enum InputFieldName {
   SENTIMENT_SCORE = 'sentimentScore',
 }
 
-type PropsT = {
+type FormValuesT = Pick<TagDataT, 'label' | 'volume' | 'type' | 'sentimentScore'>;
+
+export type TagFormPropsT = {
   initValues?: Partial<TagDataT>;
   onCancel: () => void;
-  onSubmit: (
-    data: Omit<TagDataT, 'id'> & Readonly<{ id?: TagDataT['id'] }>,
-  ) => void;
-  classes: ClassesT;
+  onSubmit: (data: FormValuesT) => void;
 };
+
+type PropsT = TagFormPropsT & {classes: ClassesT;}
 
 type StateT = {
   id?: ThisParameterType<Pick<TagDataT, 'id'>>;
-  values: Pick<TagDataT, 'label' | 'volume' | 'type' | 'sentimentScore'>;
+  values: FormValuesT;
 };
 
 const styles = {
@@ -81,11 +82,10 @@ class TagForm extends Component<PropsT, StateT> {
     e.preventDefault();
     const { onSubmit } = this.props;
     // TODO add validation
-    const { initValues: { id } = {} } = this.props;
     const {
       values: { label, volume, type, sentimentScore },
     } = this.state;
-    onSubmit({ id, label, volume: Number(volume), type, sentimentScore: Number(sentimentScore) });
+    onSubmit({ label, volume: Number(volume), type, sentimentScore: Number(sentimentScore) });
   };
 
   render() {

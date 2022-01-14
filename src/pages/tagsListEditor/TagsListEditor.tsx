@@ -14,7 +14,7 @@ import {
   downloadRawTagsCloudDataFile,
   uploadRawTagsCloudDataFile,
 } from 'store/actions/tagsCloudDataFile';
-import TagForm from 'components/TagForm';
+import { TagFormModal } from 'components/modalWindows/TagFormModal';
 import SearchWithAutocomplete from './searchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
 import editIconSrc from './assets/edit.svg';
@@ -24,8 +24,6 @@ import trashIconSrc from './assets/trash.svg';
 import type { TagDataT, ClassesT } from 'types/types';
 import type { RootStateT, AppDispatchT } from 'store/types';
 import { withStyles } from '@material-ui/core';
-
-type CreatedTagDataT = Partial<Omit<TagDataT, 'id'>>;
 
 const { PENDING } = QueryStatuses;
 
@@ -67,8 +65,7 @@ type PropsT = PropsFromRedux & {
 type StateT = {
   tagsListHeight: number;
   scrollToItem?: { index: number };
-  createdTagData?: CreatedTagDataT;
-  editedTagData?: TagDataT;
+  tagFormData?: Partial<TagDataT>;
   tagIdToDelete?: string;
 };
 
@@ -263,11 +260,16 @@ class TagsListEditor extends Component<PropsT, StateT> {
     }
   };
 
-  onTagChange = (data: TagDataT | Omit<TagDataT, 'id'>) => {
+  onTagChange = (data: Pick<TagDataT, 'label' | 'volume' | 'type' | 'sentimentScore'>) => {
+    const { tagFormData } = this.state;
     this.closeTagForm();
-    'id' in data && data.id
-      ? this.props.editTag(data)
-      : this.props.addTag(data);
+    if (!tagFormData) {
+      return;
+    }
+    const tagId = tagFormData.id;
+    tagId
+      ? this.props.editTag({ ...tagFormData, ...data, id: tagId })
+      : this.props.addTag({ ...tagFormData, ...data });
   };
 
   onClone = (e: SyntheticEvent<EventTarget>) => {
@@ -285,12 +287,12 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
     const { id, ...restProps } = targetTagData;
 
-    const createdTagData = { ...restProps };
-    this.setState({ createdTagData });
+    const tagFormData = { ...restProps };
+    this.setState({ tagFormData });
   };
 
   onAdd = () => {
-    this.setState({ createdTagData: {} });
+    this.setState({ tagFormData: {} });
   };
 
   onEdit = (e: SyntheticEvent<EventTarget>) => {
@@ -301,11 +303,11 @@ class TagsListEditor extends Component<PropsT, StateT> {
     const id = e.currentTarget.dataset.id;
     const { tagsData } = this.props;
     const editedTagData = tagsData.data?.find(item => item.id === id);
-    this.setState({ editedTagData });
+    this.setState({ tagFormData: editedTagData });
   };
 
   closeTagForm = () => {
-    this.setState({ editedTagData: undefined, createdTagData: undefined });
+    this.setState({ tagFormData: undefined });
   };
 
   onSearch = (target: string | null) => {
@@ -320,13 +322,14 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   renderTagForm = (data: Partial<TagDataT>) => (
-    <FullScreenModalWindow onContainerClick={this.closeTagForm}>
-      <TagForm
-        initValues={data}
-        onCancel={this.closeTagForm}
-        onSubmit={this.onTagChange}
-      />
-    </FullScreenModalWindow>
+    <TagFormModal
+      formProps={{
+        initValues: data,
+        onCancel: this.closeTagForm,
+        onSubmit: this.onTagChange
+      }}
+      onBackdropClick={this.closeTagForm}
+    />
   );
 
   renderListRow =
@@ -402,9 +405,8 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
   render() {
     const { tagsData, searchAutocompleteSuggestions, classes } = this.props;
-    const { tagsListHeight, editedTagData, createdTagData } = this.state;
+    const { tagsListHeight, tagFormData } = this.state;
     const loading = tagsData.status === PENDING;
-    const tagFormData = createdTagData || editedTagData;
 
     return (
       <div>

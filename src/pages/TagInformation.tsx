@@ -2,12 +2,15 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { makeStyles } from '@material-ui/core';
+import { editDataItem } from 'store/actions/tagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
+import { LinkButton } from 'ui/buttons/LinkButton';
+import { TagFormModal } from 'components/modalWindows/TagFormModal';
 
 import { TagDataT, ClassesT } from 'types/types';
 import { RootStateT } from '../store/types';
-import { connect, ConnectedProps } from 'react-redux';
+import { connect, ConnectedProps, useDispatch } from 'react-redux';
 
 const { PENDING, FAILURE, SUCCESS } = QueryStatuses;
 
@@ -201,7 +204,9 @@ const TagInformation = (props: PropsT) => {
   const { tagsData } = props;
   const navigate = useNavigate();
   const { id: tagId } = useParams();
+  const dispatch = useDispatch();
   const [shouldShowDays, setShouldShowDays] = useState<boolean>(true);
+  const [isTagFormModalShown, setIsTagFormModalShown] = useState<boolean>(false);
   const classes = useStyles();
 
   const tagData = tagsData.data ? tagsData.data.find(i => i.id === tagId) : null;
@@ -218,6 +223,22 @@ const TagInformation = (props: PropsT) => {
       navigate('/notFound', { replace: true });
     }
   }, [tagData, tagsData.status, navigate]);
+
+  const onEditClick = useCallback(() => {
+    setIsTagFormModalShown(true);
+  }, []);
+
+  const closeTagFormModal = useCallback(() => {
+    setIsTagFormModalShown(false);
+  }, []);
+
+  const onTagChange = useCallback((data: Pick<TagDataT, 'label' | 'volume' | 'type' | 'sentimentScore'>) => {
+    setIsTagFormModalShown(false);
+    if (!tagData) {
+      return;
+    }
+    dispatch(editDataItem({ ...tagData, ...data }));
+  }, [dispatch, tagData]);
 
   if (!tagData) return null;
 
@@ -240,6 +261,19 @@ const TagInformation = (props: PropsT) => {
           />
         </div>
       ) : null}
+      {isTagFormModalShown && (
+        <TagFormModal
+          formProps={{
+            initValues: tagData,
+            onCancel: closeTagFormModal,
+            onSubmit: onTagChange
+          }}
+          onBackdropClick={closeTagFormModal}
+        />
+      )}
+      <LinkButton onClick={onEditClick}>
+        Edit
+      </LinkButton>
       <ul
         className={[
           'list-group',
