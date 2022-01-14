@@ -17,7 +17,7 @@ import {
 import { TagFormModal } from 'components/modalWindows/TagFormModal';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import { TextButton } from 'ui/buttons/TextButton';
-import SearchWithAutocomplete from './searchWithAutocomplete';
+import StyledSearchWithAutocomplete from './StyledSearchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
 import editIconSrc from './assets/edit.svg';
 import copyIconSrc from './assets/copy.svg';
@@ -312,8 +312,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
     const {
       tagsData: { data },
     } = this.props;
-    const index =
-      target && data ? data.findIndex(item => target === item.label) : -1;
+    const index = target && data ? data.findIndex(item => target === item.label) : -1;
     if (index >= 0) {
       this.setState({ scrollToItem: { index } });
     }
@@ -331,13 +330,14 @@ class TagsListEditor extends Component<PropsT, StateT> {
   );
 
   renderListRow =
-    (data: ReadonlyArray<TagDataT>, classes: ClassesT) =>
+    (data: ReadonlyArray<TagDataT>, classes: ClassesT, highlightedIndex?: number) =>
     ({ index, style }: { index: number; style: {} }) => {
       const item = data[index];
+      const itemStyle = highlightedIndex === index ? { ...style, backgroundColor: 'var(--grey300-color)' } : style;
       return (
         <li
           className={classes.tagsListRow}
-          style={style}
+          style={itemStyle}
         >
           <div
             className={classes.tagsListLabel}
@@ -393,7 +393,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
         ref={this.listRef}
         width="100%"
       >
-        {this.renderListRow(data, classes)}
+        {this.renderListRow(data, classes, this.state.scrollToItem?.index)}
       </FixedSizeList>
     );
   };
@@ -418,7 +418,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
           >
             Add new
           </PrimaryButton>
-          <SearchWithAutocomplete
+          <StyledSearchWithAutocomplete
             placeholder="Search a tag by label"
             suggestions={searchAutocompleteSuggestions}
             onSubmit={this.onSearch}
@@ -426,8 +426,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
         </div>
         {tagFormData && this.renderTagForm(tagFormData)}
         {tagsData.data && this.renderList(tagsData.data, tagsListHeight)}
-        {this.state.tagIdToDelete !== undefined &&
-          this.renderConfirmDelete(this.state.tagIdToDelete)}
+        {this.state.tagIdToDelete !== undefined && this.renderConfirmDelete(this.state.tagIdToDelete)}
       </div>
     );
   }

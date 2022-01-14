@@ -84,7 +84,7 @@ function renderSuggestion({
   );
 }
 
-function getSuggestions(value: string | null, suggestions: SuggestionsT) {
+function getSuitableSuggestions(value: string | null, suggestions: SuggestionsT) {
   if (!value) {
     return [];
   }
@@ -128,9 +128,12 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
               onSubmit &&
               event.key === 'Enter' &&
               inputValue &&
-              highlightedIndex === null
+              highlightedIndex !== null
             ) {
-              onSubmit(inputValue);
+              const highlightedSuggestion = getSuitableSuggestions(inputValue, suggestions)[highlightedIndex];
+              if (highlightedSuggestion?.label) {
+                onSubmit(highlightedSuggestion.label);
+              }
             }
           };
 
@@ -151,7 +154,7 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
                     square
                     className={classes.paper}
                   >
-                    {getSuggestions(inputValue, suggestions).map(
+                    {getSuitableSuggestions(inputValue, suggestions).map(
                       (suggestion, index) =>
                         renderSuggestion({
                           suggestion,
