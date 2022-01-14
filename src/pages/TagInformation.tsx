@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core';
 import { editDataItem } from 'store/actions/tagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
-import { LinkButton } from 'ui/buttons/LinkButton';
+import { TextButton } from 'ui/buttons/TextButton';
 import { TagFormModal } from 'components/modalWindows/TagFormModal';
 
 import { TagDataT, ClassesT } from 'types/types';
@@ -271,9 +271,9 @@ const TagInformation = (props: PropsT) => {
           onBackdropClick={closeTagFormModal}
         />
       )}
-      <LinkButton onClick={onEditClick}>
+      <TextButton onClick={onEditClick}>
         Edit
-      </LinkButton>
+      </TextButton>
       <ul
         className={[
           'list-group',

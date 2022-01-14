@@ -9,7 +9,7 @@ const useStyles = makeStyles({
   }
 });
 
-export const LinkButton = ({ children, classes, ...restProps }: ButtonPropsT) => {
+export const TextButton = ({ children, classes, ...restProps }: ButtonPropsT) => {
   const ownClasses = useStyles();
   return (
     <Button
