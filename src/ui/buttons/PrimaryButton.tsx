@@ -5,11 +5,12 @@ import { Button, PropsT as ButtonPropsT } from './Button';
 
 const useStyles = makeStyles({
   root: {
-    color: 'var(--primary-main-color)',
+    color: 'var(--white-color)',
+    backgroundColor: 'var(--primary-main-color)!important',
   }
 });
 
-export const TextButton = ({ children, classes, ...restProps }: ButtonPropsT) => {
+export const PrimaryButton = ({ children, classes, ...restProps }: ButtonPropsT) => {
   const ownClasses = useStyles();
   return (
     <Button

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core';
+import { PrimaryButton } from 'ui/buttons/PrimaryButton';
+import { TextButton } from 'ui/buttons/TextButton';
 
 import { TagDataT, ClassesT } from 'types/types';
 
@@ -133,18 +135,15 @@ class TagForm extends Component<PropsT, StateT> {
           onChange={this.handleInputChange}
         />
         <div className={classes.buttons}>
-          <button
-            key="cancel"
-            type="button"
-            onClick={onCancel}
-          >
-            cancel
-          </button>
-          <input
-            className={classes.submitButton}
+          <TextButton onClick={onCancel}>
+            Cancel
+          </TextButton>
+          <PrimaryButton
+            classes={{ root: classes.submitButton }}
             type="submit"
-            value="submit"
-          />
+          >
+            Submit
+          </PrimaryButton>
         </div>
       </form>
     );

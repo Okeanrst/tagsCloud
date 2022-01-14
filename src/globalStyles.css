@@ -11,7 +11,8 @@ body {
 }
 
 :root {
-  --primary-main: #1976d2;
+  --white-color: #fff;
+  --primary-main-color: #1976d2;
   --navbar-color: #e3f2fd;
   --footer-color: #9ec2f1;
   --danger-color: #b71c1c;

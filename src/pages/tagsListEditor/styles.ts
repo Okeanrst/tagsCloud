@@ -27,7 +27,7 @@ const styles = (theme: Theme) => createStyles({
     justifyContent: 'center',
     width: '100%',
   },
-  confirmDelete: {},
+  confirmDeleteButton: { marginLeft: '24px' },
   confirmDeleteQuestion: {},
   confirmDeleteButtons: {
     marginTop: '100px',

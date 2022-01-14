@@ -15,6 +15,8 @@ import {
   uploadRawTagsCloudDataFile,
 } from 'store/actions/tagsCloudDataFile';
 import { TagFormModal } from 'components/modalWindows/TagFormModal';
+import { PrimaryButton } from 'ui/buttons/PrimaryButton';
+import { TextButton } from 'ui/buttons/TextButton';
 import SearchWithAutocomplete from './searchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
 import editIconSrc from './assets/edit.svg';
@@ -188,13 +190,13 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   renderFileDownloader = (disabled: boolean) => (
-    <button
-      className={this.props.classes.downloadButton}
+    <PrimaryButton
+      classes={{ root: this.props.classes.downloadButton }}
       disabled={disabled}
       onClick={this.downloadTagsDataFile}
     >
       Download tags cloud as a file
-    </button>
+    </PrimaryButton>
   );
 
   resetIdForDelete = () => {
@@ -222,19 +224,15 @@ class TagsListEditor extends Component<PropsT, StateT> {
         className={classes.confirmDeleteButtons}
         key="buttons"
       >
-        <button
-          key="cancel"
-          onClick={this.resetIdForDelete}
-        >
-          cancel
-        </button>
-        <button
-          key="delete"
-          style={{ marginLeft: '24px' }}
+        <TextButton onClick={this.resetIdForDelete}>
+          Cancel
+        </TextButton>
+        <PrimaryButton
+          classes={{ root: classes.confirmDeleteButton }}
           onClick={onConfirm}
         >
-          delete
-        </button>
+          Delete
+        </PrimaryButton>
       </div>,
     ];
 
@@ -353,7 +351,6 @@ class TagsListEditor extends Component<PropsT, StateT> {
           <button
             className={cx(classes.tagsListButton, classes.cloneButton)}
             data-id={item.id}
-            key="clone"
             onClick={this.onClone}
           >
             <img
@@ -364,7 +361,6 @@ class TagsListEditor extends Component<PropsT, StateT> {
           <button
             className={cx(classes.tagsListButton, classes.editButton)}
             data-id={item.id}
-            key="edit"
             onClick={this.onEdit}
           >
             <img
@@ -375,7 +371,6 @@ class TagsListEditor extends Component<PropsT, StateT> {
           <button
             className={cx(classes.tagsListButton, classes.deleteButton)}
             data-id={item.id}
-            key="delete"
             onClick={this.onDelete}
           >
             <img
@@ -417,12 +412,12 @@ class TagsListEditor extends Component<PropsT, StateT> {
         >
           {this.renderFileUploader(loading)}
           {this.renderFileDownloader(!tagsData.data || loading)}
-          <button
-            className={classes.addNewButton}
+          <PrimaryButton
+            classes={{ root: classes.addNewButton }}
             onClick={this.onAdd}
           >
             Add new
-          </button>
+          </PrimaryButton>
           <SearchWithAutocomplete
             placeholder="Search a tag by label"
             suggestions={searchAutocompleteSuggestions}

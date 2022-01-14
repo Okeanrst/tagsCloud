@@ -7,6 +7,7 @@ import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
 import { Checkbox } from 'ui/checkbox/Checkbox';
+import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
@@ -69,14 +70,14 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   controls: {
     position: 'absolute',
-    top: '20px',
+    top: '0px',
     zIndex: 5,
   },
   rebuildButtonContainer: {
     justifyContent: 'center',
     display: 'flex',
     position: 'absolute',
-    top: '20px',
+    top: '0px',
     left: '50%',
     right: '50%',
     zIndex: 3,
@@ -191,12 +192,12 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   renderRebuildButton = (onClick: () => void, disabled: boolean) => (
     <div style={styles.rebuildButtonContainer}>
-      <button
+      <PrimaryButton
         disabled={disabled}
         onClick={onClick}
       >
         Rebuild
-      </button>
+      </PrimaryButton>
     </div>
   );
 

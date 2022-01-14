@@ -19,6 +19,7 @@ import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManage
 import { FONT_FAMILY, FONT_Y_FACTOR, SCENE_MAP_RESOLUTION } from 'constants/index';
 import { Checkbox } from 'ui/checkbox/Checkbox';
 import { Collapse } from 'components/Collapse';
+import { TextButton } from 'ui/buttons/TextButton';
 
 import type { PositionedTagRectT, ClassesT, RectAreaT } from 'types/types';
 import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
@@ -107,9 +108,9 @@ const styles = createStyles({
     top: 0,
     right: '-20px',
     width: '20px',
+    minWidth: '20px!important',
     height: '16px',
     lineHeight: '16px',
-    border: 'none',
   },
   settingsControls: {
     display: 'flex',
@@ -584,12 +585,12 @@ const SvgTagsCloud = ({
   return (
     <div className={classes.container}>
       <div className={classes.settingsControlsWrapper}>
-        <button
-          className={classes.toggleIsSettingsControlsButton}
+        <TextButton
+          classes={{ root: classes.toggleIsSettingsControlsButton }}
           onClick={toggleIsSettingsControlsShown}
         >
           {isSettingsControlsShown ? '-' : '+'}
-        </button>
+        </TextButton>
         <Collapse isOpen={isSettingsControlsShown} >
           <div className={classes.settingsControls}>
             <Checkbox

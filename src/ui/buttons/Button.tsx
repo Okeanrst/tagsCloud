@@ -5,11 +5,12 @@ import cx from 'classnames';
 export type PropsT = {
   children: React.ReactNode;
   tabIndex?: number;
-  onClick: () => void;
+  onClick?: () => void;
   disabled?: boolean;
   classes?: {
     root?: string;
   },
+  type?: 'submit' | 'reset' | 'button';
 };
 
 const useStyles = makeStyles({
@@ -29,14 +30,14 @@ const useStyles = makeStyles({
   }
 });
 
-export const Button = ({ children, tabIndex, disabled, onClick, classes }: PropsT) => {
+export const Button = ({ children, tabIndex, disabled, onClick, classes, type = 'button' }: PropsT) => {
   const ownClasses = useStyles();
   return (
     <button
       className={cx(classes?.root, ownClasses.root)}
       disabled={disabled}
       tabIndex={tabIndex}
-      type="button"
+      type={type}
       onClick={onClick}
     >
       {children}
