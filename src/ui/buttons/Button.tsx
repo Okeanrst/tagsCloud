@@ -26,7 +26,9 @@ const useStyles = makeStyles({
     verticalAlign: 'middle',
     lineHeight: 1.75,
     borderRadius: '4px',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    appearance: 'none',
+    cursor: 'pointer',
   }
 });
 

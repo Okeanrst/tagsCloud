@@ -32,6 +32,9 @@ const styles = {
     width: '400px',
     maxWidth: '100%',
   },
+  inputMarginTop: {
+    marginTop: '8px',
+  },
   buttons: {
     marginTop: '100px',
     display: 'flex',
@@ -111,6 +114,7 @@ class TagForm extends Component<PropsT, StateT> {
         <br />
         <input
           required
+          className={classes.inputMarginTop}
           name={InputFieldName.VOLUME}
           placeholder="Volume"
           type={inputByTypes.volume}
@@ -119,6 +123,7 @@ class TagForm extends Component<PropsT, StateT> {
         />
         <br />
         <input
+          className={classes.inputMarginTop}
           name={InputFieldName.TYPE}
           placeholder="Type"
           type={inputByTypes.type}
@@ -128,6 +133,7 @@ class TagForm extends Component<PropsT, StateT> {
         <br />
         <input
           required
+          className={classes.inputMarginTop}
           name={InputFieldName.SENTIMENT_SCORE}
           placeholder="SentimentScore"
           type={inputByTypes.sentimentScore}

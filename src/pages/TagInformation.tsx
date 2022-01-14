@@ -40,15 +40,46 @@ const useStyles = makeStyles({
     width: '100%',
     zIndex: 1,
   },
-  listItems: { display: 'flex' },
-  containerStyle: { listStyle: 'none' },
-  pageType: { listStyle: 'none', padding: '0px' },
-  days: { listStyle: 'none', padding: '0px' },
-  sentiment: {
+  informationList: {
+    display: 'flex',
+    flexDirection: 'column',
+    margin: 0,
+    paddingLeft: 0,
+    listStyle: 'none',
+    borderRadius: 0,
+  },
+  listItem: {
+    display: 'flex',
+    padding: '12px 20px',
+    border: '1px solid rgba(0,0,0,.125)',
+    borderWidth: '0 0 1px',
+  },
+  pageType: {
+    padding: '0px',
+    listStyle: 'none',
+  },
+  days: {
+    padding: '0px',
+    listStyle: 'none',
+  },
+  sentimentList: {
     listStyle: 'none',
     display: 'flex',
     alignItems: 'center',
     padding: '0px',
+  },
+  sentimentListItem: {
+    borderRadius: '0.25rem',
+    display: 'inline-block',
+    padding: '0.25em 0.4em',
+    fontSize: '75%',
+    fontWeight: 700,
+    lineHeight: 1,
+    textAlign: 'center',
+    verticalAlign: 'baseline',
+    whiteSpace: 'nowrap',
+    backgroundColor: '#6c757d',
+    color: '#fff',
   },
   daysPicker: {
     display: 'flex',
@@ -90,9 +121,9 @@ const renderSentiment = (
 ) => {
   const { negative = 0, neutral = 0, positive = 0 } = sentiment ?? {};
   return (
-    <ul className={classes.sentiment}>
+    <ul className={classes.sentimentList}>
       <li
-        className="badge badge-secondary"
+        className={classes.sentimentListItem}
         key="negative"
       >
         negative
@@ -100,7 +131,7 @@ const renderSentiment = (
         {negative}
       </li>
       <li
-        className="badge badge-secondary"
+        className={classes.sentimentListItem}
         key="neutral"
         style={{ marginLeft: '8px' }}
       >
@@ -109,7 +140,7 @@ const renderSentiment = (
         {neutral}
       </li>
       <li
-        className="badge badge-secondary"
+        className={classes.sentimentListItem}
         key="positive"
         style={{ marginLeft: '8px' }}
       >
@@ -274,17 +305,10 @@ const TagInformation = (props: PropsT) => {
       <TextButton onClick={onEditClick}>
         Edit
       </TextButton>
-      <ul
-        className={[
-          'list-group',
-          'list-group-flush',
-          classes.containerStyle,
-        ].join(' ')}
-        key="tagInformation"
-      >
+      <ul className={classes.informationList}>
         {informationListRenderers.map(i => (
           <li
-            className={['list-group-item', classes.listItems].join(' ')}
+            className={classes.listItem}
             key={i.key}
           >
             {i.cells && [

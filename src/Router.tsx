@@ -29,8 +29,11 @@ const Router = () => {
           element={<TagInformation />}
           path="/tag/:id"
         />
+        <Route
+          element={<NotFoundPage />}
+          path="*"
+        />
       </Route>
-      <Route element={<NotFoundPage />} />
     </Routes>
   );
 };

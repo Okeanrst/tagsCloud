@@ -1321,7 +1321,7 @@
     "sentiment": {
       "neutral": 5
     },
-    "sentimentScore": 895,
+    "sentimentScore": 655,
     "burst": 60,
     "days": [
       {
@@ -1785,5 +1785,10 @@
         "volume": 3
       }
     ]
+  },
+  {
+    "id": "JoM_2",
+    "label": "JoM",
+    "sentimentScore": 500
   }
 ]

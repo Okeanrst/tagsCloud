@@ -7,7 +7,9 @@ const styles = (theme: Theme) =>
   createStyles({
     root: {
       width: 250,
-      marginTop: '8px',
+      [theme.breakpoints.down('sm')]: {
+        marginTop: '8px',
+      },
     },
     container: {
       flexGrow: 1,

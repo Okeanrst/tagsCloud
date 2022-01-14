@@ -16,10 +16,14 @@ const styles = (theme: Theme) => createStyles({
     display: 'block',
   },
   downloadButton: {
-    marginTop: '8px',
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '8px',
+    },
   },
   addNewButton: {
-    marginTop: '8px',
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '8px',
+    },
   },
   loaderContainer: {
     position: 'absolute',
