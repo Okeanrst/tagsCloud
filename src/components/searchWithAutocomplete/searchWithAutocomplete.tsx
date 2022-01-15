@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import deburr from 'lodash.deburr';
 import Downshift from 'downshift';
 import TextField from '@material-ui/core/TextField';
@@ -108,12 +108,20 @@ function getSuitableSuggestions(value: string | null, suggestions: SuggestionsT)
       });
 }
 
+const handleKeyDown: HandleKeyDownT = () => {};
+
 export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
   const { classes, suggestions, placeholder, onChange, onSubmit } = props;
 
+  const onSelect = useCallback((selectedItem) => {
+    if (selectedItem && onSubmit) {
+      onSubmit(selectedItem);
+    }
+  }, [onSubmit]);
+
   return (
     <div className={classes.root}>
-      <Downshift id="downshift-simple">
+      <Downshift onChange={onSelect}>
         {({
           getInputProps,
           getItemProps,
@@ -123,20 +131,6 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
           isOpen,
           selectedItem,
         }) => {
-          const handleKeyDown: HandleKeyDownT = event => {
-            if (
-              onSubmit &&
-              event.key === 'Enter' &&
-              inputValue &&
-              highlightedIndex !== null
-            ) {
-              const highlightedSuggestion = getSuitableSuggestions(inputValue, suggestions)[highlightedIndex];
-              if (highlightedSuggestion?.label) {
-                onSubmit(highlightedSuggestion.label);
-              }
-            }
-          };
-
           return (
             <div className={classes.container}>
               {renderInput({
