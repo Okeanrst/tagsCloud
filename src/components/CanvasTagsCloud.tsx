@@ -6,8 +6,8 @@ import { getBorderCoordinates } from 'utilities/tagsCloud/tagsCloud';
 import { RootStateT } from 'store/types';
 
 const mapStateToProps = (state: RootStateT) => {
-  const { tagsCloud: { tagsPositions } } = state;
-  return { tagsPositions };
+  const { tagsCloud: { tagsPositions }, settings } = state;
+  return { tagsPositions, settings };
 };
 
 const connector = connect(mapStateToProps);
@@ -94,7 +94,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   };
 
   draw = () => {
-    const { width, height, tagsPositions } = this.props;
+    const { width, height, tagsPositions, settings } = this.props;
 
     if (!tagsPositions) {
       return;
@@ -106,6 +106,8 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       return;
     }
 
+    const { fontFamily } = settings;
+
     const ctx = canvas.getContext('2d');
 
     if (ctx && this.state.clearParams && this.state.restoreCoords) {
@@ -113,7 +115,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       ctx.translate(...this.state.restoreCoords);
     }
 
-    const drawResult = drawOnCanvas(tagsPositions, canvas, { width, height });
+    const drawResult = drawOnCanvas(tagsPositions, canvas, { width, height }, { fontFamily });
 
     if (!drawResult) {
       return;

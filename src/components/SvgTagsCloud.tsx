@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { withStyles, createStyles } from '@material-ui/core';
+import { makeStyles, Theme } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import throttle from 'lodash.throttle';
 import * as actions from 'store/actions/tagsCloud';
@@ -16,12 +16,13 @@ import { SceneMap, Dimensions } from 'utilities/positioningAlgorithm/sceneMap';
 import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
 import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
-import { FONT_FAMILY, FONT_Y_FACTOR, SCENE_MAP_RESOLUTION } from 'constants/index';
+import { getFontYFactor } from 'utilities/common/getFontYFactor';
+import { FontFamilies } from 'constants/index';
 import { Checkbox } from 'ui/checkbox/Checkbox';
 import { Collapse } from 'components/Collapse';
 import { TextButton } from 'ui/buttons/TextButton';
 
-import type { PositionedTagRectT, ClassesT, RectAreaT } from 'types/types';
+import type { PositionedTagRectT, RectAreaT } from 'types/types';
 import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
 import type { ViewBoxT } from 'utilities/tagsCloud/tagsCloud';
 import { RootStateT } from 'store/types';
@@ -32,12 +33,13 @@ type PropsT = {
   width: number;
   height: number;
   onTagClick: (id: string) => void;
-  classes: ClassesT;
 };
 
 type CoordinatesT = { x: number; y: number };
 
 type VacanciesT = NonNullable<RootStateT['tagsCloud']['vacancies']>;
+
+type StylesOptionsT = {fontFamily: FontFamilies};
 
 const DURATION = 300;
 
@@ -73,7 +75,7 @@ const tagStyle = {
   cursor: 'pointer',
 };
 
-const styles = createStyles({
+const useStyles = makeStyles<Theme, StylesOptionsT>({
   container: {
     width: '100%',
     textAlign: 'center',
@@ -81,7 +83,7 @@ const styles = createStyles({
   tagsCloudCanvas: {
     position: 'relative',
     zIndex: TAGS_CLOUD_CANVAS_Z_INDEX,
-    fontFamily: FONT_FAMILY,
+    fontFamily: ({ fontFamily }) => fontFamily,
   },
   tagAvatarCanvas: {
     position: 'absolute',
@@ -152,7 +154,8 @@ const activeVacanciesStyle: React.CSSProperties = {
   left: 0,
 };
 
-const renderVacancyRect = (vacancy: VacancyT, kind: string, importanceIndex: number) => {
+const renderVacancyRect = (vacancy: VacancyT, { kind, importanceIndex, sceneMapResolution }
+  : {kind: string, importanceIndex: number, sceneMapResolution: number}) => {
   // @ts-ignore
   const left = Number.isFinite(vacancy.left) ? vacancy.left : vacancy.leftEdgeColumn;
   // @ts-ignore
@@ -171,14 +174,14 @@ const renderVacancyRect = (vacancy: VacancyT, kind: string, importanceIndex: num
     <rect
       fill="purple"
       fillOpacity="0"
-      height={SceneMap.countPositions(bottom, top) * SCENE_MAP_RESOLUTION}
+      height={SceneMap.countPositions(bottom, top) * sceneMapResolution}
       key={`${left},${right},${top},${bottom},${kind}`}
       stroke="blue"
       strokeOpacity="0.25"
       strokeWidth={importanceIndex === 0 ? 1 : 0.5}
-      width={SceneMap.countPositions(left, right) * SCENE_MAP_RESOLUTION}
-      x={SceneMap.getPositionLeftEdge(left) * SCENE_MAP_RESOLUTION}
-      y={-SceneMap.getPositionRightEdge(top) * SCENE_MAP_RESOLUTION}
+      width={SceneMap.countPositions(left, right) * sceneMapResolution}
+      x={SceneMap.getPositionLeftEdge(left) * sceneMapResolution}
+      y={-SceneMap.getPositionRightEdge(top) * sceneMapResolution}
     />
   );
 };
@@ -188,12 +191,13 @@ type ActiveVacanciesPropsT = {
   svgSize: SizeT;
   viewBox: ViewBoxT;
   transform: string;
+  sceneMapResolution: number,
 };
-const Vacancies = ({ vacancies, svgSize, viewBox, transform }: ActiveVacanciesPropsT) => {
+const Vacancies = ({ vacancies, svgSize, viewBox, transform, sceneMapResolution }: ActiveVacanciesPropsT) => {
   const rects: React.ReactNode[] = [];
   if (vacancies) {
     vacancies.forEach(({ vacancy, kind }) => {
-      rects.push(renderVacancyRect(vacancy, kind, rects.length));
+      rects.push(renderVacancyRect(vacancy, { kind, importanceIndex: rects.length, sceneMapResolution }));
     });
   }
 
@@ -259,36 +263,41 @@ const limitCoordinatesWithCanvasBoundaries = (coordinates: CoordinatesT, canvasR
   };
 };
 
-const canvasCoordinatesToSceneCoordinates = (canvasCoordinates: CoordinatesT, sceneEdges: SceneEdgesT, zoom: number) => {
+const canvasCoordinatesToSceneCoordinates = (canvasCoordinates: CoordinatesT, { sceneMapEdges, zoom, sceneMapResolution }
+  : { sceneMapEdges: SceneEdgesT, zoom: number, sceneMapResolution: number }) => {
   const { x, y } = canvasCoordinates;
 
   return {
-    x: (x / zoom + sceneEdges[Dimensions.MINUS_X] * SCENE_MAP_RESOLUTION) / SCENE_MAP_RESOLUTION,
-    y: (sceneEdges[Dimensions.Y] * SCENE_MAP_RESOLUTION - y / zoom) / SCENE_MAP_RESOLUTION,
+    x: (x / zoom + sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) / sceneMapResolution,
+    y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y / zoom) / sceneMapResolution,
   };
 };
 
-const sceneCoordinatesToCanvasCoordinates = (sceneCoordinates: CoordinatesT, sceneEdges: SceneEdgesT, zoom: number) => {
+const sceneCoordinatesToCanvasCoordinates = (sceneCoordinates: CoordinatesT, { sceneMapEdges, zoom, sceneMapResolution }
+  : {sceneMapEdges: SceneEdgesT, zoom: number, sceneMapResolution: number}) => {
   const { x, y } = sceneCoordinates;
 
   return {
-    x: (x - sceneEdges[Dimensions.MINUS_X] * SCENE_MAP_RESOLUTION) * zoom,
-    y: (sceneEdges[Dimensions.Y] * SCENE_MAP_RESOLUTION - y) * zoom,
+    x: (x - sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) * zoom,
+    y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y) * zoom,
   };
 };
 
 const stateSelector = (state: RootStateT) => {
-  const { tagsCloud: { tagsPositions, vacancies, sceneMap: sceneMapPositions }, rectAreasMapsData: rectAreasMaps } = state;
-  return { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions  };
+  const {
+    tagsCloud: { tagsPositions, vacancies, sceneMap: sceneMapPositions },
+    rectAreasMapsData: rectAreasMaps,
+    settings: { fontFamily, sceneMapResolution },
+  } = state;
+  return { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions, fontFamily, sceneMapResolution  };
 };
 
 const SvgTagsCloud = ({
   width,
   height,
   onTagClick,
-  classes,
 }: PropsT) => {
-  const { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions } = useSelector(stateSelector);
+  const { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions, fontFamily, sceneMapResolution } = useSelector(stateSelector);
   const dispatch = useDispatch();
 
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -296,6 +305,8 @@ const SvgTagsCloud = ({
   const preventOnClickHandlingRef = useRef<boolean>(false);
   const handleMouseUpEventRef = useRef(() => {});
   const zoomRef = useRef(1);
+
+  const classes = useStyles({ fontFamily });
 
   const [isCoordinateGridShown, setIsCoordinateGridShown] = useState(false);
   const [isReactAreasShown, setIsReactAreasShown] = useState(false);
@@ -359,8 +370,8 @@ const SvgTagsCloud = ({
   }, [sceneMapPositions]);
 
   const tagsSvgData = useMemo(() => {
-    return tagsPositions && getTagsSvgData(tagsPositions);
-  }, [tagsPositions]);
+    return tagsPositions && getTagsSvgData(tagsPositions, { fontFamily });
+  }, [tagsPositions, fontFamily]);
 
   const allVacancies = useMemo(() => {
     if (!vacancies || !isVacanciesShown) {
@@ -407,7 +418,7 @@ const SvgTagsCloud = ({
     } = sceneCoordinatesToCanvasCoordinates({
       x: tagPosition.rectLeft,
       y: tagPosition.rectTop
-    }, sceneMapEdges, zoomRef.current);
+    }, { sceneMapEdges, zoom: zoomRef.current, sceneMapResolution });
 
     const canvasWrapperRect = canvasWrapperRef.current?.getBoundingClientRect();
     if (!canvasWrapperRect) {
@@ -458,17 +469,21 @@ const SvgTagsCloud = ({
       const tagAvatarWidth = rectRight - rectLeft;
       const tagAvatarHeight = rectTop - rectBottom;
 
-      const pointerSceneCoordinates = canvasCoordinatesToSceneCoordinates(pointerCanvasCoordinates, sceneMapEdges, currentZoom);
-
-      const nextRectTop = pointerSceneCoordinates.y * SCENE_MAP_RESOLUTION  + shiftY / currentZoom;
-      const nextRectLeft = pointerSceneCoordinates.x * SCENE_MAP_RESOLUTION - shiftX / currentZoom;
+      const pointerSceneCoordinates = canvasCoordinatesToSceneCoordinates(pointerCanvasCoordinates, {
+        sceneMapEdges,
+        zoom: currentZoom,
+        sceneMapResolution,
+      });
+      const fontYFactor = getFontYFactor(fontFamily);
+      const nextRectTop = pointerSceneCoordinates.y * sceneMapResolution  + shiftY / currentZoom;
+      const nextRectLeft = pointerSceneCoordinates.x * sceneMapResolution - shiftX / currentZoom;
       const { rectTranslateX, rectTranslateY } = calcTagSvgData({
         ...tagPosition,
         rectTop: nextRectTop,
         rectBottom: nextRectTop - tagAvatarHeight,
         rectLeft: nextRectLeft,
         rectRight: nextRectLeft + tagAvatarWidth,
-      }, FONT_Y_FACTOR - 0.5);
+      }, fontYFactor - 0.5);
 
       draggableTagAvatarRef.current.style.transform = `translate(${rectTranslateX}px,${rectTranslateY}px) rotate(${tagPosition.rotate ? 90 : 0}deg) scale(1)`;
 
@@ -501,7 +516,7 @@ const SvgTagsCloud = ({
 
     document.addEventListener('touchend', onMouseUp);
     document.addEventListener('touchmove', onMouseMove);
-  }, [tagsPositions, sceneMapEdges]);
+  }, [tagsPositions, sceneMapEdges, fontFamily, sceneMapResolution]);
 
   if (!tagsPositions || !tagsSvgData) {
     return null;
@@ -545,7 +560,11 @@ const SvgTagsCloud = ({
       return null;
     }
 
-    const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, sceneMapEdges, zoom);
+    const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, {
+      sceneMapEdges,
+      zoom,
+      sceneMapResolution
+    });
 
     return sortActiveVacancies(getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacanciesToProcess));
   })();
@@ -618,7 +637,7 @@ const SvgTagsCloud = ({
         onMouseDown={onCanvasWrapperMouseDown}
         onTouchStart={onCanvasWrapperMouseDown}
       >
-        {isCoordinateGridShown && drawCoordinateGrid(tagsPositions, svgSize, viewBox)}
+        {isCoordinateGridShown && drawCoordinateGrid({ tagsPositions, svgSize, viewBox, sceneMapResolution })}
         {isReactAreasShown && drawReactAreas(tagsPositions, svgSize, viewBox, transform)}
         <svg
           {...svgSize}
@@ -692,12 +711,14 @@ const SvgTagsCloud = ({
           </g>
         </svg>
         <Vacancies
+          sceneMapResolution={sceneMapResolution}
           svgSize={svgSize}
           transform={transform}
           vacancies={activeVacancies}
           viewBox={viewBox}
         />
         <Vacancies
+          sceneMapResolution={sceneMapResolution}
           svgSize={svgSize}
           transform={transform}
           vacancies={allVacancies}
@@ -729,13 +750,14 @@ const coordinateGridCanvasStyle: React.CSSProperties = {
   zIndex: COORDINATE_GRID_CANVAS_Z_INDEX,
 };
 
-function drawCoordinateGrid(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT) {
-  const sceneMapUnitSize = SCENE_MAP_RESOLUTION;
+function drawCoordinateGrid({ tagsPositions, svgSize, viewBox, sceneMapResolution }
+  : {tagsPositions: ReadonlyArray<PositionedTagRectT>, svgSize: SizeT, viewBox: ViewBoxT, sceneMapResolution: number}) {
+  const sceneMapUnitSize = sceneMapResolution;
   const zoom = calcZoom(svgSize, viewBox);
 
   const [,, width, height] = viewBox;
 
-  const borderCoordinates = getBorderCoordinates(tagData);
+  const borderCoordinates = getBorderCoordinates(tagsPositions);
 
   if (!borderCoordinates) {
     return null;
@@ -844,4 +866,4 @@ function drawReactAreas(tagData: ReadonlyArray<PositionedTagRectT>, svgSize: Siz
   );
 }
 
-export default withStyles(styles)(SvgTagsCloud);
+export default SvgTagsCloud;

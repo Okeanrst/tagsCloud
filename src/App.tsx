@@ -8,7 +8,7 @@ import Router from './Router';
 import { store } from './store/store';
 import { loadFont } from './store/actions/loadFont';
 
-loadFont()(store.dispatch);
+loadFont()(store.dispatch, store.getState);
 
 class App extends Component {
   render() {

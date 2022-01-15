@@ -1,22 +1,23 @@
 import * as actionTypes from './actionTypes';
 import { createAction } from './helpers';
 import FontFaceObserver from 'fontfaceobserver';
-import { Dispatch } from 'redux';
-import { FONT_FAMILY } from 'constants/index';
 
-import { AppDispatchT } from '../types';
+import { AppDispatchT, GetStateT } from '../types';
 
 const { FONT_LOAD_SUCCESS, FONT_LOAD_REQUEST, FONT_LOAD_FAILURE } = actionTypes;
 
-export function loadFont(): (dispatch: Dispatch) => void {
-  return (dispatch: AppDispatchT) => {
+const TIMEOUT = 5000;
+
+export function loadFont() {
+  return (dispatch: AppDispatchT, getState: GetStateT) => {
+    const { settings: { fontFamily } } = getState();
     if (sessionStorage.getItem('fontLoaded')) {
       // return dispatch(createAction(FONT_LOAD_SUCCESS));
     }
     dispatch(createAction(FONT_LOAD_REQUEST));
-    const font = new FontFaceObserver(FONT_FAMILY);
+    const font = new FontFaceObserver(fontFamily);
     font
-      .load(null, 5000)
+      .load(null, TIMEOUT)
       .then(function () {
         sessionStorage.setItem('fontLoaded', JSON.stringify(1));
         dispatch(createAction(FONT_LOAD_SUCCESS));

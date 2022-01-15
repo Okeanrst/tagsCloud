@@ -10,8 +10,30 @@ import type {
   PreparedLeftEdgeVacancyT,
   PreparedRightEdgeVacancyT,
 } from 'utilities/positioningAlgorithm/types';
+import {
+  FontFamilies,
+  PickingStrategies,
+  SortingClosedVacanciesStrategies,
+  SortingEdgeVacanciesStrategies
+} from 'constants/index';
 
 export type RootStateT = {
+  settings: {
+    fontFamily: FontFamilies,
+    shouldDrawFinalMap: boolean;
+    shouldDrawStepMap: boolean;
+    shouldDrawVacanciesMap: boolean;
+    shouldDrawFinalVacanciesMap: boolean;
+    shouldTryAnotherAngle: boolean;
+    addIfEmptyIndex: number;
+    pickingClosedVacancyStrategy: PickingStrategies,
+    pickingEdgeVacancyStrategy: PickingStrategies,
+    sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies,
+    sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies,
+    sceneMapResolution: number,
+    minFontSize: number,
+    maxFontSize: number,
+  },
   tagsData: {
     data: ReadonlyArray<TagDataT>;
     status: QueryStatuses.SUCCESS;
@@ -49,3 +71,5 @@ export type RootStateT = {
 };
 
 export type AppDispatchT = ThunkDispatch<RootStateT, void, Action>;
+
+export type GetStateT = () => RootStateT;

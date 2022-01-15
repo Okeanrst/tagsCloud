@@ -1,3 +1,4 @@
+import { FontFamilies } from 'constants/index';
 import { IdRectAreaMapT, PreparedTagDataT } from '../types/types';
 import { getRectAreaMap } from './getGlyphsMap';
 import { splitAndPerformWork } from './common/splitAndPerformWork';
@@ -8,7 +9,7 @@ export function formRectAreaMapKey(word: string, fontSize: number) {
 
 export function prepareRectAreasMaps(
   tagsData: ReadonlyArray<PreparedTagDataT>,
-  { resolution, fontFamily }: {resolution: number; fontFamily: string},
+  { resolution, fontFamily }: {resolution: number; fontFamily: FontFamilies},
 ): Promise<ReadonlyArray<IdRectAreaMapT>> {
   return new Promise(function (resolve, reject) {
     const canvas = document.createElement('canvas');

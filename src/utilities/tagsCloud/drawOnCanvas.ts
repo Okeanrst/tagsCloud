@@ -1,10 +1,11 @@
 import { getBorderCoordinates } from './tagsCloud';
 import { PositionedTagRectT } from 'types/types';
-import { FONT_FAMILY, FONT_Y_FACTOR } from 'constants/index';
+import { FontFamilies } from 'constants/index';
+import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 
 type OptionsT = {
-  fontFamily?: string;
+  fontFamily: FontFamilies;
   drawAxles?: boolean;
 };
 
@@ -15,13 +16,13 @@ export function drawOnCanvas(
   data: ReadonlyArray<PositionedTagRectT>,
   canvas: HTMLCanvasElement,
   availableSize: { width: number; height: number },
-  options?: OptionsT,
+  options: OptionsT,
 ): {
   clearParams: ClearParamsT;
   restoreCoords: RestoreCoordsT;
   scale: number;
 } | null {
-  const { fontFamily = FONT_FAMILY, drawAxles = false } = options ?? {};
+  const { fontFamily, drawAxles = false } = options;
   const borderCoordinates = getBorderCoordinates(data);
 
   if (!borderCoordinates) {
@@ -93,13 +94,13 @@ export function drawOnCanvas(
       ctx.translate(dX, dY);
       rotate(90);
       const xOffset = (height * scale - wordWidth) / 2 + item.glyphsXOffset * scale;
-      const yOffset = width * FONT_Y_FACTOR * scale + item.glyphsYOffset * scale;
+      const yOffset = width * getFontYFactor(fontFamily) * scale + item.glyphsYOffset * scale;
       ctx.fillText(item.label, xOffset, yOffset);
       rotate(-90);
       ctx.translate(-dX, -dY);
     } else {
       const xOffset = item.rectLeft * scale + (width * scale - wordWidth) / 2 + item.glyphsXOffset * scale;
-      const yOffset = (-item.rectTop + height * FONT_Y_FACTOR) * scale + item.glyphsYOffset * scale;
+      const yOffset = (-item.rectTop + height * getFontYFactor(fontFamily)) * scale + item.glyphsYOffset * scale;
       ctx.fillText(item.label, xOffset, yOffset);
     }
   });

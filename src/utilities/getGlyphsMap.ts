@@ -1,9 +1,10 @@
 import {
-  FONT_Y_FACTOR,
   FONT_SIZE_TO_GLYPH_HEIGHT_RATIO,
   OPEN_SANS_FONT,
+  FontFamilies,
 } from 'constants/index';
 import openSansGlyphsByChars from './glyphsByChars/openSans.json';
+import { getFontYFactor } from 'utilities/common/getFontYFactor';
 
 import {
   TwoDimensionalMapMetaT,
@@ -56,7 +57,7 @@ export function getRectAreaMap(
     word: string;
     fontSize: number;
     resolution: number;
-    fontFamily: string;
+    fontFamily: FontFamilies;
   },
   {
     returnFakeRectAreaMap,
@@ -175,7 +176,7 @@ export function getGlyphsMap(
     word: string;
     fontSize: number;
     resolution: number;
-    fontFamily: string;
+    fontFamily: FontFamilies;
   },
 ): ({
   map: TwoDimensionalMapT;
@@ -229,7 +230,7 @@ export function getGlyphsMap(
   ctx.textBaseline = 'alphabetic';
   ctx.font = `${fontSize}px "${fontFamily}"`;
 
-  ctx.fillText(word, leftExtraColumns * resolution, height * FONT_Y_FACTOR);
+  ctx.fillText(word, leftExtraColumns * resolution, height * getFontYFactor(fontFamily));
 
   const imageData = ctx.getImageData(0, 0, width, height);
   const data = imageData.data;
@@ -344,7 +345,7 @@ export function getHighResolutionGlyphsMap(
     fontSize: number;
     width: number;
     height: number;
-    fontFamily: string;
+    fontFamily: FontFamilies;
     xOffset?: number;
   },
 ): {
@@ -363,8 +364,7 @@ export function getHighResolutionGlyphsMap(
   ctx.textBaseline = 'alphabetic';
   ctx.font = `${fontSize}px "${fontFamily}"`;
 
-  // TODO use opentype.js
-  ctx.fillText(word, xOffset, height * FONT_Y_FACTOR);
+  ctx.fillText(word, xOffset, height * getFontYFactor(fontFamily));
 
   const sx = 0;
   const sy = 0;

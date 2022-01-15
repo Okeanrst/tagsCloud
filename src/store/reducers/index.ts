@@ -5,6 +5,7 @@ import { tagsCloudReducer } from './tagsCloud';
 import { incrementalBuildReducer } from './incrementalBuild';
 import fontLoaded from './fontLoaded';
 import { rectAreasMapsDataReducer } from './rectAreasMapsData';
+import { settingsReducer } from './settings';
 
 import type { RootStateT } from '../types';
 
@@ -17,6 +18,7 @@ const useCanvasReducer = (
 };
 
 export default combineReducers({
+  settings: settingsReducer,
   tagsData: tagsDataReducer,
   tagsCloud: tagsCloudReducer,
   useCanvas: useCanvasReducer,

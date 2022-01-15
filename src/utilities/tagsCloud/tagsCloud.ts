@@ -1,5 +1,6 @@
-import { FONT_Y_FACTOR } from 'constants/index';
+import { FontFamilies } from 'constants/index';
 import { getRandomRGBColor } from 'utilities/common/getRandomRGBColor';
+import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import {
   TagDataT,
   PreparedTagDataT,
@@ -21,6 +22,8 @@ export type BorderCoordinatesT = {
 };
 
 export type ViewBoxT = [number, number, number, number];
+
+type GetTagsSvgDataOptionsT = {fontFamily: FontFamilies};
 
 export function prepareTagsData(
   tagsData: ReadonlyArray<TagDataT>,
@@ -102,7 +105,7 @@ export function calcTagSvgData(tagData: PositionedTagRectT, yFactor: number) {
   };
 }
 
-export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
+export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>, { fontFamily }: GetTagsSvgDataOptionsT): {
   transform: string;
   viewBox: ViewBoxT;
   aspectRatio: number;
@@ -114,7 +117,7 @@ export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>): {
     return null;
   }
 
-  const yFactor = FONT_Y_FACTOR - 0.5;
+  const yFactor = getFontYFactor(fontFamily) - 0.5;
 
   const positionedTagsSvgData = data.map(tagData => {
     return calcTagSvgData(tagData, yFactor);

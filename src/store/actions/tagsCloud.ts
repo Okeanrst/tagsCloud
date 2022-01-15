@@ -1,15 +1,6 @@
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
 import {
-  DEFAULT_MAX_FONT_SIZE,
-  DEFAULT_MIN_FONT_SIZE,
-  PickingStrategies,
-  SCENE_MAP_RESOLUTION,
-  SortingClosedVacanciesStrategies,
-  SortingEdgeVacanciesStrategies,
-  FONT_FAMILY,
-} from 'constants/index';
-import {
   calcTagsPositions, creatRawPositionedTagRect, moveRectAreaPositionsOnSceneMap,
   pickClosedVacancy,
   pickEdgeVacancy,
@@ -29,7 +20,7 @@ import { createAction } from './helpers';
 import validateTagsCloudRawData from './rawDataValidator';
 
 import { TagDataT } from 'types/types';
-import { AppDispatchT, RootStateT } from '../types';
+import { AppDispatchT, RootStateT, GetStateT } from '../types';
 import { AnyAction } from 'redux';
 import {
   VacancyKinds,
@@ -40,8 +31,6 @@ import {
   PreparedLeftEdgeVacancyT,
   PreparedBottomEdgeVacancyT,
 } from 'utilities/positioningAlgorithm/types';
-
-type GetStateT = () => RootStateT;
 
 function selectMaxSentimentScore(state: RootStateT) {
   return getMaxSentimentScore(state.tagsData?.data ?? []);
@@ -87,41 +76,27 @@ export function getData() {
   };
 }
 
-const preparedTagsDataOptions = {
-  minFontSize: DEFAULT_MIN_FONT_SIZE,
-  maxFontSize: DEFAULT_MAX_FONT_SIZE,
-};
-
-const calcTagsPositionsOptions = {
-  shouldDrawFinalMap: false,
-  shouldDrawStepMap: false,
-  shouldDrawVacanciesMap: false,
-  shouldDrawFinalVacanciesMap: false,
-  shouldTryAnotherAngle: false,
-  addIfEmptyIndex: 5,
-  pickingClosedVacancyStrategy: PickingStrategies.ASC,
-  pickingEdgeVacancyStrategy: PickingStrategies.ASC,
-  sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER,
-  sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies.DISTANCE_FROM_CENTER,
-  sceneMapResolution: SCENE_MAP_RESOLUTION,
+const formCalcTagsPositionsOptions = (settings: RootStateT['settings']) => {
+  const { fontFamily, minFontSize, maxFontSize, ...restSettings } = settings;
+  return restSettings;
 };
 
 export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
     dispatch(createAction(actionTypes.TAGS_CLOUD_BUILD_REQUEST));
     const maxSentimentScore = getMaxSentimentScore(tagsData);
-    const preparedTagsData = prepareTagsData(tagsData, {
-      ...preparedTagsDataOptions,
-      maxSentimentScore
-    });
+    const { settings } = getState();
+    const { fontFamily, sceneMapResolution, minFontSize, maxFontSize } = settings;
+    const preparedTagsData = prepareTagsData(tagsData, { minFontSize, maxFontSize, maxSentimentScore });
     const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
     return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, {
-      resolution: SCENE_MAP_RESOLUTION,
-      fontFamily: FONT_FAMILY
+      resolution: sceneMapResolution,
+      fontFamily,
     })
       .then(tagsRectAreasMaps => {
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
         const fullRectAreasMapsData = getState().rectAreasMapsData;
+        const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
         return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, [], calcTagsPositionsOptions);
       })
       .then(({ tagsPositions, sceneMapPositions, vacancies }) => {
@@ -143,20 +118,21 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
     dispatch(createAction(actionTypes.INCREMENTAL_BUILD_TAGS_CLOUD_REQUEST));
 
+    const { settings } = getState();
+    const { fontFamily, sceneMapResolution, minFontSize, maxFontSize } = settings;
+
     const maxSentimentScore = selectMaxSentimentScore(getState());
-    const preparedTagsData = prepareTagsData(tagsData, {
-      ...preparedTagsDataOptions,
-      maxSentimentScore
-    });
+    const preparedTagsData = prepareTagsData(tagsData, { minFontSize, maxFontSize, maxSentimentScore });
     const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
     return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, {
-      resolution: SCENE_MAP_RESOLUTION,
-      fontFamily: FONT_FAMILY
+      resolution: sceneMapResolution,
+      fontFamily,
     })
       .then(tagsRectAreasMaps => {
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         const sceneMap = getState().tagsCloud.sceneMap ?? [];
+        const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
         return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, sceneMap, {
           ...calcTagsPositionsOptions,
           addIfEmptyIndex: calcTagsPositionsOptions.addIfEmptyIndex - (getState().tagsCloud.tagsPositions?.length ?? 0),
@@ -301,6 +277,9 @@ export function changeTagPosition({ tagId, vacancy, vacancyKind }: { tagId: stri
     if (!tagRectArea) {
       return null;
     }
+
+    const { settings } = getState();
+    const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
 
     let rectPosition;
     if (vacancyKind === VacancyKinds.closedVacancies) {
