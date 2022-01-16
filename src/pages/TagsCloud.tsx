@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
+import { withStyles } from '@material-ui/core';
 import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from 'store/actions/tagsCloud';
 import { loadFont } from 'store/actions/loadFont';
@@ -8,11 +9,12 @@ import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
 import { Checkbox } from 'ui/checkbox/Checkbox';
-import { PrimaryButton } from 'ui/buttons/PrimaryButton';
+import downloadIconSrc from 'assets/download.svg';
 
+import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
-import { TagDataT } from 'types/types';
+import { ClassesT, TagDataT } from 'types/types';
 
 const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
 
@@ -41,14 +43,31 @@ const mapDispatchToProps = (dispatch: AppDispatchT) => ({
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
+const stylesClasses = {
+  downloadButton: {
+    border: 'none',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+  },
+  downloadIcon: {
+    width: '32px',
+    height: '32px',
+  },
+  rebuildButton: {
+    marginLeft: '16px',
+  },
+};
+
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type PropsT = PropsFromRedux & {
   navigate: NavigateFunction;
+  classes: ClassesT;
 };
 
 type StateT = {
   tagsCloudSceneSize: { width: number; height: number } | null;
+  downloadCloudCounter: number;
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
@@ -94,7 +113,7 @@ const getTagsDataByTagsIds = (tagsIds: string[], tagsData: ReadonlyArray<TagData
 };
 
 class TagsCloud extends Component<PropsT, StateT> {
-  state: StateT = { tagsCloudSceneSize: null };
+  state: StateT = { tagsCloudSceneSize: null, downloadCloudCounter: 0 };
 
   tagsCloudSceneRef = React.createRef<HTMLDivElement>();
 
@@ -194,6 +213,10 @@ class TagsCloud extends Component<PropsT, StateT> {
     this.props.navigate('/tag/' + encodeURIComponent(id));
   };
 
+  onDownloadClick = () => {
+    this.setState(({ downloadCloudCounter }) => ({ downloadCloudCounter: downloadCloudCounter + 1 }));
+  };
+
   renderLoader = (loading: boolean) => (
     <div style={styles.loaderContainer}>
       <FadeLoader
@@ -203,21 +226,36 @@ class TagsCloud extends Component<PropsT, StateT> {
     </div>
   );
 
-  renderRebuildButton = (onClick: () => void, disabled: boolean) => (
-    <div style={styles.rebuildButtonContainer}>
-      <PrimaryButton
-        disabled={disabled}
-        onClick={onClick}
-      >
-        Rebuild
-      </PrimaryButton>
-    </div>
-  );
+  renderActionButtons = (disabled: boolean) => {
+    const { classes, triggerRebuild } = this.props;
+    return (
+      <div style={styles.rebuildButtonContainer}>
+        <button
+          className={classes.downloadButton}
+          disabled={disabled}
+          onClick={this.onDownloadClick}
+        >
+          <img
+            alt="download"
+            className={classes.downloadIcon}
+            src={downloadIconSrc}
+          />
+        </button>
+        <PrimaryButton
+          classes={{ root: classes.rebuildButton }}
+          disabled={disabled}
+          onClick={triggerRebuild}
+        >
+          Rebuild
+        </PrimaryButton>
+      </div>
+    );
+  };
 
   render() {
-    const { tagsCloudSceneSize } = this.state;
-    const { useCanvas, tagsData, tagsCloud, toggleUseCanvas, fontLoaded, incrementalBuild, triggerRebuild, fontFamily } =
-      this.props;
+    const { tagsCloudSceneSize, downloadCloudCounter } = this.state;
+    const { useCanvas, tagsData, tagsCloud, toggleUseCanvas, fontLoaded, incrementalBuild, fontFamily } = this.props;
+
     const loading = [
       tagsData.status,
       tagsCloud.status,
@@ -230,7 +268,7 @@ class TagsCloud extends Component<PropsT, StateT> {
       <div style={styles.pageContainer}>
         <div style={{ fontFamily, visibility: 'hidden' }} />
         {this.renderLoader(loading)}
-        {this.renderRebuildButton(triggerRebuild, loading)}
+        {this.renderActionButtons(loading)}
         <div style={styles.controls}>
           <Checkbox
             checked={useCanvas}
@@ -244,6 +282,7 @@ class TagsCloud extends Component<PropsT, StateT> {
         >
           {tagsCloudSceneSize && tagsCloud.status === SUCCESS && (
             <TagsCloudComponent
+              downloadCloudCounter={downloadCloudCounter}
               height={tagsCloudSceneSize.height}
               width={tagsCloudSceneSize.width}
               onTagClick={this.onTagClick}
@@ -255,7 +294,4 @@ class TagsCloud extends Component<PropsT, StateT> {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(withTriggerGettingRawData<PropsT>(TagsCloud));
+export default connector(withStyles(stylesClasses)(withTriggerGettingRawData<PropsT>(TagsCloud)));

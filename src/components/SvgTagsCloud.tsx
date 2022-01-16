@@ -33,6 +33,7 @@ type PropsT = {
   width: number;
   height: number;
   onTagClick: (id: string) => void;
+  downloadCloudCounter: number;
 };
 
 type CoordinatesT = { x: number; y: number };

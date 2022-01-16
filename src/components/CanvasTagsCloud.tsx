@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
+import { saveAs } from 'file-saver';
 import { withStyles } from '@material-ui/core';
 import { drawOnCanvas } from 'utilities/tagsCloud/drawOnCanvas';
 import { getBorderCoordinates } from 'utilities/tagsCloud/tagsCloud';
@@ -21,6 +22,7 @@ type PropsT = PropsFromRedux & {
   classes: {
     container: string;
   };
+  downloadCloudCounter: number;
 };
 
 type StateT = {
@@ -43,17 +45,15 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
     this.draw();
   }
 
-  shouldComponentUpdate(nextProps: PropsT) {
-    return (
-      this.props.width !== nextProps.width ||
-      this.props.height !== nextProps.height ||
-      this.props.tagsPositions !== nextProps.tagsPositions ||
-      this.props.onTagClick !== nextProps.onTagClick
-    );
-  }
-
-  componentDidUpdate() {
-    this.draw();
+  componentDidUpdate(prevProps: PropsT) {
+    const { width, height, tagsPositions, settings, downloadCloudCounter } = this.props;
+    if (prevProps.width !== width || prevProps.height !== height || prevProps.tagsPositions !== tagsPositions
+      || prevProps.settings !== settings) {
+      this.draw();
+    }
+    if (prevProps.downloadCloudCounter !== downloadCloudCounter) {
+      this.downloadCloudImage();
+    }
   }
 
   onCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -89,8 +89,24 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
         -(minLeft - i.rectRight) * scale > sceneX
       ) {
         this.props.onTagClick(i.id);
+        break;
       }
     }
+  };
+
+  downloadCloudImage = () => {
+    const canvas = this.tagCloudCanvasRef.current;
+
+    if (!canvas) {
+      return;
+    }
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        return;
+      }
+      saveAs(blob, 'tagCloud.png');
+    });
   };
 
   draw = () => {
