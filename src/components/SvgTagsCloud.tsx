@@ -1,8 +1,9 @@
-import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
+import React, { useCallback, useState, useMemo, useRef, useEffect, MutableRefObject } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles, Theme } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import throttle from 'lodash.throttle';
+import { saveAs } from 'file-saver';
 import * as actions from 'store/actions/tagsCloud';
 import { getBorderCoordinates, getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagsCloud';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
@@ -17,6 +18,7 @@ import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
 import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
+import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
 import { FontFamilies } from 'constants/index';
 import { Checkbox } from 'ui/checkbox/Checkbox';
 import { Collapse } from 'components/Collapse';
@@ -134,6 +136,13 @@ type DraggableTagAvatarProps = {
   color?: string;
   fontSize?: number;
   display?: string;
+};
+
+const downloadTagCloudHtmlFile = (html: string, fileName?: string) => {
+  const blob = new Blob([html], {
+    type: 'text/html;charset=utf-8',
+  });
+  saveAs(blob, fileName ?? 'tagCloud.html');
 };
 
 const DraggableTagAvatar = React.forwardRef<SVGTextElement, DraggableTagAvatarProps>((props, ref ) => {
@@ -284,6 +293,17 @@ const sceneCoordinatesToCanvasCoordinates = (sceneCoordinates: CoordinatesT, { s
   };
 };
 
+const useCounterChanged = ({ counter, callbackRef }: {counter: number, callbackRef: MutableRefObject<() => void>}) => {
+  const counterRef = useRef(counter);
+
+  useEffect(() => {
+    if (counter !== counterRef.current) {
+      counterRef.current = counter;
+      callbackRef.current();
+    }
+  }, [counter, callbackRef]);
+};
+
 const stateSelector = (state: RootStateT) => {
   const {
     tagsCloud: { tagsPositions, vacancies, sceneMap: sceneMapPositions },
@@ -297,6 +317,7 @@ const SvgTagsCloud = ({
   width,
   height,
   onTagClick,
+  downloadCloudCounter,
 }: PropsT) => {
   const { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions, fontFamily, sceneMapResolution } = useSelector(stateSelector);
   const dispatch = useDispatch();
@@ -306,6 +327,7 @@ const SvgTagsCloud = ({
   const preventOnClickHandlingRef = useRef<boolean>(false);
   const handleMouseUpEventRef = useRef(() => {});
   const zoomRef = useRef(1);
+  const downloadTagCloudRef = useRef(() => {});
 
   const classes = useStyles({ fontFamily });
 
@@ -316,6 +338,8 @@ const SvgTagsCloud = ({
   const [draggableTagId, setDraggableTagId] = useState<string | null>(null);
   const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
   const [tmpVacancies, setTmpVacancies] = useState<VacanciesT | null>(null);
+
+  useCounterChanged({ counter: downloadCloudCounter, callbackRef: downloadTagCloudRef });
 
   useEffect(() => {
     if (!draggableTagId || !sceneMapPositions) {
@@ -601,6 +625,11 @@ const SvgTagsCloud = ({
     const { label, color, fontSize } = tagPosition;
     return { label, color, fontSize, display: 'block' };
   })();
+
+  downloadTagCloudRef.current = () => {
+    const html = exportTagCloudAsHtml({ tagsSvgData: positionedTagSvgData, svgSize, viewBox, transform, fontFamily });
+    downloadTagCloudHtmlFile(html);
+  };
 
   return (
     <div className={classes.container}>
