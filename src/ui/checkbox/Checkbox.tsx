@@ -1,3 +1,4 @@
+import React, { ChangeEventHandler } from 'react';
 import { makeStyles } from '@material-ui/core';
 import cx from 'classnames';
 
@@ -10,25 +11,24 @@ const useStyles = makeStyles({
   },
 });
 
-type PropsT = {
-  checked?: boolean;
+export type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
+  name?: string;
   label?: string;
-  onChange?: () => void;
-  classes?: ReturnType<typeof useStyles>;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
+  classes?: Partial<ReturnType<typeof useStyles>>;
 };
 
-export const Checkbox = ({ checked = false, label = '', onChange, classes }: PropsT) => {
-  const styles = useStyles();
+export const Checkbox = ({ label = '', classes, ...restProps }: PropsT) => {
+  const ownClasses = useStyles();
   return (
-    <label className={cx(styles.root, classes?.root)}>
+    <label className={cx(ownClasses.root, classes?.root)}>
       <span>
         <input
-          checked={checked}
+          {...restProps}
           type="checkbox"
-          onChange={onChange}
         />
       </span>
-      <span className={cx(styles.label, classes?.label)}>
+      <span className={cx(ownClasses.label, classes?.label)}>
         {label}
       </span>
     </label>

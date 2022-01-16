@@ -9,6 +9,7 @@ import {
   RESET_TAGS_CLOUD,
   INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS,
   TAGS_CLOUD_UPDATE_TAG,
+  SETTINGS_UPDATE,
 } from '../actions/actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
@@ -27,6 +28,7 @@ export const tagsCloudReducer = (
     case TAGS_CLOUD_BUILD_FAILURE:
       return { ...state, status: FAILURE };
     case RESET_TAGS_CLOUD:
+    case SETTINGS_UPDATE:
       return { ...initState };
     case INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS: {
       const tagsPositions: RootStateT['tagsCloud']['tagsPositions'] = [

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
+import settingsIconSrc from 'assets/settings.svg';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -62,7 +63,23 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up('lg')]: {
       maxWidth: '1140px',
     },
-  }
+  },
+  settingsLink: {
+    marginLeft: '32px',
+  },
+  settingsLinkLabel: {
+    marginRight: '16px',
+    [theme.breakpoints.down('xs')]: {
+      display: 'none',
+    }
+  },
+  settingsLinkIcon: {
+    width: '32px',
+    height: '32px',
+    [theme.breakpoints.down('sm')]: {
+      display: 'inline',
+    }
+  },
 }));
 
 export const Layout = () => {
@@ -71,10 +88,23 @@ export const Layout = () => {
     <div className={classes.root}>
       <nav className={classes.navbar}>
         <div className={classes.navbarContent}>
-          <Link to="/">
-            Tags cloud
-          </Link>
-          <Link to="/tagsListEditor">Tags editor</Link>
+          <Link to="/">Tags cloud</Link>
+          <div>
+            <Link to="/tagsListEditor">
+              Tags editor
+            </Link>
+            <Link
+              className={classes.settingsLink}
+              to="/settings"
+            >
+              <span className={classes.settingsLinkLabel}>Settings</span>
+              <img
+                alt="settings icon"
+                className={classes.settingsLinkIcon}
+                src={settingsIconSrc}
+              />
+            </Link>
+          </div>
         </div>
       </nav>
       <main className={classes.main}>

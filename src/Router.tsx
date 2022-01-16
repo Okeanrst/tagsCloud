@@ -5,6 +5,7 @@ import TagsCloud from 'pages/TagsCloud';
 import { NotFoundPage } from 'components/NotFoundPage';
 import TagInformation from 'pages/TagInformation';
 import TagsListEditor from 'pages/tagsListEditor/TagsListEditor';
+import { Settings } from 'pages/Settings';
 import { Layout } from 'components/Layout';
 
 const Router = () => {
@@ -28,6 +29,10 @@ const Router = () => {
         <Route
           element={<TagInformation />}
           path="/tag/:id"
+        />
+        <Route
+          element={<Settings />}
+          path="/settings"
         />
         <Route
           element={<NotFoundPage />}

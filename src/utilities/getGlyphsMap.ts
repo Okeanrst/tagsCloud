@@ -1,9 +1,11 @@
 import {
   FONT_SIZE_TO_GLYPH_HEIGHT_RATIO,
   OPEN_SANS_FONT,
+  SPACE_MONO_FONT,
   FontFamilies,
 } from 'constants/index';
 import openSansGlyphsByChars from './glyphsByChars/openSans.json';
+import spaceMonoGlyphsByChars from './glyphsByChars/spaceMono.json';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 
 import {
@@ -18,6 +20,7 @@ type GlyphsByCharsT = {[key: string]: {xMin: number, yMin: number, xMax: number,
 
 const glyphsByCharsMap: {[key: string]: GlyphsByCharsT} = {
   [OPEN_SANS_FONT]: openSansGlyphsByChars,
+  [SPACE_MONO_FONT]: spaceMonoGlyphsByChars,
 };
 
 function calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily }: {

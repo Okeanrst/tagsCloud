@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from 'store/actions/tagsCloud';
+import { loadFont } from 'store/actions/loadFont';
 import SvgTagsCloud from 'components/SvgTagsCloud';
 import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
@@ -16,8 +17,8 @@ import { TagDataT } from 'types/types';
 const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
 
 const mapStateToProps = (state: RootStateT) => {
-  const { tagsCloud, useCanvas, fontLoaded, tagsData, incrementalBuild } = state;
-  return { tagsCloud, useCanvas, fontLoaded, tagsData, incrementalBuild };
+  const { tagsCloud, useCanvas, fontLoaded, tagsData, incrementalBuild, settings: { fontFamily } } = state;
+  return { tagsCloud, useCanvas, fontLoaded, tagsData, incrementalBuild, fontFamily };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatchT) => ({
@@ -32,6 +33,9 @@ const mapDispatchToProps = (dispatch: AppDispatchT) => ({
   },
   triggerRebuild() {
     dispatch(actions.resetTagsCloud());
+  },
+  observerLoadFont() {
+    dispatch(loadFont());
   }
 });
 
@@ -104,7 +108,12 @@ class TagsCloud extends Component<PropsT, StateT> {
       buildTagsCloud,
       incrementallyBuildTagsCloud,
       incrementalBuild,
+      observerLoadFont,
     } = this.props;
+
+    if (fontLoaded.status === PRISTINE) {
+      observerLoadFont();
+    }
 
     if (
       fontLoaded.status === SUCCESS &&
@@ -140,7 +149,11 @@ class TagsCloud extends Component<PropsT, StateT> {
   }
 
   componentDidUpdate(prevProps: PropsT, prevState: StateT) {
-    const { fontLoaded, tagsData, tagsCloud, buildTagsCloud } = this.props;
+    const { fontLoaded, tagsData, tagsCloud, buildTagsCloud, observerLoadFont } = this.props;
+
+    if (prevProps.fontLoaded.status !== PRISTINE && fontLoaded.status === PRISTINE) {
+      observerLoadFont();
+    }
 
     if (
       fontLoaded.data &&
@@ -203,7 +216,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   render() {
     const { tagsCloudSceneSize } = this.state;
-    const { useCanvas, tagsData, tagsCloud, toggleUseCanvas, fontLoaded, incrementalBuild, triggerRebuild } =
+    const { useCanvas, tagsData, tagsCloud, toggleUseCanvas, fontLoaded, incrementalBuild, triggerRebuild, fontFamily } =
       this.props;
     const loading = [
       tagsData.status,
@@ -215,6 +228,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
     return (
       <div style={styles.pageContainer}>
+        <div style={{ fontFamily, visibility: 'hidden' }} />
         {this.renderLoader(loading)}
         {this.renderRebuildButton(triggerRebuild, loading)}
         <div style={styles.controls}>

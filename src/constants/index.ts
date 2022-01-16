@@ -1,5 +1,9 @@
+export const MIN_SCENE_MAP_RESOLUTION = 2;
+export const MAX_SCENE_MAP_RESOLUTION = 300;
 export const DEFAULT_SCENE_MAP_RESOLUTION = 4;
 export const FONT_SIZE_TO_GLYPH_HEIGHT_RATIO = 1.2;
+export const MIN_FONT_SIZE = 8;
+export const MAX_FONT_SIZE = 300;
 export const DEFAULT_MIN_FONT_SIZE = 8;
 export const DEFAULT_MAX_FONT_SIZE = 160;
 
