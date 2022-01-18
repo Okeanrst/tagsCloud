@@ -211,7 +211,7 @@ export function editDataItem(tagData: TagDataT) {
     if (!currentTagDataItem) {
       return;
     }
-    const currentSentimentScore = currentTagDataItem.sentimentScore;
+    const { sentimentScore: currentSentimentScore, color: currentColor } = currentTagDataItem;
     const currentMaxSentimentScore = selectMaxSentimentScore(getState());
     let shouldResetTagsCloud = currentTagDataItem.label !== tagData.label || currentMaxSentimentScore < tagData.sentimentScore;
     dispatch(createAction(actionTypes.EDIT_DATA_ITEM, tagData));
@@ -227,6 +227,8 @@ export function editDataItem(tagData: TagDataT) {
       }
       dispatch(removeTagAction);
       dispatch(createAction(actionTypes.INCREMENTAL_BUILD_ADD_TAG_ID, tagData.id));
+    } else if (currentColor !== tagData.color) {
+      dispatch(createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG_COLOR, { tagId: tagData.id, color: tagData.color }));
     }
   };
 }

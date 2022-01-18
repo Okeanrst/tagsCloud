@@ -1,152 +1,182 @@
 [
   {
-    "id": "1751295897__Odessa",
-    "label": "Odessa",
+    "id": "1751295897__Odesa",
+    "label": "Odesa",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 65
   },
   {
     "id": "1751295897__DJ",
     "label": "DJ",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 54
   },
   {
     "id": "1751295897__Ostgut Ton",
     "label": "Ostgut Ton",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 58
   },
   {
     "id": "1751295897__Hammered",
     "label": "Hammered",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 20
   },
   {
     "id": "1751295897__Code",
     "label": "Code",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 68
   },
   {
     "id": "1751295897__Quantified Drunk",
     "label": "Quantified Drunk",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Berghain resident",
     "label": "Berghain resident",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 73
   },
   {
     "id": "1751295897__San Soda's Panorama Bar",
     "label": "San Soda's Panorama Bar",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Germany",
     "label": "Germany",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 80
   },
   {
     "id": "1751295897__Amsterdam",
     "label": "Amsterdam",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 91
   },
   {
     "id": "1751295897__Kantine am Berghain",
     "label": "Kantine am Berghain",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 59
   },
   {
     "id": "1751295897__London",
     "label": "London",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 1
   },
   {
     "id": "1751295897__UK",
     "label": "UK",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Marcel Dettmann",
     "label": "Marcel Dettmann",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 87
   },
   {
     "id": "1751295897__Disco",
     "label": "Disco",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Barcelona",
     "label": "Barcelona",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Watergate",
     "label": "Watergate",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 64
   },
   {
     "id": "1751295897__debut LP",
     "label": "debut LP",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 100
   },
   {
     "id": "1751295897__Patrick Gräser",
     "label": "Patrick Gräser",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 100
   },
   {
     "id": "1751295897__Panorama Bar in Berlin",
     "label": "Panorama Bar in Berlin",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 83
   },
   {
     "id": "1751295897__legendary nightclub",
     "label": "legendary nightclub",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 150
   },
   {
     "id": "1751295897__Ben Klock",
     "label": "Ben Klock",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Mixes",
     "label": "Mixes",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 895
   },
   {
     "id": "1751295897__Panorama Bar Music",
     "label": "Panorama Bar Music",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Terrace Sundae",
     "label": "Terrace Sundae",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Jun",
     "label": "Jun",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__Live set",
     "label": "Live set",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 75
   },
   {
     "id": "1751295897__dance music",
     "label": "dance music",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 0
   },
   {
     "id": "1751295897__club culture",
     "label": "club culture",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   },
   {
     "id": "1751295897__D/B Presents",
     "label": "D/B Presents",
+    "color": "rgb(155, 155, 155)",
     "sentimentScore": 50
   }
 ]

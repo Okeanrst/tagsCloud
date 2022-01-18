@@ -258,7 +258,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
     }
   };
 
-  onTagChange = (data: Pick<TagDataT, 'label' | 'volume' | 'type' | 'sentimentScore'>) => {
+  onTagChange = (data: Pick<TagDataT, 'label' | 'color' | 'sentimentScore'>) => {
     const { tagFormData } = this.state;
     this.closeTagForm();
     if (!tagFormData) {

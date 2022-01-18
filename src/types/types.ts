@@ -9,6 +9,7 @@ export type TagSentimentT = Readonly<{
 export type TagDataT = Readonly<{
   id: string;
   label: string;
+  color: string;
   volume?: number;
   type?: string;
   sentiment?: TagSentimentT;
@@ -34,11 +35,7 @@ export type TagDataT = Readonly<{
   queries?: any;
 }>;
 
-export type PreparedTagDataT = TagDataT &
-  Readonly<{
-    fontSize: number;
-    color: string;
-  }>;
+export type PreparedTagDataT = TagDataT & Readonly<{ fontSize: number; }>;
 
 export type TwoDimensionalMapT = Array<Array<boolean>>;
 

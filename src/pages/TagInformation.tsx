@@ -263,7 +263,7 @@ const TagInformation = (props: PropsT) => {
     setIsTagFormModalShown(false);
   }, []);
 
-  const onTagChange = useCallback((data: Pick<TagDataT, 'label' | 'volume' | 'type' | 'sentimentScore'>) => {
+  const onTagChange = useCallback((data: Pick<TagDataT, 'label' | 'color' | 'sentimentScore'>) => {
     setIsTagFormModalShown(false);
     if (!tagData) {
       return;

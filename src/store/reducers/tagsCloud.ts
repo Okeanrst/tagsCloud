@@ -9,6 +9,7 @@ import {
   RESET_TAGS_CLOUD,
   INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS,
   TAGS_CLOUD_UPDATE_TAG,
+  TAGS_CLOUD_UPDATE_TAG_COLOR,
   SETTINGS_UPDATE,
 } from '../actions/actionTypes';
 
@@ -50,6 +51,20 @@ export const tagsCloudReducer = (
       const tagsPositions = state.tagsPositions?.filter(({ id }) => id !== tagPosition.id);
       tagsPositions.push(tagPosition);
       return { ...state, tagsPositions, sceneMap, vacancies };
+    }
+    case TAGS_CLOUD_UPDATE_TAG_COLOR: {
+      const { tagId, color } = action.payload;
+      if (!state.tagsPositions) {
+        return state;
+      }
+      const targetTagPositionIndex = state.tagsPositions.findIndex(({ id }) => id === tagId);
+      if (targetTagPositionIndex === -1) {
+        return state;
+      }
+      const targetTagPosition = state.tagsPositions[targetTagPositionIndex];
+      const nestTagsPositions = [...state.tagsPositions];
+      nestTagsPositions[targetTagPositionIndex] = { ...targetTagPosition, color };
+      return { ...state, tagsPositions: nestTagsPositions };
     }
     default:
       return state;

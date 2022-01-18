@@ -1,7 +1,8 @@
 [
   {
-    "id": "1751295897__Odessa",
-    "label": "Odessa",
+    "id": "1751295897__Odesa",
+    "label": "Odesa",
+    "color": "rgb(86,72,145)",
     "volume": 165,
     "type": "topic",
     "sentiment": {
@@ -63,6 +64,7 @@
   {
     "id": "1751295897__DJ",
     "label": "DJ",
+    "color": "rgb(41,167,249)",
     "volume": 48,
     "type": "topic",
     "sentiment": {
@@ -123,6 +125,7 @@
   {
     "id": "1751295897__Ostgut Ton",
     "label": "Ostgut Ton",
+    "color": "rgb(44,9,176)",
     "volume": 24,
     "type": "topic",
     "sentiment": {
@@ -183,6 +186,7 @@
   {
     "id": "1751295897__Hammered",
     "label": "Hammered",
+    "color": "rgb(126,57,49)",
     "volume": 48,
     "type": "topic",
     "sentiment": {
@@ -243,6 +247,7 @@
   {
     "id": "1751295897__Code",
     "label": "Code",
+    "color": "rgb(134,144,132)",
     "volume": 16,
     "type": "topic",
     "sentiment": {
@@ -303,6 +308,7 @@
   {
     "id": "1751295897__Quantified Drunk",
     "label": "Quantified Drunk",
+    "color": "rgb(88,70,174)",
     "volume": 14,
     "type": "topic",
     "sentiment": {
@@ -362,6 +368,7 @@
   {
     "id": "1751295897__Berghain resident",
     "label": "Berghain resident",
+    "color": "rgb(243,68,180)",
     "volume": 13,
     "type": "topic",
     "sentiment": {
@@ -422,6 +429,7 @@
   {
     "id": "1751295897__San Soda's Panorama Bar",
     "label": "San Soda's Panorama Bar",
+    "color": "rgb(68,145,44)",
     "volume": 13,
     "type": "topic",
     "sentiment": {
@@ -481,6 +489,7 @@
   {
     "id": "1751295897__Germany",
     "label": "Germany",
+    "color": "rgb(226,198,161)",
     "volume": 13,
     "type": "topic",
     "sentiment": {
@@ -541,6 +550,7 @@
   {
     "id": "1751295897__Amsterdam",
     "label": "Amsterdam",
+    "color": "rgb(187,104,67)",
     "volume": 12,
     "type": "topic",
     "sentiment": {
@@ -601,6 +611,7 @@
   {
     "id": "1751295897__Kantine am Berghain",
     "label": "Kantine am Berghain",
+    "color": "rgb(200,212,174)",
     "volume": 11,
     "type": "topic",
     "sentiment": {
@@ -661,6 +672,7 @@
   {
     "id": "1751295897__London",
     "label": "London",
+    "color": "rgb(250,132,163)",
     "volume": 11,
     "type": "topic",
     "sentiment": {
@@ -721,6 +733,7 @@
   {
     "id": "1751295897__UK",
     "label": "UK",
+    "color": "rgb(0,216,80)",
     "volume": 8,
     "type": "topic",
     "sentiment": {
@@ -780,6 +793,7 @@
   {
     "id": "1751295897__Marcel Dettmann",
     "label": "Marcel Dettmann",
+    "color": "rgb(29,99,5)",
     "volume": 8,
     "type": "topic",
     "sentiment": {
@@ -840,6 +854,7 @@
   {
     "id": "1751295897__Disco",
     "label": "Disco",
+    "color": "rgb(154,169,125)",
     "volume": 8,
     "type": "topic",
     "sentiment": {
@@ -899,6 +914,7 @@
   {
     "id": "1751295897__Barcelona",
     "label": "Barcelona",
+    "color": "rgb(182,108,114)",
     "volume": 7,
     "type": "topic",
     "sentiment": {
@@ -958,6 +974,7 @@
   {
     "id": "1751295897__Watergate",
     "label": "Watergate",
+    "color": "rgb(213,69,134)",
     "volume": 7,
     "type": "topic",
     "sentiment": {
@@ -1018,6 +1035,7 @@
   {
     "id": "1751295897__debut LP",
     "label": "debut LP",
+    "color": "rgb(43,49,151)",
     "volume": 6,
     "type": "topic",
     "sentiment": {
@@ -1078,6 +1096,7 @@
   {
     "id": "1751295897__Patrick Gräser",
     "label": "Patrick Gräser",
+    "color": "rgb(138,1,103)",
     "volume": 6,
     "type": "topic",
     "sentiment": {
@@ -1138,6 +1157,7 @@
   {
     "id": "1751295897__Panorama Bar in Berlin",
     "label": "Panorama Bar in Berlin",
+    "color": "rgb(32,235,103)",
     "volume": 6,
     "type": "topic",
     "sentiment": {
@@ -1198,6 +1218,7 @@
   {
     "id": "1751295897__legendary nightclub",
     "label": "legendary nightclub",
+    "color": "rgb(177,5,111)",
     "volume": 6,
     "type": "topic",
     "sentiment": {
@@ -1257,6 +1278,7 @@
   {
     "id": "1751295897__Ben Klock",
     "label": "Ben Klock",
+    "color": "rgb(246,187,205)",
     "volume": 5,
     "type": "topic",
     "sentiment": {
@@ -1316,6 +1338,7 @@
   {
     "id": "1751295897__Mixes",
     "label": "Mixes",
+    "color": "rgb(72,61,171)",
     "volume": 5,
     "type": "topic",
     "sentiment": {
@@ -1375,6 +1398,7 @@
   {
     "id": "1751295897__Panorama Bar Music",
     "label": "Panorama Bar Music",
+    "color": "rgb(229,95,201)",
     "volume": 5,
     "type": "topic",
     "sentiment": {
@@ -1434,6 +1458,7 @@
   {
     "id": "1751295897__Terrace Sundae",
     "label": "Terrace Sundae",
+    "color": "rgb(43,28,91)",
     "volume": 5,
     "type": "topic",
     "sentiment": {
@@ -1493,6 +1518,7 @@
   {
     "id": "1751295897__Jun",
     "label": "Jun",
+    "color": "rgb(125,222,89)",
     "volume": 5,
     "type": "topic",
     "sentiment": {
@@ -1552,6 +1578,7 @@
   {
     "id": "1751295897__Live set",
     "label": "Live set",
+    "color": "rgb(223,125,87)",
     "volume": 4,
     "type": "topic",
     "sentiment": {
@@ -1612,6 +1639,7 @@
   {
     "id": "1751295897__dance music",
     "label": "dance music",
+    "color": "rgb(71,162,207)",
     "volume": 4,
     "type": "topic",
     "sentiment": {
@@ -1671,6 +1699,7 @@
   {
     "id": "1751295897__club culture",
     "label": "club culture",
+    "color": "rgb(13,116,117)",
     "volume": 3,
     "type": "topic",
     "sentiment": {
@@ -1730,6 +1759,7 @@
   {
     "id": "1751295897__D/B Presents",
     "label": "D/B Presents",
+    "color": "rgb(144,118,86)",
     "volume": 3,
     "type": "topic",
     "sentiment": {
@@ -1789,6 +1819,7 @@
   {
     "id": "JoM_2",
     "label": "JoM",
+    "color": "rgb(5,169,12)",
     "sentimentScore": 500
   }
 ]

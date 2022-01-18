@@ -1,3 +1,4 @@
+import { OPEN_SANS_FONT } from 'constants/index';
 import { prepareTagsData } from 'utilities/tagsCloud/tagsCloud';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
@@ -35,7 +36,7 @@ describe('positioningAlgorithm tests', () => {
 
   describe('prepareRectAreasMaps tests', () => {
     it(`should return array with correct value (right shape)`, async () => {
-      const tagsRectAreasMaps = await prepareRectAreasMaps(preparedData, { resolution: 2, fontFamily: 'fontFamily' });
+      const tagsRectAreasMaps = await prepareRectAreasMaps(preparedData, { resolution: 2, fontFamily: OPEN_SANS_FONT });
       expect(tagsRectAreasMaps).toStrictEqual(
         preparedData.map(({ label, fontSize }) => ({ key: formRectAreaMapKey(label, fontSize), map: null, mapMeta: null })),
       );

@@ -445,8 +445,8 @@ Array [
     "fontSize": 8,
     "glyphsXOffset": 0,
     "glyphsYOffset": 0,
-    "id": "1751295897__Odessa",
-    "label": "Odessa",
+    "id": "1751295897__Odesa",
+    "label": "Odesa",
     "left": 6,
     "rectBottom": -74,
     "rectLeft": 8,
@@ -580,8 +580,8 @@ Array [
   Object {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
-    "id": "1751295897__Odessa",
-    "label": "Odessa",
+    "id": "1751295897__Odesa",
+    "label": "Odesa",
     "sentimentScore": 65,
   },
   Object {

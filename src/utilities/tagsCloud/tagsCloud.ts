@@ -1,5 +1,4 @@
 import { FontFamilies } from 'constants/index';
-import { getRandomRGBColor } from 'utilities/common/getRandomRGBColor';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import {
   TagDataT,
@@ -41,7 +40,6 @@ export function prepareTagsData(
     return {
       ...tagData,
       fontSize,
-      color: getRandomRGBColor(),
     };
   });
 }
