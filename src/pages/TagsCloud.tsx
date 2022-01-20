@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { withStyles } from '@material-ui/core';
+import { createStyles, withStyles } from '@material-ui/core';
 import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from 'store/actions/tagsCloud';
 import { loadFont } from 'store/actions/loadFont';
@@ -9,6 +9,8 @@ import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
 import { Checkbox } from 'ui/checkbox/Checkbox';
+import { TextButton } from 'ui/buttons/TextButton';
+import { Collapse } from 'components/Collapse';
 import downloadIconSrc from 'assets/download.svg';
 
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
@@ -20,7 +22,7 @@ const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
 
 const mapStateToProps = (state: RootStateT) => {
   const { tagsCloud, useCanvas, fontLoaded, tagsData, incrementalBuild, settings: { fontFamily } } = state;
-  return { tagsCloud, useCanvas, fontLoaded, tagsData, incrementalBuild, fontFamily };
+  return { tagsCloud, shouldUseCanvas: useCanvas, fontLoaded, tagsData, incrementalBuild, fontFamily };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatchT) => ({
@@ -43,7 +45,7 @@ const mapDispatchToProps = (dispatch: AppDispatchT) => ({
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-const stylesClasses = {
+const styleClasses = createStyles({
   downloadButton: {
     border: 'none',
     backgroundColor: 'transparent',
@@ -56,7 +58,30 @@ const stylesClasses = {
   rebuildButton: {
     marginLeft: '16px',
   },
-};
+  settingsControlsWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'absolute',
+    right: 0,
+    zIndex: 3,
+  },
+  toggleIsSettingsControlsButton: {
+    position: 'absolute',
+    top: 0,
+    right: '-20px',
+    width: '20px',
+    minWidth: '20px!important',
+    height: '16px',
+    lineHeight: '16px',
+  },
+  settingsControls: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '8px',
+    textAlign: 'left',
+    backgroundColor: '#d2d2d2',
+  },
+});
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -68,6 +93,10 @@ type PropsT = PropsFromRedux & {
 type StateT = {
   tagsCloudSceneSize: { width: number; height: number } | null;
   downloadCloudCounter: number;
+  isSettingsControlsShown: boolean;
+  isCoordinateGridShown: boolean;
+  isReactAreasShown: boolean;
+  isVacanciesShown: boolean;
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
@@ -113,7 +142,14 @@ const getTagsDataByTagsIds = (tagsIds: string[], tagsData: ReadonlyArray<TagData
 };
 
 class TagsCloud extends Component<PropsT, StateT> {
-  state: StateT = { tagsCloudSceneSize: null, downloadCloudCounter: 0 };
+  state: StateT = {
+    tagsCloudSceneSize: null,
+    downloadCloudCounter: 0,
+    isSettingsControlsShown: false,
+    isCoordinateGridShown: false,
+    isReactAreasShown: false,
+    isVacanciesShown: false,
+  };
 
   tagsCloudSceneRef = React.createRef<HTMLDivElement>();
 
@@ -217,6 +253,28 @@ class TagsCloud extends Component<PropsT, StateT> {
     this.setState(({ downloadCloudCounter }) => ({ downloadCloudCounter: downloadCloudCounter + 1 }));
   };
 
+  toggleIsSettingsControlsShown = () => {
+    this.setState(({ isSettingsControlsShown }) => ({ isSettingsControlsShown: !isSettingsControlsShown }));
+  };
+
+  toggleIsVacanciesShown = () => {
+    this.setState(({ isVacanciesShown }) => ({ isVacanciesShown: !isVacanciesShown }));
+  };
+
+  toggleIsReactAreasShown = () => {
+    this.setState(({ isReactAreasShown }) => ({ isReactAreasShown: !isReactAreasShown }));
+  };
+
+  toggleIsCoordinateGridShown = () => {
+    this.setState(({ isCoordinateGridShown }) => ({ isCoordinateGridShown: !isCoordinateGridShown }));
+  };
+
+  onShouldUseCanvasChange = () => {
+    const { toggleUseCanvas } = this.props;
+    this.setState({ isSettingsControlsShown: false });
+    toggleUseCanvas();
+  };
+
   renderLoader = (loading: boolean) => (
     <div style={styles.loaderContainer}>
       <FadeLoader
@@ -252,9 +310,86 @@ class TagsCloud extends Component<PropsT, StateT> {
     );
   };
 
+  renderSettings = () => {
+    const {
+      toggleIsSettingsControlsShown,
+      toggleIsCoordinateGridShown,
+      toggleIsReactAreasShown,
+      toggleIsVacanciesShown
+    } = this;
+    const { classes, shouldUseCanvas } = this.props;
+    const { isSettingsControlsShown, isCoordinateGridShown, isReactAreasShown, isVacanciesShown } = this.state;
+    return (
+      <div className={classes.settingsControlsWrapper}>
+        <TextButton
+          classes={{ root: classes.toggleIsSettingsControlsButton }}
+          onClick={toggleIsSettingsControlsShown}
+        >
+          {isSettingsControlsShown ? '-' : '+'}
+        </TextButton>
+        <Collapse isOpen={isSettingsControlsShown} >
+          <div className={classes.settingsControls}>
+            {!shouldUseCanvas && (
+              <Checkbox
+                checked={isCoordinateGridShown}
+                label="draw coordinate grid"
+                onChange={toggleIsCoordinateGridShown}
+              />
+            )}
+            <Checkbox
+              checked={isReactAreasShown}
+              label="draw react areas"
+              onChange={toggleIsReactAreasShown}
+            />
+            {!shouldUseCanvas && (
+              <Checkbox
+                checked={isVacanciesShown}
+                label="draw vacancies"
+                onChange={toggleIsVacanciesShown}
+              />
+            )}
+          </div>
+        </Collapse>
+      </div>
+    );
+  };
+
+  renderTagsCloud = () => {
+    const { tagsCloudSceneSize, downloadCloudCounter, isVacanciesShown, isReactAreasShown, isCoordinateGridShown } = this.state;
+    const { shouldUseCanvas } = this.props;
+
+    if (!tagsCloudSceneSize) {
+      return null;
+    }
+
+    if (shouldUseCanvas) {
+      return (
+        <CanvasTagsCloud
+          downloadCloudCounter={downloadCloudCounter}
+          height={tagsCloudSceneSize.height}
+          isReactAreasShown={isReactAreasShown}
+          width={tagsCloudSceneSize.width}
+          onTagClick={this.onTagClick}
+        />
+      );
+    } else {
+      return (
+        <SvgTagsCloud
+          downloadCloudCounter={downloadCloudCounter}
+          height={tagsCloudSceneSize.height}
+          isCoordinateGridShown={isCoordinateGridShown}
+          isReactAreasShown={isReactAreasShown}
+          isVacanciesShown={isVacanciesShown}
+          width={tagsCloudSceneSize.width}
+          onTagClick={this.onTagClick}
+        />
+      );
+    }
+  };
+
   render() {
-    const { tagsCloudSceneSize, downloadCloudCounter } = this.state;
-    const { useCanvas, tagsData, tagsCloud, toggleUseCanvas, fontLoaded, incrementalBuild, fontFamily } = this.props;
+    const { tagsCloudSceneSize } = this.state;
+    const { shouldUseCanvas, tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily } = this.props;
 
     const loading = [
       tagsData.status,
@@ -262,7 +397,6 @@ class TagsCloud extends Component<PropsT, StateT> {
       fontLoaded.status,
       incrementalBuild.status,
     ].includes(PENDING);
-    const TagsCloudComponent = useCanvas ? CanvasTagsCloud : SvgTagsCloud;
 
     return (
       <div style={styles.pageContainer}>
@@ -271,27 +405,21 @@ class TagsCloud extends Component<PropsT, StateT> {
         {this.renderActionButtons(loading)}
         <div style={styles.controls}>
           <Checkbox
-            checked={useCanvas}
+            checked={shouldUseCanvas}
             label="use canvas"
-            onChange={toggleUseCanvas}
+            onChange={this.onShouldUseCanvasChange}
           />
         </div>
+        {tagsCloud.status === SUCCESS && this.renderSettings()}
         <div
           ref={this.tagsCloudSceneRef}
           style={styles.tagsCloudScene}
         >
-          {tagsCloudSceneSize && tagsCloud.status === SUCCESS && (
-            <TagsCloudComponent
-              downloadCloudCounter={downloadCloudCounter}
-              height={tagsCloudSceneSize.height}
-              width={tagsCloudSceneSize.width}
-              onTagClick={this.onTagClick}
-            />
-          )}
+          {tagsCloudSceneSize && tagsCloud.status === SUCCESS && this.renderTagsCloud()}
         </div>
       </div>
     );
   }
 }
 
-export default connector(withStyles(stylesClasses)(withTriggerGettingRawData<PropsT>(TagsCloud)));
+export default connector(withStyles(styleClasses)(withTriggerGettingRawData<PropsT>(TagsCloud)));

@@ -20,9 +20,6 @@ import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManage
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
 import { FontFamilies } from 'constants/index';
-import { Checkbox } from 'ui/checkbox/Checkbox';
-import { Collapse } from 'components/Collapse';
-import { TextButton } from 'ui/buttons/TextButton';
 
 import type { PositionedTagRectT, RectAreaT } from 'types/types';
 import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
@@ -36,6 +33,9 @@ type PropsT = {
   height: number;
   onTagClick: (id: string) => void;
   downloadCloudCounter: number;
+  isVacanciesShown: boolean;
+  isReactAreasShown: boolean;
+  isCoordinateGridShown: boolean;
 };
 
 type CoordinatesT = { x: number; y: number };
@@ -49,7 +49,6 @@ const DURATION = 300;
 const MOVEMENT_THRESHOLD = 10; // px
 
 const TAGS_CLOUD_CANVAS_Z_INDEX = 2;
-const SETTINGS_CONTROLS_Z_INDEX = 3;
 const TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX = 1;
 const TAG_AVATAR_CANVAS_Z_INDEX = 10;
 const REACT_AREAS_CANVAS_Z_INDEX = 1;
@@ -100,29 +99,6 @@ const useStyles = makeStyles<Theme, StylesOptionsT>({
   text: {
     'white-space': 'pre',
     'user-select': 'none',
-  },
-  settingsControlsWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'absolute',
-    right: 0,
-    zIndex: SETTINGS_CONTROLS_Z_INDEX,
-  },
-  toggleIsSettingsControlsButton: {
-    position: 'absolute',
-    top: 0,
-    right: '-20px',
-    width: '20px',
-    minWidth: '20px!important',
-    height: '16px',
-    lineHeight: '16px',
-  },
-  settingsControls: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '8px',
-    textAlign: 'left',
-    backgroundColor: '#d2d2d2',
   },
   canvasWrapper: {
     display: 'inline-block',
@@ -318,6 +294,9 @@ const SvgTagsCloud = ({
   height,
   onTagClick,
   downloadCloudCounter,
+  isCoordinateGridShown,
+  isReactAreasShown,
+  isVacanciesShown,
 }: PropsT) => {
   const { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions, fontFamily, sceneMapResolution } = useSelector(stateSelector);
   const dispatch = useDispatch();
@@ -331,10 +310,6 @@ const SvgTagsCloud = ({
 
   const classes = useStyles({ fontFamily });
 
-  const [isCoordinateGridShown, setIsCoordinateGridShown] = useState(false);
-  const [isReactAreasShown, setIsReactAreasShown] = useState(false);
-  const [isVacanciesShown, setIsVacanciesShown] = useState(false);
-  const [isSettingsControlsShown, setIsSettingsControlsShown] = useState(false);
   const [draggableTagId, setDraggableTagId] = useState<string | null>(null);
   const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
   const [tmpVacancies, setTmpVacancies] = useState<VacanciesT | null>(null);
@@ -370,22 +345,6 @@ const SvgTagsCloud = ({
       preventOnClickHandlingRef.current = false;
     }
   }, [draggableTagId]);
-
-  const toggleIsCoordinateGridShown = useCallback(() => {
-    setIsCoordinateGridShown((value) => !value);
-  }, [setIsCoordinateGridShown]);
-
-  const toggleIsReactAreasShown = useCallback(() => {
-    setIsReactAreasShown((value) => !value);
-  }, [setIsReactAreasShown]);
-
-  const toggleIsSettingsControlsShown = useCallback(() => {
-    setIsSettingsControlsShown((value) => !value);
-  }, [setIsSettingsControlsShown]);
-
-  const toggleIsVacanciesShown = useCallback(() => {
-    setIsVacanciesShown((value) => !value);
-  }, [setIsVacanciesShown]);
 
   const sceneMapEdges = useMemo(() => {
     if (!sceneMapPositions) {
@@ -633,33 +592,6 @@ const SvgTagsCloud = ({
 
   return (
     <div className={classes.container}>
-      <div className={classes.settingsControlsWrapper}>
-        <TextButton
-          classes={{ root: classes.toggleIsSettingsControlsButton }}
-          onClick={toggleIsSettingsControlsShown}
-        >
-          {isSettingsControlsShown ? '-' : '+'}
-        </TextButton>
-        <Collapse isOpen={isSettingsControlsShown} >
-          <div className={classes.settingsControls}>
-            <Checkbox
-              checked={isCoordinateGridShown}
-              label="draw coordinate grid"
-              onChange={toggleIsCoordinateGridShown}
-            />
-            <Checkbox
-              checked={isReactAreasShown}
-              label="draw react areas"
-              onChange={toggleIsReactAreasShown}
-            />
-            <Checkbox
-              checked={isVacanciesShown}
-              label="draw vacancies"
-              onChange={toggleIsVacanciesShown}
-            />
-          </div>
-        </Collapse>
-      </div>
       <div
         className={classes.canvasWrapper}
         ref={canvasWrapperRef}

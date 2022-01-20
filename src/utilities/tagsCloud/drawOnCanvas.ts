@@ -7,6 +7,7 @@ import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 type OptionsT = {
   fontFamily: FontFamilies;
   drawAxles?: boolean;
+  shouldDrawReactAreas: boolean;
 };
 
 type ClearParamsT = [number, number, number, number];
@@ -22,7 +23,7 @@ export function drawOnCanvas(
   restoreCoords: RestoreCoordsT;
   scale: number;
 } | null {
-  const { fontFamily, drawAxles = false } = options;
+  const { fontFamily, drawAxles = false, shouldDrawReactAreas } = options;
   const borderCoordinates = getBorderCoordinates(data);
 
   if (!borderCoordinates) {
@@ -74,13 +75,16 @@ export function drawOnCanvas(
   data.forEach(item => {
     const width = item.rectRight - item.rectLeft;
     const height = item.rectTop - item.rectBottom;
-    ctx.strokeStyle = item.color;
-    ctx.strokeRect(
-      item.rectLeft * scale,
-      -item.rectTop * scale,
-      width * scale,
-      height * scale,
-    );
+
+    if (shouldDrawReactAreas) {
+      ctx.strokeStyle = item.color;
+      ctx.strokeRect(
+        item.rectLeft * scale,
+        -item.rectTop * scale,
+        width * scale,
+        height * scale,
+      );
+    }
 
     ctx.textBaseline = 'alphabetic';
     ctx.font = `${item.fontSize * scale}px ${fontFamily}`;

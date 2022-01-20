@@ -23,6 +23,7 @@ type PropsT = PropsFromRedux & {
     container: string;
   };
   downloadCloudCounter: number;
+  isReactAreasShown: boolean;
 };
 
 type StateT = {
@@ -46,9 +47,9 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   }
 
   componentDidUpdate(prevProps: PropsT) {
-    const { width, height, tagsPositions, settings, downloadCloudCounter } = this.props;
+    const { width, height, tagsPositions, settings, downloadCloudCounter, isReactAreasShown } = this.props;
     if (prevProps.width !== width || prevProps.height !== height || prevProps.tagsPositions !== tagsPositions
-      || prevProps.settings !== settings) {
+      || prevProps.settings !== settings || prevProps.isReactAreasShown !== isReactAreasShown) {
       this.draw();
     }
     if (prevProps.downloadCloudCounter !== downloadCloudCounter) {
@@ -110,7 +111,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   };
 
   draw = () => {
-    const { width, height, tagsPositions, settings } = this.props;
+    const { width, height, tagsPositions, settings, isReactAreasShown } = this.props;
 
     if (!tagsPositions) {
       return;
@@ -131,7 +132,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       ctx.translate(...this.state.restoreCoords);
     }
 
-    const drawResult = drawOnCanvas(tagsPositions, canvas, { width, height }, { fontFamily });
+    const drawResult = drawOnCanvas(tagsPositions, canvas, { width, height }, { fontFamily, shouldDrawReactAreas: isReactAreasShown });
 
     if (!drawResult) {
       return;
