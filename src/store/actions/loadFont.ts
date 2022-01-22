@@ -1,7 +1,9 @@
+import { batch } from 'react-redux';
+import { NOTIFICATIONS_TYPES } from 'constants/index';
+import { addNotification } from './notifications';
 import * as actionTypes from './actionTypes';
 import { createAction } from './helpers';
 import FontFaceObserver from 'fontfaceobserver';
-
 import { AppDispatchT, GetStateT } from '../types';
 
 const { FONT_LOAD_SUCCESS, FONT_LOAD_REQUEST, FONT_LOAD_FAILURE } = actionTypes;
@@ -24,7 +26,14 @@ export function loadFont() {
       })
       .catch(() => {
         sessionStorage.removeItem('fontLoaded');
-        dispatch(createAction(FONT_LOAD_FAILURE));
+        batch(() => {
+          dispatch(createAction(FONT_LOAD_FAILURE));
+          dispatch(addNotification({
+            content: 'font is not loaded',
+            type: NOTIFICATIONS_TYPES.ERROR,
+            timeout: 5000
+          }));
+        });
       });
   };
 }
