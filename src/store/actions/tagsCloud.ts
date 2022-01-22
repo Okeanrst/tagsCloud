@@ -17,7 +17,7 @@ import { EDGE } from 'utilities/positioningAlgorithm/edgesManager';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { selectTargetTagDataItem } from '../reducers/tagsData';
 import { createAction } from './helpers';
-import validateTagsCloudRawData from './rawDataValidator';
+import { validateTagCloudRawData } from './rawDataValidator';
 
 import { TagDataT } from 'types/types';
 import { AppDispatchT, RootStateT, GetStateT } from '../types';
@@ -65,8 +65,8 @@ export function getData() {
     return api
       .getData()
       .then(response => {
-        if (!validateTagsCloudRawData(response)) {
-          throw new Error('Raw tagsCloud data is invalid');
+        if (validateTagCloudRawData(response)) {
+          throw new Error('Raw tag cloud data is invalid');
         }
         dispatch(createAction(actionTypes.FETCH_DATA_SUCCESS, response));
       })

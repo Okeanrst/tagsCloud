@@ -6,7 +6,7 @@ import {
   RESET_TAGS_CLOUD,
 } from './actionTypes';
 import { createAction } from './helpers';
-import validateTagsCloudRawData from './rawDataValidator';
+import { validateTagCloudRawData } from './rawDataValidator';
 
 import type { TagDataT } from 'types/types';
 import type { AppDispatchT } from '../types';
@@ -36,8 +36,8 @@ function parseRawTagsCloudDataFile(file: File): Promise<TagDataT> {
         }
         const text = reader.result as string;
         const data = JSON.parse(text);
-        if (!validateTagsCloudRawData(data)) {
-          throw new Error('Raw tagsCloud data is invalid');
+        if (validateTagCloudRawData(data)) {
+          throw new Error('Raw tag cloud data is invalid');
         }
         resolve(data as TagDataT);
       } catch (e) {
