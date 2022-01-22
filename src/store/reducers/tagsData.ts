@@ -2,12 +2,12 @@ import { RootStateT } from '../types';
 import { QueryStatuses } from 'constants/queryStatuses';
 import { AnyAction } from 'redux';
 import {
-  ADD_DATA_ITEM,
-  DELETE_DATA_ITEM,
-  EDIT_DATA_ITEM,
-  FETCH_DATA_FAILURE,
-  FETCH_DATA_REQUEST,
-  FETCH_DATA_SUCCESS
+  TAGS_DATA_ADD_DATA_ITEM, TAGS_DATA_DELETE_ALL_DATA,
+  TAGS_DATA_DELETE_DATA_ITEM,
+  TAGS_DATA_EDIT_DATA_ITEM,
+  TAGS_DATA_FETCH_FAILURE,
+  TAGS_DATA_FETCH_REQUEST,
+  TAGS_DATA_FETCH_SUCCESS
 } from '../actions/actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
@@ -21,20 +21,20 @@ export const tagsDataReducer = (
   action: AnyAction,
 ) => {
   switch (action.type) {
-    case FETCH_DATA_REQUEST:
+    case TAGS_DATA_FETCH_REQUEST:
       return { status: PENDING, data: null };
-    case FETCH_DATA_SUCCESS:
+    case TAGS_DATA_FETCH_SUCCESS:
       return { status: SUCCESS, data: action.payload };
-    case FETCH_DATA_FAILURE:
+    case TAGS_DATA_FETCH_FAILURE:
       return { status: FAILURE, data: null };
-    case DELETE_DATA_ITEM:
+    case TAGS_DATA_DELETE_DATA_ITEM:
       if (state.status !== SUCCESS) {
         return state;
       }
       const idToDelete = action.payload;
       const data = state.data.filter(item => item.id !== idToDelete);
       return { ...state, data };
-    case EDIT_DATA_ITEM: {
+    case TAGS_DATA_EDIT_DATA_ITEM: {
       if (state.status !== SUCCESS) {
         return state;
       }
@@ -50,12 +50,14 @@ export const tagsDataReducer = (
       }
       return { ...state, data: nextStateData };
     }
-    case ADD_DATA_ITEM: {
+    case TAGS_DATA_ADD_DATA_ITEM: {
       if (state.status !== SUCCESS) {
         return state;
       }
       return { ...state, data: [...state.data, action.payload] };
     }
+    case TAGS_DATA_DELETE_ALL_DATA:
+      return { status: SUCCESS, data: [] };
     default:
       return state;
   }

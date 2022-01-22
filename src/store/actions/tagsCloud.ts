@@ -1,3 +1,4 @@
+import { batch } from 'react-redux';
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
 import {
@@ -61,17 +62,17 @@ const findUnusedRectAreasMapsKeys = (state: RootStateT) => {
 
 export function getData() {
   return (dispatch: AppDispatchT) => {
-    dispatch(createAction(actionTypes.FETCH_DATA_REQUEST));
+    dispatch(createAction(actionTypes.TAGS_DATA_FETCH_REQUEST));
     return api
       .getData()
       .then(response => {
         if (validateTagCloudRawData(response)) {
           throw new Error('Raw tag cloud data is invalid');
         }
-        dispatch(createAction(actionTypes.FETCH_DATA_SUCCESS, response));
+        dispatch(createAction(actionTypes.TAGS_DATA_FETCH_SUCCESS, response));
       })
       .catch(() => {
-        dispatch(createAction(actionTypes.FETCH_DATA_FAILURE));
+        dispatch(createAction(actionTypes.TAGS_DATA_FETCH_FAILURE));
       });
   };
 }
@@ -152,6 +153,15 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
   };
 }
 
+export function deleteTagsData() {
+  return (dispatch: AppDispatchT) => {
+    batch(() => {
+      dispatch(createAction(actionTypes.TAGS_DATA_DELETE_ALL_DATA));
+      dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
+    });
+  };
+}
+
 export function toggleUseCanvas() {
   return createAction(actionTypes.USE_CANVAS_TOGGLE);
 }
@@ -191,7 +201,7 @@ export function deleteDataItem(targetId: string) {
     const itemSentimentScore = targetTagDataItem.sentimentScore;
     const currentMaxSentimentScore = selectMaxSentimentScore(getState());
 
-    dispatch(createAction(actionTypes.DELETE_DATA_ITEM, targetId));
+    dispatch(createAction(actionTypes.TAGS_DATA_DELETE_DATA_ITEM, targetId));
 
     if (itemSentimentScore >= currentMaxSentimentScore && selectMaxSentimentScore(getState()) !== currentMaxSentimentScore) {
       dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
@@ -214,7 +224,7 @@ export function editDataItem(tagData: TagDataT) {
     const { sentimentScore: currentSentimentScore, color: currentColor } = currentTagDataItem;
     const currentMaxSentimentScore = selectMaxSentimentScore(getState());
     let shouldResetTagsCloud = currentTagDataItem.label !== tagData.label || currentMaxSentimentScore < tagData.sentimentScore;
-    dispatch(createAction(actionTypes.EDIT_DATA_ITEM, tagData));
+    dispatch(createAction(actionTypes.TAGS_DATA_EDIT_DATA_ITEM, tagData));
 
     shouldResetTagsCloud = shouldResetTagsCloud || selectMaxSentimentScore(getState()) !== currentMaxSentimentScore;
 
@@ -239,7 +249,7 @@ export function addDataItem(data: Omit<TagDataT, 'id'>) {
     const shouldResetTagsCloud = maxSentimentScore < data.sentimentScore;
 
     const id = data.label + '_' + Date.now() + (Math.random() + '').slice(-3);
-    dispatch(createAction(actionTypes.ADD_DATA_ITEM, { ...data, id }));
+    dispatch(createAction(actionTypes.TAGS_DATA_ADD_DATA_ITEM, { ...data, id }));
     dispatch(createAction(actionTypes.INCREMENTAL_BUILD_ADD_TAG_ID, id));
 
     if (shouldResetTagsCloud) {

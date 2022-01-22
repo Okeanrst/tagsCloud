@@ -14,6 +14,9 @@ import { DeleteConfirmationModal } from 'components/modalWindows/DeleteConfirmat
 import { DeleteIcon } from 'ui/icons/DeleteIcon';
 import { CopyIcon } from 'ui/icons/CopyIcon';
 import { EditIcon } from 'ui/icons/EditIcon';
+import { PlusIcon } from 'ui/icons/PlusIcon';
+import { DownloadIcon } from 'ui/icons/DownloadIcon';
+import { OutlinedButton } from 'ui/buttons/OutlinedButton';
 import {
   downloadRawTagsCloudDataFile,
   uploadRawTagsCloudDataFile,
@@ -26,7 +29,7 @@ import { QueryStatuses } from 'constants/queryStatuses';
 import type { TagDataT, ClassesT } from 'types/types';
 import type { RootStateT, AppDispatchT } from 'store/types';
 
-const { PENDING } = QueryStatuses;
+const { PENDING, SUCCESS } = QueryStatuses;
 
 const getTagsData = (state: RootStateT) => state.tagsData.data;
 const getSearchAutocompleteSuggestions = createSelector(
@@ -49,6 +52,7 @@ const mapDispatchToProps = (dispatch: AppDispatchT) =>
       deleteTag: actions.deleteDataItem,
       addTag: actions.addDataItem,
       editTag: actions.editDataItem,
+      deleteTagsData: actions.deleteTagsData,
       uploadTagsDataFile: uploadRawTagsCloudDataFile,
     },
     dispatch,
@@ -68,18 +72,22 @@ type StateT = {
   scrollToItem?: { index: number };
   tagFormData?: Partial<TagDataT>;
   tagIdToDelete?: string;
+  isConfirmDeleteTagsDataShown: boolean;
 };
 
 const TAGS_LIST_ROW_HEIGHT = 35;
 
 class TagsListEditor extends Component<PropsT, StateT> {
-  state: StateT = { tagsListHeight: TAGS_LIST_ROW_HEIGHT };
-  confFilesRef = React.createRef<HTMLDivElement>();
+  state: StateT = {
+    tagsListHeight: TAGS_LIST_ROW_HEIGHT,
+    isConfirmDeleteTagsDataShown: false,
+  };
+  actionsBlockRef = React.createRef<HTMLDivElement>();
   listRef = React.createRef<FixedSizeList>();
   resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
 
   componentDidMount() {
-    this.confFilesRef.current?.addEventListener(
+    this.actionsBlockRef.current?.addEventListener(
       'resize',
       this.confFilesRefHandleResize,
     );
@@ -89,8 +97,8 @@ class TagsListEditor extends Component<PropsT, StateT> {
   }
 
   componentWillUnmount() {
-    if (this.confFilesRef.current) {
-      this.confFilesRef.current?.removeEventListener(
+    if (this.actionsBlockRef.current) {
+      this.actionsBlockRef.current?.removeEventListener(
         'resize',
         this.confFilesRefHandleResize,
       );
@@ -126,11 +134,11 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   calcTagsListHeight = () => {
-    if (!this.confFilesRef.current) {
+    if (!this.actionsBlockRef.current) {
       return 0;
     }
 
-    const { top, bottom } = this.confFilesRef.current?.getBoundingClientRect();
+    const { top, bottom } = this.actionsBlockRef.current?.getBoundingClientRect();
     const restScreenHeight = this.props.restScreenHeight - (bottom - top);
     return restScreenHeight > TAGS_LIST_ROW_HEIGHT
       ? restScreenHeight
@@ -188,15 +196,19 @@ class TagsListEditor extends Component<PropsT, StateT> {
     downloadRawTagsCloudDataFile(tagsData);
   };
 
-  renderFileDownloader = (disabled: boolean) => (
-    <PrimaryButton
-      classes={{ root: this.props.classes.downloadButton }}
-      disabled={disabled}
-      onClick={this.downloadTagsDataFile}
-    >
-      Download tags cloud as a file
-    </PrimaryButton>
-  );
+  renderDownloadFileButton = (disabled: boolean) => {
+    const { classes } = this.props;
+    return (
+      <PrimaryButton
+        classes={{ root: this.props.classes.downloadButton }}
+        disabled={disabled}
+        onClick={this.downloadTagsDataFile}
+      >
+        <span className={classes.downloadLabel}>Download</span>
+        <DownloadIcon className={classes.downloadIcon} />
+      </PrimaryButton>
+    );
+  };
 
   resetIdForDelete = () => {
     this.setState({ tagIdToDelete: undefined });
@@ -215,6 +227,28 @@ class TagsListEditor extends Component<PropsT, StateT> {
         }}
       />
     );
+  };
+
+  renderConfirmDeleteTagsData = () => {
+    const onCancel = () => {
+      this.setState({ isConfirmDeleteTagsDataShown: false });
+    };
+    const confirmQuestion = `Are you sure you want to delete all tags?`;
+    return (
+      <DeleteConfirmationModal
+        confirmQuestion={confirmQuestion}
+        onBackdropClick={onCancel}
+        onCancel={onCancel}
+        onConfirm={() => {
+          this.setState({ isConfirmDeleteTagsDataShown: false });
+          this.props.deleteTagsData();
+        }}
+      />
+    );
+  };
+
+  onDeleteTagsData = () => {
+    this.setState({ isConfirmDeleteTagsDataShown: true });
   };
 
   onDelete = (e: SyntheticEvent<EventTarget>) => {
@@ -365,23 +399,36 @@ class TagsListEditor extends Component<PropsT, StateT> {
     const { tagsData, searchAutocompleteSuggestions, classes } = this.props;
     const { tagsListHeight, tagFormData } = this.state;
     const loading = tagsData.status === PENDING;
+    const isDataReady = tagsData.status === SUCCESS;
 
     return (
-      <div>
+      <div className={classes.root}>
         {this.renderLoader(loading)}
         <div
-          className={classes.cloudConfFiles}
-          ref={this.confFilesRef}
+          className={classes.actionsBlock}
+          ref={this.actionsBlockRef}
         >
           {this.renderFileUploader(loading)}
-          {this.renderFileDownloader(!tagsData.data || loading)}
+          {this.renderDownloadFileButton(!isDataReady)}
           <PrimaryButton
             classes={{ root: classes.addNewButton }}
+            disabled={!isDataReady}
             onClick={this.onAdd}
           >
-            Add new
+            <span className={classes.addNewLabel}>Add new</span>
+            <PlusIcon className={classes.addNewIcon} />
           </PrimaryButton>
+          <OutlinedButton
+            borderColor="var(--danger-color)"
+            classes={{ root: classes.leanUpButton }}
+            color="var(--danger-color)"
+            onClick={this.onDeleteTagsData}
+          >
+            <span className={classes.leanUpLabel}>Clean up</span>
+            <DeleteIcon className={classes.leanUpIcon} />
+          </OutlinedButton>
           <StyledSearchWithAutocomplete
+            disabled={!isDataReady}
             placeholder="Search a tag by label"
             suggestions={searchAutocompleteSuggestions}
             onSubmit={this.onSearch}
@@ -390,6 +437,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
         {tagFormData && this.renderTagForm(tagFormData)}
         {tagsData.data && this.renderList(tagsData.data, tagsListHeight)}
         {this.state.tagIdToDelete !== undefined && this.renderConfirmDelete(this.state.tagIdToDelete)}
+        {this.state.isConfirmDeleteTagsDataShown && this.renderConfirmDeleteTagsData()}
       </div>
     );
   }

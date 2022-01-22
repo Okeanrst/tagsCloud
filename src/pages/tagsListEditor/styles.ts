@@ -1,7 +1,10 @@
 import { createStyles, Theme } from '@material-ui/core';
 
 const styles = (theme: Theme) => createStyles({
-  cloudConfFiles: {
+  root: {
+    position: 'relative',
+  },
+  actionsBlock: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -24,6 +27,41 @@ const styles = (theme: Theme) => createStyles({
     [theme.breakpoints.down('sm')]: {
       marginTop: '8px',
     },
+  },
+  addNewLabel: {
+    marginRight: '8px',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none'
+    },
+  },
+  addNewIcon: {
+    width: '28px',
+    height: '28px',
+  },
+  downloadLabel: {
+    marginRight: '8px',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none'
+    },
+  },
+  downloadIcon: {
+    width: '28px',
+    height: '28px',
+  },
+  leanUpButton: {
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '8px',
+    },
+  },
+  leanUpLabel: {
+    marginRight: '8px',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none'
+    },
+  },
+  leanUpIcon: {
+    width: '28px',
+    height: '28px',
   },
   loaderContainer: {
     position: 'absolute',

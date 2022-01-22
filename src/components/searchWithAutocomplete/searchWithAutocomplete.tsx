@@ -19,12 +19,14 @@ type IntegrationDownshiftPropsT = {
   placeholder: string;
   onChange?: (target: string | null) => void;
   onSubmit?: (target: string | null) => void;
+  disabled?: boolean;
 };
 
 type ItemPropsT = {
   InputProps: {};
   classes: ClassesT;
   fullWidth: boolean;
+  disabled?: boolean;
 };
 
 type RenderSuggestionPropsT = {
@@ -44,7 +46,7 @@ type OptionsT = Pick<IntegrationDownshiftPropsT, 'placeholder' | 'onChange'> & {
 const SUGGESTIONS_MAX_NUMBER = 5;
 
 function renderInput(inputProps: ItemPropsT) {
-  const { InputProps, classes, fullWidth } = inputProps;
+  const { InputProps, classes, fullWidth, disabled } = inputProps;
   return (
     <TextField
       fullWidth={fullWidth}
@@ -54,6 +56,7 @@ function renderInput(inputProps: ItemPropsT) {
           input: classes.inputInput,
         },
         ...InputProps,
+        disabled,
       }}
     />
   );
@@ -111,7 +114,7 @@ function getSuitableSuggestions(value: string | null, suggestions: SuggestionsT)
 const handleKeyDown: HandleKeyDownT = () => {};
 
 export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
-  const { classes, suggestions, placeholder, onChange, onSubmit } = props;
+  const { classes, suggestions, placeholder, onChange, onSubmit, disabled } = props;
 
   const onSelect = useCallback((selectedItem) => {
     if (selectedItem && onSubmit) {
@@ -141,6 +144,7 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
                   onChange,
                   onKeyDown: handleKeyDown,
                 }),
+                disabled,
               })}
               <div {...getMenuProps()}>
                 {isOpen ? (
