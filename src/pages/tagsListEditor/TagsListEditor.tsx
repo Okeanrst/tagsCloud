@@ -4,12 +4,16 @@ import { createSelector } from 'reselect';
 import { bindActionCreators } from 'redux';
 import { FixedSizeList } from 'react-window';
 import cx from 'classnames';
+import { withStyles } from '@material-ui/core';
 import FadeLoader from 'react-spinners/FadeLoader';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { withRestScreenHeight } from 'decorators/withRestScreenHeight';
 import * as actions from 'store/actions/tagsCloud';
 import styles from './styles';
 import { DeleteConfirmationModal } from 'components/modalWindows/DeleteConfirmationModal';
+import { DeleteIcon } from 'ui/icons/DeleteIcon';
+import { CopyIcon } from 'ui/icons/CopyIcon';
+import { EditIcon } from 'ui/icons/EditIcon';
 import {
   downloadRawTagsCloudDataFile,
   uploadRawTagsCloudDataFile,
@@ -18,13 +22,9 @@ import { TagFormModal } from 'components/modalWindows/TagFormModal';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import StyledSearchWithAutocomplete from './StyledSearchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
-import editIconSrc from './assets/edit.svg';
-import copyIconSrc from './assets/copy.svg';
-import trashIconSrc from './assets/trash.svg';
 
 import type { TagDataT, ClassesT } from 'types/types';
 import type { RootStateT, AppDispatchT } from 'store/types';
-import { withStyles } from '@material-ui/core';
 
 const { PENDING } = QueryStatuses;
 
@@ -325,30 +325,21 @@ class TagsListEditor extends Component<PropsT, StateT> {
             data-id={item.id}
             onClick={this.onClone}
           >
-            <img
-              alt="clone"
-              src={copyIconSrc}
-            />
+            <CopyIcon/>
           </button>
           <button
             className={cx(classes.tagsListButton, classes.editButton)}
             data-id={item.id}
             onClick={this.onEdit}
           >
-            <img
-              alt="edit"
-              src={editIconSrc}
-            />
+            <EditIcon/>
           </button>
           <button
             className={cx(classes.tagsListButton, classes.deleteButton)}
             data-id={item.id}
             onClick={this.onDelete}
           >
-            <img
-              alt="delete"
-              src={trashIconSrc}
-            />
+            <DeleteIcon />
           </button>
         </li>
       );

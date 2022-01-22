@@ -1,4 +1,4 @@
-export const CloseIcon = ({ className }: {className: string}) => {
+export const CloseIcon = ({ className }: {className?: string}) => {
   return (
     <svg
       aria-hidden="true"

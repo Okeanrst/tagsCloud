@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core';
 import { deleteNotification } from 'store/actions/notifications';
 import { NOTIFICATIONS_TYPES } from 'constants/index';
 import { Button } from 'ui/buttons/Button';
-import { CloseIcon } from 'components/CloseIcon';
+import { CloseIcon } from 'ui/icons/CloseIcon';
 import { RootStateT } from 'store/types';
 
 const useStyles = makeStyles({
