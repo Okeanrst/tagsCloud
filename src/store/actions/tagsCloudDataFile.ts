@@ -1,4 +1,5 @@
 import { saveAs } from 'file-saver';
+import { batch } from 'react-redux';
 import {
   FETCH_DATA_REQUEST,
   FETCH_DATA_SUCCESS,
@@ -13,11 +14,13 @@ import type { AppDispatchT } from '../types';
 
 export function uploadRawTagsCloudDataFile(file: File) {
   return (dispatch: AppDispatchT) => {
-    dispatch(createAction(FETCH_DATA_REQUEST));
+    batch(() => {
+      dispatch(createAction(FETCH_DATA_REQUEST));
+      dispatch(createAction(RESET_TAGS_CLOUD));
+    });
 
     parseRawTagsCloudDataFile(file)
       .then(fileContent => {
-        dispatch(createAction(RESET_TAGS_CLOUD));
         dispatch(createAction(FETCH_DATA_SUCCESS, fileContent));
       })
       .catch(() => {

@@ -6,7 +6,7 @@ import { QueryStatuses } from 'constants/queryStatuses';
 
 import type { RootStateT } from 'store/types';
 
-const { PENDING } = QueryStatuses;
+const { PRISTINE } = QueryStatuses;
 
 function withTriggerGettingRawData<T>(
   WrappedComponent: React.ComponentType<T>,
@@ -20,11 +20,10 @@ function withTriggerGettingRawData<T>(
     const dispatch = useDispatch();
 
     useEffect(() => {
-      if (!tagsData.data && tagsData.status !== PENDING) {
+      if (tagsData.status === PRISTINE) {
         dispatch(actions.getData());
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch, tagsData]);
 
     return <WrappedComponent {...props} />;
   };
