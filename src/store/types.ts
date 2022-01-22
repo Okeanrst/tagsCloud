@@ -1,6 +1,7 @@
 import { ThunkDispatch } from 'redux-thunk';
 import { Action } from 'redux';
 import { QueryStatuses } from 'constants/queryStatuses';
+import { NOTIFICATIONS_TYPES } from 'constants/index';
 import { VacancyKinds } from 'utilities/positioningAlgorithm/types';
 import type { PositionedTagRectT, TagDataT, IdRectAreaMapT } from 'types/types';
 import type {
@@ -16,6 +17,13 @@ import {
   SortingClosedVacanciesStrategies,
   SortingEdgeVacanciesStrategies
 } from 'constants/index';
+
+export type NotificationT = {
+  id: string;
+  type: NOTIFICATIONS_TYPES;
+  content: string | string[];
+  timeout?: number;
+};
 
 export type RootStateT = {
   settings: {
@@ -68,6 +76,7 @@ export type RootStateT = {
     status: QueryStatuses;
     tagsIds: string[];
   };
+  notifications: NotificationT[],
 };
 
 export type AppDispatchT = ThunkDispatch<RootStateT, void, Action>;

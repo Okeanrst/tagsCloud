@@ -6,6 +6,7 @@ import { incrementalBuildReducer } from './incrementalBuild';
 import fontLoaded from './fontLoaded';
 import { rectAreasMapsDataReducer } from './rectAreasMapsData';
 import { settingsReducer } from './settings';
+import { notificationsReducer } from './notifications';
 
 import type { RootStateT } from '../types';
 
@@ -25,4 +26,5 @@ export default combineReducers({
   fontLoaded,
   rectAreasMapsData: rectAreasMapsDataReducer,
   incrementalBuild: incrementalBuildReducer,
+  notifications: notificationsReducer,
 });

@@ -36,3 +36,8 @@ export const FONT_Y_FACTOR_BY_FONT = {
 };
 
 export const DEFAULT_FONT_Y_FACTOR = 0.79;
+
+export enum NOTIFICATIONS_TYPES {
+  ERROR = 'error',
+  SUCCESS = 'success',
+}

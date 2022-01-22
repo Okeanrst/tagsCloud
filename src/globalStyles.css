@@ -22,7 +22,9 @@ body {
   --navbar-color: #e3f2fd;
   --footer-color: #9ec2f1;
   --danger-color: #b71c1c;
+  --error-color: #d32f2f;
   --green900-color: #1b5e20;
+  --success-color: #2e7d32;
   --blue900-color: #01579b;
   --grey300-color: #E0E0E0;
 }

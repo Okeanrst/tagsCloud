@@ -5,6 +5,7 @@ import 'sanitize.css/forms.css';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import Router from './Router';
+import { Notifications } from './Notifications';
 import { store } from './store/store';
 import { loadFont } from './store/actions/loadFont';
 
@@ -16,6 +17,7 @@ class App extends Component {
       <BrowserRouter>
         <Provider store={store}>
           <Router />
+          <Notifications />
         </Provider>
       </BrowserRouter>
     );
