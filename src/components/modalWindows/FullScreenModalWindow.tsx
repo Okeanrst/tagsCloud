@@ -7,7 +7,7 @@ import withModalWindowContainer from './withModalWindowContainer';
 type PropsT = {
   style?: React.CSSProperties;
   children: React.ReactNode;
-  onContainerClick?: (e: React.SyntheticEvent<EventTarget>) => void;
+  onBackdropClick?: (e: React.SyntheticEvent<EventTarget>) => void;
 };
 
 const useStyles = makeStyles((theme: Theme) => ({

@@ -31,13 +31,6 @@ const styles = (theme: Theme) => createStyles({
     justifyContent: 'center',
     width: '100%',
   },
-  confirmDeleteButton: { marginLeft: '24px' },
-  confirmDeleteQuestion: {},
-  confirmDeleteButtons: {
-    marginTop: '100px',
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
   tagsList: {
     marginTop: '24px',
   },

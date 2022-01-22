@@ -3,14 +3,14 @@ import getDisplayName from 'react-display-name';
 import ReactDOM from 'react-dom';
 
 type EnhancedComponentPropsT = {
-  onContainerClick?: (e: React.SyntheticEvent<EventTarget>) => void;
+  onBackdropClick?: (e: React.SyntheticEvent<EventTarget>) => void;
 };
 
 export default function withModalWindowContainer<P>(
-  WrappedComponent: React.ComponentType<Omit<P, 'onContainerClick'>>,
+  WrappedComponent: React.ComponentType<Omit<P, 'onBackdropClick'>>,
 ) {
   const EnhancedComponent = React.forwardRef<any, P & EnhancedComponentPropsT>(
-    ({ onContainerClick, ...props }: P & EnhancedComponentPropsT, ref) => {
+    ({ onBackdropClick, ...props }: P & EnhancedComponentPropsT, ref) => {
       const modalWindowRef = useRef<any>(null);
 
       const setComponentRef = useCallback(
@@ -27,7 +27,7 @@ export default function withModalWindowContainer<P>(
 
       const onClick = useCallback(
         (e: React.SyntheticEvent<EventTarget>) => {
-          if (!onContainerClick) {
+          if (!onBackdropClick) {
             return;
           }
           if (!(e.target instanceof HTMLElement)) {
@@ -43,10 +43,10 @@ export default function withModalWindowContainer<P>(
             wrappedComponentNode &&
             !wrappedComponentNode.contains(e.target)
           ) {
-            onContainerClick(e);
+            onBackdropClick(e);
           }
         },
-        [onContainerClick],
+        [onBackdropClick],
       );
 
       return (

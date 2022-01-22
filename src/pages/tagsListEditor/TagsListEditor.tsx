@@ -9,14 +9,13 @@ import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { withRestScreenHeight } from 'decorators/withRestScreenHeight';
 import * as actions from 'store/actions/tagsCloud';
 import styles from './styles';
-import FullScreenModalWindow from 'components/modalWindows/FullScreenModalWindow';
+import { DeleteConfirmationModal } from 'components/modalWindows/DeleteConfirmationModal';
 import {
   downloadRawTagsCloudDataFile,
   uploadRawTagsCloudDataFile,
 } from 'store/actions/tagsCloudDataFile';
 import { TagFormModal } from 'components/modalWindows/TagFormModal';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
-import { TextButton } from 'ui/buttons/TextButton';
 import StyledSearchWithAutocomplete from './StyledSearchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
 import editIconSrc from './assets/edit.svg';
@@ -204,44 +203,17 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   renderConfirmDelete = (tagIdToDelete: string) => {
-    const { classes } = this.props;
-
-    const onConfirm = () => {
-      this.resetIdForDelete();
-      this.props.deleteTag(tagIdToDelete);
-    };
-
-    const modalWindowBody = [
-      <span
-        className={classes.confirmDeleteQuestion}
-        key="question"
-      >
-        Are you sure you want to delete tag with "
-        {tagIdToDelete}
-        " id?
-      </span>,
-      <div
-        className={classes.confirmDeleteButtons}
-        key="buttons"
-      >
-        <TextButton onClick={this.resetIdForDelete}>
-          Cancel
-        </TextButton>
-        <PrimaryButton
-          classes={{ root: classes.confirmDeleteButton }}
-          onClick={onConfirm}
-        >
-          Delete
-        </PrimaryButton>
-      </div>,
-    ];
-
+    const confirmQuestion = `Are you sure you want to delete tag with "${tagIdToDelete}" id?`;
     return (
-      <FullScreenModalWindow onContainerClick={this.resetIdForDelete}>
-        <div className={classes.confirmDelete}>
-          {modalWindowBody}
-        </div>
-      </FullScreenModalWindow>
+      <DeleteConfirmationModal
+        confirmQuestion={confirmQuestion}
+        onBackdropClick={this.resetIdForDelete}
+        onCancel={this.resetIdForDelete}
+        onConfirm={() => {
+          this.resetIdForDelete();
+          this.props.deleteTag(tagIdToDelete);
+        }}
+      />
     );
   };
 
