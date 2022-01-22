@@ -2,11 +2,13 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import FadeLoader from 'react-spinners/FadeLoader';
 import { makeStyles } from '@material-ui/core';
-import { editDataItem } from 'store/actions/tagsCloud';
+import { editDataItem, deleteDataItem } from 'store/actions/tagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
 import { TextButton } from 'ui/buttons/TextButton';
+import { OutlinedButton } from 'ui/buttons/OutlinedButton';
 import { TagFormModal } from 'components/modalWindows/TagFormModal';
+import { DeleteConfirmationModal } from 'components/modalWindows/DeleteConfirmationModal';
 
 import { TagDataT, ClassesT } from 'types/types';
 import { RootStateT } from '../store/types';
@@ -90,6 +92,9 @@ const useStyles = makeStyles({
     width: '1.5em',
     backgroundColor: '#e3f2fd',
     marginLeft: '1.5em',
+  },
+  deleteButton: {
+    marginLeft: '24px',
   },
 });
 
@@ -238,6 +243,7 @@ const TagInformation = (props: PropsT) => {
   const dispatch = useDispatch();
   const [shouldShowDays, setShouldShowDays] = useState<boolean>(true);
   const [isTagFormModalShown, setIsTagFormModalShown] = useState<boolean>(false);
+  const [isDeleteConfirmationModalShown, setIsDeleteConfirmationModalShown] = useState<boolean>(false);
   const classes = useStyles();
 
   const tagData = tagsData.data ? tagsData.data.find(i => i.id === tagId) : null;
@@ -271,6 +277,22 @@ const TagInformation = (props: PropsT) => {
     dispatch(editDataItem({ ...tagData, ...data }));
   }, [dispatch, tagData]);
 
+  const onDeleteClick = useCallback(() => {
+    setIsDeleteConfirmationModalShown(true);
+  }, []);
+
+  const onDeleteCancel = useCallback(() => {
+    setIsDeleteConfirmationModalShown(false);
+  }, []);
+
+  const onDeleteConfirm = useCallback(() => {
+    if (!tagData) {
+      return;
+    }
+    dispatch(deleteDataItem(tagData.id));
+    navigate('/', { replace: true });
+  }, [dispatch, tagData, navigate]);
+
   if (!tagData) return null;
 
   const informationListRenderers = getInformationListRenderers(
@@ -283,52 +305,70 @@ const TagInformation = (props: PropsT) => {
   const loading = tagsData.status === PENDING;
 
   return (
-    <div className={classes.root}>
-      {loading ? (
-        <div className={classes.loaderContainer}>
-          <FadeLoader
-            color="#123abc"
-            loading={loading}
+    <>
+      <div className={classes.root}>
+        {loading ? (
+          <div className={classes.loaderContainer}>
+            <FadeLoader
+              color="#123abc"
+              loading={loading}
+            />
+          </div>
+        ) : null}
+        {isTagFormModalShown && (
+          <TagFormModal
+            formProps={{
+              initValues: tagData,
+              onCancel: closeTagFormModal,
+              onSubmit: onTagChange
+            }}
+            onBackdropClick={closeTagFormModal}
           />
-        </div>
-      ) : null}
-      {isTagFormModalShown && (
-        <TagFormModal
-          formProps={{
-            initValues: tagData,
-            onCancel: closeTagFormModal,
-            onSubmit: onTagChange
-          }}
-          onBackdropClick={closeTagFormModal}
+        )}
+        <TextButton onClick={onEditClick}>
+          Edit
+        </TextButton>
+        <OutlinedButton
+          borderColor="var(--danger-color)"
+          classes={{ root: classes.deleteButton }}
+          color="var(--danger-color)"
+          onClick={onDeleteClick}
+        >
+          Delete
+        </OutlinedButton>
+        <ul className={classes.informationList}>
+          {informationListRenderers.map(i => (
+            <li
+              className={classes.listItem}
+              key={i.key}
+            >
+              {i.cells && [
+                <div
+                  key="0"
+                  style={{ display: 'flex', flex: 2 }}
+                >
+                  {renderCell(i.cells[0])}
+                </div>,
+                <div
+                  key="1"
+                  style={{ flex: 10 }}
+                >
+                  {renderCell(i.cells[1])}
+                </div>,
+              ]}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {isDeleteConfirmationModalShown ? (
+        <DeleteConfirmationModal
+          confirmQuestion="Are you sure you want to delete tag?"
+          onBackdropClick={onDeleteCancel}
+          onCancel={onDeleteCancel}
+          onConfirm={onDeleteConfirm}
         />
-      )}
-      <TextButton onClick={onEditClick}>
-        Edit
-      </TextButton>
-      <ul className={classes.informationList}>
-        {informationListRenderers.map(i => (
-          <li
-            className={classes.listItem}
-            key={i.key}
-          >
-            {i.cells && [
-              <div
-                key="0"
-                style={{ display: 'flex', flex: 2 }}
-              >
-                {renderCell(i.cells[0])}
-              </div>,
-              <div
-                key="1"
-                style={{ flex: 10 }}
-              >
-                {renderCell(i.cells[1])}
-              </div>,
-            ]}
-          </li>
-        ))}
-      </ul>
-    </div>
+      ) : null}
+    </>
   );
 };
 
