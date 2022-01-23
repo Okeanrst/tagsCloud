@@ -150,9 +150,15 @@ export const Settings = () => {
     if (!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLSelectElement)) {
       return;
     }
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+    let inputValue: string | boolean;
+    if (e.target instanceof HTMLInputElement && type === 'checkbox') {
+      ({ checked: inputValue } = e.target);
+    } else {
+      inputValue = value;
+    }
     setValues(currentValue => {
-      return { ...currentValue, [name]: transformInputValue(name as SettingsKeysT, value) };
+      return { ...currentValue, [name]: transformInputValue(name as SettingsKeysT, inputValue) };
     });
   }, []);
 
