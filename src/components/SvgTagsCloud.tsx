@@ -365,6 +365,13 @@ const SvgTagsCloud = ({
     return sortActiveVacancies(vacancies);
   }, [vacancies, isVacanciesShown]);
 
+  const onContextMenu = useCallback((e: React.SyntheticEvent<EventTarget>) => {
+    if (!(e.target instanceof SVGTextElement)) {
+      return;
+    }
+    e.preventDefault();
+  }, []);
+
   const onCanvasWrapperClick = useCallback((e: React.SyntheticEvent<EventTarget>) => {
     if (!(e.target instanceof SVGTextElement)) {
       return;
@@ -617,6 +624,7 @@ const SvgTagsCloud = ({
         className={classes.canvasWrapper}
         ref={canvasWrapperRef}
         onClick={onCanvasWrapperClick}
+        onContextMenu={onContextMenu}
         onMouseDown={onCanvasWrapperMouseDown}
         onTouchStart={onCanvasWrapperMouseDown}
       >
