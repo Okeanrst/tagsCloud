@@ -15,7 +15,6 @@ import { IdRectAreaMapT, TwoDimensionalMapT } from 'types/types';
 import type {
   PreparedTagDataT,
   TagRectT,
-  RectPositionT,
   PositionedTagRectT,
   RectAreaT,
 } from 'types/types';
@@ -47,7 +46,14 @@ const { TOP, RIGHT, BOTTOM, LEFT } = EDGE;
 
 const { ASC, DESC } = PickingStrategies;
 
-type RawPositionedTagRectT = TagRectT & RectPositionT & { rotate: boolean };
+type RectMapPositionT = {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+type MapPositionedTagRectT = TagRectT & RectMapPositionT & { rotate: boolean };
 
 type LoopOrderParamT = {
   from: number;
@@ -70,7 +76,7 @@ type PerformWorkT = (
 ) => { status: true; isRotated: boolean } | { status: false };
 
 const mapRectAreaMapOnRectPosition = (
-  rectPosition: RectPositionT,
+  rectPosition: RectMapPositionT,
   rectAreaMap: TwoDimensionalMapT,
   isRectAreaRotated: boolean,
 ) => {
@@ -165,7 +171,7 @@ const mapRectAreaMapOnRectPosition = (
 
 export const releaseRectAreaPositionsOnSceneMap = (
   sceneMapPositions: PositionT[],
-  tagPosition: RawPositionedTagRectT,
+  tagPosition: MapPositionedTagRectT,
   rectAreaMap: TwoDimensionalMapT,
 ) => {
   const sceneMap = new SceneMap(sceneMapPositions);
@@ -183,8 +189,8 @@ export const releaseRectAreaPositionsOnSceneMap = (
 
 export const moveRectAreaPositionsOnSceneMap = (
   sceneMapPositions: PositionT[],
-  currentTagPosition: RawPositionedTagRectT,
-  nextTagPosition: RawPositionedTagRectT,
+  currentTagPosition: MapPositionedTagRectT,
+  nextTagPosition: MapPositionedTagRectT,
   rectAreaMap: TwoDimensionalMapT,
 ) => {
   const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, rectAreaMap);
@@ -207,29 +213,29 @@ export const getSceneMapVacancies = (sceneMap: SceneMap) => {
   };
 };
 
-export function creatRawPositionedTagRect(
+export function creatMapPositionedTagRect(
   rect: TagRectT,
-  { top, right, bottom, left }: RectPositionT,
+  { top, right, bottom, left }: RectMapPositionT,
   isRotated: boolean,
-): RawPositionedTagRectT {
+): MapPositionedTagRectT {
   if (
     !['production', 'test'].includes(process.env.NODE_ENV) &&
     (top < bottom || left > right)
   ) {
     throw new Error(
-      'creatRawPositionedTagRect error: top < bottom || left > right',
+      'creatMapPositionedTagRect error: top < bottom || left > right',
     );
   }
   return { ...rect, top, right, bottom, left, rotate: isRotated };
 }
 
-// mutate rawPositionedTagRect
+// mutate mapPositionedTagRect
 export const preparePositionedTagRect = (
-  rawPositionedTagRect: RawPositionedTagRectT,
+  mapPositionedTagRect: MapPositionedTagRectT,
   rectAreaMapMeta: IdRectAreaMapT['mapMeta'],
   sceneMapUnitSize: number
 ) => {
-  const { top, right, bottom, left } = rawPositionedTagRect;
+  const { top, right, bottom, left } = mapPositionedTagRect;
   const topEdge = SceneMap.getPositionRightEdge(top);
   const bottomEdge = SceneMap.getPositionLeftEdge(bottom);
   const rightEdge = SceneMap.getPositionRightEdge(right);
@@ -240,7 +246,7 @@ export const preparePositionedTagRect = (
   let marginTop;
   let marginBottom;
 
-  if (rawPositionedTagRect.rotate) {
+  if (mapPositionedTagRect.rotate) {
     // clockwise
     marginRight = rectAreaMapMeta?.marginTop ?? 0;
     marginLeft = rectAreaMapMeta?.marginBottom ?? 0;
@@ -255,7 +261,7 @@ export const preparePositionedTagRect = (
     } = rectAreaMapMeta ?? {});
   }
 
-  Object.assign(rawPositionedTagRect, {
+  Object.assign(mapPositionedTagRect, {
     rectTop:
       SceneMap.sceneMapSizeToRectSize(topEdge, sceneMapUnitSize) +
       marginTop * sceneMapUnitSize,
@@ -292,7 +298,7 @@ export const pickClosedVacancy = (
   rectArea: RectAreaT,
   vacancies: (ClosedVacancyT | void)[],
   { pickingStrategy }: { pickingStrategy: PickingStrategies }
-): { rectPosition: RectPositionT, vacancyIndex: number } | void => {
+): { rectPosition: RectMapPositionT, vacancyIndex: number } | void => {
   const loopParams: LoopParamsT = {
     [ASC]: {
       from: 0,
@@ -380,7 +386,7 @@ export const pickEdgeVacancy = <T extends Array<PreparedTopEdgeVacancyT | Prepar
   sceneEdges: SceneEdgesT,
   edge: EDGE,
   { force = false, threshold = 0.5, pickingStrategy }: { force?: boolean; threshold?: number; pickingStrategy: PickingStrategies },
-): { rectPosition: RectPositionT, vacancyIndex: number } | void => {
+): { rectPosition: RectMapPositionT, vacancyIndex: number } | void => {
   let pickedVacancyIndex: number;
 
   const rowsToColsRation = rectArea.rows / rectArea.cols;
@@ -804,10 +810,10 @@ export function calcTagsPositions(
       }
       const edgesManager = new EdgesManager();
 
-      const positionedRectsData: RawPositionedTagRectT[] = [];
+      const positionedRectsData: MapPositionedTagRectT[] = [];
 
       const updateSceneMap = (
-        rectPosition: RectPositionT,
+        rectPosition: RectMapPositionT,
         rectAreaMap: TwoDimensionalMapT,
         isRectAreaRotated: boolean,
       ) => {
@@ -913,7 +919,7 @@ export function calcTagsPositions(
 
           updateSceneMap(rectPosition, rectAreaMap, isRotated);
           positionedRectsData.push(
-            creatRawPositionedTagRect(rect, rectPosition, isRotated),
+            creatMapPositionedTagRect(rect, rectPosition, isRotated),
           );
 
           return { status: true, isRotated };
@@ -940,7 +946,7 @@ export function calcTagsPositions(
             try {
               updateSceneMap(rectPosition, rectAreaMap, isRotated);
               positionedRectsData.push(
-                creatRawPositionedTagRect(rect, rectPosition, isRotated),
+                creatMapPositionedTagRect(rect, rectPosition, isRotated),
               );
             } catch (e) {
               if (e instanceof IntersectionError && vacanciesManager.needVacanciesRebuild) {
@@ -1011,7 +1017,7 @@ export function calcTagsPositions(
               try {
                 updateSceneMap(rectPosition, rectAreaMap, isRotated);
                 positionedRectsData.push(
-                  creatRawPositionedTagRect(rect, rectPosition, isRotated),
+                  creatMapPositionedTagRect(rect, rectPosition, isRotated),
                 );
 
                 rebuildVacanciesMap(shouldCreateVacancyIfNoSuchKind);
@@ -1045,7 +1051,7 @@ export function calcTagsPositions(
           try {
             updateSceneMap(rectPosition, rectAreaMap, isRotated);
             positionedRectsData.push(
-              creatRawPositionedTagRect(rect, rectPosition, isRotated),
+              creatMapPositionedTagRect(rect, rectPosition, isRotated),
             );
 
             rebuildVacanciesMap(shouldCreateVacancyIfNoSuchKind);
@@ -1075,13 +1081,13 @@ export function calcTagsPositions(
         if (options?.shouldDrawFinalVacanciesMap) {
           vacanciesManager.drawVacanciesMap();
         }
-        positionedRectsData.forEach(rawPositionedTagRect => {
+        positionedRectsData.forEach(mapPositionedTagRect => {
           const { mapMeta: rectAreaMapMeta } =
-          rectAreaMapByKey.get(formRectAreaMapKey(rawPositionedTagRect.label, rawPositionedTagRect.fontSize)) ?? {};
+          rectAreaMapByKey.get(formRectAreaMapKey(mapPositionedTagRect.label, mapPositionedTagRect.fontSize)) ?? {};
           if (!rectAreaMapMeta) {
-            throw new Error(`rectAreaMap for tag with id: "${rawPositionedTagRect.id}" is missing`);
+            throw new Error(`rectAreaMap for tag with id: "${mapPositionedTagRect.id}" is missing`);
           }
-          preparePositionedTagRect(rawPositionedTagRect, rectAreaMapMeta, sceneMapUnitSize);
+          preparePositionedTagRect(mapPositionedTagRect, rectAreaMapMeta, sceneMapUnitSize);
         });
 
         const vacancies = {

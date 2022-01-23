@@ -2,7 +2,9 @@ import { batch } from 'react-redux';
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
 import {
-  calcTagsPositions, creatRawPositionedTagRect, moveRectAreaPositionsOnSceneMap,
+  calcTagsPositions,
+  creatMapPositionedTagRect,
+  moveRectAreaPositionsOnSceneMap,
   pickClosedVacancy,
   pickEdgeVacancy,
   preparePositionedTagRect,
@@ -262,7 +264,12 @@ export function resetTagsCloud() {
   return createAction(actionTypes.RESET_TAGS_CLOUD);
 }
 
-export function changeTagPosition({ tagId, vacancy, vacancyKind }: { tagId: string; vacancy: VacancyT; vacancyKind: VacancyKinds }) {
+export function changeTagPosition({
+  tagId,
+  vacancy,
+  vacancyKind,
+  isRotated
+}: { tagId: string; vacancy: VacancyT; vacancyKind: VacancyKinds, isRotated: boolean }) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
     const { tagsCloud: { sceneMap: sceneMapPositions, tagsPositions }, rectAreasMapsData: rectAreasMaps } = getState();
 
@@ -279,8 +286,6 @@ export function changeTagPosition({ tagId, vacancy, vacancyKind }: { tagId: stri
     if (!rectAreaMap?.map || !rectAreaMap?.mapMeta) {
       return null;
     }
-
-    const isRotated = currentTagPosition.rotate;
 
     const tagRectArea = isRotated ?
       rotateRectArea(getRectAreaOfRectMap(rectAreaMap.map))
@@ -334,14 +339,14 @@ export function changeTagPosition({ tagId, vacancy, vacancyKind }: { tagId: stri
       return;
     }
 
-    const nextRawPositionedTagRect = creatRawPositionedTagRect(currentTagPosition, rectPosition, isRotated);
+    const nextMapPositionedTagRect = creatMapPositionedTagRect(currentTagPosition, rectPosition, isRotated);
 
-    const sceneMap = moveRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, nextRawPositionedTagRect, rectAreaMap.map);
+    const sceneMap = moveRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, nextMapPositionedTagRect, rectAreaMap.map);
 
-    preparePositionedTagRect(nextRawPositionedTagRect, rectAreaMap.mapMeta, calcTagsPositionsOptions.sceneMapResolution);
+    preparePositionedTagRect(nextMapPositionedTagRect, rectAreaMap.mapMeta, calcTagsPositionsOptions.sceneMapResolution);
 
     dispatch(createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG, {
-      tagPosition: nextRawPositionedTagRect,
+      tagPosition: nextMapPositionedTagRect,
       sceneMap: sceneMap.toPositions(),
       vacancies: getSceneMapVacancies(sceneMap),
     }));

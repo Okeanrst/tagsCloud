@@ -5,6 +5,7 @@ import {
   PreparedTagDataT,
   PositionedTagRectT,
   PositionedTagSvgDataT,
+  RectPositionT,
 } from 'types/types';
 
 export type PrepareDataOptionsT = {
@@ -86,7 +87,10 @@ export function getBorderCoordinates(
   return { top: maxTop, bottom: minBottom, right: maxRight, left: minLeft };
 }
 
-export function calcTagSvgData(tagData: PositionedTagRectT, yFactor: number) {
+export function calcTagSvgData(
+  tagData: Pick<RectPositionT, 'rectRight' | 'rectLeft' | 'rectTop' | 'rectBottom' | 'glyphsXOffset' | 'glyphsYOffset'> & { rotate: boolean },
+  yFactor: number
+) {
   const diffX = tagData.rectRight - tagData.rectLeft;
   const diffY = tagData.rectTop - tagData.rectBottom;
   const middleX = tagData.rectLeft + diffX / 2;
@@ -97,7 +101,6 @@ export function calcTagSvgData(tagData: PositionedTagRectT, yFactor: number) {
   const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * yFactor) + glyphsYOffset;
 
   return {
-    ...tagData,
     rectTranslateX,
     rectTranslateY,
   };
@@ -118,7 +121,7 @@ export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>, { fontFa
   const yFactor = getFontYFactor(fontFamily) - 0.5;
 
   const positionedTagsSvgData = data.map(tagData => {
-    return calcTagSvgData(tagData, yFactor);
+    return { ...tagData, ...calcTagSvgData(tagData, yFactor) };
   });
 
   const {
