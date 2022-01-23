@@ -70,7 +70,7 @@ const styles = (theme: Theme) => createStyles({
     width: '100%',
   },
   tagsList: {
-    marginTop: '24px',
+    marginTop: '24px', // TAGS_LIST_MARGIN_TOP
   },
   tagsListRow: {
     display: 'flex',

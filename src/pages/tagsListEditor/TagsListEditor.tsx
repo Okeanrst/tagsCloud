@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { createSelector } from 'reselect';
 import { bindActionCreators } from 'redux';
 import { FixedSizeList } from 'react-window';
+import throttle from 'lodash.throttle';
 import cx from 'classnames';
 import { withStyles } from '@material-ui/core';
 import FadeLoader from 'react-spinners/FadeLoader';
@@ -68,7 +69,7 @@ type PropsT = PropsFromRedux & {
 };
 
 type StateT = {
-  tagsListHeight: number;
+  actionsBlockHeight: number;
   scrollToItem?: { index: number };
   tagFormData?: Partial<TagDataT>;
   tagIdToDelete?: string;
@@ -76,42 +77,31 @@ type StateT = {
 };
 
 const TAGS_LIST_ROW_HEIGHT = 35;
+const TAGS_LIST_MARGIN_TOP = 24;
 
 class TagsListEditor extends Component<PropsT, StateT> {
   state: StateT = {
-    tagsListHeight: TAGS_LIST_ROW_HEIGHT,
     isConfirmDeleteTagsDataShown: false,
+    actionsBlockHeight: 0,
   };
   actionsBlockRef = React.createRef<HTMLDivElement>();
   listRef = React.createRef<FixedSizeList>();
-  resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
 
   componentDidMount() {
-    this.actionsBlockRef.current?.addEventListener(
-      'resize',
-      this.confFilesRefHandleResize,
-    );
-
-    const tagsListHeight = this.calcTagsListHeight();
-    this.setState({ tagsListHeight });
+    window.addEventListener('resize', this.onActionsBlockResize);
+    this.processActionsBlockHeight();
   }
 
   componentWillUnmount() {
     if (this.actionsBlockRef.current) {
-      this.actionsBlockRef.current?.removeEventListener(
-        'resize',
-        this.confFilesRefHandleResize,
-      );
+      window.removeEventListener('resize', this.onActionsBlockResize);
     }
-    this.resizeTaskTimer && clearTimeout(this.resizeTaskTimer);
+    this.onActionsBlockResize.cancel();
   }
 
   componentDidUpdate(prevProps: PropsT, prevState: StateT) {
     if (prevProps.restScreenHeight !== this.props.restScreenHeight) {
-      const tagsListHeight = this.calcTagsListHeight();
-      if (tagsListHeight !== this.state.tagsListHeight) {
-        this.setState({ tagsListHeight });
-      }
+      this.processActionsBlockHeight();
     }
     const { scrollToItem } = this.state;
     if (scrollToItem && prevState.scrollToItem !== scrollToItem) {
@@ -119,30 +109,25 @@ class TagsListEditor extends Component<PropsT, StateT> {
     }
   }
 
-  confFilesRefHandleResize = () => {
-    const delay = 500;
+  onActionsBlockResize = throttle(() => {
+    this.processActionsBlockHeight();
+  }, 500);
 
-    if (!this.resizeTaskTimer) {
-      this.resizeTaskTimer = setTimeout(() => {
-        this.resizeTaskTimer = null;
-        const tagsListHeight = this.calcTagsListHeight();
-        if (tagsListHeight !== this.state.tagsListHeight) {
-          this.setState({ tagsListHeight });
-        }
-      }, delay);
-    }
-  };
-
-  calcTagsListHeight = () => {
+  processActionsBlockHeight = () => {
     if (!this.actionsBlockRef.current) {
-      return 0;
+      this.setState({ actionsBlockHeight: 0 });
+      return;
     }
 
     const { top, bottom } = this.actionsBlockRef.current?.getBoundingClientRect();
-    const restScreenHeight = this.props.restScreenHeight - (bottom - top);
-    return restScreenHeight > TAGS_LIST_ROW_HEIGHT
-      ? restScreenHeight
-      : TAGS_LIST_ROW_HEIGHT;
+    this.setState({ actionsBlockHeight: bottom - top });
+  };
+
+  calcTagsListHeight = () => {
+    const { restScreenHeight } = this.props;
+    const { actionsBlockHeight } = this.state;
+    const tagsListHeight = Math.floor((restScreenHeight - actionsBlockHeight - TAGS_LIST_MARGIN_TOP) / TAGS_LIST_ROW_HEIGHT) * TAGS_LIST_ROW_HEIGHT;
+    return tagsListHeight < TAGS_LIST_ROW_HEIGHT * 5 ? TAGS_LIST_ROW_HEIGHT * 5 : tagsListHeight;
   };
 
   renderLoader = (loading: boolean) => {
@@ -397,9 +382,11 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
   render() {
     const { tagsData, searchAutocompleteSuggestions, classes } = this.props;
-    const { tagsListHeight, tagFormData } = this.state;
+    const { tagFormData } = this.state;
     const loading = tagsData.status === PENDING;
     const isDataReady = tagsData.status === SUCCESS;
+
+    const tagsListHeight = this.calcTagsListHeight();
 
     return (
       <div className={classes.root}>

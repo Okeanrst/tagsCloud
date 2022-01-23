@@ -1,4 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { makeStyles } from '@material-ui/core';
+import throttle from 'lodash.throttle';
+
+const useStyles = makeStyles({
+  wrapper: {
+    width: '100%',
+    flexGrow: 12,
+  },
+});
 
 export function withRestScreenHeight<T extends { restScreenHeight: number }>(
   WrappedComponent: React.ComponentType<T>,
@@ -8,9 +17,7 @@ export function withRestScreenHeight<T extends { restScreenHeight: number }>(
   return function (props) {
     const [height, setHeight] = useState<number>(0);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
-    const resizeTaskTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-      null,
-    );
+    const classes = useStyles();
 
     const { children } = props;
 
@@ -19,46 +26,30 @@ export function withRestScreenHeight<T extends { restScreenHeight: number }>(
         return 0;
       }
 
-      const node = wrapperRef.current;
-
-      const { top } = node.getBoundingClientRect();
-      const scrollTop = document.documentElement.scrollTop;
-      const screenHeight = document.documentElement.clientHeight;
-      const restScreenHeight = screenHeight - (scrollTop + top);
-      return restScreenHeight > 0 ? restScreenHeight : 0;
+      const { top, bottom } = wrapperRef.current.getBoundingClientRect();
+      return bottom - top;
     }, []);
 
-    const handleResize = useCallback((): void => {
-      const recalculateState = () => {
-        resizeTaskTimerRef.current = null;
-        const nextHeight = calcRestScreenHeight();
-
-        if (height !== nextHeight) {
-          setHeight(nextHeight);
-        }
-      };
-
-      const delay = 500;
-
-      if (!resizeTaskTimerRef.current) {
-        resizeTaskTimerRef.current = setTimeout(recalculateState, delay);
-      }
-    }, [height, calcRestScreenHeight]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const handleResize = useCallback(throttle((): void => {
+      setHeight(calcRestScreenHeight());
+    }, 500), [calcRestScreenHeight]);
 
     useEffect(() => {
       setHeight(calcRestScreenHeight());
-
       window.addEventListener('resize', handleResize);
       return () => {
         window.removeEventListener('resize', handleResize);
-
-        resizeTaskTimerRef.current && clearTimeout(resizeTaskTimerRef.current);
+        handleResize.cancel();
       };
     }, [handleResize, calcRestScreenHeight]);
 
     const nextProps = { ...props, restScreenHeight: height };
     return (
-      <div ref={wrapperRef}>
+      <div
+        className={classes.wrapper}
+        ref={wrapperRef}
+      >
         <WrappedComponent {...nextProps}>
           {children}
         </WrappedComponent>
