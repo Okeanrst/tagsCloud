@@ -7,6 +7,7 @@ import {
   isVacancyLargeEnoughToFitRect,
   rotateRectArea,
   releaseRectAreaPositionsOnSceneMap,
+  moveRectAreaPositionsOnSceneMap,
 } from '../calcTagsPositions';
 import { PositionT, SceneMap } from '../sceneMap';
 import entryData from './entryData.json';
@@ -120,6 +121,17 @@ describe('positioningAlgorithm tests', () => {
       const rectAreaMap = [[true, false, true, false], [true, true, true, true], [true, true, true, true]];
       const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, tagPosition, rectAreaMap);
       expect(sceneMap.toPositions()).toStrictEqual([[1,4],[2,4],[4,4],[6,4],[1,3],[2,3],[1,2],[2,2],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1]]);
+    });
+  });
+
+  describe('moveRectAreaPositionsOnSceneMap tests', () => {
+    it(`should return correct result`, () => {
+      const sceneMapPositions: PositionT[] = [[3, 2], [4, 2]];
+      const currentTagPosition = {bottom: 2, top: 2, left: 3, right: 4, rotate: false };
+      const nextTagPosition = {bottom: 3, top: 4, left: 4, right: 4, rotate: true };
+      const rectAreaMap = [[true, true], [true, true]];
+      const sceneMap = moveRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, nextTagPosition, rectAreaMap);
+      expect(sceneMap.toPositions()).toStrictEqual([[4,4],[4,3]]);
     });
   });
 });

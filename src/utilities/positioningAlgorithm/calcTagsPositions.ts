@@ -182,8 +182,8 @@ export const releaseRectAreaPositionsOnSceneMap = (
 
 export const moveRectAreaPositionsOnSceneMap = (
   sceneMapPositions: PositionT[],
-  currentTagPosition: MapPositionedTagRectT,
-  nextTagPosition: MapPositionedTagRectT,
+  currentTagPosition: RectMapPositionT & { rotate: boolean },
+  nextTagPosition: RectMapPositionT & { rotate: boolean },
   rectAreaMap: TwoDimensionalMapT,
 ) => {
   const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, rectAreaMap);
