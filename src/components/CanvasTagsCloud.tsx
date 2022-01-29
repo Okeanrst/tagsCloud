@@ -149,7 +149,6 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
     return (
       <div className={classes.container}>
         <canvas
-          id="tagCloudCanvasRef"
           ref={this.tagCloudCanvasRef}
           onClick={this.onCanvasClick}
         />

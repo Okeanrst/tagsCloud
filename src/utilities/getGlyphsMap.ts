@@ -4,9 +4,9 @@ import {
   SPACE_MONO_FONT,
   FontFamilies,
 } from 'constants/index';
+import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import openSansGlyphsByChars from './glyphsByChars/openSans.json';
 import spaceMonoGlyphsByChars from './glyphsByChars/spaceMono.json';
-import { getFontYFactor } from 'utilities/common/getFontYFactor';
 
 import {
   TwoDimensionalMapMetaT,
@@ -225,7 +225,6 @@ export function getGlyphsMap(
 
   const { height } = originSize;
   const width = originSize.width + extraColumns * resolution;
-
 
   canvas.width = width;
   canvas.height = height;
