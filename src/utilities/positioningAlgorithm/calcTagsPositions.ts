@@ -164,7 +164,7 @@ const mapRectAreaMapOnRectPosition = (
 
 export const releaseRectAreaPositionsOnSceneMap = (
   sceneMapPositions: PositionT[],
-  tagPosition: MapPositionedTagRectT,
+  tagPosition: RectMapPositionT & { rotate: boolean },
   rectAreaMap: TwoDimensionalMapT,
 ) => {
   const sceneMap = new SceneMap(sceneMapPositions);
