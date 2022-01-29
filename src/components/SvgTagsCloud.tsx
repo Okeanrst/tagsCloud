@@ -355,7 +355,11 @@ const SvgTagsCloud = ({
   }, [sceneMapPositions]);
 
   const tagsSvgData = useMemo(() => {
-    return tagsPositions && getTagsSvgData(tagsPositions, { fontFamily });
+    if (!tagsPositions) {
+      return;
+    }
+    const sortedTagsPositions = [...tagsPositions].sort((a, b) => b.fontSize - a.fontSize);
+    return getTagsSvgData(sortedTagsPositions, { fontFamily });
   }, [tagsPositions, fontFamily]);
 
   const allVacancies = useMemo(() => {
