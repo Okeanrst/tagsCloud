@@ -65,17 +65,17 @@ const useStyles = makeStyles(theme => ({
     },
   },
   settingsLink: {
-    marginLeft: '32px',
+    marginLeft: theme.spacing(4),
   },
   settingsLinkLabel: {
-    marginRight: '16px',
+    marginRight: theme.spacing(2),
     [theme.breakpoints.down('xs')]: {
       display: 'none',
     }
   },
   settingsLinkIcon: {
-    width: '32px',
-    height: '32px',
+    width: theme.spacing(4),
+    height: theme.spacing(4),
     [theme.breakpoints.down('sm')]: {
       display: 'inline',
     }

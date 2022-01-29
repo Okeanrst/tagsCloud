@@ -44,7 +44,7 @@ type VacanciesT = NonNullable<RootStateT['tagsCloud']['vacancies']>;
 
 type StylesOptionsT = {fontFamily: FontFamilies};
 
-const DURATION = 300;
+const ANIMATION_DURATION = 300;
 
 const MOVEMENT_THRESHOLD = 10; // px
 const CHANGE_ROTATION_THRESHOLD = 500; // ms
@@ -73,7 +73,7 @@ const getEventDocumentCoordinates = (event: MouseEvent | TouchEvent | React.Mous
 };
 
 const tagStyle = {
-  transition: `all ${DURATION}ms ease-in-out`,
+  transition: `all ${ANIMATION_DURATION}ms ease-in-out`,
   opacity: 0,
   cursor: 'pointer',
 };
@@ -113,6 +113,11 @@ type DraggableTagAvatarProps = {
   color?: string;
   fontSize?: number;
   display?: string;
+};
+
+const formTagTransformStyle = ({ translateX, translateY, isRotated, scale = 1 }
+  : { translateX: number; translateY: number; isRotated: boolean; scale?: number }) => {
+  return `translate(${translateX}px,${translateY}px) rotate(${isRotated ? 90 : 0}deg) scale(${scale})`;
 };
 
 const downloadTagCloudHtmlFile = (html: string, fileName?: string) => {
@@ -260,8 +265,10 @@ const canvasCoordinatesToSceneCoordinates = (canvasCoordinates: CoordinatesT, { 
   };
 };
 
-const sceneCoordinatesToCanvasCoordinates = (sceneCoordinates: CoordinatesT, { sceneMapEdges, zoom, sceneMapResolution }
-  : {sceneMapEdges: SceneEdgesT, zoom: number, sceneMapResolution: number}) => {
+const sceneCoordinatesToCanvasCoordinates = (
+  sceneCoordinates: CoordinatesT,
+  { sceneMapEdges, zoom, sceneMapResolution }: {sceneMapEdges: SceneEdgesT, zoom: number, sceneMapResolution: number}
+) => {
   const { x, y } = sceneCoordinates;
 
   return {
@@ -494,7 +501,7 @@ const SvgTagsCloud = ({
         rotate,
       }, fontYFactor - 0.5);
 
-      draggableTagAvatarRef.current.style.transform = `translate(${rectTranslateX}px,${rectTranslateY}px) rotate(${rotate ? 90 : 0}deg) scale(1)`;
+      draggableTagAvatarRef.current.style.transform = formTagTransformStyle({ translateX: rectTranslateX, translateY: rectTranslateY, isRotated: rotate });
 
       draggableTagAvatarRef.current.style.display = 'block';
 
@@ -658,35 +665,41 @@ const SvgTagsCloud = ({
                 const transitionStyles: { [key: string]: React.CSSProperties } = {
                   exited: {
                     opacity: 0,
-                    transform: `translate(${i.rectTranslateX}px,${
-                      i.rectTranslateY
-                    }px) rotate(${i.rotate ? 90 : 0}deg) scale(1)`,
+                    transform: formTagTransformStyle({
+                      translateX: i.rectTranslateX,
+                      translateY: i.rectTranslateY,
+                      isRotated: i.rotate
+                    }),
                   },
                   entering: {
                     opacity: 0,
-                    transform: `translate(${i.rectTranslateX}px,${
-                      i.rectTranslateY
-                    }px) rotate(${i.rotate ? 90 : 0}deg) scale(0.1)`,
+                    transform: formTagTransformStyle({
+                      translateX: i.rectTranslateX,
+                      translateY: i.rectTranslateY,
+                      isRotated: i.rotate,
+                      scale: 0.1
+                    }),
                   },
                   entered: {
                     opacity: 1,
-                    transform: `translate(${i.rectTranslateX}px,${
-                      i.rectTranslateY
-                    }px) rotate(${i.rotate ? 90 : 0}deg) scale(1)`,
+                    transform: formTagTransformStyle({
+                      translateX: i.rectTranslateX,
+                      translateY: i.rectTranslateY,
+                      isRotated: i.rotate
+                    }),
                   },
                 };
 
                 return (
                   <Transition
                     key={i.id + i.rectLeft + i.rectTop}
-                    timeout={DURATION}
+                    timeout={ANIMATION_DURATION}
                   >
                     {state => {
                       return (
                         <text
                           className={classes.text}
                           data-id={i.id}
-                          // transform={`translate(${i.rectTranslateX},${i.rectTranslateY})rotate(${i.rotate ? 90 : 0})`}
                           key={`${i.id}_${index}`}
                           style={{
                             ...style,
