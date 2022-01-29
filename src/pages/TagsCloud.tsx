@@ -45,7 +45,27 @@ const mapDispatchToProps = (dispatch: AppDispatchT) => ({
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-const styleClasses = createStyles({
+const styles = createStyles({
+  pageContainer: {
+    position: 'relative',
+    minHeight: '250px',
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 12,
+  },
+  loaderContainer: {
+    position: 'absolute',
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  tagsCloudScene: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    position: 'relative',
+    flexGrow: 12,
+  },
   downloadButton: {
     border: 'none',
     backgroundColor: 'transparent',
@@ -81,6 +101,20 @@ const styleClasses = createStyles({
     textAlign: 'left',
     backgroundColor: '#d2d2d2',
   },
+  rebuildButtonContainer: {
+    justifyContent: 'center',
+    display: 'flex',
+    position: 'absolute',
+    top: '0px',
+    left: '50%',
+    right: '50%',
+    zIndex: 3,
+  },
+  controls: {
+    position: 'absolute',
+    top: '0px',
+    zIndex: 5,
+  },
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -97,43 +131,6 @@ type StateT = {
   isCoordinateGridShown: boolean;
   isReactAreasShown: boolean;
   isVacanciesShown: boolean;
-};
-
-const styles: { [key: string]: React.CSSProperties } = {
-  pageContainer: {
-    position: 'relative',
-    minHeight: '250px',
-    display: 'flex',
-    flexDirection: 'column',
-    flexGrow: 12,
-  },
-  loaderContainer: {
-    position: 'absolute',
-    display: 'flex',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  tagsCloudScene: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    position: 'relative',
-    flexGrow: 12,
-  },
-  controls: {
-    position: 'absolute',
-    top: '0px',
-    zIndex: 5,
-  },
-  rebuildButtonContainer: {
-    justifyContent: 'center',
-    display: 'flex',
-    position: 'absolute',
-    top: '0px',
-    left: '50%',
-    right: '50%',
-    zIndex: 3,
-  }
 };
 
 const getTagsDataByTagsIds = (tagsIds: string[], tagsData: ReadonlyArray<TagDataT>) => {
@@ -276,7 +273,7 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   renderLoader = (loading: boolean) => (
-    <div style={styles.loaderContainer}>
+    <div className={this.props.classes.loaderContainer}>
       <FadeLoader
         color="#123abc"
         loading={loading}
@@ -287,7 +284,7 @@ class TagsCloud extends Component<PropsT, StateT> {
   renderActionButtons = (disabled: boolean) => {
     const { classes, triggerRebuild } = this.props;
     return (
-      <div style={styles.rebuildButtonContainer}>
+      <div className={classes.rebuildButtonContainer}>
         <button
           className={classes.downloadButton}
           disabled={disabled}
@@ -389,7 +386,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   render() {
     const { tagsCloudSceneSize } = this.state;
-    const { shouldUseCanvas, tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily } = this.props;
+    const { shouldUseCanvas, tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily, classes } = this.props;
 
     const loading = [
       tagsData.status,
@@ -399,11 +396,11 @@ class TagsCloud extends Component<PropsT, StateT> {
     ].includes(PENDING);
 
     return (
-      <div style={styles.pageContainer}>
+      <div className={classes.pageContainer}>
         <div style={{ fontFamily, visibility: 'hidden' }} />
         {this.renderLoader(loading)}
         {this.renderActionButtons(loading)}
-        <div style={styles.controls}>
+        <div className={classes.controls}>
           <Checkbox
             checked={shouldUseCanvas}
             label="use canvas"
@@ -412,8 +409,8 @@ class TagsCloud extends Component<PropsT, StateT> {
         </div>
         {tagsCloud.status === SUCCESS && this.renderSettings()}
         <div
+          className={classes.tagsCloudScene}
           ref={this.tagsCloudSceneRef}
-          style={styles.tagsCloudScene}
         >
           {tagsCloudSceneSize && tagsCloud.status === SUCCESS && this.renderTagsCloud()}
         </div>
@@ -422,4 +419,4 @@ class TagsCloud extends Component<PropsT, StateT> {
   }
 }
 
-export default connector(withStyles(styleClasses)(withTriggerGettingRawData<PropsT>(TagsCloud)));
+export default connector(withStyles(styles)(withTriggerGettingRawData<PropsT>(TagsCloud)));
