@@ -2,7 +2,11 @@ import { OPEN_SANS_FONT } from 'constants/index';
 import { prepareTagsData } from 'utilities/tagsCloud/tagsCloud';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
-import { calcTagsPositions, isVacancyLargeEnoughToFitRect } from '../calcTagsPositions';
+import {
+  calcTagsPositions,
+  isVacancyLargeEnoughToFitRect,
+  rotateRectArea,
+} from '../calcTagsPositions';
 import { SceneMap } from '../sceneMap';
 import entryData from './entryData.json';
 import preparedData from './preparedData.json';
@@ -76,17 +80,30 @@ describe('positioningAlgorithm tests', () => {
 
   describe('isVacancyLargeEnoughToFitRect tests', () => {
     it(`should return correct result`, () => {
-      const isLargeEnough = isVacancyLargeEnoughToFitRect({rows: 2, cols: 4}, {top: 4, bottom: 3, left: 2, right: 5});
+      const isLargeEnough = isVacancyLargeEnoughToFitRect({rows: 2, cols: 4}, {top: 4, bottom: 3, left: -Infinity, right: 5});
       expect(isLargeEnough).toBe(true);
     });
     it(`should return correct result (1)`, () => {
-      const isLargeEnough = isVacancyLargeEnoughToFitRect({rows: 1, cols: 1}, {top: -1, bottom: -1, left: -5, right: -5});
+      const isLargeEnough = isVacancyLargeEnoughToFitRect({rows: 1, cols: 1}, {top: -1, bottom: -Infinity, left: -5, right: -5});
       expect(isLargeEnough).toBe(true);
     });
-
-    it(`should return falsy result for rotated vacancy`, () => {
-      const isLargeEnough = isVacancyLargeEnoughToFitRect({rows: 2, cols: 4}, {right: 4, left: 3, bottom: 2, top: 5});
+    it(`should return correct result (2)`, () => {
+      const isLargeEnough = isVacancyLargeEnoughToFitRect({rows: 5, cols: 2}, {top: -1, bottom: -Infinity, left: -5, right: Infinity});
+      expect(isLargeEnough).toBe(true);
+    });
+    it(`should return correct result (3)`, () => {
+      const isLargeEnough = isVacancyLargeEnoughToFitRect({rows: 100, cols: 2000}, {right: Infinity, left: -Infinity, bottom: 2, top: Infinity});
+      expect(isLargeEnough).toBe(true);
+    });
+    it(`should return falsy result for rotated vacancy (1)`, () => {
+      const isLargeEnough = isVacancyLargeEnoughToFitRect({rows: 3, cols: 4}, {right: 4, left: -Infinity, bottom: 2, top: 3});
       expect(isLargeEnough).toBe(false);
+    });
+  });
+
+  describe('rotateRectArea tests', () => {
+    it(`should return correct result`, () => {
+      expect(rotateRectArea({rows: 5, cols: 2})).toStrictEqual({rows: 2, cols: 5});
     });
   });
 });
