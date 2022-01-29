@@ -23,8 +23,6 @@ export type BorderCoordinatesT = {
 
 export type ViewBoxT = [number, number, number, number];
 
-type GetTagsSvgDataOptionsT = {fontFamily: FontFamilies};
-
 export function prepareTagsData(
   tagsData: ReadonlyArray<TagDataT>,
   options: PrepareDataOptionsT,
@@ -88,7 +86,7 @@ export function getBorderCoordinates(
 }
 
 export function calcTagSvgData(
-  tagData: Pick<RectPositionT, 'rectRight' | 'rectLeft' | 'rectTop' | 'rectBottom' | 'glyphsXOffset' | 'glyphsYOffset'> & { rotate: boolean },
+  tagData: Pick<PositionedTagRectT, 'rotate' | 'glyphsXOffset' | 'glyphsYOffset'> & RectPositionT,
   yFactor: number
 ) {
   const diffX = tagData.rectRight - tagData.rectLeft;
@@ -106,7 +104,7 @@ export function calcTagSvgData(
   };
 }
 
-export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>, { fontFamily }: GetTagsSvgDataOptionsT): {
+export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>, { fontFamily }: {fontFamily: FontFamilies}): {
   transform: string;
   viewBox: ViewBoxT;
   aspectRatio: number;

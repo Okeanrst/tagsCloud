@@ -11,7 +11,7 @@ import { VacanciesManager } from './vacanciesManager';
 import IntersectionError from './IntersectionError';
 import { getRectAreaOfRectMap } from '../getGlyphsMap';
 
-import { IdRectAreaMapT, TwoDimensionalMapT } from 'types/types';
+import { IdRectAreaMapT, TwoDimensionalMapT, RectMapPositionT } from 'types/types';
 import type {
   PreparedTagDataT,
   TagRectT,
@@ -45,13 +45,6 @@ export type Options = Readonly<{
 const { TOP, RIGHT, BOTTOM, LEFT } = EDGE;
 
 const { ASC, DESC } = PickingStrategies;
-
-type RectMapPositionT = {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
 
 type MapPositionedTagRectT = TagRectT & RectMapPositionT & { rotate: boolean };
 

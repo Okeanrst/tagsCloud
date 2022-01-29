@@ -70,20 +70,25 @@ export type TagRectT = PreparedTagDataT & {
   square: number;
 };
 
-export type RectPositionT = {
+export type RectMapPositionT = {
   top: number;
   bottom: number;
   left: number;
   right: number;
+};
+
+export type RectPositionT = {
   rectTop: number;
   rectBottom: number;
   rectLeft: number;
   rectRight: number;
+};
+
+export type PositionedTagRectT = TagRectT & RectMapPositionT & RectPositionT & {
+  rotate: boolean;
   glyphsXOffset: number;
   glyphsYOffset: number;
 };
-
-export type PositionedTagRectT = TagRectT & RectPositionT & { rotate: boolean };
 
 export type PositionedTagSvgDataT = Readonly<
   PositionedTagRectT & {

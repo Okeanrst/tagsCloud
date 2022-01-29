@@ -1,5 +1,5 @@
 import { FontFamilies } from 'constants/index';
-import { IdRectAreaMapT, PreparedTagDataT } from '../types/types';
+import { IdRectAreaMapT, PreparedTagDataT } from 'types/types';
 import { getRectAreaMap } from './getGlyphsMap';
 import { splitAndPerformWork } from './common/splitAndPerformWork';
 
