@@ -22,7 +22,7 @@ const useStyles = makeStyles({
   }
 });
 
-const ModalWindowLayout = ({ children, className, style, onBackdropClick }: PropsT) => {
+export const ModalWindowBackdrop = ({ children, className, style, onBackdropClick }: PropsT) => {
   const classes = useStyles();
   const containerRef = useRef<HTMLDivElement>(null);
   const onClick = useCallback(
@@ -53,5 +53,3 @@ const ModalWindowLayout = ({ children, className, style, onBackdropClick }: Prop
     </RootModal>
   );
 };
-
-export default ModalWindowLayout;

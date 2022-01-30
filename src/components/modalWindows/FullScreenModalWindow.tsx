@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles, Theme } from '@material-ui/core';
-import { withModalWindowLayout } from './withModalWindowLayout';
+import { withModalWindowBackdrop } from './withModalWindowBackdrop';
 
 type PropsT = {
   style?: React.CSSProperties;
@@ -39,4 +39,4 @@ const FullScreenModalWindow = React.forwardRef<HTMLDivElement, PropsT>(
   },
 );
 
-export default withModalWindowLayout<PropsT>()(FullScreenModalWindow);
+export default withModalWindowBackdrop<PropsT>()(FullScreenModalWindow);
