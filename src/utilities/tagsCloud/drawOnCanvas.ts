@@ -1,8 +1,8 @@
-import { getBorderCoordinates } from './tagsCloud';
-import { PositionedTagRectT } from 'types/types';
 import { FontFamilies } from 'constants/index';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
+import { getBorderCoordinates } from './getBorderCoordinates';
+import { PositionedTagRectT } from 'types/types';
 
 type OptionsT = {
   fontFamily: FontFamilies;

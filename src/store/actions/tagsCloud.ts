@@ -13,7 +13,7 @@ import {
   getSceneMapVacancies,
 } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
-import { prepareTagsData } from 'utilities/tagsCloud/tagsCloud';
+import { prepareTagsData } from 'utilities/prepareTagsData';
 import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
 import { SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
 import { EDGE } from 'utilities/positioningAlgorithm/edgesManager';

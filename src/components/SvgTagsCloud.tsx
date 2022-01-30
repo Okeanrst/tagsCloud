@@ -5,7 +5,8 @@ import { Transition, TransitionGroup } from 'react-transition-group';
 import throttle from 'lodash.throttle';
 import { saveAs } from 'file-saver';
 import * as actions from 'store/actions/tagsCloud';
-import { getBorderCoordinates, getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagsCloud';
+import { getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagSvgData';
+import { getBorderCoordinates } from 'utilities/tagsCloud/getBorderCoordinates';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 import {
   getSceneMapVacancies,
@@ -23,7 +24,7 @@ import { FontFamilies } from 'constants/index';
 
 import type { PositionedTagRectT, RectAreaT } from 'types/types';
 import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
-import type { ViewBoxT } from 'utilities/tagsCloud/tagsCloud';
+import type { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { RootStateT } from 'store/types';
 import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
 import { SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap';

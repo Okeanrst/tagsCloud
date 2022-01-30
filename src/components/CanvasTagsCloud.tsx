@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { saveAs } from 'file-saver';
 import { withStyles } from '@material-ui/core';
 import { drawOnCanvas } from 'utilities/tagsCloud/drawOnCanvas';
-import { getBorderCoordinates } from 'utilities/tagsCloud/tagsCloud';
+import { getBorderCoordinates } from 'utilities/tagsCloud/getBorderCoordinates';
 import { RootStateT } from 'store/types';
 
 const mapStateToProps = (state: RootStateT) => {

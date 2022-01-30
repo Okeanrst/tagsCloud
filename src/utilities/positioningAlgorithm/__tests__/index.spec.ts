@@ -1,5 +1,5 @@
 import { OPEN_SANS_FONT } from 'constants/index';
-import { prepareTagsData } from 'utilities/tagsCloud/tagsCloud';
+import { prepareTagsData } from 'utilities/prepareTagsData';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
 import {
