@@ -16,7 +16,7 @@ import {
 } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { SceneMap, Dimensions } from 'utilities/positioningAlgorithm/sceneMap';
 import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
-import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
+import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
 import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
@@ -571,8 +571,8 @@ const SvgTagsCloud = ({
 
     const rotate = draggableTag.changeRotation ? !tagPosition.rotate : tagPosition.rotate;
     const tagRectArea = rotate ?
-      rotateRectArea(getRectAreaOfRectMap(rectAreaMap))
-      : getRectAreaOfRectMap(rectAreaMap);
+      rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap))
+      : getRectAreaOfRectAreaMap(rectAreaMap);
 
     if (!tagRectArea) {
       return null;

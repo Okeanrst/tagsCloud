@@ -140,7 +140,7 @@ export function getRectAreaMap(
       topCutOffRows,
       bottomCutOffRows,
     },
-  } = cutOffMapEmptyArea(fullSizeRectAreaMap);
+  } = trimMapEmptyEdges(fullSizeRectAreaMap);
 
   if (false) {
     // eslint-disable-next-line no-console
@@ -168,7 +168,7 @@ export function getRectAreaMap(
   };
 }
 
-export function getGlyphsMap(
+function getGlyphsMap(
   canvas: HTMLCanvasElement,
   {
     word,
@@ -333,7 +333,7 @@ export function getGlyphsMap(
 // not in use any more
 // const glyphsMap = getHighResolutionGlyphsMap(...)
 // const fullSizeRectMap = glyphsMapToRectMap(glyphsMap.map, rectArea, false);
-export function getHighResolutionGlyphsMap(
+function getHighResolutionGlyphsMap(
   canvas: HTMLCanvasElement,
   {
     word,
@@ -486,7 +486,7 @@ function glyphsMapToRectMap(
   const horizRatio = glyphsRows / rectRows;
   const vertRatio = glyphsCols / rectCols;
 
-  const isRectAreaBusy = (rectCol: number, rectRow: number) => {
+  const isAreaMapPositionOccupied = (rectCol: number, rectRow: number) => {
     const rowStart = Math.floor(horizRatio * rectRow);
     let rowFinish = Math.floor(horizRatio * (rectRow + 1));
 
@@ -519,21 +519,21 @@ function glyphsMapToRectMap(
       if (!rectMap[row]) {
         rectMap[row] = [];
       }
-      rectMap[row][col] = isRectAreaBusy(col, row);
+      rectMap[row][col] = isAreaMapPositionOccupied(col, row);
     }
   }
 
   return rectMap;
 }
 
-export function getRectAreaOfRectMap(map: Array<Array<boolean>>) {
+export function getRectAreaOfRectAreaMap(map: TwoDimensionalMapT) {
   const rows = map.length;
   const cols = map[0]?.length ?? 0;
   return { rows, cols };
 }
 
-function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
-  map: Array<Array<boolean>>;
+function trimMapEmptyEdges(entryMap: TwoDimensionalMapT): {
+  map: TwoDimensionalMapT;
   meta: {
     topCutOffRows: number;
     bottomCutOffRows: number;
@@ -541,7 +541,7 @@ function cutOffMapEmptyArea(entryMap: Array<Array<boolean>>): {
     rightCutOffColumns: number;
   };
 } {
-  const { rows: entryMapRows, cols: entryMapCols } = getRectAreaOfRectMap(entryMap);
+  const { rows: entryMapRows, cols: entryMapCols } = getRectAreaOfRectAreaMap(entryMap);
 
   const emptyRows = Array.from({ length: entryMapRows }).fill(true);
   const emptyColumns = Array.from({ length: entryMapCols }).fill(true);
@@ -621,7 +621,7 @@ function visualizeMap(
   rowLength: number = 250,
 ): string {
   let res = '';
-  const { cols, rows } = getRectAreaOfRectMap(map);
+  const { cols, rows } = getRectAreaOfRectAreaMap(map);
   const maxCol = rowLength < cols ? rowLength : cols;
 
   if (rowLength < cols) {

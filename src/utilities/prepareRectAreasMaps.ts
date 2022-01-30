@@ -1,6 +1,6 @@
 import { FontFamilies } from 'constants/index';
 import { IdRectAreaMapT, PreparedTagDataT } from 'types/types';
-import { getRectAreaMap } from './getGlyphsMap';
+import { getRectAreaMap } from './rectAreaMap/rectAreaMap';
 import { splitAndPerformWork } from './common/splitAndPerformWork';
 
 export function formRectAreaMapKey(word: string, fontSize: number) {

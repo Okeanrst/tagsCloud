@@ -9,7 +9,7 @@ import { SceneMap, Dimensions, PositionT, SceneEdgesT } from './sceneMap';
 import { EdgesManager, edgesOrder, EDGE } from './edgesManager';
 import { VacanciesManager } from './vacanciesManager';
 import IntersectionError from './IntersectionError';
-import { getRectAreaOfRectMap } from '../getGlyphsMap';
+import { getRectAreaOfRectAreaMap } from '../rectAreaMap/rectAreaMap';
 
 import { IdRectAreaMapT, TwoDimensionalMapT, RectMapPositionT } from 'types/types';
 import type {
@@ -74,7 +74,7 @@ const mapRectAreaMapOnRectPosition = (
   isRectAreaRotated: boolean,
 ) => {
   const mappedPositions: [number, number, any][] = [];
-  const rectArea = getRectAreaOfRectMap(rectAreaMap);
+  const rectArea = getRectAreaOfRectAreaMap(rectAreaMap);
 
   const logDebugInformation = (mainInformation: string[] = []) => {
     if (['production', 'test'].includes(process.env.NODE_ENV)) {
@@ -783,7 +783,7 @@ export function calcTagsPositions(
               `rectAreaMap for rect with id: "${tagData.id}" is not found`,
             );
           }
-          const { rows, cols } = getRectAreaOfRectMap(rectAreaMap);
+          const { rows, cols } = getRectAreaOfRectAreaMap(rectAreaMap);
 
           return {
             ...tagData,
@@ -897,8 +897,8 @@ export function calcTagsPositions(
           );
         }
         const rectArea = isRotated
-          ? rotateRectArea(getRectAreaOfRectMap(rectAreaMap))
-          : getRectAreaOfRectMap(rectAreaMap);
+          ? rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap))
+          : getRectAreaOfRectAreaMap(rectAreaMap);
 
         if (index === 0 && isFromScratch) {
           const { rows, cols } = rectArea;

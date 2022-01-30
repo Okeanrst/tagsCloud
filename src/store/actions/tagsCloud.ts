@@ -12,7 +12,7 @@ import {
   rotateRectArea,
   getSceneMapVacancies,
 } from 'utilities/positioningAlgorithm/calcTagsPositions';
-import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
+import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
 import { prepareTagsData } from 'utilities/prepareTagsData';
 import { getMaxSentimentScore } from 'utilities/getMaxSentimentScore';
 import { SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
@@ -288,8 +288,8 @@ export function changeTagPosition({
     }
 
     const tagRectArea = isRotated ?
-      rotateRectArea(getRectAreaOfRectMap(rectAreaMap.map))
-      : getRectAreaOfRectMap(rectAreaMap.map);
+      rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap.map))
+      : getRectAreaOfRectAreaMap(rectAreaMap.map);
 
     if (!tagRectArea) {
       return null;

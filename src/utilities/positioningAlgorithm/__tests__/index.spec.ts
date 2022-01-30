@@ -23,9 +23,9 @@ jest.mock('utilities/common/getRandomRGBColor', () => {
   };
 });
 
-jest.mock('utilities/getGlyphsMap', () => {
+jest.mock('utilities/rectAreaMap/rectAreaMap', () => {
   return {
-    ...jest.requireActual('utilities/getGlyphsMap'),
+    ...jest.requireActual('utilities/rectAreaMap/rectAreaMap'),
     getRectAreaMap: () => {
       return {};
     },
