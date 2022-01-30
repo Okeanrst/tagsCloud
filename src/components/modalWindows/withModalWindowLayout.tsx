@@ -1,30 +1,30 @@
 import React from 'react';
-import cx from 'classnames';
 import getDisplayName from 'react-display-name';
 import ModalWindowLayout from './ModalWindowLayout';
 
-type PropsT = {
-  layoutClassName?: string;
-  layoutStyle?: React.CSSProperties;
+type EnhancedComponentPropsT = {
+  onBackdropClick?: (e: React.SyntheticEvent<EventTarget>) => void;
 };
 
 export function withModalWindowLayout<P>({
   layoutStyle,
   layoutClassName,
-}: PropsT = {}) {
-  return (WrappedComponent: React.ComponentType<P>) => {
-    const EnhancedComponent = (props: P) => (
-      <React.Fragment>
+}: {
+  layoutClassName?: string;
+  layoutStyle?: React.CSSProperties;
+} = {}) {
+  return (WrappedComponent: React.ComponentType<Omit<P, 'onBackdropClick'>>) => {
+    const EnhancedComponent = ({ onBackdropClick, ...props }: P & EnhancedComponentPropsT) => {
+      return (
         <ModalWindowLayout
-          className={cx('smallModalWindowLayout', {
-            [layoutClassName ?? '']: !!layoutClassName,
-          })}
-          key="layout"
+          className={layoutClassName}
           style={layoutStyle}
-        />
-        <WrappedComponent {...props} />
-      </React.Fragment>
-    );
+          onBackdropClick={onBackdropClick}
+        >
+          <WrappedComponent {...props} />
+        </ModalWindowLayout>
+      );
+    };
     if (process.env.NODE_ENV !== 'production') {
       EnhancedComponent.displayName = `withModalWindowLayout(${getDisplayName(
         WrappedComponent,
