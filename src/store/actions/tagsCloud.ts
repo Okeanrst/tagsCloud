@@ -14,7 +14,7 @@ import {
 } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { getRectAreaOfRectMap } from 'utilities/getGlyphsMap';
 import { prepareTagsData } from 'utilities/prepareTagsData';
-import { getMaxSentimentScore } from 'utilities/tagsCloud/getMaxSentimentScore';
+import { getMaxSentimentScore } from 'utilities/getMaxSentimentScore';
 import { SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
 import { EDGE } from 'utilities/positioningAlgorithm/edgesManager';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
