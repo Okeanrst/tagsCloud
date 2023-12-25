@@ -16,30 +16,29 @@ export function prepareRectAreasMaps(
 
     const rectAreasMaps = new Map<string, IdRectAreaMapT>();
 
-    const workGenerator: () => Generator<void> =
-      function* workGenerator() {
-        for (let i = 0; i < tagsData.length; i++) {
-          const { label, fontSize } = tagsData[i];
-          const key = formRectAreaMapKey(label, fontSize);
+    function* workGenerator(): Generator<void> {
+      for (let i = 0; i < tagsData.length; i++) {
+        const { label, fontSize } = tagsData[i];
+        const key = formRectAreaMapKey(label, fontSize);
 
-          if (rectAreasMaps.has(key)) {
-            yield;
-            continue;
-          }
-
-          const { map = null, meta = null } =
-            getRectAreaMap(canvas, {
-              word: label,
-              resolution,
-              fontSize,
-              fontFamily,
-            }) ?? {};
-
-          rectAreasMaps.set(key, { key , map, mapMeta: meta });
-
+        if (rectAreasMaps.has(key)) {
           yield;
+          continue;
         }
-      };
+
+        const { map = null, meta = null } =
+        getRectAreaMap(canvas, {
+          word: label,
+          resolution,
+          fontSize,
+          fontFamily,
+        }) ?? {};
+
+        rectAreasMaps.set(key, { key , map, mapMeta: meta });
+
+        yield;
+      }
+    }
 
     splitAndPerformWork<void>(workGenerator, 50)
       .then(() => {
