@@ -316,6 +316,7 @@ const SvgTagsCloud = ({
   const handleMouseUpEventRef = useRef(() => {});
   const zoomRef = useRef(1);
   const downloadTagCloudRef = useRef(() => {});
+  const textRefs = useRef<Record<string, { current: SVGTextElement | null }>>({});
 
   const classes = useStyles({ fontFamily });
 
@@ -691,9 +692,18 @@ const SvgTagsCloud = ({
                   },
                 };
 
+                const key = i.id + i.rectLeft + i.rectTop;
+
+                if (!textRefs.current[key]) {
+                  textRefs.current[key] = { current: null };
+                }
+                const nodeRef = textRefs.current[key];
+
                 return (
                   <Transition
-                    key={i.id + i.rectLeft + i.rectTop}
+                    key={key}
+                    // @ts-ignore
+                    nodeRef={nodeRef}
                     timeout={ANIMATION_DURATION}
                   >
                     {state => {
@@ -702,6 +712,7 @@ const SvgTagsCloud = ({
                           className={classes.text}
                           data-id={i.id}
                           key={`${i.id}_${index}`}
+                          ref={nodeRef}
                           style={{
                             ...style,
                             ...tagStyle,
