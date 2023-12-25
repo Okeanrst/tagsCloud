@@ -30,7 +30,7 @@ function calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily }: {
   resolution: number;
   fontFamily: string;
 }): ([RectAreaT, RectAreaSize, number] | null) {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
   if (!ctx) {
     return null;
@@ -186,7 +186,7 @@ function getGlyphsMap(
   rectArea: RectAreaT;
   meta: TwoDimensionalMapMetaT;
 } | null) {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
   if (!ctx) {
     return null;
@@ -354,7 +354,7 @@ function getHighResolutionGlyphsMap(
   map: TwoDimensionalMapT;
   meta: TwoDimensionalMapMetaT;
 } | null {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
   if (!ctx) {
     return null;
