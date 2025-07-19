@@ -43,7 +43,7 @@
     "redux-thunk": "^2.4.0",
     "reselect": "^4.1.5",
     "sanitize.css": "^13.0.0",
-    "serve": "^10.0.2",
+    "serve": "^14.2.4",
     "typescript": "^4.5.2",
     "web-vitals": "^1.1.2"
   },
