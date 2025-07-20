@@ -333,6 +333,7 @@ function getGlyphsMap(
 // not in use any more
 // const glyphsMap = getHighResolutionGlyphsMap(...)
 // const fullSizeRectMap = glyphsMapToRectMap(glyphsMap.map, rectArea, false);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getHighResolutionGlyphsMap(
   canvas: HTMLCanvasElement,
   {
@@ -474,6 +475,7 @@ function getHighResolutionGlyphsMap(
 }
 
 // not in use any more
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function glyphsMapToRectMap(
   glyphsMap: TwoDimensionalMapT,
   rectArea: RectAreaT,
