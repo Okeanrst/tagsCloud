@@ -9,7 +9,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
-    "@types/file-saver": "^2.0.4",
+    "@types/file-saver": "^2.0.5",
     "@types/fontfaceobserver": "^2.1.0",
     "@types/jest": "^27.5.1",
     "@types/lodash.deburr": "^4.1.6",
