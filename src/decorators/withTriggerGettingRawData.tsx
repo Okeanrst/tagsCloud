@@ -8,7 +8,7 @@ import type { RootStateT } from 'store/types';
 
 const { PRISTINE } = QueryStatuses;
 
-function withTriggerGettingRawData<T>(
+function withTriggerGettingRawData<T extends {}>(
   WrappedComponent: React.ComponentType<T>,
 ) {
   const EnhancedComponent = (props: T) => {

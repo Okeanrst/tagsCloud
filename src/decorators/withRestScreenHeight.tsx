@@ -44,7 +44,7 @@ export function withRestScreenHeight<T extends { restScreenHeight: number }>(
       };
     }, [handleResize, calcRestScreenHeight]);
 
-    const nextProps = { ...props, restScreenHeight: height };
+    const nextProps = { ...props, restScreenHeight: height } as T;
     return (
       <div
         className={classes.wrapper}
