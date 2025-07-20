@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+.pnp.*
+.yarn/*
 /.pnp
 .pnp.js
 
@@ -13,6 +15,7 @@
 
 # misc
 .idea/
+.vscode/
 .DS_Store
 .env
 .env.local
