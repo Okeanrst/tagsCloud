@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
+import cx from 'classnames';
 import settingsIconSrc from 'assets/settings.svg';
 
 const useStyles = makeStyles(theme => ({
@@ -19,6 +20,9 @@ const useStyles = makeStyles(theme => ({
     padding: `${theme.spacing(1)}px ${theme.spacing(4)}px`,
     zIndex: 20,
     backgroundColor: 'var(--navbar-color)',
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1),
+    }
   },
   navbarContent: {
     width: '100%',
@@ -64,8 +68,20 @@ const useStyles = makeStyles(theme => ({
       maxWidth: '1140px',
     },
   },
+  link: {
+    display: 'inline-block',
+    padding: '8px 16px',
+    backgroundColor: 'transparent',
+    transition: 'background-color 0.3s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    }
+  },
   settingsLink: {
     marginLeft: theme.spacing(4),
+    [theme.breakpoints.down('sm')]: {
+      marginLeft: theme.spacing(1),
+    }
   },
   settingsLinkLabel: {
     marginRight: theme.spacing(2),
@@ -88,13 +104,21 @@ export const Layout = () => {
     <div className={classes.root}>
       <nav className={classes.navbar}>
         <div className={classes.navbarContent}>
-          <Link to="/">Tags cloud</Link>
+          <Link
+            className={classes.link}
+            to="/"
+          >
+            Tags cloud
+          </Link>
           <div>
-            <Link to="/tagsListEditor">
+            <Link
+              className={classes.link}
+              to="/tagsListEditor"
+            >
               Tags editor
             </Link>
             <Link
-              className={classes.settingsLink}
+              className={cx(classes.link, classes.settingsLink)}
               to="/settings"
             >
               <span className={classes.settingsLinkLabel}>Settings</span>
