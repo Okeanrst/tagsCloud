@@ -226,7 +226,7 @@ export function creatMapPositionedTagRect(
 export const preparePositionedTagRect = (
   mapPositionedTagRect: MapPositionedTagRectT,
   rectAreaMapMeta: IdRectAreaMapT['mapMeta'],
-  sceneMapUnitSize: number
+  sceneMapUnitSize: number,
 ) => {
   const { top, right, bottom, left } = mapPositionedTagRect;
   const topEdge = SceneMap.getPositionRightEdge(top);
@@ -290,8 +290,8 @@ function isClosedVacancyLargeEnoughToFitRect(
 export const pickClosedVacancy = (
   rectArea: RectAreaT,
   vacancies: (ClosedVacancyT | void)[],
-  { pickingStrategy }: { pickingStrategy: PickingStrategies }
-): { rectPosition: RectMapPositionT, vacancyIndex: number } | void => {
+  { pickingStrategy }: { pickingStrategy: PickingStrategies },
+): { rectPosition: RectMapPositionT; vacancyIndex: number } | void => {
   const loopParams: LoopParamsT = {
     [ASC]: {
       from: 0,
@@ -310,10 +310,7 @@ export const pickClosedVacancy = (
   let vacancyIndex: number = -1;
   for (let i = from; condition(i); i += diff) {
     const possiblySuitableVacancy = vacancies[i];
-    if (
-      possiblySuitableVacancy &&
-      isClosedVacancyLargeEnoughToFitRect(rectArea, possiblySuitableVacancy)
-    ) {
+    if (possiblySuitableVacancy && isClosedVacancyLargeEnoughToFitRect(rectArea, possiblySuitableVacancy)) {
       suitableVacancy = vacancies[i];
       vacancyIndex = i;
       break;
@@ -339,18 +336,14 @@ export const pickClosedVacancy = (
 
   if (suitableVacancy.square / rectAreaSquare > SQUARE_RATION_LIMIT) {
     // from edge
-    if (
-      Math.abs(suitableVacancy.right) > Math.abs(suitableVacancy.left)
-    ) {
+    if (Math.abs(suitableVacancy.right) > Math.abs(suitableVacancy.left)) {
       left = suitableVacancy.left;
       right = countPositionsFroward(suitableVacancy.left, rectArea.cols);
     } else {
       right = suitableVacancy.right;
       left = countPositionsBackwards(right, rectArea.cols);
     }
-    if (
-      Math.abs(suitableVacancy.bottom) > Math.abs(suitableVacancy.top)
-    ) {
+    if (Math.abs(suitableVacancy.bottom) > Math.abs(suitableVacancy.top)) {
       top = suitableVacancy.top;
       bottom = countPositionsBackwards(top, rectArea.rows);
     } else {
@@ -359,12 +352,8 @@ export const pickClosedVacancy = (
     }
   } else {
     // center
-    const rowsDiffHalf = Math.round(
-      (suitableVacancy.rows - rectArea.rows) / 2,
-    );
-    const colsDiffHalf = Math.round(
-      (suitableVacancy.cols - rectArea.cols) / 2,
-    );
+    const rowsDiffHalf = Math.round((suitableVacancy.rows - rectArea.rows) / 2);
+    const colsDiffHalf = Math.round((suitableVacancy.cols - rectArea.cols) / 2);
     top = SceneMap.changePosition(suitableVacancy.top, -rowsDiffHalf);
     right = SceneMap.changePosition(suitableVacancy.right, -colsDiffHalf);
     bottom = countPositionsBackwards(top, rectArea.rows);
@@ -390,8 +379,7 @@ export const pickEdgeVacancy = <T extends Array<PreparedTopEdgeVacancyT | Prepar
   const countPositionsBackwards = SceneMap.countPositionsBackwards;
   const countPositions = SceneMap.countPositions;
 
-  const howOppositeSizeStandForEdge = (begin: number, end: number) =>
-    countPositions(begin, end) / oppositeSize;
+  const howOppositeSizeStandForEdge = (begin: number, end: number) => countPositions(begin, end) / oppositeSize;
 
   const howBaseSizeStandForEdge = (begin?: number, end?: number): number => {
     if (typeof begin === 'undefined' || typeof end === 'undefined') {
@@ -779,9 +767,7 @@ export function calcTagsPositions(
           const { map: rectAreaMap } = rectAreaMapByKey.get(formRectAreaMapKey(tagData.label, tagData.fontSize)) ?? {};
 
           if (!rectAreaMap) {
-            throw new Error(
-              `rectAreaMap for rect with id: "${tagData.id}" is not found`,
-            );
+            throw new Error(`rectAreaMap for rect with id: "${tagData.id}" is not found`);
           }
           const { rows, cols } = getRectAreaOfRectAreaMap(rectAreaMap);
 
@@ -812,7 +798,7 @@ export function calcTagsPositions(
       ) => {
         const mappedPositions = mapRectAreaMapOnRectPosition(rectPosition, rectAreaMap, isRectAreaRotated);
 
-        sceneMap.bulkOccupyPosition(mappedPositions.filter(([,, value]) => value));
+        sceneMap.bulkOccupyPosition(mappedPositions.filter(([, , value]) => value));
 
         vacanciesManager.needVacanciesRebuild = true;
 
@@ -874,9 +860,7 @@ export function calcTagsPositions(
         }
       };
 
-      const rebuildVacanciesMap = (
-        shouldCreateVacancyIfNoSuchKind: boolean,
-      ) => {
+      const rebuildVacanciesMap = (shouldCreateVacancyIfNoSuchKind: boolean) => {
         vacanciesManager.buildVacanciesMap({ shouldCreateVacancyIfNoSuchKind });
 
         // vacanciesManager.filterUnsuitableClosedVacancies(vacancyFilter);
@@ -892,9 +876,7 @@ export function calcTagsPositions(
       ) => {
         const { map: rectAreaMap } = rectAreaMapByKey.get(formRectAreaMapKey(rect.label, rect.fontSize)) ?? {};
         if (!rectAreaMap) {
-          throw new Error(
-            `rectAreaMap for rect with id: "${rect.id}" is not found`,
-          );
+          throw new Error(`rectAreaMap for rect with id: "${rect.id}" is not found`);
         }
         const rectArea = isRotated
           ? rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap))
@@ -911,9 +893,7 @@ export function calcTagsPositions(
           const rectPosition = { top, right, bottom, left };
 
           updateSceneMap(rectPosition, rectAreaMap, isRotated);
-          positionedRectsData.push(
-            creatMapPositionedTagRect(rect, rectPosition, isRotated),
-          );
+          positionedRectsData.push(creatMapPositionedTagRect(rect, rectPosition, isRotated));
 
           return { status: true, isRotated };
         }
@@ -938,9 +918,7 @@ export function calcTagsPositions(
           if (rectPosition && pickedVacancyIndex) {
             try {
               updateSceneMap(rectPosition, rectAreaMap, isRotated);
-              positionedRectsData.push(
-                creatMapPositionedTagRect(rect, rectPosition, isRotated),
-              );
+              positionedRectsData.push(creatMapPositionedTagRect(rect, rectPosition, isRotated));
             } catch (e) {
               if (e instanceof IntersectionError && vacanciesManager.needVacanciesRebuild) {
                 rebuildVacanciesMap(shouldCreateVacancyIfNoSuchKind);
@@ -1009,9 +987,7 @@ export function calcTagsPositions(
             if (rectPosition) {
               try {
                 updateSceneMap(rectPosition, rectAreaMap, isRotated);
-                positionedRectsData.push(
-                  creatMapPositionedTagRect(rect, rectPosition, isRotated),
-                );
+                positionedRectsData.push(creatMapPositionedTagRect(rect, rectPosition, isRotated));
 
                 rebuildVacanciesMap(shouldCreateVacancyIfNoSuchKind);
                 return { status: true, isRotated };
@@ -1043,9 +1019,7 @@ export function calcTagsPositions(
 
           try {
             updateSceneMap(rectPosition, rectAreaMap, isRotated);
-            positionedRectsData.push(
-              creatMapPositionedTagRect(rect, rectPosition, isRotated),
-            );
+            positionedRectsData.push(creatMapPositionedTagRect(rect, rectPosition, isRotated));
 
             rebuildVacanciesMap(shouldCreateVacancyIfNoSuchKind);
             edgesManager.confirmEdgeUsage(edge);
