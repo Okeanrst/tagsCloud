@@ -29,6 +29,9 @@ const useStyles = makeStyles({
     backgroundColor: 'transparent',
     appearance: 'none',
     cursor: 'pointer',
+    '&:disabled': {
+      cursor: 'default',
+    }
   }
 });
 
