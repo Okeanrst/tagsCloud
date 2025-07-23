@@ -44,15 +44,17 @@ const filterPreparedTagsDataWithoutRectAreasMaps = (
   rectAreasMapsData: RootStateT['rectAreasMapsData'],
 ) => {
   const rectAreasMapsKeys = new Set(rectAreasMapsData.map(({ key }) => key));
-  return  preparedTagsData.filter(({ label, fontSize }) => {
+  return preparedTagsData.filter(({ label, fontSize }) => {
     return !rectAreasMapsKeys.has(formRectAreaMapKey(label, fontSize));
   });
 };
 
 const findUnusedRectAreasMapsKeys = (state: RootStateT) => {
-  const usedKeys = new Set(state.tagsCloud?.tagsPositions?.map(({ label, fontSize }) => {
-    return formRectAreaMapKey(label, fontSize);
-  }) ?? []);
+  const usedKeys = new Set(
+    state.tagsCloud?.tagsPositions?.map(({ label, fontSize }) => {
+      return formRectAreaMapKey(label, fontSize);
+    }) ?? [],
+  );
   const unusedKeys: string[] = [];
   state.rectAreasMapsData.forEach(({ key }) => {
     if (!usedKeys.has(key)) {
@@ -91,7 +93,10 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
     const { settings } = getState();
     const { fontFamily, sceneMapResolution, minFontSize, maxFontSize } = settings;
     const preparedTagsData = prepareTagsData(tagsData, { minFontSize, maxFontSize, maxSentimentScore });
-    const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
+    const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(
+      preparedTagsData,
+      getState().rectAreasMapsData,
+    );
     return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, {
       resolution: sceneMapResolution,
       fontFamily,
@@ -104,10 +109,7 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
       })
       .then(({ tagsPositions, sceneMapPositions, vacancies }) => {
         dispatch(
-          createAction(
-            actionTypes.TAGS_CLOUD_BUILD_SUCCESS,
-            { tagsPositions, sceneMap: sceneMapPositions, vacancies },
-          ),
+          createAction(actionTypes.TAGS_CLOUD_BUILD_SUCCESS, { tagsPositions, sceneMap: sceneMapPositions, vacancies }),
         );
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_REMOVE_MAPS, findUnusedRectAreasMapsKeys(getState())));
       })
@@ -126,7 +128,10 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
 
     const maxSentimentScore = selectMaxSentimentScore(getState());
     const preparedTagsData = prepareTagsData(tagsData, { minFontSize, maxFontSize, maxSentimentScore });
-    const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(preparedTagsData, getState().rectAreasMapsData);
+    const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(
+      preparedTagsData,
+      getState().rectAreasMapsData,
+    );
     return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, {
       resolution: sceneMapResolution,
       fontFamily,
@@ -141,12 +146,13 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
           addIfEmptyIndex: calcTagsPositionsOptions.addIfEmptyIndex - (getState().tagsCloud.tagsPositions?.length ?? 0),
         });
       })
-      .then(({ tagsPositions , sceneMapPositions, vacancies }) => {
+      .then(({ tagsPositions, sceneMapPositions, vacancies }) => {
         dispatch(
-          createAction(
-            actionTypes.INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS,
-            { tagsPositions, sceneMap: sceneMapPositions, vacancies },
-          ),
+          createAction(actionTypes.INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS, {
+            tagsPositions,
+            sceneMap: sceneMapPositions,
+            vacancies,
+          }),
         );
       })
       .catch(() => {
@@ -188,7 +194,11 @@ const createRemoveTagAction = (targetId: string, getState: GetStateT): AnyAction
 
   const vacancies = getSceneMapVacancies(sceneMap);
 
-  return createAction(actionTypes.TAGS_CLOUD_REMOVE_TAG, { tagId: targetId, sceneMap: sceneMap.toPositions(), vacancies });
+  return createAction(actionTypes.TAGS_CLOUD_REMOVE_TAG, {
+    tagId: targetId,
+    sceneMap: sceneMap.toPositions(),
+    vacancies,
+  });
 };
 
 export function deleteDataItem(targetId: string) {
@@ -205,7 +215,10 @@ export function deleteDataItem(targetId: string) {
 
     dispatch(createAction(actionTypes.TAGS_DATA_DELETE_DATA_ITEM, targetId));
 
-    if (itemSentimentScore >= currentMaxSentimentScore && selectMaxSentimentScore(getState()) !== currentMaxSentimentScore) {
+    if (
+      itemSentimentScore >= currentMaxSentimentScore &&
+      selectMaxSentimentScore(getState()) !== currentMaxSentimentScore
+    ) {
       dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
     } else {
       const removeTagAction = createRemoveTagAction(targetId, getState);
@@ -225,7 +238,8 @@ export function editDataItem(tagData: TagDataT) {
     }
     const { sentimentScore: currentSentimentScore, color: currentColor } = currentTagDataItem;
     const currentMaxSentimentScore = selectMaxSentimentScore(getState());
-    let shouldResetTagsCloud = currentTagDataItem.label !== tagData.label || currentMaxSentimentScore < tagData.sentimentScore;
+    let shouldResetTagsCloud =
+      currentTagDataItem.label !== tagData.label || currentMaxSentimentScore < tagData.sentimentScore;
     dispatch(createAction(actionTypes.TAGS_DATA_EDIT_DATA_ITEM, tagData));
 
     shouldResetTagsCloud = shouldResetTagsCloud || selectMaxSentimentScore(getState()) !== currentMaxSentimentScore;
@@ -268,10 +282,18 @@ export function changeTagPosition({
   tagId,
   vacancy,
   vacancyKind,
-  isRotated
-}: { tagId: string; vacancy: VacancyT; vacancyKind: VacancyKinds, isRotated: boolean }) {
+  isRotated,
+}: {
+  tagId: string;
+  vacancy: VacancyT;
+  vacancyKind: VacancyKinds;
+  isRotated: boolean;
+}) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
-    const { tagsCloud: { sceneMap: sceneMapPositions, tagsPositions }, rectAreasMapsData: rectAreasMaps } = getState();
+    const {
+      tagsCloud: { sceneMap: sceneMapPositions, tagsPositions },
+      rectAreasMapsData: rectAreasMaps,
+    } = getState();
 
     const currentTagPosition = tagsPositions?.find(({ id }) => id === tagId);
 
@@ -287,8 +309,8 @@ export function changeTagPosition({
       return null;
     }
 
-    const tagRectArea = isRotated ?
-      rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap.map))
+    const tagRectArea = isRotated
+      ? rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap.map))
       : getRectAreaOfRectAreaMap(rectAreaMap.map);
 
     if (!tagRectArea) {
@@ -300,39 +322,48 @@ export function changeTagPosition({
 
     let rectPosition;
     if (vacancyKind === VacancyKinds.closedVacancies) {
-      ({ rectPosition } = pickClosedVacancy(tagRectArea, [vacancy as ClosedVacancyT], {
-        pickingStrategy: calcTagsPositionsOptions.pickingClosedVacancyStrategy,
-      }) ?? {});
-    } else if ([VacancyKinds.topEdgeVacancies, VacancyKinds.bottomEdgeVacancies, VacancyKinds.rightEdgeVacancies, VacancyKinds.leftEdgeVacancies].includes(vacancyKind)) {
-       const sceneEdges = new SceneMap(sceneMapPositions).getSceneEdges();
-       let edge;
-       let vacancies;
-       switch (vacancyKind) {
-         case VacancyKinds.topEdgeVacancies: {
-           edge = EDGE.TOP;
-           vacancies = [vacancy as PreparedTopEdgeVacancyT];
-           break;
-         }
-         case VacancyKinds.bottomEdgeVacancies: {
-           edge = EDGE.BOTTOM;
-           vacancies = [vacancy as PreparedBottomEdgeVacancyT];
-           break;
-         }
-         case VacancyKinds.leftEdgeVacancies: {
-           edge = EDGE.LEFT;
-           vacancies = [vacancy as PreparedLeftEdgeVacancyT];
-           break;
-         }
-         case VacancyKinds.rightEdgeVacancies: {
-           edge = EDGE.RIGHT;
-           vacancies = [vacancy as PreparedRightEdgeVacancyT];
-           break;
-         }
-       }
-       ({ rectPosition } = pickEdgeVacancy(tagRectArea, vacancies, sceneEdges, edge, {
-         force: true,
-         pickingStrategy: calcTagsPositionsOptions.pickingEdgeVacancyStrategy
-       }) ?? {});
+      ({ rectPosition } =
+        pickClosedVacancy(tagRectArea, [vacancy as ClosedVacancyT], {
+          pickingStrategy: calcTagsPositionsOptions.pickingClosedVacancyStrategy,
+        }) ?? {});
+    } else if (
+      [
+        VacancyKinds.topEdgeVacancies,
+        VacancyKinds.bottomEdgeVacancies,
+        VacancyKinds.rightEdgeVacancies,
+        VacancyKinds.leftEdgeVacancies,
+      ].includes(vacancyKind)
+    ) {
+      const sceneEdges = new SceneMap(sceneMapPositions).getSceneEdges();
+      let edge;
+      let vacancies;
+      switch (vacancyKind) {
+        case VacancyKinds.topEdgeVacancies: {
+          edge = EDGE.TOP;
+          vacancies = [vacancy as PreparedTopEdgeVacancyT];
+          break;
+        }
+        case VacancyKinds.bottomEdgeVacancies: {
+          edge = EDGE.BOTTOM;
+          vacancies = [vacancy as PreparedBottomEdgeVacancyT];
+          break;
+        }
+        case VacancyKinds.leftEdgeVacancies: {
+          edge = EDGE.LEFT;
+          vacancies = [vacancy as PreparedLeftEdgeVacancyT];
+          break;
+        }
+        case VacancyKinds.rightEdgeVacancies: {
+          edge = EDGE.RIGHT;
+          vacancies = [vacancy as PreparedRightEdgeVacancyT];
+          break;
+        }
+      }
+      ({ rectPosition } =
+        pickEdgeVacancy(tagRectArea, vacancies, sceneEdges, edge, {
+          force: true,
+          pickingStrategy: calcTagsPositionsOptions.pickingEdgeVacancyStrategy,
+        }) ?? {});
     }
 
     if (!rectPosition) {
@@ -341,14 +372,25 @@ export function changeTagPosition({
 
     const nextMapPositionedTagRect = creatMapPositionedTagRect(currentTagPosition, rectPosition, isRotated);
 
-    const sceneMap = moveRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, nextMapPositionedTagRect, rectAreaMap.map);
+    const sceneMap = moveRectAreaPositionsOnSceneMap(
+      sceneMapPositions,
+      currentTagPosition,
+      nextMapPositionedTagRect,
+      rectAreaMap.map,
+    );
 
-    preparePositionedTagRect(nextMapPositionedTagRect, rectAreaMap.mapMeta, calcTagsPositionsOptions.sceneMapResolution);
+    preparePositionedTagRect(
+      nextMapPositionedTagRect,
+      rectAreaMap.mapMeta,
+      calcTagsPositionsOptions.sceneMapResolution,
+    );
 
-    dispatch(createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG, {
-      tagPosition: nextMapPositionedTagRect,
-      sceneMap: sceneMap.toPositions(),
-      vacancies: getSceneMapVacancies(sceneMap),
-    }));
+    dispatch(
+      createAction(actionTypes.TAGS_CLOUD_UPDATE_TAG, {
+        tagPosition: nextMapPositionedTagRect,
+        sceneMap: sceneMap.toPositions(),
+        vacancies: getSceneMapVacancies(sceneMap),
+      }),
+    );
   };
 }

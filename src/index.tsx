@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import * as Sentry from "@sentry/react";
+import * as Sentry from '@sentry/react';
+import packageJson from '../package.json';
 import { App } from './App';
 import reportWebVitals from './reportWebVitals';
-import packageJson from '../package.json';
 import { config } from './config';
 
 Sentry.init({
