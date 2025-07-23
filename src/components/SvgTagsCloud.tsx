@@ -1,4 +1,13 @@
-import React, { useCallback, useState, useMemo, useRef, useEffect, MutableRefObject } from 'react';
+import React, {
+  useCallback,
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  useImperativeHandle,
+  MutableRefObject,
+  forwardRef,
+} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles, Theme } from '@material-ui/core';
 import { Transition, TransitionGroup } from 'react-transition-group';
@@ -235,7 +244,7 @@ const getActiveVacanciesByCoordinates = (point: CoordinatesT, rectArea: RectArea
 };
 
 const sortActiveVacancies = (vacancies: VacanciesT) => {
-  const sortedVacancies: {vacancy: VacancyT, kind: VacancyKinds}[] = [];
+  const sortedVacancies: { vacancy: VacancyT, kind: VacancyKinds }[] = [];
   for (let kind of Object.values(VacancyKinds)) {
     sortedVacancies.push(...(vacancies[kind].map(vacancy => ({ vacancy, kind }))));
   }
@@ -268,7 +277,7 @@ const canvasCoordinatesToSceneCoordinates = (canvasCoordinates: CoordinatesT, { 
 
 const sceneCoordinatesToCanvasCoordinates = (
   sceneCoordinates: CoordinatesT,
-  { sceneMapEdges, zoom, sceneMapResolution }: {sceneMapEdges: SceneEdgesT, zoom: number, sceneMapResolution: number}
+  { sceneMapEdges, zoom, sceneMapResolution }: { sceneMapEdges: SceneEdgesT, zoom: number, sceneMapResolution: number }
 ) => {
   const { x, y } = sceneCoordinates;
 
@@ -293,12 +302,20 @@ const stateSelector = (state: RootStateT) => {
   const {
     tagsCloud: { tagsPositions, vacancies, sceneMap: sceneMapPositions },
     rectAreasMapsData: rectAreasMaps,
-    settings: { fontFamily, sceneMapResolution },
+    settings: { fontFamily, sceneMapResolution, tagByTagRenderInterval },
   } = state;
-  return { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions, fontFamily, sceneMapResolution  };
+  return {
+    tagsPositions,
+    vacancies,
+    rectAreasMaps,
+    sceneMapPositions,
+    fontFamily,
+    sceneMapResolution,
+    tagByTagRenderInterval,
+  };
 };
 
-const SvgTagsCloud = ({
+const SvgTagsCloud = forwardRef<{ play: () => void }, PropsT>(({
   width,
   height,
   onTagClick,
@@ -306,8 +323,16 @@ const SvgTagsCloud = ({
   isCoordinateGridShown,
   isReactAreasShown,
   isVacanciesShown,
-}: PropsT) => {
-  const { tagsPositions, vacancies, rectAreasMaps, sceneMapPositions, fontFamily, sceneMapResolution } = useSelector(stateSelector);
+}, ref) => {
+  const {
+    tagsPositions,
+    vacancies,
+    rectAreasMaps,
+    sceneMapPositions,
+    fontFamily,
+    sceneMapResolution,
+    tagByTagRenderInterval,
+  } = useSelector(stateSelector);
   const dispatch = useDispatch();
 
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -317,6 +342,14 @@ const SvgTagsCloud = ({
   const zoomRef = useRef(1);
   const downloadTagCloudRef = useRef(() => {});
   const textRefs = useRef<Record<string, { current: SVGTextElement | null }>>({});
+
+  const [tagEndIndexToShow, setTagEndIndexToShow] = useState<number>(-1);
+
+  useImperativeHandle(ref, () => ({
+    play: () => {
+      setTagEndIndexToShow(1);
+    },
+  }), []);
 
   const classes = useStyles({ fontFamily });
 
@@ -378,6 +411,23 @@ const SvgTagsCloud = ({
     return sortActiveVacancies(vacancies);
   }, [vacancies, isVacanciesShown]);
 
+  const tagsCount = tagsSvgData?.data?.length ?? 0;
+
+  useEffect(() => {
+    if (!tagsCount || tagEndIndexToShow === -1) {
+      return;
+    }
+    if (tagEndIndexToShow >= tagsCount) {
+      setTagEndIndexToShow(-1);
+    }
+    const timeout = setTimeout(() => {
+      setTagEndIndexToShow((v) => v + 1);
+    }, tagByTagRenderInterval * 100);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [tagsCount, tagEndIndexToShow, tagByTagRenderInterval]);
+
   const onContextMenu = useCallback((e: React.SyntheticEvent<EventTarget>) => {
     if (!(e.target instanceof SVGTextElement)) {
       return;
@@ -419,10 +469,10 @@ const SvgTagsCloud = ({
 
     const {
       x: rectLeftCanvasCoordinate,
-      y: rectTopCanvasCoordinate
+      y: rectTopCanvasCoordinate,
     } = sceneCoordinatesToCanvasCoordinates({
       x: tagPosition.rectLeft,
-      y: tagPosition.rectTop
+      y: tagPosition.rectTop,
     }, { sceneMapEdges, zoom: zoomRef.current, sceneMapResolution });
 
     const canvasWrapperRect = canvasWrapperRef.current?.getBoundingClientRect();
@@ -656,7 +706,7 @@ const SvgTagsCloud = ({
               component={null}
               exite={false}
             >
-              {positionedTagSvgData.map((i, index: number) => {
+              {(tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow)).map((i, index: number) => {
                 const style: React.CSSProperties = {
                   fontSize: `${i.fontSize}px`,
                   fill: i.color,
@@ -760,7 +810,7 @@ const SvgTagsCloud = ({
       </div>
     </div>
   );
-};
+});
 
 const coordinateGridCanvasStyle: React.CSSProperties = {
   position: 'absolute',

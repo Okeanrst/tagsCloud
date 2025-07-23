@@ -149,6 +149,7 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   tagsCloudSceneRef = React.createRef<HTMLDivElement>();
+  svgTagsCloudRef = React.createRef<{ play: () => void }>();
 
   resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -282,7 +283,7 @@ class TagsCloud extends Component<PropsT, StateT> {
   );
 
   renderActionButtons = (disabled: boolean) => {
-    const { classes, triggerRebuild } = this.props;
+    const { classes, triggerRebuild, shouldUseCanvas } = this.props;
     return (
       <div className={classes.rebuildButtonContainer}>
         <button
@@ -302,6 +303,13 @@ class TagsCloud extends Component<PropsT, StateT> {
           onClick={triggerRebuild}
         >
           Rebuild
+        </PrimaryButton>
+        <PrimaryButton
+          classes={{ root: classes.rebuildButton }}
+          disabled={disabled || shouldUseCanvas}
+          onClick={() => this.svgTagsCloudRef.current?.play()}
+        >
+          Play
         </PrimaryButton>
       </div>
     );
@@ -377,6 +385,7 @@ class TagsCloud extends Component<PropsT, StateT> {
           isCoordinateGridShown={isCoordinateGridShown}
           isReactAreasShown={isReactAreasShown}
           isVacanciesShown={isVacanciesShown}
+          ref={this.svgTagsCloudRef}
           width={tagsCloudSceneSize.width}
           onTagClick={this.onTagClick}
         />

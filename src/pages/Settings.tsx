@@ -8,6 +8,8 @@ import {
   MAX_FONT_SIZE,
   MAX_SCENE_MAP_RESOLUTION,
   MIN_SCENE_MAP_RESOLUTION,
+  MIN_TAG_BY_TAG_RENDER_INTERVAL,
+  MAX_TAG_BY_TAG_RENDER_INTERVAL,
   FontFamilies,
   PickingStrategies,
   SortingClosedVacanciesStrategies,
@@ -73,6 +75,7 @@ const validate = (values: RootStateT['settings']): Partial<{ [key in SettingsKey
     sceneMapResolution,
     minFontSize,
     maxFontSize,
+    tagByTagRenderInterval,
   } = values;
   if (!fontFamily) {
     return { fontFamily: 'required' };
@@ -115,6 +118,13 @@ const validate = (values: RootStateT['settings']): Partial<{ [key in SettingsKey
 
   if (minFontSize > maxFontSize) {
     return { minFontSize: `more then maxFontSize`, maxFontSize: `less then minFontSize` };
+  }
+
+  if (MIN_TAG_BY_TAG_RENDER_INTERVAL > tagByTagRenderInterval) {
+    return { tagByTagRenderInterval: `less then ${MIN_TAG_BY_TAG_RENDER_INTERVAL}` };
+  }
+  if (MAX_TAG_BY_TAG_RENDER_INTERVAL < tagByTagRenderInterval) {
+    return { tagByTagRenderInterval: `more then ${MAX_TAG_BY_TAG_RENDER_INTERVAL}` };
   }
 
   return null;
@@ -266,6 +276,18 @@ export const Settings = () => {
         name="sortingEdgeVacanciesStrategy"
         options={sortingEdgeVacanciesOptions}
         value={values.sortingEdgeVacanciesStrategy}
+        onChange={onInputChange}
+      />
+      <InputFormField
+        required
+        classes={{ helperText: classes.helperText, root: classes.notFirstFormControl }}
+        helperText={errors?.tagByTagRenderInterval}
+        label="tagByTagRenderInterval"
+        max={MAX_TAG_BY_TAG_RENDER_INTERVAL}
+        min={MIN_TAG_BY_TAG_RENDER_INTERVAL}
+        name="tagByTagRenderInterval"
+        type="number"
+        value={values.tagByTagRenderInterval}
         onChange={onInputChange}
       />
     </form>

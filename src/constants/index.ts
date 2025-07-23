@@ -6,6 +6,9 @@ export const MIN_FONT_SIZE = 8;
 export const MAX_FONT_SIZE = 300;
 export const DEFAULT_MIN_FONT_SIZE = 8;
 export const DEFAULT_MAX_FONT_SIZE = 160;
+export const DEFAULT_TAG_BY_TAG_RENDER_INTERVAL = 5; // in hundreds of milliseconds
+export const MIN_TAG_BY_TAG_RENDER_INTERVAL = 1;
+export const MAX_TAG_BY_TAG_RENDER_INTERVAL = 20;
 
 export enum PickingStrategies {
   ASC = 'ascendant',

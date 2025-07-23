@@ -6,6 +6,7 @@ import {
   SortingEdgeVacanciesStrategies,
   DEFAULT_MIN_FONT_SIZE,
   DEFAULT_MAX_FONT_SIZE,
+  DEFAULT_TAG_BY_TAG_RENDER_INTERVAL,
 } from 'constants/index';
 import { RootStateT } from '../types';
 import { AnyAction } from 'redux';
@@ -26,6 +27,7 @@ const initState: RootStateT['settings'] = {
   sceneMapResolution: DEFAULT_SCENE_MAP_RESOLUTION,
   minFontSize: DEFAULT_MIN_FONT_SIZE,
   maxFontSize: DEFAULT_MAX_FONT_SIZE,
+  tagByTagRenderInterval: DEFAULT_TAG_BY_TAG_RENDER_INTERVAL,
 };
 
 export const settingsReducer = (

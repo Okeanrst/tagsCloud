@@ -7,6 +7,10 @@ const useStyles = makeStyles({
   root: {
     color: 'var(--white-color)',
     backgroundColor: 'var(--primary-main-color)!important',
+    '&:disabled': {
+      color: 'var(--white-disabled-text)',
+      backgroundColor: 'var(--primary-disabled-bg)!important',
+    }
   }
 });
 

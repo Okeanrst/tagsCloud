@@ -27,6 +27,8 @@ body {
   --success-color: #2e7d32;
   --blue900-color: #01579b;
   --grey300-color: #E0E0E0;
+  --primary-disabled-bg: rgba(56, 103, 146, 0.13);
+  --white-disabled-text: #ffffff4D;
 }
 
 [data-color-scheme='dark'] {

@@ -41,6 +41,7 @@ export type RootStateT = {
     sceneMapResolution: number,
     minFontSize: number,
     maxFontSize: number,
+    tagByTagRenderInterval: number,
   },
   tagsData: {
     data: ReadonlyArray<TagDataT>;
