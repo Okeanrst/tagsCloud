@@ -90,7 +90,7 @@ class TagForm extends Component<PropsT, StateT> {
     const {
       label = '',
       color,
-      sentimentScore = 0,
+      sentimentScore = 1,
     } = props.initValues ?? {};
     this.state = {
       errors: null,
