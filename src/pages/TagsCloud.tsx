@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { createStyles, withStyles } from '@material-ui/core';
+import { createStyles, Theme, withStyles } from '@material-ui/core';
 import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from 'store/actions/tagsCloud';
 import { loadFont } from 'store/actions/loadFont';
@@ -45,7 +45,7 @@ const mapDispatchToProps = (dispatch: AppDispatchT) => ({
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-const styles = createStyles({
+const styles = (theme: Theme) => createStyles({
   pageContainer: {
     position: 'relative',
     minHeight: '250px',
@@ -64,12 +64,17 @@ const styles = createStyles({
     right: 0,
     zIndex: 6,
   },
-  tagsCloudScene: {
+  controls: {
     width: '100%',
     display: 'flex',
-    justifyContent: 'center',
-    position: 'relative',
-    flexGrow: 12,
+    justifyContent: 'space-between',
+    '& > *:not(:first-child)': {
+      marginLeft: theme.spacing(1),
+    },
+  },
+  controlsBox: {
+    display: 'flex',
+    alignItems: 'center',
   },
   downloadButton: {
     border: 'none',
@@ -77,48 +82,52 @@ const styles = createStyles({
     cursor: 'pointer',
   },
   downloadIcon: {
-    width: '32px',
-    height: '32px',
+    width: theme.spacing(4),
+    height: theme.spacing(4),
   },
-  rebuildButton: {
-    marginLeft: '16px',
+  actionMainButton: {
+    marginLeft: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1),
+    }
   },
-  settingsControlsWrapper: {
+  debugSettingsControls: {
     display: 'flex',
-    flexDirection: 'column',
-    position: 'absolute',
-    right: 0,
-    zIndex: 3,
+    alignItems: 'center',
+    position: 'relative',
+    height: '100%',
   },
   toggleIsSettingsControlsButton: {
-    position: 'absolute',
-    top: 0,
-    right: '-20px',
     width: '20px',
     minWidth: '20px!important',
     height: '16px',
     lineHeight: '16px',
   },
-  settingsControls: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '8px',
-    textAlign: 'left',
-    backgroundColor: '#d2d2d2',
-  },
-  rebuildButtonContainer: {
-    justifyContent: 'center',
-    display: 'flex',
+  debugMenuCollapse: {
     position: 'absolute',
-    top: '0px',
-    left: '50%',
-    right: '50%',
+    right: 0,
+    top: '100%',
     zIndex: 3,
   },
-  controls: {
-    position: 'absolute',
-    top: '0px',
-    zIndex: 5,
+  debugMenu: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: theme.spacing(1),
+    textAlign: 'left',
+    backgroundColor: '#d2d2d2',
+    whiteSpace: 'nowrap',
+  },
+  actionControls: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  tagsCloudScene: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    position: 'relative',
+    flexGrow: 12,
+    marginTop: theme.spacing(1),
   },
 });
 
@@ -290,7 +299,7 @@ class TagsCloud extends Component<PropsT, StateT> {
   renderActionButtons = (disabled: boolean) => {
     const { classes, triggerRebuild, shouldUseCanvas } = this.props;
     return (
-      <div className={classes.rebuildButtonContainer}>
+      <div className={classes.actionControls}>
         <button
           className={classes.downloadButton}
           disabled={disabled}
@@ -303,24 +312,24 @@ class TagsCloud extends Component<PropsT, StateT> {
           />
         </button>
         <PrimaryButton
-          classes={{ root: classes.rebuildButton }}
+          classes={{ root: classes.actionMainButton }}
           disabled={disabled}
           onClick={triggerRebuild}
         >
           Rebuild
         </PrimaryButton>
         <PrimaryButton
-          classes={{ root: classes.rebuildButton }}
+          classes={{ root: classes.actionMainButton }}
           disabled={disabled || shouldUseCanvas}
           onClick={() => this.svgTagsCloudRef.current?.play()}
         >
-          Play
+          One by one
         </PrimaryButton>
       </div>
     );
   };
 
-  renderSettings = () => {
+  renderDebugSettings = () => {
     const {
       toggleIsSettingsControlsShown,
       toggleIsCoordinateGridShown,
@@ -330,15 +339,18 @@ class TagsCloud extends Component<PropsT, StateT> {
     const { classes, shouldUseCanvas } = this.props;
     const { isSettingsControlsShown, isCoordinateGridShown, isReactAreasShown, isVacanciesShown } = this.state;
     return (
-      <div className={classes.settingsControlsWrapper}>
+      <div className={classes.debugSettingsControls}>
         <TextButton
           classes={{ root: classes.toggleIsSettingsControlsButton }}
           onClick={toggleIsSettingsControlsShown}
         >
           {isSettingsControlsShown ? '-' : '+'}
         </TextButton>
-        <Collapse isOpen={isSettingsControlsShown} >
-          <div className={classes.settingsControls}>
+        <Collapse
+          className={classes.debugMenuCollapse}
+          isOpen={isSettingsControlsShown}
+        >
+          <div className={classes.debugMenu}>
             {!shouldUseCanvas && (
               <Checkbox
                 checked={isCoordinateGridShown}
@@ -360,6 +372,27 @@ class TagsCloud extends Component<PropsT, StateT> {
             )}
           </div>
         </Collapse>
+      </div>
+    );
+  };
+
+  renderControls = (loading: boolean) => {
+    const { shouldUseCanvas, classes, tagsCloud } = this.props;
+    return (
+      <div className={classes.controls}>
+        <div className={classes.controlsBox}>
+          <Checkbox
+            checked={shouldUseCanvas}
+            label="use canvas"
+            onChange={this.onShouldUseCanvasChange}
+          />
+        </div>
+        <div className={classes.controlsBox}>
+          {this.renderActionButtons(loading)}
+        </div>
+        <div className={classes.controlsBox}>
+          {tagsCloud.status === SUCCESS && this.renderDebugSettings()}
+        </div>
       </div>
     );
   };
@@ -400,7 +433,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   render() {
     const { tagsCloudSceneSize } = this.state;
-    const { shouldUseCanvas, tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily, classes } = this.props;
+    const { tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily, classes } = this.props;
 
     const loading = [
       tagsData.status,
@@ -412,16 +445,8 @@ class TagsCloud extends Component<PropsT, StateT> {
     return (
       <div className={classes.pageContainer}>
         <div style={{ fontFamily, visibility: 'hidden' }} />
-        {this.renderActionButtons(loading)}
         {loading && this.renderLoader()}
-        <div className={classes.controls}>
-          <Checkbox
-            checked={shouldUseCanvas}
-            label="use canvas"
-            onChange={this.onShouldUseCanvasChange}
-          />
-        </div>
-        {tagsCloud.status === SUCCESS && this.renderSettings()}
+        {this.renderControls(loading)}
         <div
           className={classes.tagsCloudScene}
           ref={this.tagsCloudSceneRef}

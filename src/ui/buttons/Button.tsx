@@ -29,6 +29,7 @@ const useStyles = makeStyles({
     backgroundColor: 'transparent',
     appearance: 'none',
     cursor: 'pointer',
+    whiteSpace: 'nowrap',
     '&:disabled': {
       cursor: 'default',
     }
