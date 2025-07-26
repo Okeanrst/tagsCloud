@@ -156,16 +156,16 @@ const activeVacanciesStyle: React.CSSProperties = {
   left: 0,
 };
 
-const renderVacancyRect = (vacancy: VacancyT, { kind, importanceIndex, sceneMapResolution }
-  : {kind: string, importanceIndex: number, sceneMapResolution: number}) => {
-  // @ts-ignore
-  const left = Number.isFinite(vacancy.left) ? vacancy.left : vacancy.leftEdgeColumn;
-  // @ts-ignore
-  const right = Number.isFinite(vacancy.right) ? vacancy.right : vacancy.rightEdgeColumn;
-  // @ts-ignore
-  const top = Number.isFinite(vacancy.top) ? vacancy.top : vacancy.topEdgeRow;
-  // @ts-ignore
-  const bottom = Number.isFinite(vacancy.bottom) ? vacancy.bottom : vacancy.bottomEdgeRow;
+const renderVacancyRect = (
+  vacancy: VacancyT,
+  sceneMapEdges: SceneEdgesT,
+  { kind, importanceIndex, sceneMapResolution }: { kind: string, importanceIndex: number, sceneMapResolution: number },
+) => {
+  // when the coordinate is not defined, then it is a vacancy on the edge (an edge vacancy)
+  const left = Number.isFinite(vacancy.left) ? vacancy.left : sceneMapEdges[Dimensions.MINUS_X];
+  const right = Number.isFinite(vacancy.right) ? vacancy.right : sceneMapEdges[Dimensions.X];
+  const top = Number.isFinite(vacancy.top) ? vacancy.top : sceneMapEdges[Dimensions.Y];
+  const bottom = Number.isFinite(vacancy.bottom) ? vacancy.bottom : sceneMapEdges[Dimensions.MINUS_Y];
 
   if (left > right || top < bottom) {
     // the case when vacancy is outside the scene
@@ -189,17 +189,18 @@ const renderVacancyRect = (vacancy: VacancyT, { kind, importanceIndex, sceneMapR
 };
 
 type ActiveVacanciesPropsT = {
+  sceneMapEdges: SceneEdgesT | null;
   vacancies: { vacancy: VacancyT; kind: VacancyKinds }[] | null;
   svgSize: SizeT;
   viewBox: ViewBoxT;
   transform: string;
   sceneMapResolution: number,
 };
-const Vacancies = ({ vacancies, svgSize, viewBox, transform, sceneMapResolution }: ActiveVacanciesPropsT) => {
+const Vacancies = ({ sceneMapEdges, vacancies, svgSize, viewBox, transform, sceneMapResolution }: ActiveVacanciesPropsT) => {
   const rects: React.ReactNode[] = [];
-  if (vacancies) {
+  if (vacancies && sceneMapEdges) {
     vacancies.forEach(({ vacancy, kind }) => {
-      rects.push(renderVacancyRect(vacancy, { kind, importanceIndex: rects.length, sceneMapResolution }));
+      rects.push(renderVacancyRect(vacancy, sceneMapEdges, { kind, importanceIndex: rects.length, sceneMapResolution }));
     });
   }
 
@@ -781,6 +782,7 @@ const SvgTagsCloud = forwardRef<{ play: () => void }, PropsT>(({
           </g>
         </svg>
         <Vacancies
+          sceneMapEdges={sceneMapEdges}
           sceneMapResolution={sceneMapResolution}
           svgSize={svgSize}
           transform={transform}
@@ -788,6 +790,7 @@ const SvgTagsCloud = forwardRef<{ play: () => void }, PropsT>(({
           viewBox={viewBox}
         />
         <Vacancies
+          sceneMapEdges={sceneMapEdges}
           sceneMapResolution={sceneMapResolution}
           svgSize={svgSize}
           transform={transform}

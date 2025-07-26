@@ -100,7 +100,7 @@ const styles = (theme: Theme) => createStyles({
   toggleIsSettingsControlsButton: {
     width: '20px',
     minWidth: '20px!important',
-    height: '16px',
+    height: '20px',
     lineHeight: '16px',
   },
   debugMenuCollapse: {
