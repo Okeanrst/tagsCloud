@@ -48,6 +48,9 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up('lg')]: {
       maxWidth: '1140px',
     },
+    [`${theme.breakpoints.down('sm')} and (orientation: landscape)`]: {
+      paddingBottom: theme.spacing(2),
+    },
   },
   footer: {
     display: 'flex',
