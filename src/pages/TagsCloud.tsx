@@ -57,7 +57,12 @@ const styles = createStyles({
     position: 'absolute',
     display: 'flex',
     justifyContent: 'center',
-    width: '100%',
+    alignItems: 'center',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 6,
   },
   tagsCloudScene: {
     width: '100%',
@@ -273,11 +278,11 @@ class TagsCloud extends Component<PropsT, StateT> {
     toggleUseCanvas();
   };
 
-  renderLoader = (loading: boolean) => (
+  renderLoader = () => (
     <div className={this.props.classes.loaderContainer}>
       <FadeLoader
+        loading
         color="#123abc"
-        loading={loading}
       />
     </div>
   );
@@ -407,8 +412,8 @@ class TagsCloud extends Component<PropsT, StateT> {
     return (
       <div className={classes.pageContainer}>
         <div style={{ fontFamily, visibility: 'hidden' }} />
-        {this.renderLoader(loading)}
         {this.renderActionButtons(loading)}
+        {loading && this.renderLoader()}
         <div className={classes.controls}>
           <Checkbox
             checked={shouldUseCanvas}
