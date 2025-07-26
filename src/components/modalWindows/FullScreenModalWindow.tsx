@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
+    overflow: 'auto',
     backgroundColor: 'white',
     [theme.breakpoints.down('sm')]: {
       width: '100%',
