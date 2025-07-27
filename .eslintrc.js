@@ -3,7 +3,7 @@ module.exports = {
     'jest/globals': true,
   },
   root: true,
-  extends: ['react-app'],
+  extends: ['react-app', 'plugin:prettier/recommended'],
   plugins: ['jest', 'prettier', 'react-hooks', 'unicorn', 'react'],
   rules: {
     semi: ['error', 'always'],
