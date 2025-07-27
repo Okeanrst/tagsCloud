@@ -15,12 +15,13 @@ import {
   PositionT,
 } from './types';
 
-type OptionsT = {
+type OptionsT = Partial<{
   sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies;
   sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies;
   shouldCreateVacancyIfNoSuchKind: boolean;
   shouldDeduplicate: boolean;
-};
+}>;
+export type VacanciesManagerOptionsT = OptionsT;
 
 type LineT = { begin: number; end: number };
 
@@ -81,7 +82,7 @@ export class VacanciesManager {
   private readonly _options: OptionsT = DEFAULT_OPTIONS;
   needVacanciesRebuild = false;
 
-  constructor(sceneMap: SceneMap, options?: Partial<OptionsT>) {
+  constructor(sceneMap: SceneMap, options?: OptionsT) {
     this.sceneMap = sceneMap;
     this._options = { ...DEFAULT_OPTIONS, ...(options ?? {}) };
   }
