@@ -8,15 +8,11 @@ import type { RootStateT } from 'store/types';
 
 const { PRISTINE } = QueryStatuses;
 
-function withTriggerGettingRawData<T extends {}>(
-  WrappedComponent: React.ComponentType<T>,
-) {
+function withTriggerGettingRawData<T extends {}>(WrappedComponent: React.ComponentType<T>) {
   const EnhancedComponent = (props: T) => {
-    const { tagsData } = useSelector(
-      (state: RootStateT): { tagsData: RootStateT['tagsData'] } => {
-        return { tagsData: state.tagsData };
-      },
-    );
+    const { tagsData } = useSelector((state: RootStateT): { tagsData: RootStateT['tagsData'] } => {
+      return { tagsData: state.tagsData };
+    });
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -28,9 +24,7 @@ function withTriggerGettingRawData<T extends {}>(
     return <WrappedComponent {...props} />;
   };
 
-  EnhancedComponent.displayName = `withRawData(${getDisplayName(
-    WrappedComponent,
-  )})`;
+  EnhancedComponent.displayName = `withRawData(${getDisplayName(WrappedComponent)})`;
 
   return EnhancedComponent;
 }

@@ -9,17 +9,14 @@ const useStyles = makeStyles({
     backgroundColor: 'var(--primary-main-color)!important',
     '&:disabled': {
       backgroundColor: 'var(--primary-disabled-bg)!important',
-    }
-  }
+    },
+  },
 });
 
 export const PrimaryButton = ({ children, classes, ...restProps }: ButtonPropsT) => {
   const ownClasses = useStyles();
   return (
-    <Button
-      classes={{ root: cx(classes?.root, ownClasses.root) }}
-      {...restProps}
-    >
+    <Button classes={{ root: cx(classes?.root, ownClasses.root) }} {...restProps}>
       {children}
     </Button>
   );

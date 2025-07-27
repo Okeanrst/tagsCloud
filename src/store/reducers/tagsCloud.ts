@@ -17,10 +17,7 @@ const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
 
 const initState: RootStateT['tagsCloud'] = { status: PRISTINE, tagsPositions: null, sceneMap: null, vacancies: null };
 
-export const tagsCloudReducer = (
-  state: RootStateT['tagsCloud'] = { ...initState },
-  action: AnyAction,
-) => {
+export const tagsCloudReducer = (state: RootStateT['tagsCloud'] = { ...initState }, action: AnyAction) => {
   switch (action.type) {
     case TAGS_CLOUD_BUILD_REQUEST:
       return { ...state, status: PENDING };

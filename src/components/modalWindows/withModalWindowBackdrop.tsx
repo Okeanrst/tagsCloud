@@ -16,19 +16,13 @@ export function withModalWindowBackdrop<P>({
   return (WrappedComponent: React.ComponentType<Omit<P, 'onBackdropClick'>>) => {
     const EnhancedComponent = ({ onBackdropClick, ...props }: P & EnhancedComponentPropsT) => {
       return (
-        <ModalWindowBackdrop
-          className={layoutClassName}
-          style={layoutStyle}
-          onBackdropClick={onBackdropClick}
-        >
+        <ModalWindowBackdrop className={layoutClassName} style={layoutStyle} onBackdropClick={onBackdropClick}>
           <WrappedComponent {...props} />
         </ModalWindowBackdrop>
       );
     };
     if (process.env.NODE_ENV !== 'production') {
-      EnhancedComponent.displayName = `withModalWindowLayout(${getDisplayName(
-        WrappedComponent,
-      )})`;
+      EnhancedComponent.displayName = `withModalWindowLayout(${getDisplayName(WrappedComponent)})`;
     }
     return EnhancedComponent;
   };

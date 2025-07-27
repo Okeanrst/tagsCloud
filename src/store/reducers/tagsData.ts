@@ -2,12 +2,13 @@ import { RootStateT } from '../types';
 import { QueryStatuses } from 'constants/queryStatuses';
 import { AnyAction } from 'redux';
 import {
-  TAGS_DATA_ADD_DATA_ITEM, TAGS_DATA_DELETE_ALL_DATA,
+  TAGS_DATA_ADD_DATA_ITEM,
+  TAGS_DATA_DELETE_ALL_DATA,
   TAGS_DATA_DELETE_DATA_ITEM,
   TAGS_DATA_EDIT_DATA_ITEM,
   TAGS_DATA_FETCH_FAILURE,
   TAGS_DATA_FETCH_REQUEST,
-  TAGS_DATA_FETCH_SUCCESS
+  TAGS_DATA_FETCH_SUCCESS,
 } from '../actions/actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
@@ -32,14 +33,14 @@ export const tagsDataReducer = (
         return state;
       }
       const idToDelete = action.payload;
-      const data = state.data.filter(item => item.id !== idToDelete);
+      const data = state.data.filter((item) => item.id !== idToDelete);
       return { ...state, data };
     case TAGS_DATA_EDIT_DATA_ITEM: {
       if (state.status !== SUCCESS) {
         return state;
       }
       const itemData = action.payload;
-      const itemIndex = state.data.findIndex(item => item.id === itemData.id) ?? -1;
+      const itemIndex = state.data.findIndex((item) => item.id === itemData.id) ?? -1;
       let nextStateData = state.data;
       if (itemIndex > -1) {
         nextStateData = [

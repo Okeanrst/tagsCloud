@@ -30,22 +30,14 @@ export function drawOnCanvas(
     return null;
   }
 
-  const {
-    top: maxTop,
-    bottom: minBottom,
-    right: maxRight,
-    left: minLeft,
-  } = borderCoordinates;
+  const { top: maxTop, bottom: minBottom, right: maxRight, left: minLeft } = borderCoordinates;
 
   const sceneWidth = maxRight - minLeft;
   const sceneHeight = maxTop - minBottom;
 
   const aspectRatio = sceneWidth / sceneHeight;
 
-  const { width: canvasWidth, height: canvasHeight } = getSuitableSize(
-    availableSize,
-    aspectRatio,
-  );
+  const { width: canvasWidth, height: canvasHeight } = getSuitableSize(availableSize, aspectRatio);
 
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
@@ -72,18 +64,13 @@ export function drawOnCanvas(
   }
 
   const rotate = (deg: number) => ctx.rotate((Math.PI / 180) * deg);
-  data.forEach(item => {
+  data.forEach((item) => {
     const width = item.rectRight - item.rectLeft;
     const height = item.rectTop - item.rectBottom;
 
     if (shouldDrawReactAreas) {
       ctx.strokeStyle = item.color;
-      ctx.strokeRect(
-        item.rectLeft * scale,
-        -item.rectTop * scale,
-        width * scale,
-        height * scale,
-      );
+      ctx.strokeRect(item.rectLeft * scale, -item.rectTop * scale, width * scale, height * scale);
     }
 
     ctx.textBaseline = 'alphabetic';
@@ -109,12 +96,7 @@ export function drawOnCanvas(
     }
   });
 
-  const clearParams: ClearParamsT = [
-    minLeft * scale,
-    -maxTop * scale,
-    sceneWidth * scale,
-    sceneHeight * scale,
-  ];
+  const clearParams: ClearParamsT = [minLeft * scale, -maxTop * scale, sceneWidth * scale, sceneHeight * scale];
   const restoreCoords: RestoreCoordsT = [-axisXOffset, -axisYOffset];
   return { clearParams, restoreCoords, scale };
 }

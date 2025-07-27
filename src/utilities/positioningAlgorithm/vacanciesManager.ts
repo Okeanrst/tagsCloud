@@ -25,7 +25,7 @@ export type VacanciesManagerOptionsT = OptionsT;
 
 type LineT = { begin: number; end: number };
 
-type VacancyRectAreaT = { beginColumn: number; endColumn: number, rows: any };
+type VacancyRectAreaT = { beginColumn: number; endColumn: number; rows: any };
 
 type RawPreparedVacancyT = VacancyT & {
   baseSize?: number;
@@ -46,7 +46,7 @@ function deduplicateLines(lines: Array<LineT>) {
     return `${begin}${DELIMITER}${end}`;
   });
 
-  return Array.from(new Set(linesAddresses)).map(str => {
+  return Array.from(new Set(linesAddresses)).map((str) => {
     const parts = str.split(DELIMITER);
     return { begin: +parts[0], end: +parts[1] };
   });
@@ -59,7 +59,7 @@ function deduplicateVacancyRectAreas(vacancyRectArea: VacancyRectAreaT[]): Vacan
     return `${beginColumn}${DELIMITER}${endColumn}${DELIMITER}${rows}`;
   });
 
-  return Array.from(new Set(linesAddresses)).map(str => {
+  return Array.from(new Set(linesAddresses)).map((str) => {
     const parts = str.split(DELIMITER);
     return { beginColumn: +parts[0], endColumn: +parts[1], rows: +parts[2] };
   });
@@ -69,7 +69,7 @@ const DEFAULT_OPTIONS = {
   sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER,
   sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies.DISTANCE_FROM_CENTER,
   shouldCreateVacancyIfNoSuchKind: false,
-  shouldDeduplicate: true
+  shouldDeduplicate: true,
 };
 
 export class VacanciesManager {
@@ -154,9 +154,11 @@ export class VacanciesManager {
         return line;
       };
 
-      const horizontalLines: Array<LineT> = deduplicatedColumnsToClose.filter(column => !!accumulated[column]).map(column => {
-        return spreadHorizontalLine(column, column);
-      });
+      const horizontalLines: Array<LineT> = deduplicatedColumnsToClose
+        .filter((column) => !!accumulated[column])
+        .map((column) => {
+          return spreadHorizontalLine(column, column);
+        });
 
       const deduplicatedHorizontalLines = deduplicateLines(horizontalLines);
 
@@ -171,7 +173,7 @@ export class VacanciesManager {
       };
 
       const vacancyRectAreas: Array<VacancyRectAreaT> = [];
-      deduplicatedHorizontalLines.forEach(line => {
+      deduplicatedHorizontalLines.forEach((line) => {
         let beginColumn = line.begin;
         let endColumn = line.end;
         let prevColVal = accumulated[beginColumn];
@@ -194,7 +196,7 @@ export class VacanciesManager {
       const deduplicatedVacancyRectAreas = deduplicateVacancyRectAreas(vacancyRectAreas);
 
       // to spread rect area horizontally
-      deduplicatedVacancyRectAreas.forEach(line => {
+      deduplicatedVacancyRectAreas.forEach((line) => {
         let beginColumn = prev(line.beginColumn);
         while (accumulated[beginColumn] >= line.rows) {
           line.beginColumn = beginColumn;
@@ -207,7 +209,7 @@ export class VacanciesManager {
         }
       });
 
-      deduplicatedVacancyRectAreas.forEach(vacancyRectArea => {
+      deduplicatedVacancyRectAreas.forEach((vacancyRectArea) => {
         let top = row;
         let right = vacancyRectArea.endColumn;
         let bottom = countPositionsBackwards(row, vacancyRectArea.rows);
@@ -324,8 +326,10 @@ export class VacanciesManager {
 
     const sceneCenter = SceneMap.calcSceneCenter(sceneEdges);
 
-    const deduplicatedRawClosedVacancies = shouldDeduplicate ? deduplicateVacancies(rawClosedVacancies) : rawClosedVacancies;
-    deduplicatedRawClosedVacancies.forEach(v => prepareClosedVacancy(v, sceneCenter));
+    const deduplicatedRawClosedVacancies = shouldDeduplicate
+      ? deduplicateVacancies(rawClosedVacancies)
+      : rawClosedVacancies;
+    deduplicatedRawClosedVacancies.forEach((v) => prepareClosedVacancy(v, sceneCenter));
     const _closedVacancies = deduplicatedRawClosedVacancies as ClosedVacancyT[];
 
     if (sortingClosedVacanciesStrategy === SortingClosedVacanciesStrategies.DISTANCE_FROM_CENTER) {
@@ -336,8 +340,10 @@ export class VacanciesManager {
     this._closedVacancies = _closedVacancies;
 
     const processRawEdgeVacancies = (rawEdgeVacancies: RawPreparedVacancyT[]) => {
-      const deduplicatedRawEdgeVacancies = shouldDeduplicate ? deduplicateVacancies(rawEdgeVacancies) : rawEdgeVacancies;
-      deduplicatedRawEdgeVacancies.forEach(v => {
+      const deduplicatedRawEdgeVacancies = shouldDeduplicate
+        ? deduplicateVacancies(rawEdgeVacancies)
+        : rawEdgeVacancies;
+      deduplicatedRawEdgeVacancies.forEach((v) => {
         v.baseSize = calcEdgeVacancyBaseSize(v);
         v.distanceFromCenter = calcEdgeVacancyDistanceFromCenter(v, sceneCenter);
       });
@@ -374,31 +380,19 @@ export class VacanciesManager {
     this._closedVacancies[index] = undefined;
   }
 
-  filterUnsuitableClosedVacancies(
-    vacancyFilter: (vacancy: ClosedVacancyT | void) => boolean,
-  ) {
-    this._closedVacancies = this._closedVacancies.filter(vacancy =>
-      vacancyFilter(vacancy),
-    );
+  filterUnsuitableClosedVacancies(vacancyFilter: (vacancy: ClosedVacancyT | void) => boolean) {
+    this._closedVacancies = this._closedVacancies.filter((vacancy) => vacancyFilter(vacancy));
   }
 
   drawVacanciesMap() {
     const sceneEdges = this.sceneMap.getSceneEdges();
 
-    this.topEdgeVacancies.forEach(v =>
-      drawVacancy(v, sceneEdges),
-    );
-    this.bottomEdgeVacancies.forEach(v =>
-      drawVacancy(v, sceneEdges),
-    );
-    this.rightEdgeVacancies.forEach(v =>
-      drawVacancy(v, sceneEdges),
-    );
-    this.leftEdgeVacancies.forEach(v =>
-      drawVacancy(v, sceneEdges),
-    );
+    this.topEdgeVacancies.forEach((v) => drawVacancy(v, sceneEdges));
+    this.bottomEdgeVacancies.forEach((v) => drawVacancy(v, sceneEdges));
+    this.rightEdgeVacancies.forEach((v) => drawVacancy(v, sceneEdges));
+    this.leftEdgeVacancies.forEach((v) => drawVacancy(v, sceneEdges));
 
-    this.closedVacancies.forEach(vacancy => {
+    this.closedVacancies.forEach((vacancy) => {
       if (!vacancy) {
         return;
       }
@@ -408,13 +402,21 @@ export class VacanciesManager {
 
   static checkIsPointBelongToVacancy = (point: CoordinatePointT, vacancy: VacancyT) => {
     const v = vacancy;
-    return SceneMap.getPositionLeftEdge(v.bottom) < point.y && point.y < SceneMap.getPositionRightEdge(v.top)
-      && SceneMap.getPositionLeftEdge(v.left) < point.x && point.x < SceneMap.getPositionRightEdge(v.right);
+    return (
+      SceneMap.getPositionLeftEdge(v.bottom) < point.y &&
+      point.y < SceneMap.getPositionRightEdge(v.top) &&
+      SceneMap.getPositionLeftEdge(v.left) < point.x &&
+      point.x < SceneMap.getPositionRightEdge(v.right)
+    );
   };
 
   static checkIsPositionBelongToVacancy = (position: PositionT, vacancy: VacancyT) => {
-    return vacancy.bottom <= position.row && vacancy.top >= position.row && vacancy.left <= position.col
-      && vacancy.right >= position.col;
+    return (
+      vacancy.bottom <= position.row &&
+      vacancy.top >= position.row &&
+      vacancy.left <= position.col &&
+      vacancy.right >= position.col
+    );
   };
 }
 
@@ -446,10 +448,7 @@ export function drawVacancy(vacancy: VacancyT, sceneEdges: SceneEdgesT): void {
   console.log(res, '\n\n');
 }
 
-const calcEdgeVacancyBaseSize = (
-  vacancy: VacancyT,
-  isHorizontal: boolean = true,
-) => {
+const calcEdgeVacancyBaseSize = (vacancy: VacancyT, isHorizontal: boolean = true) => {
   const countPositions = SceneMap.countPositions;
   return isHorizontal ? countPositions(vacancy.left, vacancy.right) : countPositions(vacancy.bottom, vacancy.top);
 };
@@ -457,13 +456,8 @@ const calcEdgeVacancyBaseSize = (
 function prepareClosedVacancy(vacancy: VacancyT, sceneCenter: CoordinatePointT): ClosedVacancyT {
   const v = vacancy;
   const debug = process.env.NODE_ENV !== 'production';
-  if (
-    debug &&
-    (isNaN(v.top) || isNaN(v.right) || isNaN(v.bottom) || isNaN(v.left))
-  ) {
-    throw new Error(
-      'prepareClosedVacancy error: isNaN(top) || isNaN(right) || isNaN(bottom) || isNaN(left)',
-    );
+  if (debug && (isNaN(v.top) || isNaN(v.right) || isNaN(v.bottom) || isNaN(v.left))) {
+    throw new Error('prepareClosedVacancy error: isNaN(top) || isNaN(right) || isNaN(bottom) || isNaN(left)');
   }
   const rows = SceneMap.countPositions(vacancy.bottom, vacancy.top);
   const cols = SceneMap.countPositions(vacancy.left, vacancy.right);
@@ -516,9 +510,11 @@ function calcEdgeVacancyDistanceFromCenter(vacancy: VacancyT, center: Coordinate
 }
 
 function deduplicateVacancies<T extends VacancyT>(vacancies: T[]): T[] {
-  const map = new Map<string, T>(vacancies.map((vacancy): [string, T] => {
-    const { left, right, bottom, top } = vacancy;
-    return [`${left},${right},${bottom},${top}`, vacancy];
-  }));
+  const map = new Map<string, T>(
+    vacancies.map((vacancy): [string, T] => {
+      const { left, right, bottom, top } = vacancy;
+      return [`${left},${right},${bottom},${top}`, vacancy];
+    }),
+  );
   return [...map.values()];
 }

@@ -271,7 +271,11 @@ describe('SceneMap tests', () => {
       });
     });
     it('getSceneEdges should return correct values after successful bulkOccupyPosition', () => {
-      sceneMap.bulkOccupyPosition([[1, 1], [2, 1], [3, 1]]);
+      sceneMap.bulkOccupyPosition([
+        [1, 1],
+        [2, 1],
+        [3, 1],
+      ]);
       sceneMap.calcSceneEdges();
       expect(sceneMap.getSceneEdges()).toStrictEqual({
         '-x': 0,
@@ -283,7 +287,11 @@ describe('SceneMap tests', () => {
     it('getDataAtPosition should return correct value after unsuccessful bulkOccupyPosition', () => {
       sceneMap.occupyPosition(3, 1);
       expect(() => {
-        sceneMap.bulkOccupyPosition([[1, 1], [2, 1], [3, 1]]);
+        sceneMap.bulkOccupyPosition([
+          [1, 1],
+          [2, 1],
+          [3, 1],
+        ]);
       }).toThrowError(IntersectionError);
       expect(sceneMap.getDataAtPosition(3, 1)).toBe(true);
       expect(sceneMap.getDataAtPosition(2, 1)).toBe(false);
@@ -332,8 +340,21 @@ describe('SceneMap tests', () => {
     });
     it('should return the same positions', () => {
       const originPositions: [number, number][] = [
-        [-2, 3], [-1, 3], [1, 3], [2, 3], [3, 3], [-1, 2], [1, 2], [-1, 1], [1, 1],
-        [-1, -1], [1, -1], [-1, -2], [1, -2], [-1, -3], [1, -3]
+        [-2, 3],
+        [-1, 3],
+        [1, 3],
+        [2, 3],
+        [3, 3],
+        [-1, 2],
+        [1, 2],
+        [-1, 1],
+        [1, 1],
+        [-1, -1],
+        [1, -1],
+        [-1, -2],
+        [1, -2],
+        [-1, -3],
+        [1, -3],
       ];
       sceneMap.bulkOccupyPosition(originPositions);
       expect(sceneMap.toPositions()).toStrictEqual(originPositions);

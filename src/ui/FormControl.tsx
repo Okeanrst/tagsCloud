@@ -4,22 +4,18 @@ import cx from 'classnames';
 
 export type PropsT = {
   children: React.ReactNode;
-  className?: string,
+  className?: string;
 };
 
 const useStyles = makeStyles({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-start'
-  }
+    justifyContent: 'flex-start',
+  },
 });
 
 export const FormControl = ({ children, className }: PropsT) => {
   const ownClasses = useStyles();
-  return (
-    <div className={cx(ownClasses.root, className)}>
-      {children}
-    </div>
-  );
+  return <div className={cx(ownClasses.root, className)}>{children}</div>;
 };

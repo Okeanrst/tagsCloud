@@ -7,7 +7,10 @@ import { getBorderCoordinates } from 'utilities/tagsCloud/getBorderCoordinates';
 import { RootStateT } from 'store/types';
 
 const mapStateToProps = (state: RootStateT) => {
-  const { tagsCloud: { tagsPositions }, settings } = state;
+  const {
+    tagsCloud: { tagsPositions },
+    settings,
+  } = state;
   return { tagsPositions, settings };
 };
 
@@ -48,8 +51,13 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
 
   componentDidUpdate(prevProps: PropsT) {
     const { width, height, tagsPositions, settings, downloadCloudCounter, isReactAreasShown } = this.props;
-    if (prevProps.width !== width || prevProps.height !== height || prevProps.tagsPositions !== tagsPositions
-      || prevProps.settings !== settings || prevProps.isReactAreasShown !== isReactAreasShown) {
+    if (
+      prevProps.width !== width ||
+      prevProps.height !== height ||
+      prevProps.tagsPositions !== tagsPositions ||
+      prevProps.settings !== settings ||
+      prevProps.isReactAreasShown !== isReactAreasShown
+    ) {
       this.draw();
     }
     if (prevProps.downloadCloudCounter !== downloadCloudCounter) {
@@ -132,7 +140,12 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       ctx.translate(...this.state.restoreCoords);
     }
 
-    const drawResult = drawOnCanvas(tagsPositions, canvas, { width, height }, { fontFamily, shouldDrawReactAreas: isReactAreasShown });
+    const drawResult = drawOnCanvas(
+      tagsPositions,
+      canvas,
+      { width, height },
+      { fontFamily, shouldDrawReactAreas: isReactAreasShown },
+    );
 
     if (!drawResult) {
       return;
@@ -148,10 +161,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
 
     return (
       <div className={classes.container}>
-        <canvas
-          ref={this.tagCloudCanvasRef}
-          onClick={this.onCanvasClick}
-        />
+        <canvas ref={this.tagCloudCanvasRef} onClick={this.onCanvasClick} />
       </div>
     );
   }

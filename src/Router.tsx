@@ -14,30 +14,12 @@ const Router = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route
-          element={<TagsCloud navigate={navigate} />}
-          path="/"
-        />
-        <Route
-          element={<NotFoundPage />}
-          path="/notFound"
-        />
-        <Route
-          element={<TagsListEditor />}
-          path="/tagsListEditor"
-        />
-        <Route
-          element={<TagInformation />}
-          path="/tag/:id"
-        />
-        <Route
-          element={<Settings />}
-          path="/settings"
-        />
-        <Route
-          element={<NotFoundPage />}
-          path="*"
-        />
+        <Route element={<TagsCloud navigate={navigate} />} path="/" />
+        <Route element={<NotFoundPage />} path="/notFound" />
+        <Route element={<TagsListEditor />} path="/tagsListEditor" />
+        <Route element={<TagInformation />} path="/tag/:id" />
+        <Route element={<Settings />} path="/settings" />
+        <Route element={<NotFoundPage />} path="*" />
       </Route>
     </Routes>
   );

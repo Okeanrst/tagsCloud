@@ -24,21 +24,12 @@ export const InputFormField = ({ classes, label, helperText, ...restProps }: Pro
   return (
     <FormControl className={cx(ownClassed.root, classes?.root)}>
       {label ? (
-        <label
-          className={cx(ownClassed.label, classes?.label)}
-          htmlFor={inputIdRef.current}
-        >
+        <label className={cx(ownClassed.label, classes?.label)} htmlFor={inputIdRef.current}>
           {label}
         </label>
       ) : null}
-      <input
-        className={cx(ownClassed.input, classes?.input)}
-        id={inputIdRef.current}
-        {...restProps}
-      />
-      <div className={cx(ownClassed.helperText, classes?.helperText)}>
-        {helperText}
-      </div>
+      <input className={cx(ownClassed.input, classes?.input)} id={inputIdRef.current} {...restProps} />
+      <div className={cx(ownClassed.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );
 };

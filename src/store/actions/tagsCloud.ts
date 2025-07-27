@@ -69,7 +69,7 @@ export function getData() {
     dispatch(createAction(actionTypes.TAGS_DATA_FETCH_REQUEST));
     return api
       .getData()
-      .then(response => {
+      .then((response) => {
         if (validateTagCloudRawData(response)) {
           throw new Error('Raw tag cloud data is invalid');
         }
@@ -101,7 +101,7 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
       resolution: sceneMapResolution,
       fontFamily,
     })
-      .then(tagsRectAreasMaps => {
+      .then((tagsRectAreasMaps) => {
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
@@ -136,7 +136,7 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
       resolution: sceneMapResolution,
       fontFamily,
     })
-      .then(tagsRectAreasMaps => {
+      .then((tagsRectAreasMaps) => {
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         const sceneMap = getState().tagsCloud.sceneMap ?? [];

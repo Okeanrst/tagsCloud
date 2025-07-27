@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core';
 import cx from 'classnames';
 import settingsIconSrc from 'assets/settings.svg';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: 'var(--navbar-color)',
     [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(1),
-    }
+    },
   },
   navbarContent: {
     width: '100%',
@@ -77,26 +77,26 @@ const useStyles = makeStyles(theme => ({
     transition: 'background-color 0.3s ease',
     '&:hover': {
       backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    }
+    },
   },
   settingsLink: {
     marginLeft: theme.spacing(4),
     [theme.breakpoints.down('sm')]: {
       marginLeft: theme.spacing(1),
-    }
+    },
   },
   settingsLinkLabel: {
     marginRight: theme.spacing(2),
     [theme.breakpoints.down('xs')]: {
       display: 'none',
-    }
+    },
   },
   settingsLinkIcon: {
     width: theme.spacing(4),
     height: theme.spacing(4),
     [theme.breakpoints.down('sm')]: {
       display: 'inline',
-    }
+    },
   },
 }));
 
@@ -106,29 +106,16 @@ export const Layout = () => {
     <div className={classes.root}>
       <nav className={classes.navbar}>
         <div className={classes.navbarContent}>
-          <Link
-            className={classes.link}
-            to="/"
-          >
+          <Link className={classes.link} to="/">
             Tags cloud
           </Link>
           <div>
-            <Link
-              className={classes.link}
-              to="/tagsListEditor"
-            >
+            <Link className={classes.link} to="/tagsListEditor">
               Tags editor
             </Link>
-            <Link
-              className={cx(classes.link, classes.settingsLink)}
-              to="/settings"
-            >
+            <Link className={cx(classes.link, classes.settingsLink)} to="/settings">
               <span className={classes.settingsLinkLabel}>Settings</span>
-              <img
-                alt="settings icon"
-                className={classes.settingsLinkIcon}
-                src={settingsIconSrc}
-              />
+              <img alt="settings icon" className={classes.settingsLinkIcon} src={settingsIconSrc} />
             </Link>
           </div>
         </div>
@@ -137,11 +124,7 @@ export const Layout = () => {
         <Outlet />
       </main>
       <footer className={classes.footer}>
-        <div className={classes.footerContent}>
-          Okeanrst©
-          {' '}
-          {new Date().getFullYear()}
-        </div>
+        <div className={classes.footerContent}>Okeanrst© {new Date().getFullYear()}</div>
       </footer>
     </div>
   );

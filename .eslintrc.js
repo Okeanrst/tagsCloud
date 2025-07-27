@@ -64,20 +64,9 @@ module.exports = {
       },
     ],
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-max-props-per-line.md
-    'react/jsx-max-props-per-line': [
-      'error',
-      {
-        maximum: 1,
-        when: 'always',
-      },
-    ],
+    'react/jsx-max-props-per-line': 'off',
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-one-expression-per-line.md
-    'react/jsx-one-expression-per-line': [
-      'error',
-      {
-        allow: 'literal',
-      },
-    ],
+    'react/jsx-one-expression-per-line': 'off',
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-key.md
     'react/jsx-key': 'error',
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-props-no-multi-spaces.md

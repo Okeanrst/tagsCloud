@@ -7,10 +7,8 @@ type BorderCoordinatesT = {
   left: number;
 };
 
-export function getBorderCoordinates(
-  tagsData: ReadonlyArray<PositionedTagRectT>,
-): null | BorderCoordinatesT {
-  const firstTagData = tagsData.find(tagData => Boolean(tagData));
+export function getBorderCoordinates(tagsData: ReadonlyArray<PositionedTagRectT>): null | BorderCoordinatesT {
+  const firstTagData = tagsData.find((tagData) => Boolean(tagData));
 
   if (!firstTagData) {
     return null;
@@ -21,14 +19,9 @@ export function getBorderCoordinates(
   let maxRight: number;
   let minLeft: number;
 
-  ({
-    rectTop: maxTop,
-    rectBottom: minBottom,
-    rectLeft: minLeft,
-    rectRight: maxRight,
-  } = firstTagData);
+  ({ rectTop: maxTop, rectBottom: minBottom, rectLeft: minLeft, rectRight: maxRight } = firstTagData);
 
-  tagsData.forEach(tagData => {
+  tagsData.forEach((tagData) => {
     if (tagData.rectTop > maxTop || maxTop === undefined) {
       maxTop = tagData.rectTop;
     }

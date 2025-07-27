@@ -21,7 +21,14 @@ import { ClassesT, TagDataT } from 'types/types';
 const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
 
 const mapStateToProps = (state: RootStateT) => {
-  const { tagsCloud, useCanvas, fontLoaded, tagsData, incrementalBuild, settings: { fontFamily } } = state;
+  const {
+    tagsCloud,
+    useCanvas,
+    fontLoaded,
+    tagsData,
+    incrementalBuild,
+    settings: { fontFamily },
+  } = state;
   return { tagsCloud, shouldUseCanvas: useCanvas, fontLoaded, tagsData, incrementalBuild, fontFamily };
 };
 
@@ -40,96 +47,97 @@ const mapDispatchToProps = (dispatch: AppDispatchT) => ({
   },
   observerLoadFont() {
     dispatch(loadFont());
-  }
+  },
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-const styles = (theme: Theme) => createStyles({
-  pageContainer: {
-    position: 'relative',
-    minHeight: '250px',
-    display: 'flex',
-    flexDirection: 'column',
-    flexGrow: 12,
-  },
-  loaderContainer: {
-    position: 'absolute',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 6,
-  },
-  controls: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    '& > *:not(:first-child)': {
-      marginLeft: theme.spacing(1),
+const styles = (theme: Theme) =>
+  createStyles({
+    pageContainer: {
+      position: 'relative',
+      minHeight: '250px',
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: 12,
     },
-  },
-  controlsBox: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  downloadButton: {
-    border: 'none',
-    backgroundColor: 'transparent',
-    cursor: 'pointer',
-  },
-  downloadIcon: {
-    width: theme.spacing(4),
-    height: theme.spacing(4),
-  },
-  actionMainButton: {
-    marginLeft: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    loaderContainer: {
+      position: 'absolute',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      zIndex: 6,
+    },
+    controls: {
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'space-between',
+      '& > *:not(:first-child)': {
+        marginLeft: theme.spacing(1),
+      },
+    },
+    controlsBox: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    downloadButton: {
+      border: 'none',
+      backgroundColor: 'transparent',
+      cursor: 'pointer',
+    },
+    downloadIcon: {
+      width: theme.spacing(4),
+      height: theme.spacing(4),
+    },
+    actionMainButton: {
+      marginLeft: theme.spacing(2),
+      [theme.breakpoints.down('sm')]: {
+        padding: theme.spacing(1),
+      },
+    },
+    debugSettingsControls: {
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
+      height: '100%',
+    },
+    toggleIsSettingsControlsButton: {
+      width: '20px',
+      minWidth: '20px!important',
+      height: '20px',
+      lineHeight: '16px',
+    },
+    debugMenuCollapse: {
+      position: 'absolute',
+      right: 0,
+      top: '100%',
+      zIndex: 3,
+    },
+    debugMenu: {
+      display: 'flex',
+      flexDirection: 'column',
       padding: theme.spacing(1),
-    }
-  },
-  debugSettingsControls: {
-    display: 'flex',
-    alignItems: 'center',
-    position: 'relative',
-    height: '100%',
-  },
-  toggleIsSettingsControlsButton: {
-    width: '20px',
-    minWidth: '20px!important',
-    height: '20px',
-    lineHeight: '16px',
-  },
-  debugMenuCollapse: {
-    position: 'absolute',
-    right: 0,
-    top: '100%',
-    zIndex: 3,
-  },
-  debugMenu: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: theme.spacing(1),
-    textAlign: 'left',
-    backgroundColor: '#d2d2d2',
-    whiteSpace: 'nowrap',
-  },
-  actionControls: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  tagsCloudScene: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    position: 'relative',
-    flexGrow: 12,
-    marginTop: theme.spacing(1),
-  },
-});
+      textAlign: 'left',
+      backgroundColor: '#d2d2d2',
+      whiteSpace: 'nowrap',
+    },
+    actionControls: {
+      display: 'flex',
+      justifyContent: 'center',
+    },
+    tagsCloudScene: {
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      position: 'relative',
+      flexGrow: 12,
+      marginTop: theme.spacing(1),
+    },
+  });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -182,13 +190,10 @@ class TagsCloud extends Component<PropsT, StateT> {
       observerLoadFont();
     }
 
-    if (
-      fontLoaded.status === SUCCESS &&
-      tagsData.status === SUCCESS &&
-      tagsCloud.status === PRISTINE
-    ) {
+    if (fontLoaded.status === SUCCESS && tagsData.status === SUCCESS && tagsCloud.status === PRISTINE) {
       buildTagsCloud(tagsData.data);
-    } else if (fontLoaded.status === SUCCESS &&
+    } else if (
+      fontLoaded.status === SUCCESS &&
       tagsData.status === SUCCESS &&
       tagsCloud.status === SUCCESS &&
       incrementalBuild.tagsIds.length
@@ -202,9 +207,7 @@ class TagsCloud extends Component<PropsT, StateT> {
       return;
     }
 
-    const tagsCloudSceneSize = this.calcTagsCloudSize(
-      this.tagsCloudSceneRef.current,
-    );
+    const tagsCloudSceneSize = this.calcTagsCloudSize(this.tagsCloudSceneRef.current);
 
     this.setState({ tagsCloudSceneSize });
   }
@@ -222,11 +225,7 @@ class TagsCloud extends Component<PropsT, StateT> {
       observerLoadFont();
     }
 
-    if (
-      fontLoaded.data &&
-      tagsData.status === SUCCESS &&
-      tagsCloud.status === PRISTINE
-    ) {
+    if (fontLoaded.data && tagsData.status === SUCCESS && tagsCloud.status === PRISTINE) {
       buildTagsCloud(tagsData.data);
     }
   }
@@ -243,9 +242,7 @@ class TagsCloud extends Component<PropsT, StateT> {
     const recalculateState = () => {
       this.resizeTaskTimer = null;
       if (this.tagsCloudSceneRef && this.tagsCloudSceneRef.current) {
-        const tagsCloudSceneSize = this.calcTagsCloudSize(
-          this.tagsCloudSceneRef.current,
-        );
+        const tagsCloudSceneSize = this.calcTagsCloudSize(this.tagsCloudSceneRef.current);
         this.setState({ tagsCloudSceneSize });
       }
     };
@@ -289,10 +286,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   renderLoader = () => (
     <div className={this.props.classes.loaderContainer}>
-      <FadeLoader
-        loading
-        color="#123abc"
-      />
+      <FadeLoader loading color="#123abc" />
     </div>
   );
 
@@ -300,22 +294,10 @@ class TagsCloud extends Component<PropsT, StateT> {
     const { classes, triggerRebuild, shouldUseCanvas } = this.props;
     return (
       <div className={classes.actionControls}>
-        <button
-          className={classes.downloadButton}
-          disabled={disabled}
-          onClick={this.onDownloadClick}
-        >
-          <img
-            alt="download"
-            className={classes.downloadIcon}
-            src={downloadIconSrc}
-          />
+        <button className={classes.downloadButton} disabled={disabled} onClick={this.onDownloadClick}>
+          <img alt="download" className={classes.downloadIcon} src={downloadIconSrc} />
         </button>
-        <PrimaryButton
-          classes={{ root: classes.actionMainButton }}
-          disabled={disabled}
-          onClick={triggerRebuild}
-        >
+        <PrimaryButton classes={{ root: classes.actionMainButton }} disabled={disabled} onClick={triggerRebuild}>
           Rebuild
         </PrimaryButton>
         <PrimaryButton
@@ -334,22 +316,16 @@ class TagsCloud extends Component<PropsT, StateT> {
       toggleIsSettingsControlsShown,
       toggleIsCoordinateGridShown,
       toggleIsReactAreasShown,
-      toggleIsVacanciesShown
+      toggleIsVacanciesShown,
     } = this;
     const { classes, shouldUseCanvas } = this.props;
     const { isSettingsControlsShown, isCoordinateGridShown, isReactAreasShown, isVacanciesShown } = this.state;
     return (
       <div className={classes.debugSettingsControls}>
-        <TextButton
-          classes={{ root: classes.toggleIsSettingsControlsButton }}
-          onClick={toggleIsSettingsControlsShown}
-        >
+        <TextButton classes={{ root: classes.toggleIsSettingsControlsButton }} onClick={toggleIsSettingsControlsShown}>
           {isSettingsControlsShown ? '-' : '+'}
         </TextButton>
-        <Collapse
-          className={classes.debugMenuCollapse}
-          isOpen={isSettingsControlsShown}
-        >
+        <Collapse className={classes.debugMenuCollapse} isOpen={isSettingsControlsShown}>
           <div className={classes.debugMenu}>
             {!shouldUseCanvas && (
               <Checkbox
@@ -358,17 +334,9 @@ class TagsCloud extends Component<PropsT, StateT> {
                 onChange={toggleIsCoordinateGridShown}
               />
             )}
-            <Checkbox
-              checked={isReactAreasShown}
-              label="draw react areas"
-              onChange={toggleIsReactAreasShown}
-            />
+            <Checkbox checked={isReactAreasShown} label="draw react areas" onChange={toggleIsReactAreasShown} />
             {!shouldUseCanvas && (
-              <Checkbox
-                checked={isVacanciesShown}
-                label="draw vacancies"
-                onChange={toggleIsVacanciesShown}
-              />
+              <Checkbox checked={isVacanciesShown} label="draw vacancies" onChange={toggleIsVacanciesShown} />
             )}
           </div>
         </Collapse>
@@ -381,24 +349,17 @@ class TagsCloud extends Component<PropsT, StateT> {
     return (
       <div className={classes.controls}>
         <div className={classes.controlsBox}>
-          <Checkbox
-            checked={shouldUseCanvas}
-            label="use canvas"
-            onChange={this.onShouldUseCanvasChange}
-          />
+          <Checkbox checked={shouldUseCanvas} label="use canvas" onChange={this.onShouldUseCanvasChange} />
         </div>
-        <div className={classes.controlsBox}>
-          {this.renderActionButtons(loading)}
-        </div>
-        <div className={classes.controlsBox}>
-          {tagsCloud.status === SUCCESS && this.renderDebugSettings()}
-        </div>
+        <div className={classes.controlsBox}>{this.renderActionButtons(loading)}</div>
+        <div className={classes.controlsBox}>{tagsCloud.status === SUCCESS && this.renderDebugSettings()}</div>
       </div>
     );
   };
 
   renderTagsCloud = () => {
-    const { tagsCloudSceneSize, downloadCloudCounter, isVacanciesShown, isReactAreasShown, isCoordinateGridShown } = this.state;
+    const { tagsCloudSceneSize, downloadCloudCounter, isVacanciesShown, isReactAreasShown, isCoordinateGridShown } =
+      this.state;
     const { shouldUseCanvas } = this.props;
 
     if (!tagsCloudSceneSize) {
@@ -435,22 +396,14 @@ class TagsCloud extends Component<PropsT, StateT> {
     const { tagsCloudSceneSize } = this.state;
     const { tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily, classes } = this.props;
 
-    const loading = [
-      tagsData.status,
-      tagsCloud.status,
-      fontLoaded.status,
-      incrementalBuild.status,
-    ].includes(PENDING);
+    const loading = [tagsData.status, tagsCloud.status, fontLoaded.status, incrementalBuild.status].includes(PENDING);
 
     return (
       <div className={classes.pageContainer}>
         <div style={{ fontFamily, visibility: 'hidden' }} />
         {loading && this.renderLoader()}
         {this.renderControls(loading)}
-        <div
-          className={classes.tagsCloudScene}
-          ref={this.tagsCloudSceneRef}
-        >
+        <div className={classes.tagsCloudScene} ref={this.tagsCloudSceneRef}>
           {tagsCloudSceneSize && tagsCloud.status === SUCCESS && this.renderTagsCloud()}
         </div>
       </div>

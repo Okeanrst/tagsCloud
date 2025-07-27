@@ -15,9 +15,12 @@ export function prepareTagsData(
   const fontSizeRation = minFontSize / maxFontSize;
   const minSentimentScoreThreshold = maxSentimentScore * fontSizeRation;
 
-  return tagsData.map(tagData => {
+  return tagsData.map((tagData) => {
     const { sentimentScore } = tagData;
-    const fontSize = sentimentScore <= minSentimentScoreThreshold ? minFontSize : Math.round(maxFontSize * sentimentScore / maxSentimentScore);
+    const fontSize =
+      sentimentScore <= minSentimentScoreThreshold
+        ? minFontSize
+        : Math.round((maxFontSize * sentimentScore) / maxSentimentScore);
 
     return {
       ...tagData,

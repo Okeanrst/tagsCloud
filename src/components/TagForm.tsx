@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core';
-import { RgbaColorPicker } from "react-colorful";
+import { RgbaColorPicker } from 'react-colorful';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import { TextButton } from 'ui/buttons/TextButton';
 import { InputFormField } from 'ui/InputFormField';
@@ -20,7 +20,7 @@ type FormValuesT = {
   color: string;
 };
 
-type FormErrorsT = Partial<{[key in keyof FormValuesT]: string}> | null;
+type FormErrorsT = Partial<{ [key in keyof FormValuesT]: string }> | null;
 
 export type TagFormPropsT = {
   initValues?: Partial<TagDataT>;
@@ -28,7 +28,7 @@ export type TagFormPropsT = {
   onSubmit: (data: SubmitValuesT) => void;
 };
 
-type PropsT = TagFormPropsT & {classes: ClassesT;}
+type PropsT = TagFormPropsT & { classes: ClassesT };
 
 type StateT = {
   values: FormValuesT;
@@ -59,8 +59,11 @@ const styles = {
   },
 };
 
-const parseRGBaColor = (color: string): { r: number, g: number, b: number, a: number } => {
-  const [r = 1, g = 1, b = 1, a = 1] = color.slice(color.indexOf('(') + 1, color.indexOf(')')).split(',').map(i => Number(i));
+const parseRGBaColor = (color: string): { r: number; g: number; b: number; a: number } => {
+  const [r = 1, g = 1, b = 1, a = 1] = color
+    .slice(color.indexOf('(') + 1, color.indexOf(')'))
+    .split(',')
+    .map((i) => Number(i));
   return { r, g, b, a };
 };
 
@@ -87,11 +90,7 @@ class TagForm extends Component<PropsT, StateT> {
   constructor(props: PropsT) {
     super(props);
 
-    const {
-      label = '',
-      color,
-      sentimentScore = 1,
-    } = props.initValues ?? {};
+    const { label = '', color, sentimentScore = 1 } = props.initValues ?? {};
     this.state = {
       errors: null,
       values: {
@@ -114,7 +113,7 @@ class TagForm extends Component<PropsT, StateT> {
     });
   };
 
-  handleColorChange = ({ r, g, b, a }: { r: number, g: number, b: number, a: number }) => {
+  handleColorChange = ({ r, g, b, a }: { r: number; g: number; b: number; a: number }) => {
     this.setState(({ values: currentValues }) => {
       return { values: { ...currentValues, color: `rgba(${r},${g},${b},${a})` }, errors: null };
     });
@@ -143,10 +142,7 @@ class TagForm extends Component<PropsT, StateT> {
       errors,
     } = this.state;
     return (
-      <form
-        className={classes.form}
-        onSubmit={this.onSubmit}
-      >
+      <form className={classes.form} onSubmit={this.onSubmit}>
         <InputFormField
           required
           classes={{ helperText: classes.helperText, root: classes.notFirstFormControl }}
@@ -174,13 +170,8 @@ class TagForm extends Component<PropsT, StateT> {
           onChange={this.handleColorChange}
         />
         <div className={classes.buttons}>
-          <TextButton onClick={onCancel}>
-            Cancel
-          </TextButton>
-          <PrimaryButton
-            classes={{ root: classes.submitButton }}
-            type="submit"
-          >
+          <TextButton onClick={onCancel}>Cancel</TextButton>
+          <PrimaryButton classes={{ root: classes.submitButton }} type="submit">
             Submit
           </PrimaryButton>
         </div>

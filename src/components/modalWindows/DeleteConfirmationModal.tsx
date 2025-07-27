@@ -26,17 +26,10 @@ export const DeleteConfirmationModal = ({ onBackdropClick, confirmQuestion, onCo
   const classes = useStyles();
   return (
     <FullScreenModalWindow onBackdropClick={onBackdropClick}>
-      <span>
-        {confirmQuestion}
-      </span>
+      <span>{confirmQuestion}</span>
       <div className={classes.buttons}>
-        <TextButton onClick={onCancel}>
-          Cancel
-        </TextButton>
-        <PrimaryButton
-          classes={{ root: classes.confirmDeleteButton }}
-          onClick={onConfirm}
-        >
+        <TextButton onClick={onCancel}>Cancel</TextButton>
+        <PrimaryButton classes={{ root: classes.confirmDeleteButton }} onClick={onConfirm}>
           Delete
         </PrimaryButton>
       </div>

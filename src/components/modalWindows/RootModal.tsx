@@ -42,7 +42,7 @@ export default class RootModal extends Component<PropsT> {
     }
 
     modalWindowsIds.splice(
-      modalWindowsIds.findIndex(id => id === this.modalWindowsId),
+      modalWindowsIds.findIndex((id) => id === this.modalWindowsId),
       1,
     );
     if (!modalWindowsIds.length && modalRoot) {

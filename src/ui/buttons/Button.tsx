@@ -9,7 +9,7 @@ export type PropsT = {
   disabled?: boolean;
   classes?: {
     root?: string;
-  },
+  };
   type?: 'submit' | 'reset' | 'button';
 };
 
@@ -32,8 +32,8 @@ const useStyles = makeStyles({
     whiteSpace: 'nowrap',
     '&:disabled': {
       cursor: 'default',
-    }
-  }
+    },
+  },
 });
 
 export const Button = ({ children, tabIndex, disabled, onClick, classes, type = 'button' }: PropsT) => {

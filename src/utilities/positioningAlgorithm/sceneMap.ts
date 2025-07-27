@@ -17,12 +17,7 @@ export enum Dimensions {
 
 const { X, MINUS_X, MINUS_Y, Y } = Dimensions;
 
-const {
-  TOP_RIGHT_QUARTER,
-  BOTTOM_RIGHT_QUARTER,
-  BOTTOM_LEFT_QUARTER,
-  TOP_LEFT_QUARTER,
-} = QuarterType;
+const { TOP_RIGHT_QUARTER, BOTTOM_RIGHT_QUARTER, BOTTOM_LEFT_QUARTER, TOP_LEFT_QUARTER } = QuarterType;
 
 type RowT = Array<boolean>;
 
@@ -79,7 +74,7 @@ export class SceneMap {
     const getMapLastNotEmptyRowIndex = (map: RowT[]) => {
       let lastNotEmptyRowIndex = map.length - 1;
       for (let rowIndex = map.length - 1; rowIndex >= 0; rowIndex--) {
-        if (map[rowIndex] && map[rowIndex].some(position => position)) {
+        if (map[rowIndex] && map[rowIndex].some((position) => position)) {
           lastNotEmptyRowIndex = rowIndex;
           break;
         }
@@ -90,7 +85,7 @@ export class SceneMap {
       const lastNotEmptyRowIndex = getMapLastNotEmptyRowIndex(map);
       map.length = lastNotEmptyRowIndex + 1;
     };
-    [TOP_RIGHT_QUARTER, BOTTOM_RIGHT_QUARTER, BOTTOM_LEFT_QUARTER, TOP_LEFT_QUARTER].forEach(quarter => {
+    [TOP_RIGHT_QUARTER, BOTTOM_RIGHT_QUARTER, BOTTOM_LEFT_QUARTER, TOP_LEFT_QUARTER].forEach((quarter) => {
       processQuarterMap(this.sceneMap[quarter]);
     });
   }
@@ -169,9 +164,7 @@ export class SceneMap {
       throw new Error('occupyPosition error: x === 0 || y === 0');
     }
     if (this.getDataAtPosition(x, y)) {
-      throw new IntersectionError(
-        `The position (x: ${x}, y: ${y}) is occupied`,
-      );
+      throw new IntersectionError(`The position (x: ${x}, y: ${y}) is occupied`);
     }
     this._setDataAtPosition(x, y, true);
     this.isSceneSizeFresh = false;
@@ -182,7 +175,7 @@ export class SceneMap {
     const initIsSceneSizeFresh = this.isSceneSizeFresh;
     let isSceneSizeFresh = false;
     const recoverClosedVacanciesState = () => {
-      affectedPositions.forEach(position => this.releasePosition(...position));
+      affectedPositions.forEach((position) => this.releasePosition(...position));
       isSceneSizeFresh = initIsSceneSizeFresh;
     };
 
@@ -266,7 +259,7 @@ export class SceneMap {
     }
     let totalPositionCount = 0;
     let occupiedPositionCount = 0;
-    SceneMap.traverseSceneMap(this, null,(row, col) => {
+    SceneMap.traverseSceneMap(this, null, (row, col) => {
       if (row === 0 || col === 0) {
         return;
       }
@@ -278,7 +271,11 @@ export class SceneMap {
     return occupiedPositionCount / totalPositionCount;
   }
 
-  static traverseSceneMap(map: SceneMap, targetFrameEdges: SceneEdgesT | null, cb: (row: number, column: number) => void) {
+  static traverseSceneMap(
+    map: SceneMap,
+    targetFrameEdges: SceneEdgesT | null,
+    cb: (row: number, column: number) => void,
+  ) {
     // from to bottom
     const sceneEdges = targetFrameEdges ?? map.getSceneEdges();
     const { [X]: rightCol, [MINUS_X]: leftCol, [Y]: topRow, [MINUS_Y]: bottomRow } = sceneEdges;
@@ -289,10 +286,7 @@ export class SceneMap {
     }
   }
 
-  static rectSizeToSceneMapSize(
-    rectSize: number,
-    sceneMapUnitSize: number,
-  ): number {
+  static rectSizeToSceneMapSize(rectSize: number, sceneMapUnitSize: number): number {
     return Math.ceil(rectSize / sceneMapUnitSize);
   }
 
@@ -307,9 +301,7 @@ export class SceneMap {
     if (beginPosition === 0 || endPosition === 0) {
       throw new Error('countPositions error: begin, end can not be zero');
     }
-    return beginPosition < 0 && endPosition > 0
-      ? endPosition - beginPosition
-      : endPosition - beginPosition + 1;
+    return beginPosition < 0 && endPosition > 0 ? endPosition - beginPosition : endPosition - beginPosition + 1;
   }
 
   static changePosition(currentPosition: number, diff: number): number {

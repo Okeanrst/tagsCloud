@@ -1,4 +1,4 @@
-export type ClassesT = {[key: string]: string};
+export type ClassesT = { [key: string]: string };
 
 export type TagSentimentT = Readonly<{
   negative?: number;
@@ -35,7 +35,7 @@ export type TagDataT = Readonly<{
   queries?: any;
 }>;
 
-export type PreparedTagDataT = TagDataT & Readonly<{ fontSize: number; }>;
+export type PreparedTagDataT = TagDataT & Readonly<{ fontSize: number }>;
 
 export type TwoDimensionalMapT = Array<Array<boolean>>;
 
@@ -84,11 +84,13 @@ export type RectPositionT = {
   rectRight: number;
 };
 
-export type PositionedTagRectT = TagRectT & RectMapPositionT & RectPositionT & {
-  rotate: boolean;
-  glyphsXOffset: number;
-  glyphsYOffset: number;
-};
+export type PositionedTagRectT = TagRectT &
+  RectMapPositionT &
+  RectPositionT & {
+    rotate: boolean;
+    glyphsXOffset: number;
+    glyphsYOffset: number;
+  };
 
 export type PositionedTagSvgDataT = Readonly<
   PositionedTagRectT & {

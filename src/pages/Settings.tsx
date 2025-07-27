@@ -37,22 +37,22 @@ const useStyles = makeStyles({
   },
 });
 
-const fontFamilyOptions: {value: FontFamilies, label: string}[] = [];
+const fontFamilyOptions: { value: FontFamilies; label: string }[] = [];
 for (let fontFamily of Object.values(FontFamilies)) {
   fontFamilyOptions.push({ value: fontFamily, label: fontFamily });
 }
 
-const pickingStrategiesOptions: {value: PickingStrategies, label: string}[] = [];
+const pickingStrategiesOptions: { value: PickingStrategies; label: string }[] = [];
 for (let pickingStrategy of Object.values(PickingStrategies)) {
   pickingStrategiesOptions.push({ value: pickingStrategy, label: pickingStrategy });
 }
 
-const sortingClosedVacanciesOptions: {value: SortingClosedVacanciesStrategies, label: string}[] = [];
+const sortingClosedVacanciesOptions: { value: SortingClosedVacanciesStrategies; label: string }[] = [];
 for (let sortingStrategy of Object.values(SortingClosedVacanciesStrategies)) {
   sortingClosedVacanciesOptions.push({ value: sortingStrategy, label: sortingStrategy });
 }
 
-const sortingEdgeVacanciesOptions: {value: SortingEdgeVacanciesStrategies, label: string}[] = [];
+const sortingEdgeVacanciesOptions: { value: SortingEdgeVacanciesStrategies; label: string }[] = [];
 for (let sortingStrategy of Object.values(SortingEdgeVacanciesStrategies)) {
   sortingEdgeVacanciesOptions.push({ value: sortingStrategy, label: sortingStrategy });
 }
@@ -137,12 +137,15 @@ export const Settings = () => {
     return { settings: state.settings };
   });
   const [values, setValues] = useState(settings);
-  const [errors, setErrors] = useState<null | Partial<{[key in SettingsKeysT]: string}>>(null);
+  const [errors, setErrors] = useState<null | Partial<{ [key in SettingsKeysT]: string }>>(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const throttledUpdateSettings = useCallback(throttle((data: Partial<RootStateT['settings']>) => {
-    dispatch(updateSettings(data));
-  }, 1000), [dispatch]);
+  const throttledUpdateSettings = useCallback(
+    throttle((data: Partial<RootStateT['settings']>) => {
+      dispatch(updateSettings(data));
+    }, 1000),
+    [dispatch],
+  );
 
   useEffect(() => {
     const nextErrors = validate(values);
@@ -167,16 +170,13 @@ export const Settings = () => {
     } else {
       inputValue = value;
     }
-    setValues(currentValue => {
+    setValues((currentValue) => {
       return { ...currentValue, [name]: transformInputValue(name as SettingsKeysT, inputValue) };
     });
   }, []);
 
   return (
-    <form
-      className={classes.form}
-      onSubmit={onSubmit}
-    >
+    <form className={classes.form} onSubmit={onSubmit}>
       <SelectFormField
         classes={{ helperText: classes.helperText }}
         helperText={errors?.fontFamily}
@@ -227,8 +227,8 @@ export const Settings = () => {
         checked={values.shouldTryAnotherAngle}
         classes={{ helperText: classes.helperText, root: classes.notFirstFormControl }}
         helperText={errors?.shouldTryAnotherAngle}
-        label='shouldTryAnotherAngle'
-        name='shouldTryAnotherAngle'
+        label="shouldTryAnotherAngle"
+        name="shouldTryAnotherAngle"
         onChange={onInputChange}
       />
       <InputFormField

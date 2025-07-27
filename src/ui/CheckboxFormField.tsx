@@ -6,7 +6,7 @@ import { FormControl } from './FormControl';
 
 const useStyles = makeStyles({
   root: {},
-  helperText: {}
+  helperText: {},
 });
 
 type PropsT = CheckboxPropsT & {
@@ -18,10 +18,8 @@ export const CheckboxFormField = ({ classes, helperText, ...restProps }: PropsT)
   const ownClassed = useStyles();
   return (
     <FormControl className={cx(ownClassed.root, classes?.root)}>
-      <Checkbox {...restProps}/>
-      <div className={cx(ownClassed.helperText, classes?.helperText)}>
-        {helperText}
-      </div>
+      <Checkbox {...restProps} />
+      <div className={cx(ownClassed.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );
 };

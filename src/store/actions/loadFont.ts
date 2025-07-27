@@ -12,7 +12,9 @@ const TIMEOUT = 5000;
 
 export function loadFont() {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
-    const { settings: { fontFamily } } = getState();
+    const {
+      settings: { fontFamily },
+    } = getState();
     if (sessionStorage.getItem('fontLoaded')) {
       // return dispatch(createAction(FONT_LOAD_SUCCESS));
     }
@@ -28,11 +30,13 @@ export function loadFont() {
         sessionStorage.removeItem('fontLoaded');
         batch(() => {
           dispatch(createAction(FONT_LOAD_FAILURE));
-          dispatch(addNotification({
-            content: 'font is not loaded',
-            type: NOTIFICATIONS_TYPES.ERROR,
-            timeout: 5000
-          }));
+          dispatch(
+            addNotification({
+              content: 'font is not loaded',
+              type: NOTIFICATIONS_TYPES.ERROR,
+              timeout: 5000,
+            }),
+          );
         });
       });
   };

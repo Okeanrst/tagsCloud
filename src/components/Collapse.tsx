@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { makeStyles, Theme } from '@material-ui/core';
 import cx from 'classnames';
 
-type OptionsT = {height: number};
+type OptionsT = { height: number };
 
 type PropsT = {
   isOpen: boolean;
@@ -38,9 +38,7 @@ export const Collapse = ({ isOpen, children, className }: PropsT) => {
 
   return (
     <div className={cx(className, classes.root, { [classes.openRoot]: isOpen })}>
-      <div ref={contentRef}>
-        {children}
-      </div>
+      <div ref={contentRef}>{children}</div>
     </div>
   );
 };

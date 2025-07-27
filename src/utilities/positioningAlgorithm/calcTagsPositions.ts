@@ -74,7 +74,7 @@ const mapRectAreaMapOnRectPosition = (
 
     // eslint-disable-next-line no-console
     console.log('updateSceneMap --------start');
-    mainInformation.forEach(information => {
+    mainInformation.forEach((information) => {
       // eslint-disable-next-line no-console
       console.log(information);
     });
@@ -136,8 +136,8 @@ const mapRectAreaMapOnRectPosition = (
   }
 
   if (
-    (!isRectAreaRotated && Array.isArray(rectAreaMap[lastInnerRowPlusOne]))
-    || (isRectAreaRotated && Array.isArray(rectAreaMap[rectArea.rows - 1 - lastInnerColPlusOne]))
+    (!isRectAreaRotated && Array.isArray(rectAreaMap[lastInnerRowPlusOne])) ||
+    (isRectAreaRotated && Array.isArray(rectAreaMap[rectArea.rows - 1 - lastInnerColPlusOne]))
   ) {
     logDebugInformation(['Not all rectAreaMap rows is used']);
   }
@@ -180,7 +180,7 @@ export const getSceneMapVacancies = (sceneMap: SceneMap, options?: VacanciesMana
   const vacanciesManager = new VacanciesManager(sceneMap, options);
   vacanciesManager.buildVacanciesMap();
   return {
-    [VacancyKinds.closedVacancies]: vacanciesManager.closedVacancies.filter(v => !!v) as ClosedVacancyT[],
+    [VacancyKinds.closedVacancies]: vacanciesManager.closedVacancies.filter((v) => !!v) as ClosedVacancyT[],
     [VacancyKinds.topEdgeVacancies]: vacanciesManager.topEdgeVacancies,
     [VacancyKinds.bottomEdgeVacancies]: vacanciesManager.bottomEdgeVacancies,
     [VacancyKinds.leftEdgeVacancies]: vacanciesManager.leftEdgeVacancies,
@@ -223,12 +223,7 @@ export const preparePositionedTagRect = (
     marginTop = rectAreaMapMeta?.marginLeft ?? 0;
     marginBottom = rectAreaMapMeta?.marginRight ?? 0;
   } else {
-    ({
-      marginRight = 0,
-      marginLeft = 0,
-      marginTop = 0,
-      marginBottom = 0,
-    } = rectAreaMapMeta ?? {});
+    ({ marginRight = 0, marginLeft = 0, marginTop = 0, marginBottom = 0 } = rectAreaMapMeta ?? {});
   }
 
   Object.assign(mapPositionedTagRect, {
@@ -459,48 +454,28 @@ export const pickEdgeVacancy = <
         if (
           !isVacancyOutsideScene &&
           !force &&
-          howOppositeSizeStandForEdge(
-            preparedBottomEdgeVacancy.bottomEdgeRow,
-            preparedBottomEdgeVacancy.top,
-          ) < threshold
+          howOppositeSizeStandForEdge(preparedBottomEdgeVacancy.bottomEdgeRow, preparedBottomEdgeVacancy.top) <
+            threshold
         ) {
           continue;
         }
 
-        if (
-          !Number.isFinite(preparedBottomEdgeVacancy.right) &&
-          !Number.isFinite(preparedBottomEdgeVacancy.left)
-        ) {
+        if (!Number.isFinite(preparedBottomEdgeVacancy.right) && !Number.isFinite(preparedBottomEdgeVacancy.left)) {
           const half = baseSize / 2;
           left = Math.ceil(-half);
           right = countPositionsFroward(left, baseSize);
         } else {
-          if (
-            Math.abs(preparedBottomEdgeVacancy.right) >
-            Math.abs(preparedBottomEdgeVacancy.left)
-          ) {
+          if (Math.abs(preparedBottomEdgeVacancy.right) > Math.abs(preparedBottomEdgeVacancy.left)) {
             left = preparedBottomEdgeVacancy.left;
 
-            if (
-              !force &&
-              howBaseSizeStandForEdge(
-                left,
-                preparedBottomEdgeVacancy.rightEdgeColumn,
-              ) < threshold
-            ) {
+            if (!force && howBaseSizeStandForEdge(left, preparedBottomEdgeVacancy.rightEdgeColumn) < threshold) {
               continue;
             }
             right = countPositionsFroward(left, baseSize);
           } else {
             right = preparedBottomEdgeVacancy.right;
 
-            if (
-              !force &&
-              howBaseSizeStandForEdge(
-                preparedBottomEdgeVacancy.leftEdgeColumn,
-                right,
-              ) < threshold
-            ) {
+            if (!force && howBaseSizeStandForEdge(preparedBottomEdgeVacancy.leftEdgeColumn, right) < threshold) {
               continue;
             }
             left = countPositionsBackwards(right, baseSize);
@@ -527,48 +502,28 @@ export const pickEdgeVacancy = <
         if (
           !isVacancyOutsideScene &&
           !force &&
-          howOppositeSizeStandForEdge(
-            preparedRightEdgeVacancy.left,
-            preparedRightEdgeVacancy.rightEdgeColumn,
-          ) < threshold
+          howOppositeSizeStandForEdge(preparedRightEdgeVacancy.left, preparedRightEdgeVacancy.rightEdgeColumn) <
+            threshold
         ) {
           continue;
         }
 
-        if (
-          !Number.isFinite(preparedRightEdgeVacancy.bottom) &&
-          !Number.isFinite(preparedRightEdgeVacancy.top)
-        ) {
+        if (!Number.isFinite(preparedRightEdgeVacancy.bottom) && !Number.isFinite(preparedRightEdgeVacancy.top)) {
           const half = baseSize / 2;
           top = Math.ceil(half);
           bottom = countPositionsBackwards(top, baseSize);
         } else {
-          if (
-            Math.abs(preparedRightEdgeVacancy.bottom) >
-            Math.abs(preparedRightEdgeVacancy.top)
-          ) {
+          if (Math.abs(preparedRightEdgeVacancy.bottom) > Math.abs(preparedRightEdgeVacancy.top)) {
             top = preparedRightEdgeVacancy.top;
 
-            if (
-              !force &&
-              howBaseSizeStandForEdge(
-                preparedRightEdgeVacancy.bottomEdgeRow,
-                top,
-              ) < threshold
-            ) {
+            if (!force && howBaseSizeStandForEdge(preparedRightEdgeVacancy.bottomEdgeRow, top) < threshold) {
               continue;
             }
             bottom = countPositionsBackwards(top, baseSize);
           } else {
             bottom = preparedRightEdgeVacancy.bottom;
 
-            if (
-              !force &&
-              howBaseSizeStandForEdge(
-                bottom,
-                preparedRightEdgeVacancy.topEdgeRow,
-              ) < threshold
-            ) {
+            if (!force && howBaseSizeStandForEdge(bottom, preparedRightEdgeVacancy.topEdgeRow) < threshold) {
               continue;
             }
             top = countPositionsFroward(bottom, baseSize);
@@ -595,47 +550,26 @@ export const pickEdgeVacancy = <
         if (
           !isVacancyOutsideScene &&
           !force &&
-          howOppositeSizeStandForEdge(
-            preparedLeftEdgeVacancy.leftEdgeColumn,
-            preparedLeftEdgeVacancy.right,
-          ) < threshold
+          howOppositeSizeStandForEdge(preparedLeftEdgeVacancy.leftEdgeColumn, preparedLeftEdgeVacancy.right) < threshold
         ) {
           continue;
         }
 
-        if (
-          !Number.isFinite(preparedLeftEdgeVacancy.bottom) &&
-          !Number.isFinite(preparedLeftEdgeVacancy.top)
-        ) {
+        if (!Number.isFinite(preparedLeftEdgeVacancy.bottom) && !Number.isFinite(preparedLeftEdgeVacancy.top)) {
           const half = baseSize / 2;
           top = Math.ceil(half);
           bottom = countPositionsBackwards(top, baseSize);
         } else {
-          if (
-            Math.abs(preparedLeftEdgeVacancy.bottom) >
-            Math.abs(preparedLeftEdgeVacancy.top)
-          ) {
+          if (Math.abs(preparedLeftEdgeVacancy.bottom) > Math.abs(preparedLeftEdgeVacancy.top)) {
             top = preparedLeftEdgeVacancy.top;
-            if (
-              !force &&
-              howBaseSizeStandForEdge(
-                preparedLeftEdgeVacancy.bottomEdgeRow,
-                top,
-              ) < threshold
-            ) {
+            if (!force && howBaseSizeStandForEdge(preparedLeftEdgeVacancy.bottomEdgeRow, top) < threshold) {
               continue;
             }
             bottom = countPositionsBackwards(top, baseSize);
           } else {
             bottom = preparedLeftEdgeVacancy.bottom;
 
-            if (
-              !force &&
-              howBaseSizeStandForEdge(
-                bottom,
-                preparedLeftEdgeVacancy.topEdgeRow,
-              ) < threshold
-            ) {
+            if (!force && howBaseSizeStandForEdge(bottom, preparedLeftEdgeVacancy.topEdgeRow) < threshold) {
               continue;
             }
             top = countPositionsFroward(bottom, baseSize);
@@ -699,9 +633,7 @@ export function calcTagsPositions(
   };
 }> {
   return new Promise((resolve, reject) => {
-    const rectAreaMapByKey = new Map(
-      tagsRectAreasMaps.map(({ key, map, mapMeta }) => [key, { map, mapMeta }]),
-    );
+    const rectAreaMapByKey = new Map(tagsRectAreasMaps.map(({ key, map, mapMeta }) => [key, { map, mapMeta }]));
 
     const isFromScratch = !sceneMapPositions.length;
 
@@ -715,7 +647,7 @@ export function calcTagsPositions(
       } = options;
 
       const rectsData: ReadonlyArray<TagRectT> = tagsData
-        .map(tagData => {
+        .map((tagData) => {
           const { map: rectAreaMap } = rectAreaMapByKey.get(formRectAreaMapKey(tagData.label, tagData.fontSize)) ?? {};
 
           if (!rectAreaMap) {
@@ -822,10 +754,7 @@ export function calcTagsPositions(
         }
       };
 
-      const performWork: PerformWorkT = (
-        rect,
-        { index, shouldTryAnotherAngle = true, isRotated },
-      ) => {
+      const performWork: PerformWorkT = (rect, { index, shouldTryAnotherAngle = true, isRotated }) => {
         const { map: rectAreaMap } = rectAreaMapByKey.get(formRectAreaMapKey(rect.label, rect.fontSize)) ?? {};
         if (!rectAreaMap) {
           throw new Error(`rectAreaMap for rect with id: "${rect.id}" is not found`);
@@ -855,16 +784,16 @@ export function calcTagsPositions(
         const tryPickClosedVacancy = (): boolean => {
           let rectPosition;
           let pickedVacancyIndex;
-          ({
-            rectPosition,
-            vacancyIndex: pickedVacancyIndex
-          } = pickClosedVacancy(rectArea, vacanciesManager.closedVacancies, { pickingStrategy: pickingClosedVacancyStrategy }) ?? {});
+          ({ rectPosition, vacancyIndex: pickedVacancyIndex } =
+            pickClosedVacancy(rectArea, vacanciesManager.closedVacancies, {
+              pickingStrategy: pickingClosedVacancyStrategy,
+            }) ?? {});
           if (!rectPosition && vacanciesManager.needVacanciesRebuild) {
             rebuildVacanciesMap(shouldCreateVacancyIfNoSuchKind);
-            ({
-              rectPosition,
-              vacancyIndex: pickedVacancyIndex
-            } = pickClosedVacancy(rectArea, vacanciesManager.closedVacancies, { pickingStrategy: pickingClosedVacancyStrategy }) ?? {});
+            ({ rectPosition, vacancyIndex: pickedVacancyIndex } =
+              pickClosedVacancy(rectArea, vacanciesManager.closedVacancies, {
+                pickingStrategy: pickingClosedVacancyStrategy,
+              }) ?? {});
           }
 
           if (rectPosition && pickedVacancyIndex) {
@@ -896,11 +825,7 @@ export function calcTagsPositions(
         const MAX_THRESHOLD = 0.51;
         const THRESHOLD_CHANGING_STEP = 0.25;
 
-        for (
-          let threshold = INIT_THRESHOLD;
-          threshold >= MAX_THRESHOLD;
-          threshold -= THRESHOLD_CHANGING_STEP
-        ) {
+        for (let threshold = INIT_THRESHOLD; threshold >= MAX_THRESHOLD; threshold -= THRESHOLD_CHANGING_STEP) {
           const spentEdges = [];
           for (let i = 0; i < edgesOrder.length; i++) {
             const edge = edgesManager.getNextVacanciesEdge(spentEdges);
@@ -1024,7 +949,7 @@ export function calcTagsPositions(
         if (options?.shouldDrawFinalVacanciesMap) {
           vacanciesManager.drawVacanciesMap();
         }
-        positionedRectsData.forEach(mapPositionedTagRect => {
+        positionedRectsData.forEach((mapPositionedTagRect) => {
           const { mapMeta: rectAreaMapMeta } =
             rectAreaMapByKey.get(formRectAreaMapKey(mapPositionedTagRect.label, mapPositionedTagRect.fontSize)) ?? {};
           if (!rectAreaMapMeta) {
@@ -1034,7 +959,7 @@ export function calcTagsPositions(
         });
 
         const vacancies = {
-          closedVacancies: vacanciesManager.closedVacancies.filter(v => !!v) as ClosedVacancyT[],
+          closedVacancies: vacanciesManager.closedVacancies.filter((v) => !!v) as ClosedVacancyT[],
           topEdgeVacancies: vacanciesManager.topEdgeVacancies,
           bottomEdgeVacancies: vacanciesManager.bottomEdgeVacancies,
           leftEdgeVacancies: vacanciesManager.leftEdgeVacancies,
@@ -1050,7 +975,7 @@ export function calcTagsPositions(
 
       splitAndPerformWork<ReturnType<PerformWorkT>>(createWorkGenerator(rectsData, performWork), 50)
         .then(finish)
-        .catch(error => reject(error));
+        .catch((error) => reject(error));
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);

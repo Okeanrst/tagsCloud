@@ -107,51 +107,23 @@ const renderDays = (days: TagDataT['days'], classes: ClassesT) => {
     return null;
   }
   const list = days.map((i, index: number) => {
-    return (
-      <li key={index}>
-        {`${new Date(i.date).toLocaleDateString()} - ${i.volume}`}
-      </li>
-    );
+    return <li key={index}>{`${new Date(i.date).toLocaleDateString()} - ${i.volume}`}</li>;
   });
-  return (
-    <ul className={classes.days}>
-      {list}
-    </ul>
-  );
+  return <ul className={classes.days}>{list}</ul>;
 };
 
-const renderSentiment = (
-  sentiment: TagDataT['sentiment'],
-  classes: ClassesT,
-) => {
+const renderSentiment = (sentiment: TagDataT['sentiment'], classes: ClassesT) => {
   const { negative = 0, neutral = 0, positive = 0 } = sentiment ?? {};
   return (
     <ul className={classes.sentimentList}>
-      <li
-        className={classes.sentimentListItem}
-        key="negative"
-      >
-        negative
-        {' '}
-        {negative}
+      <li className={classes.sentimentListItem} key="negative">
+        negative {negative}
       </li>
-      <li
-        className={classes.sentimentListItem}
-        key="neutral"
-        style={{ marginLeft: '8px' }}
-      >
-        neutral
-        {' '}
-        {neutral}
+      <li className={classes.sentimentListItem} key="neutral" style={{ marginLeft: '8px' }}>
+        neutral {neutral}
       </li>
-      <li
-        className={classes.sentimentListItem}
-        key="positive"
-        style={{ marginLeft: '8px' }}
-      >
-        positive
-        {' '}
-        {positive}
+      <li className={classes.sentimentListItem} key="positive" style={{ marginLeft: '8px' }}>
+        positive {positive}
       </li>
     </ul>
   );
@@ -161,26 +133,14 @@ const renderPageType = (pageType: TagDataT['pageType'], classes: ClassesT) => {
   return (
     <ul className={classes.pageType}>
       {pageType
-        ? (Object.keys(pageType) as Array<keyof typeof pageType>).map(i => (
-          <li key={i}>
-            {`${i}: ${pageType[i]}`}
-          </li>
-          ))
+        ? (Object.keys(pageType) as Array<keyof typeof pageType>).map((i) => <li key={i}>{`${i}: ${pageType[i]}`}</li>)
         : null}
     </ul>
   );
 };
 
-const renderDaysPicker = (
-  icon: string,
-  toggleShowingDays: ToggleShowingDaysT,
-  classes: ClassesT,
-) => (
-  <div
-    className={classes.daysPicker}
-    key="daysPicker"
-    onClick={toggleShowingDays}
-  >
+const renderDaysPicker = (icon: string, toggleShowingDays: ToggleShowingDaysT, classes: ClassesT) => (
+  <div className={classes.daysPicker} key="daysPicker" onClick={toggleShowingDays}>
     {icon}
   </div>
 );
@@ -194,16 +154,7 @@ const getInformationListRenderers = (
   key: string;
   cells: [ListItemsColumnItemT, ListItemsColumnItemT];
 }> => {
-  const {
-    label,
-    volume,
-    type,
-    sentiment,
-    sentimentScore,
-    burst,
-    days,
-    pageType,
-  } = data;
+  const { label, volume, type, sentiment, sentimentScore, burst, days, pageType } = data;
 
   return [
     { key: 'label', cells: ['label:', label] },
@@ -246,17 +197,14 @@ const TagInformation = (props: PropsT) => {
   const [isDeleteConfirmationModalShown, setIsDeleteConfirmationModalShown] = useState<boolean>(false);
   const classes = useStyles();
 
-  const tagData = tagsData.data ? tagsData.data.find(i => i.id === tagId) : null;
+  const tagData = tagsData.data ? tagsData.data.find((i) => i.id === tagId) : null;
 
   const toggleShowingDays = useCallback(() => {
-    setShouldShowDays(currentValue => !currentValue);
+    setShouldShowDays((currentValue) => !currentValue);
   }, []);
 
   useEffect(() => {
-    if (
-      !tagData &&
-      (tagsData.status === FAILURE || tagsData.status === SUCCESS)
-    ) {
+    if (!tagData && (tagsData.status === FAILURE || tagsData.status === SUCCESS)) {
       navigate('/notFound', { replace: true });
     }
   }, [tagData, tagsData.status, navigate]);
@@ -269,13 +217,16 @@ const TagInformation = (props: PropsT) => {
     setIsTagFormModalShown(false);
   }, []);
 
-  const onTagChange = useCallback((data: Pick<TagDataT, 'label' | 'color' | 'sentimentScore'>) => {
-    setIsTagFormModalShown(false);
-    if (!tagData) {
-      return;
-    }
-    dispatch(editDataItem({ ...tagData, ...data }));
-  }, [dispatch, tagData]);
+  const onTagChange = useCallback(
+    (data: Pick<TagDataT, 'label' | 'color' | 'sentimentScore'>) => {
+      setIsTagFormModalShown(false);
+      if (!tagData) {
+        return;
+      }
+      dispatch(editDataItem({ ...tagData, ...data }));
+    },
+    [dispatch, tagData],
+  );
 
   const onDeleteClick = useCallback(() => {
     setIsDeleteConfirmationModalShown(true);
@@ -295,12 +246,7 @@ const TagInformation = (props: PropsT) => {
 
   if (!tagData) return null;
 
-  const informationListRenderers = getInformationListRenderers(
-    tagData,
-    toggleShowingDays,
-    shouldShowDays,
-    classes,
-  );
+  const informationListRenderers = getInformationListRenderers(tagData, toggleShowingDays, shouldShowDays, classes);
 
   const loading = tagsData.status === PENDING;
 
@@ -309,10 +255,7 @@ const TagInformation = (props: PropsT) => {
       <div className={classes.root}>
         {loading ? (
           <div className={classes.loaderContainer}>
-            <FadeLoader
-              color="#123abc"
-              loading={loading}
-            />
+            <FadeLoader color="#123abc" loading={loading} />
           </div>
         ) : null}
         {isTagFormModalShown && (
@@ -320,14 +263,12 @@ const TagInformation = (props: PropsT) => {
             formProps={{
               initValues: tagData,
               onCancel: closeTagFormModal,
-              onSubmit: onTagChange
+              onSubmit: onTagChange,
             }}
             onBackdropClick={closeTagFormModal}
           />
         )}
-        <TextButton onClick={onEditClick}>
-          Edit
-        </TextButton>
+        <TextButton onClick={onEditClick}>Edit</TextButton>
         <OutlinedButton
           borderColor="var(--danger-color)"
           classes={{ root: classes.deleteButton }}
@@ -337,22 +278,13 @@ const TagInformation = (props: PropsT) => {
           Delete
         </OutlinedButton>
         <ul className={classes.informationList}>
-          {informationListRenderers.map(i => (
-            <li
-              className={classes.listItem}
-              key={i.key}
-            >
+          {informationListRenderers.map((i) => (
+            <li className={classes.listItem} key={i.key}>
               {i.cells && [
-                <div
-                  key="0"
-                  style={{ display: 'flex', flex: 2 }}
-                >
+                <div key="0" style={{ display: 'flex', flex: 2 }}>
                   {renderCell(i.cells[0])}
                 </div>,
-                <div
-                  key="1"
-                  style={{ flex: 10 }}
-                >
+                <div key="1" style={{ flex: 10 }}>
                   {renderCell(i.cells[1])}
                 </div>,
               ]}

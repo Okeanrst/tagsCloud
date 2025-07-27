@@ -22,22 +22,16 @@ const useStyles = makeStyles((theme: Theme) => ({
       width: '100%',
       height: '100%',
     },
-  }
+  },
 }));
 
-const FullScreenModalWindow = React.forwardRef<HTMLDivElement, PropsT>(
-  ({ style, children }: PropsT, ref) => {
-    const classes = useStyles();
-    return (
-      <div
-        className={classes.root}
-        ref={ref}
-        style={style}
-      >
-        {children}
-      </div>
-    );
-  },
-);
+const FullScreenModalWindow = React.forwardRef<HTMLDivElement, PropsT>(({ style, children }: PropsT, ref) => {
+  const classes = useStyles();
+  return (
+    <div className={classes.root} ref={ref} style={style}>
+      {children}
+    </div>
+  );
+});
 
 export default withModalWindowBackdrop<PropsT>()(FullScreenModalWindow);

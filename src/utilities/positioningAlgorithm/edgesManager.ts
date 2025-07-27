@@ -32,18 +32,11 @@ export class EdgesManager {
   };
 
   getNextEdge(sizeRatio: number) {
-    const availableEdges =
-      sizeRatio === 1
-        ? edgesOrder
-        : sizeRatio < 1
-        ? [RIGHT, LEFT]
-        : [TOP, BOTTOM];
+    const availableEdges = sizeRatio === 1 ? edgesOrder : sizeRatio < 1 ? [RIGHT, LEFT] : [TOP, BOTTOM];
 
-    const sortedAvailableEdges = [...availableEdges].sort(
-      (a: EDGE, b: EDGE): number => {
-        return this.edgesStatistics[a] - this.edgesStatistics[b];
-      },
-    );
+    const sortedAvailableEdges = [...availableEdges].sort((a: EDGE, b: EDGE): number => {
+      return this.edgesStatistics[a] - this.edgesStatistics[b];
+    });
 
     return sortedAvailableEdges[0];
   }
@@ -54,7 +47,7 @@ export class EdgesManager {
 
   getNextVacanciesEdge(spentEdges: ReadonlyArray<EDGE>) {
     const edges = edgesOrder
-      .filter(edge => !spentEdges.includes(edge))
+      .filter((edge) => !spentEdges.includes(edge))
       .sort((a: EDGE, b: EDGE): number => {
         return this.edgesStatistics[a] - this.edgesStatistics[b];
       });

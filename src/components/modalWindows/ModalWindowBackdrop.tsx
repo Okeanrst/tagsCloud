@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     top: 0,
     backgroundColor: '#80808080',
     zIndex: 1001,
-  }
+  },
 });
 
 export const ModalWindowBackdrop = ({ children, className, style, onBackdropClick }: PropsT) => {
@@ -42,12 +42,7 @@ export const ModalWindowBackdrop = ({ children, className, style, onBackdropClic
   );
   return (
     <RootModal>
-      <div
-        className={cx(classes.root, className)}
-        ref={containerRef}
-        style={style}
-        onClick={onClick}
-      >
+      <div className={cx(classes.root, className)} ref={containerRef} style={style} onClick={onClick}>
         {children}
       </div>
     </RootModal>

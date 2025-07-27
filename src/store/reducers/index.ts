@@ -10,10 +10,7 @@ import { notificationsReducer } from './notifications';
 
 import type { RootStateT } from '../types';
 
-const useCanvasReducer = (
-  state: RootStateT['useCanvas'] = false,
-  action: AnyAction,
-) => {
+const useCanvasReducer = (state: RootStateT['useCanvas'] = false, action: AnyAction) => {
   if (action.type === USE_CANVAS_TOGGLE) return !state;
   return state;
 };

@@ -9,7 +9,7 @@ import { TagDataT } from 'types/types';
 const TIMEOUT = 0;
 
 export function getData(): Promise<ReadonlyArray<TagDataT>> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => resolve(data), TIMEOUT);
   });
 }

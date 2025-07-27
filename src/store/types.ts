@@ -15,7 +15,7 @@ import {
   FontFamilies,
   PickingStrategies,
   SortingClosedVacanciesStrategies,
-  SortingEdgeVacanciesStrategies
+  SortingEdgeVacanciesStrategies,
 } from 'constants/index';
 
 export type NotificationT = {
@@ -27,46 +27,50 @@ export type NotificationT = {
 
 export type RootStateT = {
   settings: {
-    fontFamily: FontFamilies,
+    fontFamily: FontFamilies;
     shouldDrawFinalMap: boolean;
     shouldDrawStepMap: boolean;
     shouldDrawVacanciesMap: boolean;
     shouldDrawFinalVacanciesMap: boolean;
     shouldTryAnotherAngle: boolean;
     addIfEmptyIndex: number;
-    pickingClosedVacancyStrategy: PickingStrategies,
-    pickingEdgeVacancyStrategy: PickingStrategies,
-    sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies,
-    sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies,
-    sceneMapResolution: number,
-    minFontSize: number,
-    maxFontSize: number,
-    tagByTagRenderInterval: number,
-  },
-  tagsData: {
-    data: ReadonlyArray<TagDataT>;
-    status: QueryStatuses.SUCCESS;
-  } | {
-    data: null;
-    status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE
+    pickingClosedVacancyStrategy: PickingStrategies;
+    pickingEdgeVacancyStrategy: PickingStrategies;
+    sortingClosedVacanciesStrategy: SortingClosedVacanciesStrategies;
+    sortingEdgeVacanciesStrategy: SortingEdgeVacanciesStrategies;
+    sceneMapResolution: number;
+    minFontSize: number;
+    maxFontSize: number;
+    tagByTagRenderInterval: number;
   };
-  tagsCloud: {
-    tagsPositions: ReadonlyArray<PositionedTagRectT>;
-    sceneMap: [number, number, boolean][] | [number, number][];
-    vacancies: {
-      [VacancyKinds.closedVacancies]: ClosedVacancyT[];
-      [VacancyKinds.topEdgeVacancies]: PreparedTopEdgeVacancyT[];
-      [VacancyKinds.bottomEdgeVacancies]: PreparedBottomEdgeVacancyT[];
-      [VacancyKinds.leftEdgeVacancies]: PreparedLeftEdgeVacancyT[];
-      [VacancyKinds.rightEdgeVacancies]: PreparedRightEdgeVacancyT[];
-    };
-    status: QueryStatuses.SUCCESS;
-  } | {
-    tagsPositions: null;
-    sceneMap: null;
-    vacancies: null;
-    status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE;
-  };
+  tagsData:
+    | {
+        data: ReadonlyArray<TagDataT>;
+        status: QueryStatuses.SUCCESS;
+      }
+    | {
+        data: null;
+        status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE;
+      };
+  tagsCloud:
+    | {
+        tagsPositions: ReadonlyArray<PositionedTagRectT>;
+        sceneMap: [number, number, boolean][] | [number, number][];
+        vacancies: {
+          [VacancyKinds.closedVacancies]: ClosedVacancyT[];
+          [VacancyKinds.topEdgeVacancies]: PreparedTopEdgeVacancyT[];
+          [VacancyKinds.bottomEdgeVacancies]: PreparedBottomEdgeVacancyT[];
+          [VacancyKinds.leftEdgeVacancies]: PreparedLeftEdgeVacancyT[];
+          [VacancyKinds.rightEdgeVacancies]: PreparedRightEdgeVacancyT[];
+        };
+        status: QueryStatuses.SUCCESS;
+      }
+    | {
+        tagsPositions: null;
+        sceneMap: null;
+        vacancies: null;
+        status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE;
+      };
   useCanvas: boolean;
   fontLoaded: {
     data: boolean;
@@ -77,7 +81,7 @@ export type RootStateT = {
     status: QueryStatuses;
     tagsIds: string[];
   };
-  notifications: NotificationT[],
+  notifications: NotificationT[];
 };
 
 export type AppDispatchT = ThunkDispatch<RootStateT, void, Action>;

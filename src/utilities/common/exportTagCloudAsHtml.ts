@@ -3,35 +3,52 @@ import { SizeT } from 'utilities/tagsCloud/getSuitableSize';
 import { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { FontFamilies } from 'constants/index';
 
-const getTagCloudSvg = ({ tagsSvgData, svgSize, viewBox, transform }: {
+const getTagCloudSvg = ({
+  tagsSvgData,
+  svgSize,
+  viewBox,
+  transform,
+}: {
   tagsSvgData: ReadonlyArray<PositionedTagSvgDataT>;
   svgSize: SizeT;
   viewBox: ViewBoxT;
   transform: string;
 }) => {
-  const textTags = tagsSvgData.map(({ color, fontSize, label, rectTranslateX, rectTranslateY, rotate }) => {
-    const textTransform = `translate(${rectTranslateX}px,${rectTranslateY}px) rotate(${rotate ? 90 : 0}deg) scale(1)`;
-    const textStyle = Object.entries({ fill: color, 'font-size': fontSize + 'px', transform: textTransform })
-      .map(([key, value]) => `${key}: ${value}`)
-      .join('; ');
-    return (
-      `<text style="${textStyle}" text-anchor="middle">${label}</text>`
-    );
-  }).join('');
+  const textTags = tagsSvgData
+    .map(({ color, fontSize, label, rectTranslateX, rectTranslateY, rotate }) => {
+      const textTransform = `translate(${rectTranslateX}px,${rectTranslateY}px) rotate(${rotate ? 90 : 0}deg) scale(1)`;
+      const textStyle = Object.entries({ fill: color, 'font-size': fontSize + 'px', transform: textTransform })
+        .map(([key, value]) => `${key}: ${value}`)
+        .join('; ');
+      return `<text style="${textStyle}" text-anchor="middle">${label}</text>`;
+    })
+    .join('');
 
-  return '<?xml version="1.0" ?>' +
-    `<svg width="${svgSize.width}" height="${svgSize.height}" viewBox="${viewBox.join(' ')}" xmlns="http://www.w3.org/2000/svg">` +
+  return (
+    '<?xml version="1.0" ?>' +
+    `<svg width="${svgSize.width}" height="${svgSize.height}" viewBox="${viewBox.join(
+      ' ',
+    )}" xmlns="http://www.w3.org/2000/svg">` +
     `<g transform="${transform}">` +
     textTags +
-    '</g></svg>';
+    '</g></svg>'
+  );
 };
 
 const fontLinksByFontFamily = {
-  [FontFamilies.OPEN_SANS]: '<link href="https://fonts.googleapis.com/css?family=Open+Sans&amp;subset=cyrillic&display=swap" rel="stylesheet" />',
-  [FontFamilies.SPACE_MONO]: '<link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">'
+  [FontFamilies.OPEN_SANS]:
+    '<link href="https://fonts.googleapis.com/css?family=Open+Sans&amp;subset=cyrillic&display=swap" rel="stylesheet" />',
+  [FontFamilies.SPACE_MONO]:
+    '<link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">',
 };
 
-export const exportTagCloudAsHtml = ({ tagsSvgData, svgSize, viewBox, transform, fontFamily }: {
+export const exportTagCloudAsHtml = ({
+  tagsSvgData,
+  svgSize,
+  viewBox,
+  transform,
+  fontFamily,
+}: {
   tagsSvgData: ReadonlyArray<PositionedTagSvgDataT>;
   svgSize: SizeT;
   viewBox: ViewBoxT;

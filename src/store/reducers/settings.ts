@@ -30,10 +30,7 @@ const initState: RootStateT['settings'] = {
   tagByTagRenderInterval: DEFAULT_TAG_BY_TAG_RENDER_INTERVAL,
 };
 
-export const settingsReducer = (
-  state: RootStateT['settings'] = { ...initState },
-  action: AnyAction,
-) => {
+export const settingsReducer = (state: RootStateT['settings'] = { ...initState }, action: AnyAction) => {
   switch (action.type) {
     case SETTINGS_UPDATE:
       return { ...state, ...action.payload };

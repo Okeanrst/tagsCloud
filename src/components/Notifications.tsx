@@ -62,7 +62,7 @@ export const Notifications = () => {
 
   const onCloseClick = useCallback(() => {
     dispatch(deleteNotification(notification?.id));
-  },[dispatch, notification]);
+  }, [dispatch, notification]);
 
   if (!notification) {
     return null;
@@ -78,10 +78,7 @@ export const Notifications = () => {
     <div className={cx(classes.root, classesByType[type])}>
       <div>
         {content}
-        <Button
-          classes={{ root: classes.closeButton }}
-          onClick={onCloseClick}
-        >
+        <Button classes={{ root: classes.closeButton }} onClick={onCloseClick}>
           <CloseIcon className={classes.closeIcon} />
         </Button>
       </div>

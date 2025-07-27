@@ -6,16 +6,13 @@ import { Button, PropsT as ButtonPropsT } from './Button';
 const useStyles = makeStyles({
   root: {
     color: 'var(--primary-main-color)',
-  }
+  },
 });
 
 export const TextButton = ({ children, classes, ...restProps }: ButtonPropsT) => {
   const ownClasses = useStyles();
   return (
-    <Button
-      classes={{ root: cx(classes?.root, ownClasses.root) }}
-      {...restProps}
-    >
+    <Button classes={{ root: cx(classes?.root, ownClasses.root) }} {...restProps}>
       {children}
     </Button>
   );

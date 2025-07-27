@@ -1,17 +1,13 @@
 import { FontFamilies } from 'constants/index';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { getBorderCoordinates } from './getBorderCoordinates';
-import {
-  PositionedTagRectT,
-  PositionedTagSvgDataT,
-  RectPositionT,
-} from 'types/types';
+import { PositionedTagRectT, PositionedTagSvgDataT, RectPositionT } from 'types/types';
 
 export type ViewBoxT = [number, number, number, number];
 
 export function calcTagSvgData(
   tagData: Pick<PositionedTagRectT, 'rotate' | 'glyphsXOffset' | 'glyphsYOffset'> & RectPositionT,
-  yFactor: number
+  yFactor: number,
 ) {
   const diffX = tagData.rectRight - tagData.rectLeft;
   const diffY = tagData.rectTop - tagData.rectBottom;
@@ -28,7 +24,10 @@ export function calcTagSvgData(
   };
 }
 
-export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>, { fontFamily }: {fontFamily: FontFamilies}): {
+export function getTagsSvgData(
+  data: ReadonlyArray<PositionedTagRectT>,
+  { fontFamily }: { fontFamily: FontFamilies },
+): {
   transform: string;
   viewBox: ViewBoxT;
   aspectRatio: number;
@@ -42,16 +41,11 @@ export function getTagsSvgData(data: ReadonlyArray<PositionedTagRectT>, { fontFa
 
   const yFactor = getFontYFactor(fontFamily) - 0.5;
 
-  const positionedTagsSvgData = data.map(tagData => {
+  const positionedTagsSvgData = data.map((tagData) => {
     return { ...tagData, ...calcTagSvgData(tagData, yFactor) };
   });
 
-  const {
-    top: borderTop,
-    bottom: borderBottom,
-    right: borderRight,
-    left: borderLeft,
-  } = borderCoordinates;
+  const { top: borderTop, bottom: borderBottom, right: borderRight, left: borderLeft } = borderCoordinates;
 
   const maxRight = borderRight;
   const minLeft = borderLeft;

@@ -11,9 +11,7 @@ const useStyles = makeStyles({
 
 export function withRestScreenHeight<T extends { restScreenHeight: number }>(
   WrappedComponent: React.ComponentType<T>,
-): React.ComponentType<
-  Omit<T, 'restScreenHeight'> & { restScreenHeight?: never }
-> {
+): React.ComponentType<Omit<T, 'restScreenHeight'> & { restScreenHeight?: never }> {
   return function (props) {
     const [height, setHeight] = useState<number>(0);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -31,9 +29,12 @@ export function withRestScreenHeight<T extends { restScreenHeight: number }>(
     }, []);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const handleResize = useCallback(throttle((): void => {
-      setHeight(calcRestScreenHeight());
-    }, 500), [calcRestScreenHeight]);
+    const handleResize = useCallback(
+      throttle((): void => {
+        setHeight(calcRestScreenHeight());
+      }, 500),
+      [calcRestScreenHeight],
+    );
 
     useEffect(() => {
       setHeight(calcRestScreenHeight());
@@ -46,13 +47,8 @@ export function withRestScreenHeight<T extends { restScreenHeight: number }>(
 
     const nextProps = { ...props, restScreenHeight: height } as T;
     return (
-      <div
-        className={classes.wrapper}
-        ref={wrapperRef}
-      >
-        <WrappedComponent {...nextProps}>
-          {children}
-        </WrappedComponent>
+      <div className={classes.wrapper} ref={wrapperRef}>
+        <WrappedComponent {...nextProps}>{children}</WrappedComponent>
       </div>
     );
   };

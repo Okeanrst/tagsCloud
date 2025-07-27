@@ -23,14 +23,9 @@ export const Checkbox = ({ label = '', classes, ...restProps }: PropsT) => {
   return (
     <label className={cx(ownClasses.root, classes?.root)}>
       <span>
-        <input
-          {...restProps}
-          type="checkbox"
-        />
+        <input {...restProps} type="checkbox" />
       </span>
-      <span className={cx(ownClasses.label, classes?.label)}>
-        {label}
-      </span>
+      <span className={cx(ownClasses.label, classes?.label)}>{label}</span>
     </label>
   );
 };

@@ -62,13 +62,7 @@ function renderInput(inputProps: ItemPropsT) {
   );
 }
 
-function renderSuggestion({
-  suggestion,
-  index,
-  itemProps,
-  highlightedIndex,
-  selectedItem,
-}: RenderSuggestionPropsT) {
+function renderSuggestion({ suggestion, index, itemProps, highlightedIndex, selectedItem }: RenderSuggestionPropsT) {
   const isHighlighted = highlightedIndex === index;
   const isSelected = (selectedItem || '').indexOf(suggestion.label) > -1;
 
@@ -98,10 +92,9 @@ function getSuitableSuggestions(value: string | null, suggestions: SuggestionsT)
 
   return inputLength === 0
     ? []
-    : suggestions.filter(suggestion => {
+    : suggestions.filter((suggestion) => {
         const keep =
-          count < SUGGESTIONS_MAX_NUMBER &&
-          suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
+          count < SUGGESTIONS_MAX_NUMBER && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
 
         if (keep) {
           count += 1;
@@ -116,24 +109,19 @@ const handleKeyDown: HandleKeyDownT = () => {};
 export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
   const { classes, suggestions, placeholder, onChange, onSubmit, disabled } = props;
 
-  const onSelect = useCallback((selectedItem) => {
-    if (selectedItem && onSubmit) {
-      onSubmit(selectedItem);
-    }
-  }, [onSubmit]);
+  const onSelect = useCallback(
+    (selectedItem) => {
+      if (selectedItem && onSubmit) {
+        onSubmit(selectedItem);
+      }
+    },
+    [onSubmit],
+  );
 
   return (
     <div className={classes.root}>
       <Downshift onChange={onSelect}>
-        {({
-          getInputProps,
-          getItemProps,
-          getMenuProps,
-          highlightedIndex,
-          inputValue,
-          isOpen,
-          selectedItem,
-        }) => {
+        {({ getInputProps, getItemProps, getMenuProps, highlightedIndex, inputValue, isOpen, selectedItem }) => {
           return (
             <div className={classes.container}>
               {renderInput({
@@ -148,19 +136,15 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
               })}
               <div {...getMenuProps()}>
                 {isOpen ? (
-                  <Paper
-                    square
-                    className={classes.paper}
-                  >
-                    {getSuitableSuggestions(inputValue, suggestions).map(
-                      (suggestion, index) =>
-                        renderSuggestion({
-                          suggestion,
-                          index,
-                          itemProps: getItemProps({ item: suggestion.label }),
-                          highlightedIndex,
-                          selectedItem,
-                        }),
+                  <Paper square className={classes.paper}>
+                    {getSuitableSuggestions(inputValue, suggestions).map((suggestion, index) =>
+                      renderSuggestion({
+                        suggestion,
+                        index,
+                        itemProps: getItemProps({ item: suggestion.label }),
+                        highlightedIndex,
+                        selectedItem,
+                      }),
                     )}
                   </Paper>
                 ) : null}

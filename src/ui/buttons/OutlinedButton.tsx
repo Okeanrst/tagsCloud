@@ -17,16 +17,13 @@ const useStyles = makeStyles<Theme, OptionsT>({
   root: {
     border: ({ borderColor = 'var(--primary-main-color)' }) => `1px solid ${borderColor}`,
     color: ({ color = 'var(--primary-main-color)' }) => color,
-  }
+  },
 });
 
 export const OutlinedButton = ({ children, classes, borderColor, color, ...restProps }: PropsT) => {
   const ownClasses = useStyles({ borderColor, color });
   return (
-    <Button
-      classes={{ root: cx(classes?.root, ownClasses.root) }}
-      {...restProps}
-    >
+    <Button classes={{ root: cx(classes?.root, ownClasses.root) }} {...restProps}>
       {children}
     </Button>
   );

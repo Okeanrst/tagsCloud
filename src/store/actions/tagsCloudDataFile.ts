@@ -22,17 +22,19 @@ export function uploadRawTagsCloudDataFile(file: File) {
     });
 
     parseRawTagsCloudDataFile(file)
-      .then(fileContent => {
+      .then((fileContent) => {
         dispatch(createAction(TAGS_DATA_FETCH_SUCCESS, fileContent));
       })
       .catch(() => {
         batch(() => {
           dispatch(createAction(TAGS_DATA_FETCH_FAILURE));
-          dispatch(addNotification({
-            content: 'invalid file',
-            type: NOTIFICATIONS_TYPES.ERROR,
-            timeout: 5000
-          }));
+          dispatch(
+            addNotification({
+              content: 'invalid file',
+              type: NOTIFICATIONS_TYPES.ERROR,
+              timeout: 5000,
+            }),
+          );
         });
       });
   };
@@ -56,7 +58,7 @@ function parseRawTagsCloudDataFile(file: File): Promise<TagDataT> {
         reject(e);
       }
     };
-    reader.onerror = e => reject(e);
+    reader.onerror = (e) => reject(e);
     reader.readAsText(file);
   });
 }

@@ -18,10 +18,7 @@ import { EditIcon } from 'ui/icons/EditIcon';
 import { PlusIcon } from 'ui/icons/PlusIcon';
 import { DownloadIcon } from 'ui/icons/DownloadIcon';
 import { OutlinedButton } from 'ui/buttons/OutlinedButton';
-import {
-  downloadRawTagsCloudDataFile,
-  uploadRawTagsCloudDataFile,
-} from 'store/actions/tagsCloudDataFile';
+import { downloadRawTagsCloudDataFile, uploadRawTagsCloudDataFile } from 'store/actions/tagsCloudDataFile';
 import { TagFormModal } from 'components/modalWindows/TagFormModal';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import StyledSearchWithAutocomplete from './StyledSearchWithAutocomplete';
@@ -33,12 +30,8 @@ import type { RootStateT, AppDispatchT } from 'store/types';
 const { PENDING, SUCCESS } = QueryStatuses;
 
 const getTagsData = (state: RootStateT) => state.tagsData.data;
-const getSearchAutocompleteSuggestions = createSelector(
-  [getTagsData],
-  tagsRawData =>
-    tagsRawData
-      ? tagsRawData.map(item => ({ id: item.id, label: item.label }))
-      : [],
+const getSearchAutocompleteSuggestions = createSelector([getTagsData], (tagsRawData) =>
+  tagsRawData ? tagsRawData.map((item) => ({ id: item.id, label: item.label })) : [],
 );
 
 const mapStateToProps = (state: RootStateT) => {
@@ -126,7 +119,9 @@ class TagsListEditor extends Component<PropsT, StateT> {
   calcTagsListHeight = () => {
     const { restScreenHeight } = this.props;
     const { actionsBlockHeight } = this.state;
-    const tagsListHeight = Math.floor((restScreenHeight - actionsBlockHeight - TAGS_LIST_MARGIN_TOP) / TAGS_LIST_ROW_HEIGHT) * TAGS_LIST_ROW_HEIGHT;
+    const tagsListHeight =
+      Math.floor((restScreenHeight - actionsBlockHeight - TAGS_LIST_MARGIN_TOP) / TAGS_LIST_ROW_HEIGHT) *
+      TAGS_LIST_ROW_HEIGHT;
     return tagsListHeight < TAGS_LIST_ROW_HEIGHT * 5 ? TAGS_LIST_ROW_HEIGHT * 5 : tagsListHeight;
   };
 
@@ -134,20 +129,13 @@ class TagsListEditor extends Component<PropsT, StateT> {
     const { classes } = this.props;
     return (
       <div className={classes.loaderContainer}>
-        <FadeLoader
-          color="#123abc"
-          loading={loading}
-        />
+        <FadeLoader color="#123abc" loading={loading} />
       </div>
     );
   };
 
   uploadTagsDataFile = (e: SyntheticEvent<HTMLInputElement>) => {
-    if (
-      !(e.target instanceof HTMLInputElement) ||
-      !e.target.files ||
-      !e.target.files[0]
-    ) {
+    if (!(e.target instanceof HTMLInputElement) || !e.target.files || !e.target.files[0]) {
       return;
     }
 
@@ -158,10 +146,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
     const { classes } = this.props;
     return (
       <div className={classes.fileUploader}>
-        <label
-          className={classes.fileUploaderLabel}
-          htmlFor="cloud_conf_upload"
-        >
+        <label className={classes.fileUploaderLabel} htmlFor="cloud_conf_upload">
           Choose tags cloud configuration file (*.json)
         </label>
         <input
@@ -237,10 +222,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
   };
 
   onDelete = (e: SyntheticEvent<EventTarget>) => {
-    if (
-      this.state.tagIdToDelete !== undefined ||
-      !(e.currentTarget instanceof HTMLButtonElement)
-    ) {
+    if (this.state.tagIdToDelete !== undefined || !(e.currentTarget instanceof HTMLButtonElement)) {
       return;
     }
     const id = e.currentTarget.dataset.id;
@@ -256,9 +238,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
       return;
     }
     const tagId = tagFormData.id;
-    tagId
-      ? this.props.editTag({ ...tagFormData, ...data, id: tagId })
-      : this.props.addTag({ ...tagFormData, ...data });
+    tagId ? this.props.editTag({ ...tagFormData, ...data, id: tagId }) : this.props.addTag({ ...tagFormData, ...data });
   };
 
   onClone = (e: SyntheticEvent<EventTarget>) => {
@@ -268,7 +248,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
     const targetId = e.currentTarget.dataset.id;
     const { tagsData } = this.props;
-    const targetTagData = tagsData.data?.find(item => item.id === targetId);
+    const targetTagData = tagsData.data?.find((item) => item.id === targetId);
 
     if (!targetTagData) {
       return;
@@ -291,7 +271,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
 
     const id = e.currentTarget.dataset.id;
     const { tagsData } = this.props;
-    const editedTagData = tagsData.data?.find(item => item.id === id);
+    const editedTagData = tagsData.data?.find((item) => item.id === id);
     this.setState({ tagFormData: editedTagData });
   };
 
@@ -303,7 +283,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
     const {
       tagsData: { data },
     } = this.props;
-    const index = target && data ? data.findIndex(item => target === item.label) : -1;
+    const index = target && data ? data.findIndex((item) => target === item.label) : -1;
     if (index >= 0) {
       this.setState({ scrollToItem: { index } });
     }
@@ -314,7 +294,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
       formProps={{
         initValues: data,
         onCancel: this.closeTagForm,
-        onSubmit: this.onTagChange
+        onSubmit: this.onTagChange,
       }}
       onBackdropClick={this.closeTagForm}
     />
@@ -326,32 +306,16 @@ class TagsListEditor extends Component<PropsT, StateT> {
       const item = data[index];
       const itemStyle = highlightedIndex === index ? { ...style, backgroundColor: 'var(--grey300-color)' } : style;
       return (
-        <li
-          className={classes.tagsListRow}
-          style={itemStyle}
-        >
-          <div
-            className={classes.tagsListLabel}
-            key="label"
-          >
+        <li className={classes.tagsListRow} style={itemStyle}>
+          <div className={classes.tagsListLabel} key="label">
             {item.label}
           </div>
-          <div>
-            {item.sentimentScore}
-          </div>
-          <button
-            className={cx(classes.tagsListButton, classes.cloneButton)}
-            data-id={item.id}
-            onClick={this.onClone}
-          >
-            <CopyIcon/>
+          <div>{item.sentimentScore}</div>
+          <button className={cx(classes.tagsListButton, classes.cloneButton)} data-id={item.id} onClick={this.onClone}>
+            <CopyIcon />
           </button>
-          <button
-            className={cx(classes.tagsListButton, classes.editButton)}
-            data-id={item.id}
-            onClick={this.onEdit}
-          >
-            <EditIcon/>
+          <button className={cx(classes.tagsListButton, classes.editButton)} data-id={item.id} onClick={this.onEdit}>
+            <EditIcon />
           </button>
           <button
             className={cx(classes.tagsListButton, classes.deleteButton)}
@@ -391,17 +355,10 @@ class TagsListEditor extends Component<PropsT, StateT> {
     return (
       <div className={classes.root}>
         {this.renderLoader(loading)}
-        <div
-          className={classes.actionsBlock}
-          ref={this.actionsBlockRef}
-        >
+        <div className={classes.actionsBlock} ref={this.actionsBlockRef}>
           {this.renderFileUploader(loading)}
           {this.renderDownloadFileButton(!isDataReady)}
-          <PrimaryButton
-            classes={{ root: classes.addNewButton }}
-            disabled={!isDataReady}
-            onClick={this.onAdd}
-          >
+          <PrimaryButton classes={{ root: classes.addNewButton }} disabled={!isDataReady} onClick={this.onAdd}>
             <span className={classes.addNewLabel}>Add new</span>
             <PlusIcon className={classes.addNewIcon} />
           </PrimaryButton>
@@ -430,16 +387,10 @@ class TagsListEditor extends Component<PropsT, StateT> {
   }
 }
 
-const TagsListEditorWithRestScreenHeight = withStyles(styles)(
-  withRestScreenHeight<PropsT>(TagsListEditor),
-);
+const TagsListEditorWithRestScreenHeight = withStyles(styles)(withRestScreenHeight<PropsT>(TagsListEditor));
 
-type TagsListEditorWithRestScreenHeightPropsT = React.ComponentProps<
-  typeof TagsListEditorWithRestScreenHeight
->;
+type TagsListEditorWithRestScreenHeightPropsT = React.ComponentProps<typeof TagsListEditorWithRestScreenHeight>;
 
 export default connector(
-  withTriggerGettingRawData<TagsListEditorWithRestScreenHeightPropsT>(
-    TagsListEditorWithRestScreenHeight,
-  ),
+  withTriggerGettingRawData<TagsListEditorWithRestScreenHeightPropsT>(TagsListEditorWithRestScreenHeight),
 );

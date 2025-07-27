@@ -9,6 +9,6 @@ type PropsT = {
 
 export const TagFormModal = ({ onBackdropClick, formProps }: PropsT) => (
   <FullScreenModalWindow onBackdropClick={onBackdropClick}>
-    <TagForm {...formProps}/>
+    <TagForm {...formProps} />
   </FullScreenModalWindow>
 );

@@ -44,19 +44,27 @@ describe('positioningAlgorithm tests', () => {
     it(`should return array with correct value (right shape)`, async () => {
       const tagsRectAreasMaps = await prepareRectAreasMaps(preparedData, { resolution: 2, fontFamily: OPEN_SANS_FONT });
       expect(tagsRectAreasMaps).toStrictEqual(
-        preparedData.map(({ label, fontSize }) => ({ key: formRectAreaMapKey(label, fontSize), map: null, mapMeta: null })),
+        preparedData.map(({ label, fontSize }) => ({
+          key: formRectAreaMapKey(label, fontSize),
+          map: null,
+          mapMeta: null,
+        })),
       );
     });
   });
 
   describe('calcTagsPositions tests', () => {
     it(`return result is equal to snapshot`, async () => {
-      const { tagsPositions } = await calcTagsPositions(preparedData, tagsRectAreasMapsMock, [], { sceneMapResolution: 2 });
+      const { tagsPositions } = await calcTagsPositions(preparedData, tagsRectAreasMapsMock, [], {
+        sceneMapResolution: 2,
+      });
       expect(tagsPositions).toMatchSnapshot();
     });
 
     it(`no intersection`, async () => {
-      const { tagsPositions } = await calcTagsPositions(preparedData, fullSizeFilledRectAreasMaps, [], { sceneMapResolution: 2 });
+      const { tagsPositions } = await calcTagsPositions(preparedData, fullSizeFilledRectAreasMaps, [], {
+        sceneMapResolution: 2,
+      });
 
       let intersection = 0;
       const map = new Map();
@@ -82,23 +90,38 @@ describe('positioningAlgorithm tests', () => {
 
   describe('isVacancyLargeEnoughToFitRect tests', () => {
     it(`should return correct result`, () => {
-      const isLargeEnough = isVacancyLargeEnoughToFitRect({ rows: 2, cols: 4 }, { top: 4, bottom: 3, left: -Infinity, right: 5 });
+      const isLargeEnough = isVacancyLargeEnoughToFitRect(
+        { rows: 2, cols: 4 },
+        { top: 4, bottom: 3, left: -Infinity, right: 5 },
+      );
       expect(isLargeEnough).toBe(true);
     });
     it(`should return correct result (1)`, () => {
-      const isLargeEnough = isVacancyLargeEnoughToFitRect({ rows: 1, cols: 1 }, { top: -1, bottom: -Infinity, left: -5, right: -5 });
+      const isLargeEnough = isVacancyLargeEnoughToFitRect(
+        { rows: 1, cols: 1 },
+        { top: -1, bottom: -Infinity, left: -5, right: -5 },
+      );
       expect(isLargeEnough).toBe(true);
     });
     it(`should return correct result (2)`, () => {
-      const isLargeEnough = isVacancyLargeEnoughToFitRect({ rows: 5, cols: 2 }, { top: -1, bottom: -Infinity, left: -5, right: Infinity });
+      const isLargeEnough = isVacancyLargeEnoughToFitRect(
+        { rows: 5, cols: 2 },
+        { top: -1, bottom: -Infinity, left: -5, right: Infinity },
+      );
       expect(isLargeEnough).toBe(true);
     });
     it(`should return correct result (3)`, () => {
-      const isLargeEnough = isVacancyLargeEnoughToFitRect({ rows: 100, cols: 2000 }, { right: Infinity, left: -Infinity, bottom: 2, top: Infinity });
+      const isLargeEnough = isVacancyLargeEnoughToFitRect(
+        { rows: 100, cols: 2000 },
+        { right: Infinity, left: -Infinity, bottom: 2, top: Infinity },
+      );
       expect(isLargeEnough).toBe(true);
     });
     it(`should return falsy result for rotated vacancy (1)`, () => {
-      const isLargeEnough = isVacancyLargeEnoughToFitRect({ rows: 3, cols: 4 }, { right: 4, left: -Infinity, bottom: 2, top: 3 });
+      const isLargeEnough = isVacancyLargeEnoughToFitRect(
+        { rows: 3, cols: 4 },
+        { right: 4, left: -Infinity, bottom: 2, top: 3 },
+      );
       expect(isLargeEnough).toBe(false);
     });
   });
@@ -112,26 +135,79 @@ describe('positioningAlgorithm tests', () => {
   describe('releaseRectAreaPositionsOnSceneMap tests', () => {
     it(`should return correct result`, () => {
       const sceneMapPositions: PositionT[] = [
-        [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
-        [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2],
-        [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3],
-        [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4],
+        [1, 1],
+        [2, 1],
+        [3, 1],
+        [4, 1],
+        [5, 1],
+        [6, 1],
+        [1, 2],
+        [2, 2],
+        [3, 2],
+        [4, 2],
+        [5, 2],
+        [6, 2],
+        [1, 3],
+        [2, 3],
+        [3, 3],
+        [4, 3],
+        [5, 3],
+        [6, 3],
+        [1, 4],
+        [2, 4],
+        [3, 4],
+        [4, 4],
+        [5, 4],
+        [6, 4],
       ];
       const tagPosition = { bottom: 2, top: 4, left: 3, right: 6, rotate: false };
-      const rectAreaMap = [[true, false, true, false], [true, true, true, true], [true, true, true, true]];
+      const rectAreaMap = [
+        [true, false, true, false],
+        [true, true, true, true],
+        [true, true, true, true],
+      ];
       const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, tagPosition, rectAreaMap);
-      expect(sceneMap.toPositions()).toStrictEqual([[1,4],[2,4],[4,4],[6,4],[1,3],[2,3],[1,2],[2,2],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1]]);
+      expect(sceneMap.toPositions()).toStrictEqual([
+        [1, 4],
+        [2, 4],
+        [4, 4],
+        [6, 4],
+        [1, 3],
+        [2, 3],
+        [1, 2],
+        [2, 2],
+        [1, 1],
+        [2, 1],
+        [3, 1],
+        [4, 1],
+        [5, 1],
+        [6, 1],
+      ]);
     });
   });
 
   describe('moveRectAreaPositionsOnSceneMap tests', () => {
     it(`should return correct result`, () => {
-      const sceneMapPositions: PositionT[] = [[3, 2], [4, 2]];
+      const sceneMapPositions: PositionT[] = [
+        [3, 2],
+        [4, 2],
+      ];
       const currentTagPosition = { bottom: 2, top: 2, left: 3, right: 4, rotate: false };
       const nextTagPosition = { bottom: 3, top: 4, left: 4, right: 4, rotate: true };
-      const rectAreaMap = [[true, true], [true, true]];
-      const sceneMap = moveRectAreaPositionsOnSceneMap(sceneMapPositions, currentTagPosition, nextTagPosition, rectAreaMap);
-      expect(sceneMap.toPositions()).toStrictEqual([[4,4],[4,3]]);
+      const rectAreaMap = [
+        [true, true],
+        [true, true],
+      ];
+      const sceneMap = moveRectAreaPositionsOnSceneMap(
+        sceneMapPositions,
+        currentTagPosition,
+        nextTagPosition,
+        rectAreaMap,
+      );
+      expect(sceneMap.toPositions()).toStrictEqual([
+        [4, 4],
+        [4, 3],
+      ]);
     });
   });
 });

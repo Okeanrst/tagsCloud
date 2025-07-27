@@ -1,42 +1,41 @@
-import {
-  FONT_SIZE_TO_GLYPH_HEIGHT_RATIO,
-  OPEN_SANS_FONT,
-  SPACE_MONO_FONT,
-  FontFamilies,
-} from 'constants/index';
+import { FONT_SIZE_TO_GLYPH_HEIGHT_RATIO, OPEN_SANS_FONT, SPACE_MONO_FONT, FontFamilies } from 'constants/index';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import openSansGlyphsByChars from './glyphsByChars/openSans.json';
 import spaceMonoGlyphsByChars from './glyphsByChars/spaceMono.json';
 
-import {
-  TwoDimensionalMapMetaT,
-  TwoDimensionalMapT,
-  RectAreaT,
-} from 'types/types';
+import { TwoDimensionalMapMetaT, TwoDimensionalMapT, RectAreaT } from 'types/types';
 
 type RectAreaSize = { width: number; height: number };
 
-type GlyphsByCharsT = {[key: string]: {xMin: number, yMin: number, xMax: number, yMax: number, advanceWidth: number}};
+type GlyphsByCharsT = {
+  [key: string]: { xMin: number; yMin: number; xMax: number; yMax: number; advanceWidth: number };
+};
 
-const glyphsByCharsMap: {[key: string]: GlyphsByCharsT} = {
+const glyphsByCharsMap: { [key: string]: GlyphsByCharsT } = {
   [OPEN_SANS_FONT]: openSansGlyphsByChars,
   [SPACE_MONO_FONT]: spaceMonoGlyphsByChars,
 };
 
-function calcRectAreaSize({ canvas, word, fontSize, resolution, fontFamily }: {
-  canvas: HTMLCanvasElement,
+function calcRectAreaSize({
+  canvas,
+  word,
+  fontSize,
+  resolution,
+  fontFamily,
+}: {
+  canvas: HTMLCanvasElement;
   word: string;
   fontSize: number;
   resolution: number;
   fontFamily: string;
-}): ([RectAreaT, RectAreaSize, number] | null) {
+}): [RectAreaT, RectAreaSize, number] | null {
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
   if (!ctx) {
     return null;
   }
 
-  const height = Math.ceil(fontSize * FONT_SIZE_TO_GLYPH_HEIGHT_RATIO / resolution) * resolution;
+  const height = Math.ceil((fontSize * FONT_SIZE_TO_GLYPH_HEIGHT_RATIO) / resolution) * resolution;
 
   ctx.font = `${fontSize}px "${fontFamily}"`;
   const wordWidth = ctx.measureText(word).width;
@@ -68,7 +67,7 @@ export function getRectAreaMap(
   }: {
     returnFakeRectAreaMap: boolean;
     returnFullSizeRectAreaMap: boolean;
-  } = { returnFakeRectAreaMap: false, returnFullSizeRectAreaMap: false }
+  } = { returnFakeRectAreaMap: false, returnFullSizeRectAreaMap: false },
 ) {
   if (returnFakeRectAreaMap) {
     // for debug
@@ -115,7 +114,7 @@ export function getRectAreaMap(
     return null;
   }
 
-  const { glyphsXOffset, glyphsYOffset }= glyphsMap.meta;
+  const { glyphsXOffset, glyphsYOffset } = glyphsMap.meta;
 
   const fullSizeRectAreaMap = glyphsMap.map;
 
@@ -136,10 +135,7 @@ export function getRectAreaMap(
 
   const {
     map: rectAreaMap,
-    meta: {
-      topCutOffRows,
-      bottomCutOffRows,
-    },
+    meta: { topCutOffRows, bottomCutOffRows },
   } = trimMapEmptyEdges(fullSizeRectAreaMap);
 
   if (false) {
@@ -181,11 +177,11 @@ function getGlyphsMap(
     resolution: number;
     fontFamily: FontFamilies;
   },
-): ({
+): {
   map: TwoDimensionalMapT;
   rectArea: RectAreaT;
   meta: TwoDimensionalMapMetaT;
-} | null) {
+} | null {
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
   if (!ctx) {
@@ -215,7 +211,8 @@ function getGlyphsMap(
   if (firstCharGlyphProps && lastCharGlyphProps) {
     ctx.font = `${fontSize}px "${fontFamily}"`;
     const glyphUnitSize = ctx.measureText(firstChar).width / firstCharGlyphProps.advanceWidth;
-    glyphsXOffset = (lastCharGlyphProps.advanceWidth - lastCharGlyphProps.xMax - firstCharGlyphProps.xMin) / 2 * glyphUnitSize;
+    glyphsXOffset =
+      ((lastCharGlyphProps.advanceWidth - lastCharGlyphProps.xMax - firstCharGlyphProps.xMin) / 2) * glyphUnitSize;
     leftExtraColumns = Math.ceil(glyphsXOffset / resolution) + 1;
     rightExtraColumns = leftExtraColumns > 0 ? 0 : rightExtraColumns;
   }
@@ -254,8 +251,7 @@ function getGlyphsMap(
     for (let col = 0; col < cols; col++) {
       const colShift = oneColShift * col;
       let checkIsPositionOccupied = false;
-      subRowLoop:
-      for (let subRow = 0; subRow < resolution; subRow++) {
+      subRowLoop: for (let subRow = 0; subRow < resolution; subRow++) {
         const subRowShift = oneSubRowShift * subRow;
         for (let subCol = 0; subCol < resolution; subCol++) {
           const subColShift = subCol * bytePerPixel;
@@ -476,11 +472,7 @@ function getHighResolutionGlyphsMap(
 
 // not in use any more
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function glyphsMapToRectMap(
-  glyphsMap: TwoDimensionalMapT,
-  rectArea: RectAreaT,
-  rotate: boolean,
-): TwoDimensionalMapT {
+function glyphsMapToRectMap(glyphsMap: TwoDimensionalMapT, rectArea: RectAreaT, rotate: boolean): TwoDimensionalMapT {
   const { rows: rectRows, cols: rectCols } = rectArea;
   const glyphsRows = rotate ? glyphsMap[0].length : glyphsMap.length;
   const glyphsCols = rotate ? glyphsMap.length : glyphsMap[0].length;
@@ -504,10 +496,7 @@ function glyphsMapToRectMap(
 
     for (let row = rowStart; row < rowFinish; row++) {
       for (let col = colStart; col < colFinish; col++) {
-        if (
-          (rotate && glyphsMap[col] && glyphsMap[col][row]) ||
-          (glyphsMap[row] && glyphsMap[row][col])
-        ) {
+        if ((rotate && glyphsMap[col] && glyphsMap[col][row]) || (glyphsMap[row] && glyphsMap[row][col])) {
           return true;
         }
       }
@@ -600,10 +589,7 @@ function trimMapEmptyEdges(entryMap: TwoDimensionalMapT): {
       // not copy
       continue;
     }
-    map[targetMapRow] = entryMap[row].slice(
-      firstNotEmptyColumn,
-      lastNotEmptyColumn + 1,
-    );
+    map[targetMapRow] = entryMap[row].slice(firstNotEmptyColumn, lastNotEmptyColumn + 1);
     targetMapRow++;
   }
 
@@ -618,10 +604,7 @@ function trimMapEmptyEdges(entryMap: TwoDimensionalMapT): {
   };
 }
 
-function visualizeMap(
-  map: TwoDimensionalMapT,
-  rowLength: number = 250,
-): string {
+function visualizeMap(map: TwoDimensionalMapT, rowLength: number = 250): string {
   let res = '';
   const { cols, rows } = getRectAreaOfRectAreaMap(map);
   const maxCol = rowLength < cols ? rowLength : cols;
@@ -633,12 +616,7 @@ function visualizeMap(
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < maxCol; col++) {
-      res +=
-        map[row] && map[row][col]
-          ? '⬛'
-          : map[row] === undefined || map[row][col] === undefined
-          ? ''
-          : '⬜';
+      res += map[row] && map[row][col] ? '⬛' : map[row] === undefined || map[row][col] === undefined ? '' : '⬜';
     }
     res += '\n';
   }
