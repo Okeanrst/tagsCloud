@@ -78,12 +78,12 @@ const getEventDocumentCoordinates = (
   let pageY: number | null = null;
   if (event instanceof MouseEvent) {
     ({ pageX, pageY } = event);
-  } else if (event instanceof TouchEvent) {
+  } else if (window.TouchEvent && event instanceof TouchEvent) {
     ({ pageX, pageY } = event.touches[0]);
   } else if ('nativeEvent' in event && event.nativeEvent instanceof MouseEvent) {
     // @ts-ignore
     ({ pageX, pageY } = event);
-  } else if ('nativeEvent' in event && event.nativeEvent instanceof TouchEvent) {
+  } else if ('nativeEvent' in event && window.TouchEvent && event.nativeEvent instanceof TouchEvent) {
     // @ts-ignore
     ({ pageX, pageY } = event.touches[0]);
   }
