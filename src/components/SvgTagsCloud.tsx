@@ -118,6 +118,7 @@ const useStyles = makeStyles<Theme, StylesOptionsT>({
   text: {
     'white-space': 'pre',
     'user-select': 'none',
+    '-webkit-user-select': 'none',
   },
   canvasWrapper: {
     display: 'inline-block',

@@ -17,7 +17,12 @@ const getTagCloudSvg = ({
   const textTags = tagsSvgData
     .map(({ color, fontSize, label, rectTranslateX, rectTranslateY, rotate }) => {
       const textTransform = `translate(${rectTranslateX}px,${rectTranslateY}px) rotate(${rotate ? 90 : 0}deg) scale(1)`;
-      const textStyle = Object.entries({ fill: color, 'font-size': fontSize + 'px', transform: textTransform })
+      const textStyle = Object.entries({
+        fill: color,
+        'font-size': fontSize + 'px',
+        transform: textTransform,
+        'user-select': 'none',
+      })
         .map(([key, value]) => `${key}: ${value}`)
         .join('; ');
       return `<text style="${textStyle}" text-anchor="middle">${label}</text>`;
