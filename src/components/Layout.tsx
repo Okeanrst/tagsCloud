@@ -85,14 +85,10 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: `${theme.spacing(6)}px`,
     backgroundColor: 'transparent',
     transition: 'background-color 0.3s ease',
-    '&:hover': {
-      backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    },
   },
   logoIcon: {
     width: theme.spacing(4),
     height: theme.spacing(4),
-    color: 'var(--primary-main-color)',
   },
   settingsLinkLabel: {
     marginRight: theme.spacing(2),
