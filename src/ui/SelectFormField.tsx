@@ -22,22 +22,22 @@ type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLSelectElemen
 
 export const SelectFormField = ({ options, classes, label, helperText, ...restProps }: PropsT) => {
   const inputIdRef = useRef(`${Math.random()}`);
-  const ownClassed = useStyles();
+  const ownClasses = useStyles();
   return (
-    <FormControl className={cx(ownClassed.root, classes?.root)}>
+    <FormControl className={cx(ownClasses.root, classes?.root)}>
       {label ? (
-        <label className={cx(ownClassed.label, classes?.label)} htmlFor={inputIdRef.current}>
+        <label className={cx(ownClasses.label, classes?.label)} htmlFor={inputIdRef.current}>
           {label}
         </label>
       ) : null}
-      <select className={cx(ownClassed.select, classes?.select)} id={inputIdRef.current} {...restProps}>
+      <select className={cx(ownClasses.select, classes?.select)} id={inputIdRef.current} {...restProps}>
         {options.map(({ value, label: optionLabel }) => (
-          <option className={cx(ownClassed.option, classes?.option)} key={value} value={value}>
+          <option className={cx(ownClasses.option, classes?.option)} key={value} value={value}>
             {optionLabel}
           </option>
         ))}
       </select>
-      <div className={cx(ownClassed.helperText, classes?.helperText)}>{helperText}</div>
+      <div className={cx(ownClasses.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );
 };

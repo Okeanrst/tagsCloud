@@ -15,11 +15,11 @@ type PropsT = CheckboxPropsT & {
 };
 
 export const CheckboxFormField = ({ classes, helperText, ...restProps }: PropsT) => {
-  const ownClassed = useStyles();
+  const ownClasses = useStyles();
   return (
-    <FormControl className={cx(ownClassed.root, classes?.root)}>
+    <FormControl className={cx(ownClasses.root, classes?.root)}>
       <Checkbox {...restProps} />
-      <div className={cx(ownClassed.helperText, classes?.helperText)}>{helperText}</div>
+      <div className={cx(ownClasses.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );
 };

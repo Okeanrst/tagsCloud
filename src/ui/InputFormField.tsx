@@ -20,16 +20,16 @@ type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement
 
 export const InputFormField = ({ classes, label, helperText, ...restProps }: PropsT) => {
   const inputIdRef = useRef(`${Math.random()}`);
-  const ownClassed = useStyles();
+  const ownClasses = useStyles();
   return (
-    <FormControl className={cx(ownClassed.root, classes?.root)}>
+    <FormControl className={cx(ownClasses.root, classes?.root)}>
       {label ? (
-        <label className={cx(ownClassed.label, classes?.label)} htmlFor={inputIdRef.current}>
+        <label className={cx(ownClasses.label, classes?.label)} htmlFor={inputIdRef.current}>
           {label}
         </label>
       ) : null}
-      <input className={cx(ownClassed.input, classes?.input)} id={inputIdRef.current} {...restProps} />
-      <div className={cx(ownClassed.helperText, classes?.helperText)}>{helperText}</div>
+      <input className={cx(ownClasses.input, classes?.input)} id={inputIdRef.current} {...restProps} />
+      <div className={cx(ownClasses.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );
 };
