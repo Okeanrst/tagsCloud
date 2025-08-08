@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
-import { useTheme } from 'contexts/ThemeContext';
+import { useDarkLightTheme } from 'contexts/DarkLightThemeContext';
 import { IconButton } from 'ui/buttons/IconButton';
 import { LogoIcon } from 'ui/icons/LogoIcon';
 import { SettingsIcon } from 'ui/icons/SettingsIcon';
@@ -116,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const Layout = () => {
   const classes = useStyles();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useDarkLightTheme();
   return (
     <div className={classes.root}>
       <nav className={classes.navbar}>
