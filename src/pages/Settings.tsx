@@ -22,9 +22,10 @@ import { SelectFormField } from 'ui/SelectFormField';
 
 type SettingsKeysT = keyof RootStateT['settings'];
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   form: {
     maxWidth: '400px',
+    marginTop: theme.spacing(1),
   },
   notFirstFormControl: {
     marginTop: '8px',
@@ -35,7 +36,7 @@ const useStyles = makeStyles({
     fontSize: '14px',
     color: 'var(--danger-color)',
   },
-});
+}));
 
 const fontFamilyOptions: { value: FontFamilies; label: string }[] = [];
 for (let fontFamily of Object.values(FontFamilies)) {

@@ -10,8 +10,8 @@ import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
 import { Checkbox } from 'ui/checkbox/Checkbox';
 import { TextButton } from 'ui/buttons/TextButton';
+import { DownloadCloudIcon } from 'ui/icons/DownloadCloudIcon';
 import { Collapse } from 'components/Collapse';
-import downloadIconSrc from 'assets/download.svg';
 
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import type { NavigateFunction } from 'react-router-dom';
@@ -295,7 +295,7 @@ class TagsCloud extends Component<PropsT, StateT> {
     return (
       <div className={classes.actionControls}>
         <button className={classes.downloadButton} disabled={disabled} onClick={this.onDownloadClick}>
-          <img alt="download" className={classes.downloadIcon} src={downloadIconSrc} />
+          <DownloadCloudIcon className={classes.downloadIcon} />
         </button>
         <PrimaryButton classes={{ root: classes.actionMainButton }} disabled={disabled} onClick={triggerRebuild}>
           Rebuild

@@ -1,8 +1,12 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
-import cx from 'classnames';
-import settingsIconSrc from 'assets/settings.svg';
+import { useTheme } from 'contexts/ThemeContext';
+import { IconButton } from 'ui/buttons/IconButton';
+import { LogoIcon } from 'ui/icons/LogoIcon';
+import { SettingsIcon } from 'ui/icons/SettingsIcon';
+import { LightModeIcon } from 'ui/icons/LightModeIcon';
+import { DarkModeIcon } from 'ui/icons/DarkModeIcon';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,6 +37,12 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '20px',
     [theme.breakpoints.up('lg')]: {
       maxWidth: '1140px',
+    },
+  },
+  navbarContentRightGroup: {
+    marginLeft: theme.spacing(3),
+    '& > *:not(:first-child)': {
+      marginLeft: theme.spacing(3),
     },
   },
   main: {
@@ -72,18 +82,17 @@ const useStyles = makeStyles((theme) => ({
   },
   link: {
     display: 'inline-block',
-    padding: '8px 16px',
+    lineHeight: `${theme.spacing(6)}px`,
     backgroundColor: 'transparent',
     transition: 'background-color 0.3s ease',
     '&:hover': {
       backgroundColor: 'rgba(0, 0, 0, 0.05)',
     },
   },
-  settingsLink: {
-    marginLeft: theme.spacing(4),
-    [theme.breakpoints.down('sm')]: {
-      marginLeft: theme.spacing(1),
-    },
+  logoIcon: {
+    width: theme.spacing(4),
+    height: theme.spacing(4),
+    color: 'var(--primary-main-color)',
   },
   settingsLinkLabel: {
     marginRight: theme.spacing(2),
@@ -98,25 +107,39 @@ const useStyles = makeStyles((theme) => ({
       display: 'inline',
     },
   },
+  themeIcon: {
+    width: theme.spacing(4),
+    height: theme.spacing(4),
+    color: 'var(--primary-main-color)',
+  },
 }));
 
 export const Layout = () => {
   const classes = useStyles();
+  const { theme, toggleTheme } = useTheme();
   return (
     <div className={classes.root}>
       <nav className={classes.navbar}>
         <div className={classes.navbarContent}>
           <Link className={classes.link} to="/">
-            Tags cloud
+            <span className={classes.settingsLinkLabel}>Tags cloud</span>
+            <LogoIcon className={classes.logoIcon} />
           </Link>
-          <div>
+          <div className={classes.navbarContentRightGroup}>
             <Link className={classes.link} to="/tagsListEditor">
               Tags editor
             </Link>
-            <Link className={cx(classes.link, classes.settingsLink)} to="/settings">
+            <Link className={classes.link} to="/settings">
               <span className={classes.settingsLinkLabel}>Settings</span>
-              <img alt="settings icon" className={classes.settingsLinkIcon} src={settingsIconSrc} />
+              <SettingsIcon className={classes.settingsLinkIcon} />
             </Link>
+            <IconButton onClick={toggleTheme}>
+              {theme === 'light' ? (
+                <LightModeIcon className={classes.themeIcon} />
+              ) : (
+                <DarkModeIcon className={classes.themeIcon} />
+              )}
+            </IconButton>
           </div>
         </div>
       </nav>

@@ -8,7 +8,8 @@ body {
   font-weight: 400;
   line-height: 1.5;
   text-align: left;
-  background-color: #fff;
+  color: var(--primary-text-color);
+  background-color: var(--bg-color);
 }
 
 #root {
@@ -17,8 +18,10 @@ body {
 }
 
 :root {
+  --bg-color: #fff;
   --white-color: #fff;
   --primary-main-color: #1976d2;
+  --primary-text-color: #000;
   --navbar-color: #e3f2fd;
   --footer-color: #9ec2f1;
   --danger-color: #b71c1c;
@@ -31,6 +34,8 @@ body {
 }
 
 [data-color-scheme='dark'] {
+  --bg-color: #202124;
+  --primary-text-color: #9aa0a6;
   --navbar-color: #212529;
   --footer-color: #23313e;
   --danger-color: #b71c1c;
