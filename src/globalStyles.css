@@ -32,6 +32,7 @@ body {
   --grey300-color: #E0E0E0;
   --primary-disabled-bg: #9ba1a8;
   --scrollbar-thumb-background: hsla(207,5%,52%,.26);
+  --link-hover-color: #0e315d;
 }
 
 [data-color-scheme='dark'] {
@@ -43,6 +44,7 @@ body {
   --green900-color: #1b5e20;
   --blue900-color: #01579b;
   --scrollbar-thumb-background: hsla(0,0%,100%,.7);
+  --link-hover-color: #4a9ef9;
 }
 
 a {
@@ -52,7 +54,7 @@ a {
 }
 
 a:hover {
-  color: #0e315d;
+  color: var(--link-hover-color);
 }
 
 ::-webkit-scrollbar {
