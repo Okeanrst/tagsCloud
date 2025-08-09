@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import cx from 'classnames';
 import { makeStyles } from '@material-ui/core';
 import { FormControl } from './FormControl';
+import { Input } from './Input';
 
 const useStyles = makeStyles({
   root: {},
@@ -28,7 +29,7 @@ export const InputFormField = ({ classes, label, helperText, ...restProps }: Pro
           {label}
         </label>
       ) : null}
-      <input className={cx(ownClasses.input, classes?.input)} id={inputIdRef.current} {...restProps} />
+      <Input className={cx(ownClasses.input, classes?.input)} id={inputIdRef.current} {...restProps} ref={null} />
       <div className={cx(ownClasses.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );
