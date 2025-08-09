@@ -36,6 +36,13 @@ body {
   --input-bg: #fff;
   --input-color: #000;
   --input-bd: #CED4DAFF;
+  --checkbox-icon-color: #fff;
+  --checkbox-color: #1971c2;
+  --checkbox-bg: #fff;
+  --checkbox-bd: #CED4DAFF;
+  --disabled-bd: #dee2e6;
+  --disabled-bg: #e9ecef;
+  --input-disabled-color: #adb5bd;
 }
 
 [data-color-scheme='dark'] {
@@ -51,6 +58,12 @@ body {
   --input-bg: #2e2e2e;
   --input-color: #c9c9c9;
   --input-bd: #424242FF;
+  --checkbox-icon-color: #424242FF;
+  --checkbox-bg: #2e2e2e;
+  --checkbox-bd: #424242;
+  --disabled-bd: #424242;
+  --disabled-bg: #2e2e2e;
+  --input-disabled-color: #696969;
 }
 
 a {

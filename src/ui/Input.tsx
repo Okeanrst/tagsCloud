@@ -33,6 +33,12 @@ const useStyles = makeStyles({
       outline: 'none',
       borderColor: '#228be6',
     },
+    '&:disabled': {
+      cursor: 'not-allowed',
+      opacity: 0.6,
+      backgroundColor: 'var(--disabled-bg)',
+      color: 'var(--disabled-bg)',
+    },
   },
 });
 
