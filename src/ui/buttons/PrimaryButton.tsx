@@ -1,23 +1,28 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core';
 import cx from 'classnames';
-import { Button, PropsT as ButtonPropsT } from './Button';
+import { makeStyles } from '@material-ui/core';
+import { MainButton, MainButtonPropsT } from './MainButton';
+import { useContainedButtonStyles } from './buttonStyles';
 
 const useStyles = makeStyles({
   root: {
     color: 'var(--white-color)',
-    backgroundColor: 'var(--primary-main-color)!important',
+    backgroundColor: 'var(--primary-main-color)',
     '&:disabled': {
-      backgroundColor: 'var(--primary-disabled-bg)!important',
+      backgroundColor: 'var(--primary-disabled-bg)',
     },
   },
 });
 
-export const PrimaryButton = ({ children, classes, ...restProps }: ButtonPropsT) => {
-  const ownClasses = useStyles();
+export const PrimaryButton = ({ children, classes, ...restProps }: MainButtonPropsT) => {
+  const containedButtonClasses = useContainedButtonStyles();
+  const primaryButtonClasses = useStyles();
   return (
-    <Button classes={{ root: cx(classes?.root, ownClasses.root) }} {...restProps}>
+    <MainButton
+      classes={{ root: cx(classes?.root, primaryButtonClasses.root, containedButtonClasses.root) }}
+      {...restProps}
+    >
       {children}
-    </Button>
+    </MainButton>
   );
 };

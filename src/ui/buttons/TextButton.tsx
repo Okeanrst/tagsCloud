@@ -1,7 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
 import cx from 'classnames';
-import { Button, PropsT as ButtonPropsT } from './Button';
+import { MainButton, MainButtonPropsT } from './MainButton';
+import { useContainedButtonStyles } from './buttonStyles';
 
 const useStyles = makeStyles({
   root: {
@@ -9,11 +10,12 @@ const useStyles = makeStyles({
   },
 });
 
-export const TextButton = ({ children, classes, ...restProps }: ButtonPropsT) => {
+export const TextButton = ({ children, classes, ...restProps }: MainButtonPropsT) => {
   const ownClasses = useStyles();
+  const containedButtonClasses = useContainedButtonStyles();
   return (
-    <Button classes={{ root: cx(classes?.root, ownClasses.root) }} {...restProps}>
+    <MainButton classes={{ root: cx(classes?.root, containedButtonClasses.root, ownClasses.root) }} {...restProps}>
       {children}
-    </Button>
+    </MainButton>
   );
 };
