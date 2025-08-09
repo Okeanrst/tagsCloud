@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import deburr from 'lodash.deburr';
 import Downshift from 'downshift';
-import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
+import { Input } from 'ui/Input';
 import type { ClassesT } from 'types/types';
 
 type SuggestionT = {
@@ -44,23 +44,6 @@ type OptionsT = Pick<IntegrationDownshiftPropsT, 'placeholder' | 'onChange'> & {
 };
 
 const SUGGESTIONS_MAX_NUMBER = 5;
-
-function renderInput(inputProps: ItemPropsT) {
-  const { InputProps, classes, fullWidth, disabled } = inputProps;
-  return (
-    <TextField
-      fullWidth={fullWidth}
-      InputProps={{
-        classes: {
-          root: classes.inputRoot,
-          input: classes.inputInput,
-        },
-        ...InputProps,
-        disabled,
-      }}
-    />
-  );
-}
 
 function renderSuggestion({ suggestion, index, itemProps, highlightedIndex, selectedItem }: RenderSuggestionPropsT) {
   const isHighlighted = highlightedIndex === index;
@@ -122,18 +105,24 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
     <div className={classes.root}>
       <Downshift onChange={onSelect}>
         {({ getInputProps, getItemProps, getMenuProps, highlightedIndex, inputValue, isOpen, selectedItem }) => {
+          const {
+            ref: inputRef,
+            disabled: inputDisabled,
+            ...inputProps
+          } = getInputProps<OptionsT>({
+            placeholder,
+            onChange,
+            onKeyDown: handleKeyDown,
+          });
+
           return (
             <div className={classes.container}>
-              {renderInput({
-                fullWidth: true,
-                classes,
-                InputProps: getInputProps<OptionsT>({
-                  placeholder,
-                  onChange,
-                  onKeyDown: handleKeyDown,
-                }),
-                disabled,
-              })}
+              <Input
+                {...inputProps}
+                disabled={disabled || inputDisabled}
+                // @ts-ignore
+                ref={inputRef}
+              />
               <div {...getMenuProps()}>
                 {isOpen ? (
                   <Paper square className={classes.paper}>

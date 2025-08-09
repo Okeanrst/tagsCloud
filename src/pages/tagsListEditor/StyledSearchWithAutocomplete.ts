@@ -22,13 +22,6 @@ const styles = (theme: Theme) =>
       left: 0,
       right: 0,
     },
-    inputRoot: {
-      flexWrap: 'wrap',
-    },
-    inputInput: {
-      width: 'auto',
-      flexGrow: 1,
-    },
   });
 
 export default withStyles(styles)(SearchWithAutocomplete);

@@ -33,6 +33,9 @@ body {
   --primary-disabled-bg: #9ba1a8;
   --scrollbar-thumb-background: hsla(207,5%,52%,.26);
   --link-hover-color: #0e315d;
+  --input-bg: #fff;
+  --input-color: #000;
+  --input-bd: #CED4DAFF;
 }
 
 [data-color-scheme='dark'] {
@@ -45,6 +48,9 @@ body {
   --blue900-color: #01579b;
   --scrollbar-thumb-background: hsla(0,0%,100%,.7);
   --link-hover-color: #4a9ef9;
+  --input-bg: #2e2e2e;
+  --input-color: #c9c9c9;
+  --input-bd: #424242FF;
 }
 
 a {
