@@ -9,10 +9,9 @@ import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
 import { Checkbox } from 'ui/checkbox/Checkbox';
-import { TextButton } from 'ui/buttons/TextButton';
+import { IconButton } from 'ui/buttons/IconButton';
 import { DownloadCloudIcon } from 'ui/icons/DownloadCloudIcon';
 import { Collapse } from 'components/Collapse';
-
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
@@ -84,11 +83,6 @@ const styles = (theme: Theme) =>
       display: 'flex',
       alignItems: 'center',
     },
-    downloadButton: {
-      border: 'none',
-      backgroundColor: 'transparent',
-      cursor: 'pointer',
-    },
     downloadIcon: {
       width: theme.spacing(4),
       height: theme.spacing(4),
@@ -105,10 +99,12 @@ const styles = (theme: Theme) =>
       position: 'relative',
       height: '100%',
     },
-    toggleIsSettingsControlsButton: {
-      width: '20px',
-      minWidth: '20px!important',
-      height: '20px',
+    toggleIsSettingsControlsIcon: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 20,
+      height: 44,
       lineHeight: '16px',
     },
     debugMenuCollapse: {
@@ -294,9 +290,9 @@ class TagsCloud extends Component<PropsT, StateT> {
     const { classes, triggerRebuild, shouldUseCanvas } = this.props;
     return (
       <div className={classes.actionControls}>
-        <button className={classes.downloadButton} disabled={disabled} onClick={this.onDownloadClick}>
+        <IconButton disabled={disabled} onClick={this.onDownloadClick}>
           <DownloadCloudIcon className={classes.downloadIcon} />
-        </button>
+        </IconButton>
         <PrimaryButton classes={{ root: classes.actionMainButton }} disabled={disabled} onClick={triggerRebuild}>
           Rebuild
         </PrimaryButton>
@@ -322,9 +318,9 @@ class TagsCloud extends Component<PropsT, StateT> {
     const { isSettingsControlsShown, isCoordinateGridShown, isReactAreasShown, isVacanciesShown } = this.state;
     return (
       <div className={classes.debugSettingsControls}>
-        <TextButton classes={{ root: classes.toggleIsSettingsControlsButton }} onClick={toggleIsSettingsControlsShown}>
-          {isSettingsControlsShown ? '-' : '+'}
-        </TextButton>
+        <IconButton onClick={toggleIsSettingsControlsShown}>
+          <div className={classes.toggleIsSettingsControlsIcon}>{isSettingsControlsShown ? '-' : '+'}</div>
+        </IconButton>
         <Collapse className={classes.debugMenuCollapse} isOpen={isSettingsControlsShown}>
           <div className={classes.debugMenu}>
             {!shouldUseCanvas && (
