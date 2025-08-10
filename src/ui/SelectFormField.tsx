@@ -2,6 +2,7 @@ import cx from 'classnames';
 import { makeStyles } from '@material-ui/core';
 import React, { useRef } from 'react';
 import { FormControl } from './FormControl';
+import { Select } from './Select';
 
 const useStyles = makeStyles({
   root: {},
@@ -20,7 +21,7 @@ type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLSelectElemen
   helperText?: string | null;
 };
 
-export const SelectFormField = ({ options, classes, label, helperText, ...restProps }: PropsT) => {
+export const SelectFormField = ({ options, classes, label, helperText, ref, ...restProps }: PropsT) => {
   const inputIdRef = useRef(`${Math.random()}`);
   const ownClasses = useStyles();
   return (
@@ -30,13 +31,7 @@ export const SelectFormField = ({ options, classes, label, helperText, ...restPr
           {label}
         </label>
       ) : null}
-      <select className={cx(ownClasses.select, classes?.select)} id={inputIdRef.current} {...restProps}>
-        {options.map(({ value, label: optionLabel }) => (
-          <option className={cx(ownClasses.option, classes?.option)} key={value} value={value}>
-            {optionLabel}
-          </option>
-        ))}
-      </select>
+      <Select {...restProps} classes={{ root: classes?.select }} id={inputIdRef.current} options={options} />
       <div className={cx(ownClasses.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );

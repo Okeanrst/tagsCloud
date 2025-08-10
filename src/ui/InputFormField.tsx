@@ -20,7 +20,7 @@ type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement
   helperText?: string | null;
 };
 
-export const InputFormField = ({ classes, label, helperText, ...restProps }: PropsT) => {
+export const InputFormField = ({ classes, label, helperText, ref, ...restProps }: PropsT) => {
   const inputIdRef = useRef(`${Math.random()}`);
   const ownClasses = useStyles();
   const { type } = restProps;
@@ -32,12 +32,7 @@ export const InputFormField = ({ classes, label, helperText, ...restProps }: Pro
           {label}
         </label>
       ) : null}
-      <InputComponent
-        className={cx(ownClasses.input, classes?.input)}
-        id={inputIdRef.current}
-        {...restProps}
-        ref={null}
-      />
+      <InputComponent className={cx(ownClasses.input, classes?.input)} id={inputIdRef.current} {...restProps} />
       <div className={cx(ownClasses.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );

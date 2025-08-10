@@ -28,7 +28,7 @@ const useStyles = makeStyles({
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     '&:disabled': {
-      cursor: 'default',
+      cursor: 'not-allowed',
     },
   },
 });

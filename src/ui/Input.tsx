@@ -38,7 +38,7 @@ const useStyles = makeStyles({
       cursor: 'not-allowed',
       opacity: 0.6,
       backgroundColor: 'var(--disabled-bg)',
-      color: 'var(--disabled-bg)',
+      color: 'var(--input-disabled-color)',
     },
   },
 });

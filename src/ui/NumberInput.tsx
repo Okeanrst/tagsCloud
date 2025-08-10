@@ -57,6 +57,7 @@ const useStyles = makeStyles({
     },
     '&:disabled': {
       color: 'var(--input-disabled-color)',
+      backgroundColor: 'var(--disabled-bg)',
       cursor: 'not-allowed',
       opacity: 0.6,
     },
