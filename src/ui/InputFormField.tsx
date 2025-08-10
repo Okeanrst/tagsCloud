@@ -3,6 +3,7 @@ import cx from 'classnames';
 import { makeStyles } from '@material-ui/core';
 import { FormControl } from './FormControl';
 import { Input } from './Input';
+import { NumberInput } from './NumberInput';
 
 const useStyles = makeStyles({
   root: {},
@@ -22,6 +23,8 @@ type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement
 export const InputFormField = ({ classes, label, helperText, ...restProps }: PropsT) => {
   const inputIdRef = useRef(`${Math.random()}`);
   const ownClasses = useStyles();
+  const { type } = restProps;
+  const InputComponent = type === 'number' ? NumberInput : Input;
   return (
     <FormControl className={cx(ownClasses.root, classes?.root)}>
       {label ? (
@@ -29,7 +32,12 @@ export const InputFormField = ({ classes, label, helperText, ...restProps }: Pro
           {label}
         </label>
       ) : null}
-      <Input className={cx(ownClasses.input, classes?.input)} id={inputIdRef.current} {...restProps} ref={null} />
+      <InputComponent
+        className={cx(ownClasses.input, classes?.input)}
+        id={inputIdRef.current}
+        {...restProps}
+        ref={null}
+      />
       <div className={cx(ownClasses.helperText, classes?.helperText)}>{helperText}</div>
     </FormControl>
   );

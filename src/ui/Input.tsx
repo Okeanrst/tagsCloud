@@ -29,6 +29,7 @@ const useStyles = makeStyles({
     paddingBottom: 0,
     cursor: 'text',
     overflow: 'clip',
+    outline: 'none',
     '&:focus': {
       outline: 'none',
       borderColor: '#228be6',
