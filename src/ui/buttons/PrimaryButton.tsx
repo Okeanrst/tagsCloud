@@ -9,7 +9,8 @@ const useStyles = makeStyles({
     color: 'var(--white-color)',
     backgroundColor: 'var(--primary-main-color)',
     '&:disabled': {
-      backgroundColor: 'var(--primary-disabled-bg)',
+      color: 'var(--input-disabled-color)',
+      backgroundColor: 'var(--disabled-bg)',
     },
   },
 });
