@@ -21,6 +21,7 @@ import { OutlinedButton } from 'ui/buttons/OutlinedButton';
 import { downloadRawTagsCloudDataFile, uploadRawTagsCloudDataFile } from 'store/actions/tagsCloudDataFile';
 import { TagFormModal } from 'components/modalWindows/TagFormModal';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
+import { FileInput } from 'ui/FileInput';
 import StyledSearchWithAutocomplete from './StyledSearchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
 
@@ -140,24 +141,6 @@ class TagsListEditor extends Component<PropsT, StateT> {
     }
 
     this.props.uploadTagsDataFile(e.target.files[0]);
-  };
-
-  renderFileUploader = (disabled: boolean) => {
-    const { classes } = this.props;
-    return (
-      <div className={classes.fileUploader}>
-        <label className={classes.fileUploaderLabel} htmlFor="cloud_conf_upload">
-          Choose tags cloud configuration file (*.json)
-        </label>
-        <input
-          accept=".json"
-          disabled={disabled}
-          id="cloud_conf_upload"
-          type="file"
-          onChange={this.uploadTagsDataFile}
-        />
-      </div>
-    );
   };
 
   downloadTagsDataFile = () => {
@@ -356,7 +339,12 @@ class TagsListEditor extends Component<PropsT, StateT> {
       <div className={classes.root}>
         {this.renderLoader(loading)}
         <div className={classes.actionsBlock} ref={this.actionsBlockRef}>
-          {this.renderFileUploader(loading)}
+          <FileInput
+            accept=".json"
+            disabled={loading}
+            placeholder="Choose tags cloud configuration file (*.json)"
+            onChange={this.uploadTagsDataFile}
+          />
           {this.renderDownloadFileButton(!isDataReady)}
           <PrimaryButton classes={{ root: classes.addNewButton }} disabled={!isDataReady} onClick={this.onAdd}>
             <span className={classes.addNewLabel}>Add new</span>

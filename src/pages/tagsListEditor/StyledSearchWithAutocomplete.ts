@@ -8,6 +8,7 @@ const styles = (theme: Theme) =>
     root: {
       width: 250,
       [theme.breakpoints.down('sm')]: {
+        width: '100%',
         marginTop: '8px',
       },
     },

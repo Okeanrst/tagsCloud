@@ -13,12 +13,6 @@ const styles = (theme: Theme) =>
         flexWrap: 'wrap',
       },
     },
-    fileUploader: {
-      maxWidth: '100%',
-    },
-    fileUploaderLabel: {
-      display: 'block',
-    },
     downloadButton: {
       [theme.breakpoints.down('sm')]: {
         marginTop: '8px',

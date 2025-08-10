@@ -43,6 +43,7 @@ body {
   --disabled-bd: #dee2e6;
   --disabled-bg: #e9ecef;
   --input-disabled-color: #adb5bd;
+  --input-placeholder-color: #adb5bd;
 }
 
 [data-color-scheme='dark'] {
@@ -64,6 +65,7 @@ body {
   --disabled-bd: #424242;
   --disabled-bg: #2e2e2e;
   --input-disabled-color: #696969;
+  --input-placeholder-color: #696969;
 }
 
 a {
