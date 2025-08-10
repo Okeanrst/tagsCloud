@@ -53,7 +53,7 @@ function renderSuggestion({ suggestion, index, itemProps, highlightedIndex, sele
     <MenuItem
       {...itemProps}
       component="div"
-      key={suggestion.label}
+      key={suggestion.id}
       selected={isHighlighted}
       style={{
         fontWeight: isSelected ? 500 : 400,
