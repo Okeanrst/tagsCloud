@@ -116,10 +116,15 @@ const styles = (theme: Theme) =>
     debugMenu: {
       display: 'flex',
       flexDirection: 'column',
+      margin: 0,
       padding: theme.spacing(1),
       textAlign: 'left',
       backgroundColor: '#d2d2d2',
+      listStyleType: 'none',
       whiteSpace: 'nowrap',
+      '& > *:not(:first-child)': {
+        marginTop: theme.spacing(1),
+      },
     },
     actionControls: {
       display: 'flex',
@@ -322,19 +327,25 @@ class TagsCloud extends Component<PropsT, StateT> {
           <div className={classes.toggleIsSettingsControlsIcon}>{isSettingsControlsShown ? '-' : '+'}</div>
         </IconButton>
         <Collapse className={classes.debugMenuCollapse} isOpen={isSettingsControlsShown}>
-          <div className={classes.debugMenu}>
+          <ul className={classes.debugMenu}>
             {!shouldUseCanvas && (
-              <Checkbox
-                checked={isCoordinateGridShown}
-                label="draw coordinate grid"
-                onChange={toggleIsCoordinateGridShown}
-              />
+              <li>
+                <Checkbox
+                  checked={isCoordinateGridShown}
+                  label="draw coordinate grid"
+                  onChange={toggleIsCoordinateGridShown}
+                />
+              </li>
             )}
-            <Checkbox checked={isReactAreasShown} label="draw react areas" onChange={toggleIsReactAreasShown} />
+            <li>
+              <Checkbox checked={isReactAreasShown} label="draw react areas" onChange={toggleIsReactAreasShown} />
+            </li>
             {!shouldUseCanvas && (
-              <Checkbox checked={isVacanciesShown} label="draw vacancies" onChange={toggleIsVacanciesShown} />
+              <li>
+                <Checkbox checked={isVacanciesShown} label="draw vacancies" onChange={toggleIsVacanciesShown} />
+              </li>
             )}
-          </div>
+          </ul>
         </Collapse>
       </div>
     );
