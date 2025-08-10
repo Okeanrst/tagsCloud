@@ -35,7 +35,18 @@ const useStyles = makeStyles({
     color: 'var(--input-color)',
     backgroundColor: 'var(--input-bg)',
     cursor: 'pointer',
+    overflow: 'clip',
     '-webkit-tap-highlight-color': 'transparent',
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#228be6',
+    },
+    '&:disabled': {
+      cursor: 'not-allowed',
+      opacity: 0.6,
+      backgroundColor: 'var(--disabled-bg)',
+      color: 'var(--input-disabled-color)',
+    },
   },
   placeholder: {
     color: 'var(--input-placeholder-color)',
