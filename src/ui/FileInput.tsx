@@ -4,28 +4,16 @@ import cx from 'classnames';
 
 type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
   className?: string;
-  label?: string;
   placeholder?: string;
 };
 
 const useStyles = makeStyles({
-  input: {
-    display: 'none',
-  },
-  label: {
-    display: 'inline-block',
-    fontSize: 14,
-    fontWeight: 500,
-    wordBreak: 'break-word',
-    cursor: 'default',
-    '-webkit-tap-highlight-color': 'transparent',
-  },
-  buttonWrapper: {
+  root: {
     position: 'relative',
     cursor: 'pointer',
   },
-  buttonWrapperMarginTop: {
-    marginTop: 5,
+  input: {
+    display: 'none',
   },
   button: {
     appearance: 'none',
@@ -54,37 +42,27 @@ const useStyles = makeStyles({
   },
 });
 
-export const FileInput = ({ className, label, placeholder, ...restProps }: PropsT) => {
+export const FileInput = ({ className, placeholder, id, ...restProps }: PropsT) => {
   const ownClasses = useStyles();
-  const { current: buttonId } = useRef(`${Math.random()}`);
   const inputRef = useRef<HTMLInputElement>(null);
   return (
-    <div className={className}>
+    <div className={cx(ownClasses.root, className)}>
       <input {...restProps} className={ownClasses.input} ref={inputRef} type="file" />
-      <div>
-        {label ? (
-          <label className={ownClasses.label} htmlFor={buttonId}>
-            {label}
-          </label>
-        ) : null}
-        <div className={cx(ownClasses.buttonWrapper, { [ownClasses.buttonWrapperMarginTop]: label })}>
-          <button
-            className={ownClasses.button}
-            id={buttonId}
-            type="button"
-            onClick={() => {
-              if (!inputRef.current) {
-                return;
-              }
-              // reset the value so same file can be picked again
-              inputRef.current.value = '';
-              inputRef.current.click();
-            }}
-          >
-            {placeholder ? <span className={ownClasses.placeholder}>{placeholder}</span> : null}
-          </button>
-        </div>
-      </div>
+      <button
+        className={ownClasses.button}
+        id={id}
+        type="button"
+        onClick={() => {
+          if (!inputRef.current) {
+            return;
+          }
+          // reset the value so same file can be picked again
+          inputRef.current.value = '';
+          inputRef.current.click();
+        }}
+      >
+        {placeholder ? <span className={ownClasses.placeholder}>{placeholder}</span> : null}
+      </button>
     </div>
   );
 };
