@@ -314,7 +314,7 @@ const stateSelector = (state: RootStateT) => {
   };
 };
 
-const SvgTagsCloud = forwardRef<{ play: () => void }, PropsT>(
+const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
   (
     { width, height, onTagClick, downloadCloudCounter, isCoordinateGridShown, isReactAreasShown, isVacanciesShown },
     ref,
@@ -342,7 +342,7 @@ const SvgTagsCloud = forwardRef<{ play: () => void }, PropsT>(
     useImperativeHandle(
       ref,
       () => ({
-        play: () => {
+        oneByOne: () => {
           setTagEndIndexToShow(1);
         },
       }),

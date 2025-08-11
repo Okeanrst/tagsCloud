@@ -172,7 +172,7 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   tagsCloudSceneRef = React.createRef<HTMLDivElement>();
-  svgTagsCloudRef = React.createRef<{ play: () => void }>();
+  svgTagsCloudRef = React.createRef<{ oneByOne: () => void }>();
 
   resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -304,7 +304,7 @@ class TagsCloud extends Component<PropsT, StateT> {
         <PrimaryButton
           classes={{ root: classes.actionMainButton }}
           disabled={disabled || shouldUseCanvas}
-          onClick={() => this.svgTagsCloudRef.current?.play()}
+          onClick={() => this.svgTagsCloudRef.current?.oneByOne()}
         >
           One by one
         </PrimaryButton>
