@@ -1,0 +1,5 @@
+export const TAGS_CLOUD_CANVAS_Z_INDEX = 2;
+export const TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX = 1;
+export const TAG_AVATAR_CANVAS_Z_INDEX = 10;
+export const REACT_AREAS_CANVAS_Z_INDEX = 1;
+export const COORDINATE_GRID_CANVAS_Z_INDEX = 1;

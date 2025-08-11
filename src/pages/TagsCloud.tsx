@@ -4,7 +4,7 @@ import { createStyles, Theme, withStyles } from '@material-ui/core';
 import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from 'store/actions/tagsCloud';
 import { loadFont } from 'store/actions/loadFont';
-import SvgTagsCloud from 'components/SvgTagsCloud';
+import SvgTagsCloud from 'components/SvgTagsCloud/SvgTagsCloud';
 import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';

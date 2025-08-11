@@ -9,8 +9,7 @@ import React, {
   forwardRef,
 } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { makeStyles, Theme } from '@material-ui/core';
-import { Transition, TransitionGroup } from 'react-transition-group';
+import { makeStyles } from '@material-ui/core';
 import throttle from 'lodash.throttle';
 import { saveAs } from 'file-saver';
 import * as actions from 'store/actions/tagsCloud';
@@ -29,14 +28,21 @@ import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
 import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
-import { FontFamilies } from 'constants/index';
-
 import type { PositionedTagRectT, RectAreaT } from 'types/types';
 import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
 import type { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { RootStateT } from 'store/types';
 import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
 import { SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap';
+import { Tags } from './Tags';
+import { formTagTransformStyle } from './styleUtils';
+import {
+  TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX,
+  COORDINATE_GRID_CANVAS_Z_INDEX,
+  REACT_AREAS_CANVAS_Z_INDEX,
+  TAG_AVATAR_CANVAS_Z_INDEX,
+} from './constants';
+import { DraggableTagT } from './types';
 
 type PropsT = {
   width: number;
@@ -52,18 +58,8 @@ type CoordinatesT = { x: number; y: number };
 
 type VacanciesT = NonNullable<RootStateT['tagsCloud']['vacancies']>;
 
-type StylesOptionsT = { fontFamily: FontFamilies };
-
-const ANIMATION_DURATION = 300;
-
 const MOVEMENT_THRESHOLD = 10; // px
 const CHANGE_ROTATION_THRESHOLD = 500; // ms
-
-const TAGS_CLOUD_CANVAS_Z_INDEX = 2;
-const TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX = 1;
-const TAG_AVATAR_CANVAS_Z_INDEX = 10;
-const REACT_AREAS_CANVAS_Z_INDEX = 1;
-const COORDINATE_GRID_CANVAS_Z_INDEX = 1;
 
 const getEventDocumentCoordinates = (
   event:
@@ -90,21 +86,10 @@ const getEventDocumentCoordinates = (
   return { pageX, pageY };
 };
 
-const tagStyle = {
-  transition: `all ${ANIMATION_DURATION}ms ease-in-out`,
-  opacity: 0,
-  cursor: 'pointer',
-};
-
-const useStyles = makeStyles<Theme, StylesOptionsT>({
+const useStyles = makeStyles({
   container: {
     width: '100%',
     textAlign: 'center',
-  },
-  tagsCloudCanvas: {
-    position: 'relative',
-    zIndex: TAGS_CLOUD_CANVAS_Z_INDEX,
-    fontFamily: ({ fontFamily }) => fontFamily,
   },
   tagAvatarCanvas: {
     position: 'absolute',
@@ -114,11 +99,6 @@ const useStyles = makeStyles<Theme, StylesOptionsT>({
     'white-space': 'pre',
     'user-select': 'none',
     cursor: 'pointer',
-  },
-  text: {
-    'white-space': 'pre',
-    'user-select': 'none',
-    '-webkit-user-select': 'none',
   },
   canvasWrapper: {
     display: 'inline-block',
@@ -132,20 +112,6 @@ type DraggableTagAvatarProps = {
   color?: string;
   fontSize?: number;
   display?: string;
-};
-
-const formTagTransformStyle = ({
-  translateX,
-  translateY,
-  isRotated,
-  scale = 1,
-}: {
-  translateX: number;
-  translateY: number;
-  isRotated: boolean;
-  scale?: number;
-}) => {
-  return `translate(${translateX}px,${translateY}px) rotate(${isRotated ? 90 : 0}deg) scale(${scale})`;
 };
 
 const downloadTagCloudHtmlFile = (html: string, fileName?: string) => {
@@ -370,7 +336,6 @@ const SvgTagsCloud = forwardRef<{ play: () => void }, PropsT>(
     const handleMouseUpEventRef = useRef(() => {});
     const zoomRef = useRef(1);
     const downloadTagCloudRef = useRef(() => {});
-    const textRefs = useRef<Record<string, { current: SVGTextElement | null }>>({});
 
     const [tagEndIndexToShow, setTagEndIndexToShow] = useState<number>(-1);
 
@@ -386,7 +351,7 @@ const SvgTagsCloud = forwardRef<{ play: () => void }, PropsT>(
 
     const classes = useStyles({ fontFamily });
 
-    const [draggableTag, setDraggableTag] = useState<{ id: string; changeRotation: boolean } | null>(null);
+    const [draggableTag, setDraggableTag] = useState<DraggableTagT | null>(null);
     const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
     const [tmpVacancies, setTmpVacancies] = useState<VacanciesT | null>(null);
 
@@ -748,86 +713,15 @@ const SvgTagsCloud = forwardRef<{ play: () => void }, PropsT>(
         >
           {isCoordinateGridShown && drawCoordinateGrid({ tagsPositions, svgSize, viewBox, sceneMapResolution })}
           {isReactAreasShown && drawReactAreas(tagsPositions, svgSize, viewBox, transform)}
-          <svg {...svgSize} className={classes.tagsCloudCanvas} viewBox={viewBox.join(' ')}>
-            <g transform={transform}>
-              <TransitionGroup appear enter className="tagsCloud" component={null} exite={false}>
-                {(tagEndIndexToShow === -1
-                  ? positionedTagSvgData
-                  : positionedTagSvgData.slice(0, tagEndIndexToShow)
-                ).map((i, index: number) => {
-                  const style: React.CSSProperties = {
-                    fontSize: `${i.fontSize}px`,
-                    fill: i.color,
-                  };
-                  if (draggableTag && draggableTag.id === i.id) {
-                    style.visibility = 'hidden';
-                  }
-                  const transitionStyles: { [key: string]: React.CSSProperties } = {
-                    exited: {
-                      opacity: 0,
-                      transform: formTagTransformStyle({
-                        translateX: i.rectTranslateX,
-                        translateY: i.rectTranslateY,
-                        isRotated: i.rotate,
-                      }),
-                    },
-                    entering: {
-                      opacity: 0,
-                      transform: formTagTransformStyle({
-                        translateX: i.rectTranslateX,
-                        translateY: i.rectTranslateY,
-                        isRotated: i.rotate,
-                        scale: 0.1,
-                      }),
-                    },
-                    entered: {
-                      opacity: 1,
-                      transform: formTagTransformStyle({
-                        translateX: i.rectTranslateX,
-                        translateY: i.rectTranslateY,
-                        isRotated: i.rotate,
-                      }),
-                    },
-                  };
-
-                  const key = i.id + i.rectLeft + i.rectTop;
-
-                  if (!textRefs.current[key]) {
-                    textRefs.current[key] = { current: null };
-                  }
-                  const nodeRef = textRefs.current[key];
-
-                  return (
-                    <Transition
-                      key={key}
-                      // @ts-ignore
-                      nodeRef={nodeRef}
-                      timeout={ANIMATION_DURATION}
-                    >
-                      {(state) => {
-                        return (
-                          <text
-                            className={classes.text}
-                            data-id={i.id}
-                            key={`${i.id}_${index}`}
-                            ref={nodeRef}
-                            style={{
-                              ...style,
-                              ...tagStyle,
-                              ...transitionStyles[state],
-                            }}
-                            textAnchor="middle"
-                          >
-                            {i.label}
-                          </text>
-                        );
-                      }}
-                    </Transition>
-                  );
-                })}
-              </TransitionGroup>
-            </g>
-          </svg>
+          <Tags
+            draggableTag={draggableTag}
+            fontFamily={fontFamily}
+            positionedTagSvgData={positionedTagSvgData}
+            svgSize={svgSize}
+            tagEndIndexToShow={tagEndIndexToShow}
+            transform={transform}
+            viewBox={viewBox}
+          />
           <Vacancies
             sceneMapEdges={sceneMapEdges}
             sceneMapResolution={sceneMapResolution}
