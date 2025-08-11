@@ -11,31 +11,36 @@ import React, {
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/core';
 import throttle from 'lodash.throttle';
-import { saveAs } from 'file-saver';
 import * as actions from 'store/actions/tagsCloud';
 import { getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagSvgData';
 import { getBorderCoordinates } from 'utilities/tagsCloud/getBorderCoordinates';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 import {
   getSceneMapVacancies,
-  isVacancyLargeEnoughToFitRect,
   releaseRectAreaPositionsOnSceneMap,
   rotateRectArea,
 } from 'utilities/positioningAlgorithm/calcTagsPositions';
-import { SceneMap, Dimensions } from 'utilities/positioningAlgorithm/sceneMap';
+import { SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
 import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
-import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
-import type { PositionedTagRectT, RectAreaT } from 'types/types';
+import type { PositionedTagRectT } from 'types/types';
 import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
 import type { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { RootStateT } from 'store/types';
-import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
-import { SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap';
 import { Tags } from './Tags';
 import { Vacancies } from './Vacancies';
+import {
+  downloadTagCloudHtmlFile,
+  getEventDocumentCoordinates,
+  getActiveVacanciesByCoordinates,
+  canvasCoordinatesToSceneCoordinates,
+  documentCoordinatesToCanvasCoordinates,
+  limitCoordinatesWithCanvasBoundaries,
+  sortActiveVacancies,
+  sceneCoordinatesToCanvasCoordinates,
+} from './utils';
 import { formTagTransformStyle } from './styleUtils';
 import {
   TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX,
@@ -43,7 +48,7 @@ import {
   REACT_AREAS_CANVAS_Z_INDEX,
   TAG_AVATAR_CANVAS_Z_INDEX,
 } from './constants';
-import { DraggableTagT } from './types';
+import { DraggableTagT, VacanciesT } from './types';
 
 type PropsT = {
   width: number;
@@ -55,37 +60,8 @@ type PropsT = {
   isCoordinateGridShown: boolean;
 };
 
-type CoordinatesT = { x: number; y: number };
-
-type VacanciesT = NonNullable<RootStateT['tagsCloud']['vacancies']>;
-
 const MOVEMENT_THRESHOLD = 10; // px
 const CHANGE_ROTATION_THRESHOLD = 500; // ms
-
-const getEventDocumentCoordinates = (
-  event:
-    | MouseEvent
-    | TouchEvent
-    | React.MouseEvent
-    | React.TouchEvent
-    | React.SyntheticEvent<any, MouseEvent>
-    | React.SyntheticEvent<any, TouchEvent> /* React.MouseEvent | React.TouchEvent*/,
-) => {
-  let pageX: number | null = null;
-  let pageY: number | null = null;
-  if (event instanceof MouseEvent) {
-    ({ pageX, pageY } = event);
-  } else if (window.TouchEvent && event instanceof TouchEvent) {
-    ({ pageX, pageY } = event.touches[0]);
-  } else if ('nativeEvent' in event && event.nativeEvent instanceof MouseEvent) {
-    // @ts-ignore
-    ({ pageX, pageY } = event);
-  } else if ('nativeEvent' in event && window.TouchEvent && event.nativeEvent instanceof TouchEvent) {
-    // @ts-ignore
-    ({ pageX, pageY } = event.touches[0]);
-  }
-  return { pageX, pageY };
-};
 
 const useStyles = makeStyles({
   container: {
@@ -115,13 +91,6 @@ type DraggableTagAvatarProps = {
   display?: string;
 };
 
-const downloadTagCloudHtmlFile = (html: string, fileName?: string) => {
-  const blob = new Blob([html], {
-    type: 'text/html;charset=utf-8',
-  });
-  saveAs(blob, fileName ?? 'tagCloud.html');
-};
-
 const DraggableTagAvatar = React.forwardRef<SVGTextElement, DraggableTagAvatarProps>((props, ref) => {
   const { label = '', color = 'black', fontSize = 8, display = 'none' } = props;
   return (
@@ -130,86 +99,6 @@ const DraggableTagAvatar = React.forwardRef<SVGTextElement, DraggableTagAvatarPr
     </text>
   );
 });
-
-const getActiveVacanciesByCoordinates = (
-  point: CoordinatesT,
-  rectArea: RectAreaT,
-  vacancies: VacanciesT,
-): VacanciesT => {
-  const { closedVacancies, topEdgeVacancies, bottomEdgeVacancies, leftEdgeVacancies, rightEdgeVacancies } = vacancies;
-
-  function processVacancies<T extends VacancyT>(vacanciesToProcess: T[]) {
-    const suitableVacancies: T[] = [];
-    vacanciesToProcess.forEach((vacancy) => {
-      if (!vacancy || !VacanciesManager.checkIsPointBelongToVacancy(point, vacancy)) {
-        return;
-      }
-      if (!isVacancyLargeEnoughToFitRect(rectArea, vacancy)) {
-        return;
-      }
-      // check is big enough
-      suitableVacancies.push(vacancy);
-    });
-    return suitableVacancies;
-  }
-
-  return {
-    closedVacancies: processVacancies(closedVacancies),
-    topEdgeVacancies: processVacancies(topEdgeVacancies),
-    bottomEdgeVacancies: processVacancies(bottomEdgeVacancies),
-    leftEdgeVacancies: processVacancies(leftEdgeVacancies),
-    rightEdgeVacancies: processVacancies(rightEdgeVacancies),
-  };
-};
-
-const sortActiveVacancies = (vacancies: VacanciesT) => {
-  const sortedVacancies: { vacancy: VacancyT; kind: VacancyKinds }[] = [];
-  for (let kind of Object.values(VacancyKinds)) {
-    sortedVacancies.push(...vacancies[kind].map((vacancy) => ({ vacancy, kind })));
-  }
-  return sortedVacancies;
-};
-
-const documentCoordinatesToCanvasCoordinates = (
-  documentCoordinates: CoordinatesT,
-  canvasRect: DOMRect,
-): CoordinatesT => {
-  const { top, left } = canvasRect;
-  return { x: documentCoordinates.x - left, y: documentCoordinates.y - top };
-};
-
-const limitCoordinatesWithCanvasBoundaries = (coordinates: CoordinatesT, canvasRect: DOMRect): CoordinatesT => {
-  const { width, height } = canvasRect;
-  const { x, y } = coordinates;
-  return {
-    x: Math.min(Math.max(0, x), width),
-    y: Math.min(Math.max(0, y), height),
-  };
-};
-
-const canvasCoordinatesToSceneCoordinates = (
-  canvasCoordinates: CoordinatesT,
-  { sceneMapEdges, zoom, sceneMapResolution }: { sceneMapEdges: SceneEdgesT; zoom: number; sceneMapResolution: number },
-) => {
-  const { x, y } = canvasCoordinates;
-
-  return {
-    x: (x / zoom + sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) / sceneMapResolution,
-    y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y / zoom) / sceneMapResolution,
-  };
-};
-
-const sceneCoordinatesToCanvasCoordinates = (
-  sceneCoordinates: CoordinatesT,
-  { sceneMapEdges, zoom, sceneMapResolution }: { sceneMapEdges: SceneEdgesT; zoom: number; sceneMapResolution: number },
-) => {
-  const { x, y } = sceneCoordinates;
-
-  return {
-    x: (x - sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) * zoom,
-    y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y) * zoom,
-  };
-};
 
 const useCounterChanged = ({
   counter,
@@ -383,18 +272,18 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
     );
 
     const onCanvasWrapperMouseDown = useCallback(
-      (e: React.MouseEvent | React.TouchEvent) => {
-        if (!(e.target instanceof SVGTextElement)) {
+      (event: React.MouseEvent | React.TouchEvent) => {
+        if (!(event.target instanceof SVGTextElement)) {
           return;
         }
-        const tagId = e.target.dataset.id;
+        const tagId = event.target.dataset.id;
         if (!draggableTagAvatarRef.current || !tagId || !sceneMapEdges) {
           return;
         }
 
         const tagPosition = tagsPositions?.find(({ id }) => id === tagId);
 
-        const { pageX: initPageX, pageY: initPageY } = getEventDocumentCoordinates(e);
+        const { pageX: initPageX, pageY: initPageY } = getEventDocumentCoordinates(event);
 
         if (!tagPosition || initPageX === null || initPageY === null) {
           return;
