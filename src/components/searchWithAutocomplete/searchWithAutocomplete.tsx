@@ -120,7 +120,7 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
               <Input
                 {...inputProps}
                 disabled={disabled || inputDisabled}
-                inputmode="text"
+                inputMode="text"
                 // @ts-ignore
                 ref={inputRef}
               />
