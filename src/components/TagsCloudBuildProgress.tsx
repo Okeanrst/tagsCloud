@@ -25,9 +25,6 @@ export const TagsCloudBuildProgress = () => {
 
   const { tagsPositions: tagsPositionsProgress } = progress ?? {};
 
-  const numberProgress =
-    (typeof tagsPositionsProgress === 'number' && tagsPositionsProgress) || (status === SUCCESS ? 1 : 0);
-
   useEffect(() => {
     mountedAtRef.current = Date.now();
     const timeout = setTimeout(() => {
@@ -38,5 +35,10 @@ export const TagsCloudBuildProgress = () => {
     };
   }, []);
 
-  return <div className={classes.root}>{canBeShown ? `${round(numberProgress * 100, 1)} %` : null}</div>;
+  let progressNumber = status === SUCCESS ? 1 : 0;
+  if (status !== SUCCESS && typeof tagsPositionsProgress === 'number') {
+    progressNumber = tagsPositionsProgress;
+  }
+
+  return <div className={classes.root}>{canBeShown ? `${round(progressNumber * 100, 1)} %` : null}</div>;
 };
