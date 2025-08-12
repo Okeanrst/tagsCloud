@@ -1,4 +1,5 @@
 import { batch } from 'react-redux';
+import throttle from 'lodash.throttle';
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
 import {
@@ -93,6 +94,7 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
     const { settings } = getState();
     const { fontFamily, sceneMapResolution, minFontSize, maxFontSize } = settings;
     const preparedTagsData = prepareTagsData(tagsData, { minFontSize, maxFontSize, maxSentimentScore });
+    const start = Date.now();
     const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(
       preparedTagsData,
       getState().rectAreasMapsData,
@@ -101,11 +103,40 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
       resolution: sceneMapResolution,
       fontFamily,
     })
-      .then((tagsRectAreasMaps) => {
+      .then(async (tagsRectAreasMaps) => {
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
+
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
-        return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, [], calcTagsPositionsOptions);
+
+        let finished = false;
+        let processedTags = 0;
+
+        const dispatchProgress = throttle(() => {
+          if (finished) {
+            return;
+          }
+          dispatch(
+            createAction(actionTypes.TAGS_CLOUD_BUILD_PROGRESS_UPDATE, {
+              tagsPositions: processedTags / preparedTagsData.length,
+            }),
+          );
+        }, 1000);
+
+        try {
+          return await calcTagsPositions({
+            tagsData: preparedTagsData,
+            tagsRectAreasMaps: fullRectAreasMapsData,
+            sceneMapPositions: [],
+            options: calcTagsPositionsOptions,
+            onProgress: () => {
+              processedTags += 1;
+              dispatchProgress();
+            },
+          });
+        } finally {
+          finished = true;
+        }
       })
       .then(({ tagsPositions, sceneMapPositions, vacancies }) => {
         dispatch(
@@ -141,9 +172,19 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         const sceneMap = getState().tagsCloud.sceneMap ?? [];
         const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
-        return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, sceneMap, {
-          ...calcTagsPositionsOptions,
-          addIfEmptyIndex: calcTagsPositionsOptions.addIfEmptyIndex - (getState().tagsCloud.tagsPositions?.length ?? 0),
+        // return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, sceneMap, {
+        //   ...calcTagsPositionsOptions,
+        //   addIfEmptyIndex: calcTagsPositionsOptions.addIfEmptyIndex - (getState().tagsCloud.tagsPositions?.length ?? 0),
+        // });
+        return calcTagsPositions({
+          tagsData: preparedTagsData,
+          tagsRectAreasMaps: fullRectAreasMapsData,
+          sceneMapPositions: sceneMap,
+          options: {
+            ...calcTagsPositionsOptions,
+            addIfEmptyIndex:
+              calcTagsPositionsOptions.addIfEmptyIndex - (getState().tagsCloud.tagsPositions?.length ?? 0),
+          },
         });
       })
       .then(({ tagsPositions, sceneMapPositions, vacancies }) => {
@@ -278,6 +319,7 @@ export function resetTagsCloud() {
   return createAction(actionTypes.RESET_TAGS_CLOUD);
 }
 
+// TODO move out of action
 export function changeTagPosition({
   tagId,
   vacancy,

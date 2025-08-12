@@ -5,7 +5,10 @@ const delay0 = () =>
     }, 0);
   });
 
-export function splitAndPerformWork<T>(workGenerator: () => Generator<T>, allowedDuration: number = 50): Promise<T[]> {
+export function splitAndPerformWork<T>(
+  workGenerator: () => Generator<T>,
+  { allowedDuration = 50, onProgress }: { allowedDuration: number; onProgress?: () => void },
+): Promise<T[]> {
   return new Promise(async (resolve, reject) => {
     const iterable = workGenerator();
     const getAndPerformWork = (prevValue?: T): { done: false; value: T } | { done: true } => {
@@ -14,6 +17,9 @@ export function splitAndPerformWork<T>(workGenerator: () => Generator<T>, allowe
         return { done: true };
       } else {
         const res = typeof value === 'function' ? value() : value;
+        if (onProgress) {
+          onProgress();
+        }
         return { done: false, value: res };
       }
     };

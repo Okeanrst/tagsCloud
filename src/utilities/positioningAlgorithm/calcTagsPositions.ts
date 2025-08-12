@@ -616,12 +616,19 @@ export const rotateRectArea = (rectArea: RectAreaT) => {
   return { rows: rectArea.cols, cols: rectArea.rows };
 };
 
-export function calcTagsPositions(
-  tagsData: ReadonlyArray<PreparedTagDataT>,
-  tagsRectAreasMaps: ReadonlyArray<IdRectAreaMapT>,
-  sceneMapPositions: PositionT[],
-  options: Options,
-): Promise<{
+export function calcTagsPositions({
+  tagsData,
+  tagsRectAreasMaps,
+  sceneMapPositions,
+  options,
+  onProgress,
+}: {
+  tagsData: ReadonlyArray<PreparedTagDataT>;
+  tagsRectAreasMaps: ReadonlyArray<IdRectAreaMapT>;
+  sceneMapPositions: PositionT[];
+  options: Options;
+  onProgress?: () => void;
+}): Promise<{
   tagsPositions: PositionedTagRectT[];
   sceneMapPositions: PositionT[];
   vacancies: {
@@ -973,7 +980,10 @@ export function calcTagsPositions(
         });
       };
 
-      splitAndPerformWork<ReturnType<PerformWorkT>>(createWorkGenerator(rectsData, performWork), 50)
+      splitAndPerformWork<ReturnType<PerformWorkT>>(createWorkGenerator(rectsData, performWork), {
+        allowedDuration: 50,
+        onProgress,
+      })
         .then(finish)
         .catch((error) => reject(error));
     } catch (e) {

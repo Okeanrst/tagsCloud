@@ -55,15 +55,21 @@ describe('positioningAlgorithm tests', () => {
 
   describe('calcTagsPositions tests', () => {
     it(`return result is equal to snapshot`, async () => {
-      const { tagsPositions } = await calcTagsPositions(preparedData, tagsRectAreasMapsMock, [], {
-        sceneMapResolution: 2,
+      const { tagsPositions } = await calcTagsPositions({
+        tagsData: preparedData,
+        tagsRectAreasMaps: tagsRectAreasMapsMock,
+        sceneMapPositions: [],
+        options: { sceneMapResolution: 2 },
       });
       expect(tagsPositions).toMatchSnapshot();
     });
 
     it(`no intersection`, async () => {
-      const { tagsPositions } = await calcTagsPositions(preparedData, fullSizeFilledRectAreasMaps, [], {
-        sceneMapResolution: 2,
+      const { tagsPositions } = await calcTagsPositions({
+        tagsData: preparedData,
+        tagsRectAreasMaps: fullSizeFilledRectAreasMaps,
+        sceneMapPositions: [],
+        options: { sceneMapResolution: 2 },
       });
 
       let intersection = 0;

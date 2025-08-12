@@ -64,12 +64,21 @@ export type RootStateT = {
           [VacancyKinds.rightEdgeVacancies]: PreparedRightEdgeVacancyT[];
         };
         status: QueryStatuses.SUCCESS;
+        progress: null;
       }
     | {
         tagsPositions: null;
         sceneMap: null;
         vacancies: null;
         status: QueryStatuses.PRISTINE | QueryStatuses.PENDING | QueryStatuses.FAILURE;
+        progress: null;
+      }
+    | {
+        tagsPositions: null;
+        sceneMap: null;
+        vacancies: null;
+        status: QueryStatuses.PENDING;
+        progress: null | { tagsPositions: number };
       };
   useCanvas: boolean;
   fontLoaded: {

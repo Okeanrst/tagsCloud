@@ -12,6 +12,7 @@ import { Checkbox } from 'ui/checkbox/Checkbox';
 import { IconButton } from 'ui/buttons/IconButton';
 import { DownloadCloudIcon } from 'ui/icons/DownloadCloudIcon';
 import { Collapse } from 'components/Collapse';
+import { TagsCloudBuildProgress } from 'components/TagsCloudBuildProgress';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
@@ -70,6 +71,12 @@ const styles = (theme: Theme) =>
       left: 0,
       right: 0,
       zIndex: 6,
+    },
+    loader: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      color: 'var(--primary-main-color)',
     },
     controls: {
       width: '100%',
@@ -287,7 +294,10 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   renderLoader = () => (
     <div className={this.props.classes.loaderContainer}>
-      <FadeLoader loading color="#123abc" />
+      <div className={this.props.classes.loader}>
+        <FadeLoader loading color="var(--primary-main-color)" />
+        <TagsCloudBuildProgress />
+      </div>
     </div>
   );
 

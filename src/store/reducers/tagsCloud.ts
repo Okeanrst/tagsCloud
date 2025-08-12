@@ -10,22 +10,31 @@ import {
   INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS,
   TAGS_CLOUD_UPDATE_TAG,
   TAGS_CLOUD_UPDATE_TAG_COLOR,
+  TAGS_CLOUD_BUILD_PROGRESS_UPDATE,
 } from '../actions/actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
 
-const initState: RootStateT['tagsCloud'] = { status: PRISTINE, tagsPositions: null, sceneMap: null, vacancies: null };
+const initState: RootStateT['tagsCloud'] = {
+  status: PRISTINE,
+  tagsPositions: null,
+  sceneMap: null,
+  vacancies: null,
+  progress: null,
+};
 
 export const tagsCloudReducer = (state: RootStateT['tagsCloud'] = { ...initState }, action: AnyAction) => {
   switch (action.type) {
     case TAGS_CLOUD_BUILD_REQUEST:
       return { ...state, status: PENDING };
     case TAGS_CLOUD_BUILD_SUCCESS:
-      return { ...state, status: SUCCESS, ...action.payload };
+      return { ...state, status: SUCCESS, progress: null, ...action.payload };
     case TAGS_CLOUD_BUILD_FAILURE:
-      return { ...state, status: FAILURE };
+      return { ...state, status: FAILURE, progress: null };
     case RESET_TAGS_CLOUD:
       return { ...initState };
+    case TAGS_CLOUD_BUILD_PROGRESS_UPDATE:
+      return { ...state, progress: { ...(state.progress ?? {}), ...(action.payload ?? {}) } };
     case INCREMENTAL_BUILD_TAGS_CLOUD_SUCCESS: {
       const tagsPositions: RootStateT['tagsCloud']['tagsPositions'] = [
         ...(state.tagsPositions ?? []),

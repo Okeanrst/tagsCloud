@@ -40,7 +40,7 @@ export function prepareRectAreasMaps(
       }
     }
 
-    splitAndPerformWork<void>(workGenerator, 50)
+    splitAndPerformWork<void>(workGenerator, { allowedDuration: 50 })
       .then(() => {
         resolve([...rectAreasMaps.values()]);
       })

@@ -8,7 +8,6 @@ import {
   INCREMENTAL_BUILD_ADD_TAG_ID,
   INCREMENTAL_BUILD_REMOVE_TAG_ID,
   RESET_TAGS_CLOUD,
-  SETTINGS_UPDATE,
 } from '../actions/actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
@@ -35,7 +34,6 @@ export const incrementalBuildReducer = (
       return { ...state, status: PRISTINE, tagsIds };
     }
     case RESET_TAGS_CLOUD:
-    case SETTINGS_UPDATE:
       return { ...initState };
     default:
       return state;
