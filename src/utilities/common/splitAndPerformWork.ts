@@ -1,3 +1,10 @@
+const delay0 = () =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(null);
+    }, 0);
+  });
+
 export function splitAndPerformWork<T>(workGenerator: () => Generator<T>, allowedDuration: number = 50): Promise<T[]> {
   return new Promise(async (resolve, reject) => {
     const iterable = workGenerator();
@@ -9,18 +16,6 @@ export function splitAndPerformWork<T>(workGenerator: () => Generator<T>, allowe
         const res = typeof value === 'function' ? value() : value;
         return { done: false, value: res };
       }
-    };
-
-    const withDelay = (prevValue?: T): Promise<ReturnType<typeof getAndPerformWork>> => {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          try {
-            resolve(getAndPerformWork(prevValue));
-          } catch (err) {
-            reject(err);
-          }
-        }, 0);
-      });
     };
 
     let restTime = allowedDuration;
@@ -42,14 +37,16 @@ export function splitAndPerformWork<T>(workGenerator: () => Generator<T>, allowe
         if (spent >= restTime) {
           restTime = allowedDuration;
 
-          result = await withDelay(prevCallReturnValue);
-          ({ done } = result);
+          await delay0();
+          result = getAndPerformWork(prevCallReturnValue);
         } else {
           restTime = restTime - spent;
 
           result = getAndPerformWork(prevCallReturnValue);
-          ({ done } = result);
         }
+
+        ({ done } = result);
+
         if (!result.done) {
           values.push(result.value);
         }
