@@ -9,7 +9,7 @@ export function formRectAreaMapKey(word: string, fontSize: number) {
 
 export function prepareRectAreasMaps(
   tagsData: ReadonlyArray<PreparedTagDataT>,
-  { resolution, fontFamily }: { resolution: number; fontFamily: FontFamilies },
+  { resolution, fontFamily, signal }: { resolution: number; fontFamily: FontFamilies; signal?: AbortSignal },
 ): Promise<ReadonlyArray<IdRectAreaMapT>> {
   return new Promise(function (resolve, reject) {
     const canvas = document.createElement('canvas');
@@ -40,7 +40,7 @@ export function prepareRectAreasMaps(
       }
     }
 
-    splitAndPerformWork<void>(workGenerator, { allowedDuration: 50 })
+    splitAndPerformWork<void>(workGenerator, { allowedDuration: 50, signal })
       .then(() => {
         resolve([...rectAreasMaps.values()]);
       })

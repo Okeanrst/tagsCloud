@@ -24,6 +24,8 @@ function selectMaxSentimentScore(state: RootStateT) {
   return getMaxSentimentScore(state.tagsData?.data ?? []);
 }
 
+let buildTagsCloudController: AbortController | null = null;
+
 const filterPreparedTagsDataWithoutRectAreasMaps = (
   preparedTagsData: ReturnType<typeof prepareTagsData>,
   rectAreasMapsData: RootStateT['rectAreasMapsData'],
@@ -72,8 +74,16 @@ const formCalcTagsPositionsOptions = (settings: RootStateT['settings']) => {
 };
 
 export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
-  return (dispatch: AppDispatchT, getState: GetStateT) => {
+  return async (dispatch: AppDispatchT, getState: GetStateT) => {
+    if (buildTagsCloudController) {
+      buildTagsCloudController.abort();
+    }
+    const controller = new AbortController();
+    buildTagsCloudController = controller;
+    const { signal } = controller;
+
     dispatch(createAction(actionTypes.TAGS_CLOUD_BUILD_REQUEST));
+
     const maxSentimentScore = getMaxSentimentScore(tagsData);
     const { settings } = getState();
     const { fontFamily, sceneMapResolution, minFontSize, maxFontSize } = settings;
@@ -83,54 +93,60 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
       preparedTagsData,
       getState().rectAreasMapsData,
     );
-    return prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, {
-      resolution: sceneMapResolution,
-      fontFamily,
-    })
-      .then(async (tagsRectAreasMaps) => {
-        dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
 
-        const fullRectAreasMapsData = getState().rectAreasMapsData;
-        const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
+    let finished = false;
+    try {
+      const tagsRectAreasMaps = await prepareRectAreasMaps(preparedTagsDataWithoutRectAreasMaps, {
+        resolution: sceneMapResolution,
+        fontFamily,
+        signal,
+      });
+      dispatch(createAction(actionTypes.RECT_AREAS_MAPS_ADD_MAPS, tagsRectAreasMaps));
 
-        let finished = false;
-        let processedTags = 0;
+      const fullRectAreasMapsData = getState().rectAreasMapsData;
+      const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
 
-        const dispatchProgress = throttle(() => {
+      let processedTags = 0;
+
+      const dispatchProgress = throttle(() => {
+        dispatch(
+          createAction(actionTypes.TAGS_CLOUD_BUILD_PROGRESS_UPDATE, {
+            tagsPositions: processedTags / preparedTagsData.length,
+          }),
+        );
+      }, 1000);
+
+      const { tagsPositions, sceneMapPositions, vacancies } = await calcTagsPositions({
+        tagsData: preparedTagsData,
+        tagsRectAreasMaps: fullRectAreasMapsData,
+        sceneMapPositions: [],
+        options: calcTagsPositionsOptions,
+        onProgress: () => {
           if (finished) {
             return;
           }
-          dispatch(
-            createAction(actionTypes.TAGS_CLOUD_BUILD_PROGRESS_UPDATE, {
-              tagsPositions: processedTags / preparedTagsData.length,
-            }),
-          );
-        }, 1000);
-
-        try {
-          return await calcTagsPositions({
-            tagsData: preparedTagsData,
-            tagsRectAreasMaps: fullRectAreasMapsData,
-            sceneMapPositions: [],
-            options: calcTagsPositionsOptions,
-            onProgress: () => {
-              processedTags += 1;
-              dispatchProgress();
-            },
-          });
-        } finally {
-          finished = true;
-        }
-      })
-      .then(({ tagsPositions, sceneMapPositions, vacancies }) => {
-        dispatch(
-          createAction(actionTypes.TAGS_CLOUD_BUILD_SUCCESS, { tagsPositions, sceneMap: sceneMapPositions, vacancies }),
-        );
-        dispatch(createAction(actionTypes.RECT_AREAS_MAPS_REMOVE_MAPS, findUnusedRectAreasMapsKeys(getState())));
-      })
-      .catch(() => {
-        dispatch(createAction(actionTypes.TAGS_CLOUD_BUILD_FAILURE));
+          processedTags += 1;
+          dispatchProgress();
+        },
+        signal,
       });
+
+      dispatch(
+        createAction(actionTypes.TAGS_CLOUD_BUILD_SUCCESS, {
+          tagsPositions,
+          sceneMap: sceneMapPositions,
+          vacancies,
+        }),
+      );
+      dispatch(createAction(actionTypes.RECT_AREAS_MAPS_REMOVE_MAPS, findUnusedRectAreasMapsKeys(getState())));
+    } catch (ex: any) {
+      if (ex.name === 'AbortError') {
+        return;
+      }
+      dispatch(createAction(actionTypes.TAGS_CLOUD_BUILD_FAILURE));
+    } finally {
+      finished = true;
+    }
   };
 }
 
@@ -186,7 +202,7 @@ export function deleteTagsData() {
   return (dispatch: AppDispatchT) => {
     batch(() => {
       dispatch(createAction(actionTypes.TAGS_DATA_DELETE_ALL_DATA));
-      dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
+      dispatch(resetTagsCloud());
     });
   };
 }
@@ -240,7 +256,7 @@ export function deleteDataItem(targetId: string) {
       itemSentimentScore >= currentMaxSentimentScore &&
       selectMaxSentimentScore(getState()) !== currentMaxSentimentScore
     ) {
-      dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
+      dispatch(resetTagsCloud());
     } else {
       const removeTagAction = createRemoveTagAction(targetId, getState);
       if (!removeTagAction) {
@@ -266,7 +282,7 @@ export function editDataItem(tagData: TagDataT) {
     shouldResetTagsCloud = shouldResetTagsCloud || selectMaxSentimentScore(getState()) !== currentMaxSentimentScore;
 
     if (shouldResetTagsCloud) {
-      dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
+      dispatch(resetTagsCloud());
     } else if (currentSentimentScore !== tagData.sentimentScore) {
       const removeTagAction = createRemoveTagAction(tagData.id, getState);
       if (!removeTagAction) {
@@ -290,13 +306,19 @@ export function addDataItem(data: Omit<TagDataT, 'id'>) {
     dispatch(createAction(actionTypes.INCREMENTAL_BUILD_ADD_TAG_ID, id));
 
     if (shouldResetTagsCloud) {
-      dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
+      dispatch(resetTagsCloud());
     }
   };
 }
 
 export function resetTagsCloud() {
-  return createAction(actionTypes.RESET_TAGS_CLOUD);
+  return (dispatch: AppDispatchT) => {
+    if (buildTagsCloudController) {
+      buildTagsCloudController.abort();
+      buildTagsCloudController = null;
+    }
+    dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
+  };
 }
 
 export function changeTagPosition({

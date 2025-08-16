@@ -1,8 +1,9 @@
 import { batch } from 'react-redux';
 import { AppDispatchT, GetStateT, RootStateT } from '../types';
-import { omit } from '../../utilities/helpers/omit';
+import { omit } from 'utilities/helpers/omit';
 import { createAction } from './helpers';
 import * as actionTypes from './actionTypes';
+import { resetTagsCloud } from './tagsCloud';
 
 type SettingsT = Partial<RootStateT['settings']>;
 
@@ -30,7 +31,7 @@ export function updateSettings(data: SettingsT) {
       }
 
       if (shouldResetTagsCloud(currentSettings, data)) {
-        dispatch(createAction(actionTypes.RESET_TAGS_CLOUD));
+        dispatch(resetTagsCloud());
       }
 
       dispatch(createAction(actionTypes.SETTINGS_UPDATE, data));

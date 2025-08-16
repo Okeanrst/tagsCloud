@@ -1,15 +1,11 @@
 import { saveAs } from 'file-saver';
 import { batch } from 'react-redux';
 import { NOTIFICATIONS_TYPES } from 'constants/index';
-import {
-  TAGS_DATA_FETCH_FAILURE,
-  TAGS_DATA_FETCH_REQUEST,
-  TAGS_DATA_FETCH_SUCCESS,
-  RESET_TAGS_CLOUD,
-} from './actionTypes';
+import { TAGS_DATA_FETCH_FAILURE, TAGS_DATA_FETCH_REQUEST, TAGS_DATA_FETCH_SUCCESS } from './actionTypes';
 import { createAction } from './helpers';
 import { validateTagCloudRawData } from './rawDataValidator';
 import { addNotification } from './notifications';
+import { resetTagsCloud } from './tagsCloud';
 
 import type { TagDataT } from 'types/types';
 import type { AppDispatchT } from '../types';
@@ -18,7 +14,7 @@ export function uploadRawTagsCloudDataFile(file: File) {
   return (dispatch: AppDispatchT) => {
     batch(() => {
       dispatch(createAction(TAGS_DATA_FETCH_REQUEST));
-      dispatch(createAction(RESET_TAGS_CLOUD));
+      dispatch(resetTagsCloud());
     });
 
     parseRawTagsCloudDataFile(file)

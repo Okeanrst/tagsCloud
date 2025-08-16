@@ -6,7 +6,7 @@ import { EdgesManager, edgesOrder, EDGE } from './edgesManager';
 import { VacanciesManager, VacanciesManagerOptionsT } from './vacanciesManager';
 import IntersectionError from './IntersectionError';
 import { getRectAreaOfRectAreaMap } from '../rectAreaMap/rectAreaMap';
-
+import { AbortError } from '../errors/AbortError';
 import { IdRectAreaMapT, TwoDimensionalMapT, RectMapPositionT } from 'types/types';
 import type { PreparedTagDataT, TagRectT, PositionedTagRectT, RectAreaT } from 'types/types';
 import type {
@@ -622,12 +622,14 @@ export function calcTagsPositions({
   sceneMapPositions,
   options,
   onProgress,
+  signal,
 }: {
   tagsData: ReadonlyArray<PreparedTagDataT>;
   tagsRectAreasMaps: ReadonlyArray<IdRectAreaMapT>;
   sceneMapPositions: PositionT[];
   options: Options;
   onProgress?: () => void;
+  signal?: AbortSignal;
 }): Promise<{
   tagsPositions: PositionedTagRectT[];
   sceneMapPositions: PositionT[];
@@ -639,7 +641,11 @@ export function calcTagsPositions({
     [VacancyKinds.rightEdgeVacancies]: PreparedRightEdgeVacancyT[];
   };
 }> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
+    if (signal?.aborted) {
+      return reject(new AbortError());
+    }
+
     const rectAreaMapByKey = new Map(tagsRectAreasMaps.map(({ key, map, mapMeta }) => [key, { map, mapMeta }]));
 
     const isFromScratch = !sceneMapPositions.length;
@@ -980,16 +986,16 @@ export function calcTagsPositions({
         });
       };
 
-      splitAndPerformWork<ReturnType<PerformWorkT>>(createWorkGenerator(rectsData, performWork), {
+      await splitAndPerformWork<ReturnType<PerformWorkT>>(createWorkGenerator(rectsData, performWork), {
         allowedDuration: 50,
         onProgress,
-      })
-        .then(finish)
-        .catch((error) => reject(error));
-    } catch (e) {
+        signal,
+      });
+      finish();
+    } catch (ex) {
       // eslint-disable-next-line no-console
-      console.log(e);
-      reject(e);
+      console.log(ex);
+      reject(ex);
     }
   });
 }

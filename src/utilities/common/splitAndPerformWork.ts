@@ -1,3 +1,5 @@
+import { AbortError } from '../errors/AbortError';
+
 const delay0 = () =>
   new Promise((resolve) => {
     setTimeout(() => {
@@ -7,9 +9,26 @@ const delay0 = () =>
 
 export function splitAndPerformWork<T>(
   workGenerator: () => Generator<T>,
-  { allowedDuration = 50, onProgress }: { allowedDuration: number; onProgress?: () => void },
+  {
+    allowedDuration = 50,
+    onProgress,
+    signal,
+  }: { allowedDuration: number; onProgress?: () => void; signal?: AbortSignal },
 ): Promise<T[]> {
+  if (signal?.aborted) {
+    return Promise.reject(new AbortError());
+  }
+
+  let abortListener: () => void;
   return new Promise(async (resolve, reject) => {
+    if (signal) {
+      abortListener = () => {
+        reject(new AbortError());
+      };
+
+      signal.addEventListener('abort', abortListener, { once: true });
+    }
+
     const iterable = workGenerator();
     const getAndPerformWork = (prevValue?: T): { done: false; value: T } | { done: true } => {
       const { done, value } = iterable.next(prevValue);
@@ -32,7 +51,7 @@ export function splitAndPerformWork<T>(
       let done = false;
 
       let result;
-      while (!done) {
+      while (!done && (!signal || !signal.aborted)) {
         const spent = Date.now() - start;
 
         let prevCallReturnValue;
@@ -58,8 +77,12 @@ export function splitAndPerformWork<T>(
         }
       }
       resolve(values);
-    } catch (e) {
-      reject(e);
+    } catch (ex) {
+      reject(ex);
     }
-  });
+  }).finally(() => {
+    if (signal) {
+      signal.removeEventListener('abort', abortListener);
+    }
+  }) as Promise<T[]>;
 }
