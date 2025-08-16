@@ -171,11 +171,11 @@ const getInformationListRenderers = (
       cells: [
         () => [
           'days: ',
-          shouldShowDays
+          !days?.length
+            ? 0
+            : shouldShowDays
             ? renderDaysPicker('-', toggleShowingDays, classes)
-            : days?.length
-            ? renderDaysPicker('+', toggleShowingDays, classes)
-            : 0,
+            : renderDaysPicker('+', toggleShowingDays, classes),
         ],
         () => (shouldShowDays ? renderDays(days, classes) : null),
       ],
