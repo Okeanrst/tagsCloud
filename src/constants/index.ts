@@ -44,3 +44,9 @@ export enum NOTIFICATIONS_TYPES {
   ERROR = 'error',
   SUCCESS = 'success',
 }
+
+export enum DATA_SETS {
+  DEFAULT = 'DEFAULT',
+  SMALL_200 = 'SMALL_200',
+  BIG_500 = 'BIG_500',
+}

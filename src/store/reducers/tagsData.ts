@@ -9,6 +9,7 @@ import {
   TAGS_DATA_FETCH_FAILURE,
   TAGS_DATA_FETCH_REQUEST,
   TAGS_DATA_FETCH_SUCCESS,
+  RESET_TAGS_DATA,
 } from '../actions/actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
@@ -59,6 +60,8 @@ export const tagsDataReducer = (
     }
     case TAGS_DATA_DELETE_ALL_DATA:
       return { status: SUCCESS, data: [] };
+    case RESET_TAGS_DATA:
+      return { status: PRISTINE, data: null };
     default:
       return state;
   }

@@ -1,13 +1,20 @@
 import { batch } from 'react-redux';
 import { AppDispatchT, GetStateT, RootStateT } from '../types';
 import { omit } from 'utilities/helpers/omit';
+import { pick } from 'utilities/helpers/pick';
 import { createAction } from './helpers';
 import * as actionTypes from './actionTypes';
 import { resetTagsCloud } from './tagsCloud';
 
 type SettingsT = Partial<RootStateT['settings']>;
 
+const SETTINGS_TAGS_DATA_AFFECTING: (keyof RootStateT['settings'])[] = ['dataSet'];
 const SETTINGS_NOT_AFFECTING_CLOUD: (keyof RootStateT['settings'])[] = ['tagByTagRenderInterval'];
+
+const shouldResetTagsData = (currentSettings: SettingsT, nextSettings: SettingsT) => {
+  const targetNextSettings = pick(nextSettings, SETTINGS_TAGS_DATA_AFFECTING);
+  return Object.entries(targetNextSettings).some(([key, value]) => currentSettings[key as keyof SettingsT] !== value);
+};
 
 const shouldResetTagsCloud = (currentSettings: SettingsT, nextSettings: SettingsT) => {
   const targetNextSettings = omit(nextSettings, SETTINGS_NOT_AFFECTING_CLOUD);
@@ -28,6 +35,10 @@ export function updateSettings(data: SettingsT) {
         ('sceneMapResolution' in data && sceneMapResolution !== data.sceneMapResolution)
       ) {
         dispatch(createAction(actionTypes.RECT_AREAS_MAPS_RESET));
+      }
+
+      if (shouldResetTagsData(currentSettings, data)) {
+        dispatch(createAction(actionTypes.RESET_TAGS_DATA));
       }
 
       if (shouldResetTagsCloud(currentSettings, data)) {

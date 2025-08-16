@@ -992,9 +992,11 @@ export function calcTagsPositions({
         signal,
       });
       finish();
-    } catch (ex) {
-      // eslint-disable-next-line no-console
-      console.log(ex);
+    } catch (ex: any) {
+      if (ex.name !== 'AbortError') {
+        // eslint-disable-next-line no-console
+        console.log(ex);
+      }
       reject(ex);
     }
   });

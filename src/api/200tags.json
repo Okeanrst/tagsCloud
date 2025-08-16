@@ -1,0 +1,1202 @@
+[
+  {
+    "label": "Mixes",
+    "color": "rgb(44,136,65)",
+    "sentimentScore": 50,
+    "id": "Mixes_1754901208758022"
+  },
+  {
+    "label": "Creative",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 7,
+    "id": "Creative_1754901208758023"
+  },
+  {
+    "label": "Unique",
+    "color": "rgb(0,191,255)",
+    "sentimentScore": 12,
+    "id": "Unique_1754901208758024"
+  },
+  {
+    "label": "Inspiring",
+    "color": "rgb(255,69,0)",
+    "sentimentScore": 32,
+    "id": "Inspiring_1754901208758025"
+  },
+  {
+    "label": "Artistic",
+    "color": "rgb(128,0,128)",
+    "sentimentScore": 84,
+    "id": "Artistic_1754901208758026"
+  },
+  {
+    "label": "Innovative",
+    "color": "rgb(0,128,0)",
+    "sentimentScore": 92,
+    "id": "Innovative_1754901208758027"
+  },
+  {
+    "label": "Powerful",
+    "color": "rgb(178,34,34)",
+    "sentimentScore": 91,
+    "id": "Powerful_1754901208758028"
+  },
+  {
+    "label": "Captivating",
+    "color": "rgb(255,20,147)",
+    "sentimentScore": 90,
+    "id": "Captivating_1754901208758029"
+  },
+  {
+    "label": "Dynamic",
+    "color": "rgb(0,0,255)",
+    "sentimentScore": 72,
+    "id": "Dynamic_1754901208758030"
+  },
+  {
+    "label": "Engaging",
+    "color": "rgb(75,0,130)",
+    "sentimentScore": 5,
+    "id": "Engaging_1754901208758031"
+  },
+  {
+    "label": "Thought-provoking",
+    "color": "rgb(255,140,0)",
+    "sentimentScore": 50,
+    "id": "Thought-provoking_1754901208758032"
+  },
+  {
+    "label": "Vibrant",
+    "color": "rgb(255,0,255)",
+    "sentimentScore": 97,
+    "id": "Vibrant_1754901208758033"
+  },
+  {
+    "label": "Expressive",
+    "color": "rgb(0,255,0)",
+    "sentimentScore": 94,
+    "id": "Expressive_1754901208758034"
+  },
+  {
+    "label": "Harmonious",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 73,
+    "id": "Harmonious_1754901208758035"
+  },
+  {
+    "label": "Breathtaking",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 63,
+    "id": "Breathtaking_1754901208758036"
+  },
+  {
+    "label": "Fresh",
+    "color": "rgb(0,255,127)",
+    "sentimentScore": 84,
+    "id": "Fresh_1754901208758037"
+  },
+  {
+    "label": "Bold",
+    "color": "rgb(128,0,0)",
+    "sentimentScore": 9,
+    "id": "Bold_1754901208758038"
+  },
+  {
+    "label": "Refined",
+    "color": "rgb(100,149,237)",
+    "sentimentScore": 47,
+    "id": "Refined_1754901208758039"
+  },
+  {
+    "label": "Intriguing",
+    "color": "rgb(160,32,240)",
+    "sentimentScore": 17,
+    "id": "Intriguing_1754901208758040"
+  },
+  {
+    "label": "Masterpiece",
+    "color": "rgb(255,255,0)",
+    "sentimentScore": 95,
+    "id": "Masterpiece_1754901208758041"
+  },
+  {
+    "label": "Abstract",
+    "color": "rgb(0,0,139)",
+    "sentimentScore": 11,
+    "id": "Abstract_1754901208758042"
+  },
+  {
+    "label": "Complex",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 31,
+    "id": "Complex_1754901208758043"
+  },
+  {
+    "label": "Simple",
+    "color": "rgb(240,255,240)",
+    "sentimentScore": 12,
+    "id": "Simple_1754901208758044"
+  },
+  {
+    "label": "Minimalist",
+    "color": "rgb(192,192,192)",
+    "sentimentScore": 79,
+    "id": "Minimalist_1754901208758045"
+  },
+  {
+    "label": "Modern",
+    "color": "rgb(105,105,105)",
+    "sentimentScore": 61,
+    "id": "Modern_1754901208758046"
+  },
+  {
+    "label": "Classic",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 73,
+    "id": "Classic_1754901208758047"
+  },
+  {
+    "label": "Vintage",
+    "color": "rgb(210,180,140)",
+    "sentimentScore": 83,
+    "id": "Vintage_1754901208758048"
+  },
+  {
+    "label": "Futuristic",
+    "color": "rgb(0,255,255)",
+    "sentimentScore": 69,
+    "id": "Futuristic_1754901208758049"
+  },
+  {
+    "label": "Experimental",
+    "color": "rgb(255,0,102)",
+    "sentimentScore": 84,
+    "id": "Experimental_1754901208758050"
+  },
+  {
+    "label": "Lively",
+    "color": "rgb(255,105,180)",
+    "sentimentScore": 59,
+    "id": "Lively_1754901208758051"
+  },
+  {
+    "label": "Melodic",
+    "color": "rgb(255,140,0)",
+    "sentimentScore": 90,
+    "id": "Melodic_1754901208758052"
+  },
+  {
+    "label": "Rhythmic",
+    "color": "rgb(148,0,211)",
+    "sentimentScore": 35,
+    "id": "Rhythmic_1754901208758053"
+  },
+  {
+    "label": "Smooth",
+    "color": "rgb(135,206,250)",
+    "sentimentScore": 5,
+    "id": "Smooth_1754901208758054"
+  },
+  {
+    "label": "Energetic",
+    "color": "rgb(255,69,0)",
+    "sentimentScore": 3,
+    "id": "Energetic_1754901208758055"
+  },
+  {
+    "label": "Relaxing",
+    "color": "rgb(32,178,170)",
+    "sentimentScore": 6,
+    "id": "Relaxing_1754901208758056"
+  },
+  {
+    "label": "Hypnotic",
+    "color": "rgb(75,0,130)",
+    "sentimentScore": 23,
+    "id": "Hypnotic_1754901208758057"
+  },
+  {
+    "label": "Emotional",
+    "color": "rgb(255,20,147)",
+    "sentimentScore": 74,
+    "id": "Emotional_1754901208758058"
+  },
+  {
+    "label": "Groovy",
+    "color": "rgb(124,252,0)",
+    "sentimentScore": 43,
+    "id": "Groovy_1754901208758059"
+  },
+  {
+    "label": "Upbeat",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 98,
+    "id": "Upbeat_1754901208758060"
+  },
+  {
+    "label": "Soulful",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 93,
+    "id": "Soulful_1754901208758061"
+  },
+  {
+    "label": "Ambient",
+    "color": "rgb(0,100,0)",
+    "sentimentScore": 48,
+    "id": "Ambient_1754901208758062"
+  },
+  {
+    "label": "Chill",
+    "color": "rgb(106,90,205)",
+    "sentimentScore": 37,
+    "id": "Chill_1754901208758063"
+  },
+  {
+    "label": "Funky",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 55,
+    "id": "Funky_1754901208758064"
+  },
+  {
+    "label": "Jazzy",
+    "color": "rgb(160,32,240)",
+    "sentimentScore": 1,
+    "id": "Jazzy_1754901208758065"
+  },
+  {
+    "label": "Bluesy",
+    "color": "rgb(0,0,139)",
+    "sentimentScore": 32,
+    "id": "Bluesy_1754901208758066"
+  },
+  {
+    "label": "Electronic",
+    "color": "rgb(0,255,255)",
+    "sentimentScore": 63,
+    "id": "Electronic_1754901208758067"
+  },
+  {
+    "label": "Acoustic",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 43,
+    "id": "Acoustic_1754901208758068"
+  },
+  {
+    "label": "Indie",
+    "color": "rgb(240,255,240)",
+    "sentimentScore": 51,
+    "id": "Indie_1754901208758069"
+  },
+  {
+    "label": "Pop",
+    "color": "rgb(255,20,147)",
+    "sentimentScore": 22,
+    "id": "Pop_1754901208758070"
+  },
+  {
+    "label": "Rock",
+    "color": "rgb(128,0,0)",
+    "sentimentScore": 41,
+    "id": "Rock_1754901208758071"
+  },
+  {
+    "label": "Hip-hop",
+    "color": "rgb(0,128,0)",
+    "sentimentScore": 78,
+    "id": "Hip-hop_1754901208758072"
+  },
+  {
+    "label": "Country",
+    "color": "rgb(210,180,140)",
+    "sentimentScore": 51,
+    "id": "Country_1754901208758073"
+  },
+  {
+    "label": "Classical",
+    "color": "rgb(100,149,237)",
+    "sentimentScore": 74,
+    "id": "Classical_1754901208758074"
+  },
+  {
+    "label": "Folk",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 90,
+    "id": "Folk_1754901208758075"
+  },
+  {
+    "label": "Reggae",
+    "color": "rgb(46,139,87)",
+    "sentimentScore": 2,
+    "id": "Reggae_1754901208758076"
+  },
+  {
+    "label": "Dubstep",
+    "color": "rgb(148,0,211)",
+    "sentimentScore": 39,
+    "id": "Dubstep_1754901208758077"
+  },
+  {
+    "label": "Techno",
+    "color": "rgb(0,255,255)",
+    "sentimentScore": 52,
+    "id": "Techno_1754901208758078"
+  },
+  {
+    "label": "House",
+    "color": "rgb(255,0,255)",
+    "sentimentScore": 41,
+    "id": "House_1754901208758079"
+  },
+  {
+    "label": "Trance",
+    "color": "rgb(75,0,130)",
+    "sentimentScore": 73,
+    "id": "Trance_1754901208758080"
+  },
+  {
+    "label": "Drum & Bass",
+    "color": "rgb(255,69,0)",
+    "sentimentScore": 80,
+    "id": "Drum & Bass_1754901208758081"
+  },
+  {
+    "label": "EDM",
+    "color": "rgb(255,105,180)",
+    "sentimentScore": 65,
+    "id": "EDM_1754901208758082"
+  },
+  {
+    "label": "Punk",
+    "color": "rgb(178,34,34)",
+    "sentimentScore": 20,
+    "id": "Punk_1754901208758083"
+  },
+  {
+    "label": "Metal",
+    "color": "rgb(105,105,105)",
+    "sentimentScore": 64,
+    "id": "Metal_1754901208758084"
+  },
+  {
+    "label": "Gothic",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 11,
+    "id": "Gothic_1754901208758085"
+  },
+  {
+    "label": "Industrial",
+    "color": "rgb(128,128,128)",
+    "sentimentScore": 79,
+    "id": "Industrial_1754901208758086"
+  },
+  {
+    "label": "Alternative",
+    "color": "rgb(255,140,0)",
+    "sentimentScore": 29,
+    "id": "Alternative_1754901208758087"
+  },
+  {
+    "label": "Soundtrack",
+    "color": "rgb(100,149,237)",
+    "sentimentScore": 7,
+    "id": "Soundtrack_1754901208758088"
+  },
+  {
+    "label": "Epic",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 56,
+    "id": "Epic_1754901208758089"
+  },
+  {
+    "label": "Orchestral",
+    "color": "rgb(75,0,130)",
+    "sentimentScore": 89,
+    "id": "Orchestral_1754901208758090"
+  },
+  {
+    "label": "Cinematic",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 10,
+    "id": "Cinematic_1754901208758091"
+  },
+  {
+    "label": "Progressive",
+    "color": "rgb(0,191,255)",
+    "sentimentScore": 75,
+    "id": "Progressive_1754901208758093"
+  },
+  {
+    "label": "Chillwave",
+    "color": "rgb(106,90,205)",
+    "sentimentScore": 90,
+    "id": "Chillwave_1754901208758095"
+  },
+  {
+    "label": "Vaporwave",
+    "color": "rgb(0,255,255)",
+    "sentimentScore": 89,
+    "id": "Vaporwave_1754901208758096"
+  },
+  {
+    "label": "Synthwave",
+    "color": "rgb(255,0,255)",
+    "sentimentScore": 57,
+    "id": "Synthwave_1754901208758097"
+  },
+  {
+    "label": "Lo-fi",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 56,
+    "id": "Lo-fi_1754901208758098"
+  },
+  {
+    "label": "Instrumental",
+    "color": "rgb(192,192,192)",
+    "sentimentScore": 11,
+    "id": "Instrumental_1754901208758099"
+  },
+  {
+    "label": "Jazz",
+    "color": "rgb(160,32,240)",
+    "sentimentScore": 33,
+    "id": "Jazz_1754901208758101"
+  },
+  {
+    "label": "Blues",
+    "color": "rgb(0,0,139)",
+    "sentimentScore": 69,
+    "id": "Blues_1754901208758102"
+  },
+  {
+    "label": "Ska",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 68,
+    "id": "Ska_1754901208758104"
+  },
+  {
+    "label": "Funk",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 60,
+    "id": "Funk_1754901208758105"
+  },
+  {
+    "label": "Disco",
+    "color": "rgb(255,0,255)",
+    "sentimentScore": 40,
+    "id": "Disco_1754901208758106"
+  },
+  {
+    "label": "Soul",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 8,
+    "id": "Soul_1754901208758107"
+  },
+  {
+    "label": "R&B",
+    "color": "rgb(255,20,147)",
+    "sentimentScore": 58,
+    "id": "R&B_1754901208758108"
+  },
+  {
+    "label": "Gospel",
+    "color": "rgb(255,255,0)",
+    "sentimentScore": 37,
+    "id": "Gospel_1754901208758109"
+  },
+  {
+    "label": "Americana",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 86,
+    "id": "Americana_1754901208758112"
+  },
+  {
+    "label": "Bluegrass",
+    "color": "rgb(0,100,0)",
+    "sentimentScore": 29,
+    "id": "Bluegrass_1754901208758113"
+  },
+  {
+    "label": "World",
+    "color": "rgb(0,128,0)",
+    "sentimentScore": 80,
+    "id": "World_1754901208758114"
+  },
+  {
+    "label": "Latin",
+    "color": "rgb(255,0,0)",
+    "sentimentScore": 43,
+    "id": "Latin_1754901208758115"
+  },
+  {
+    "label": "Afrobeat",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 68,
+    "id": "Afrobeat_1754901208758116"
+  },
+  {
+    "label": "Bollywood",
+    "color": "rgb(255,69,0)",
+    "sentimentScore": 35,
+    "id": "Bollywood_1754901208758117"
+  },
+  {
+    "label": "K-Pop",
+    "color": "rgb(255,20,147)",
+    "sentimentScore": 48,
+    "id": "K-Pop_1754901208758118"
+  },
+  {
+    "label": "J-Pop",
+    "color": "rgb(255,0,0)",
+    "sentimentScore": 24,
+    "id": "J-Pop_1754901208758119"
+  },
+  {
+    "label": "C-Pop",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 14,
+    "id": "C-Pop_1754901208758120"
+  },
+  {
+    "label": "Thai Pop",
+    "color": "rgb(255,105,180)",
+    "sentimentScore": 71,
+    "id": "Thai Pop_1754901208758121"
+  },
+  {
+    "label": "Viet Pop",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 59,
+    "id": "Viet Pop_1754901208758122"
+  },
+  {
+    "label": "Rap",
+    "color": "rgb(178,34,34)",
+    "sentimentScore": 70,
+    "id": "Rap_1754901208758124"
+  },
+  {
+    "label": "Trap",
+    "color": "rgb(148,0,211)",
+    "sentimentScore": 99,
+    "id": "Trap_1754901208758125"
+  },
+  {
+    "label": "Grime",
+    "color": "rgb(105,105,105)",
+    "sentimentScore": 84,
+    "id": "Grime_1754901208758126"
+  },
+  {
+    "label": "Drill",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 50,
+    "id": "Drill_1754901208758127"
+  },
+  {
+    "label": "RnB",
+    "color": "rgb(255,20,147)",
+    "sentimentScore": 55,
+    "id": "RnB_1754901208758128"
+  },
+  {
+    "label": "Neo-soul",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 58,
+    "id": "Neo-soul_1754901208758129"
+  },
+  {
+    "label": "Indie Pop",
+    "color": "rgb(240,255,240)",
+    "sentimentScore": 22,
+    "id": "Indie Pop_1754901208758132"
+  },
+  {
+    "label": "Dream Pop",
+    "color": "rgb(100,149,237)",
+    "sentimentScore": 45,
+    "id": "Dream Pop_1754901208758133"
+  },
+  {
+    "label": "Synth Pop",
+    "color": "rgb(255,0,255)",
+    "sentimentScore": 95,
+    "id": "Synth Pop_1754901208758134"
+  },
+  {
+    "label": "Electropop",
+    "color": "rgb(0,255,255)",
+    "sentimentScore": 94,
+    "id": "Electropop_1754901208758135"
+  },
+  {
+    "label": "Alternative Rock",
+    "color": "rgb(255,140,0)",
+    "sentimentScore": 14,
+    "id": "Alternative Rock_1754901208758137"
+  },
+  {
+    "label": "Hard Rock",
+    "color": "rgb(178,34,34)",
+    "sentimentScore": 86,
+    "id": "Hard Rock_1754901208758138"
+  },
+  {
+    "label": "Soft Rock",
+    "color": "rgb(210,180,140)",
+    "sentimentScore": 6,
+    "id": "Soft Rock_1754901208758139"
+  },
+  {
+    "label": "Classic Rock",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 96,
+    "id": "Classic Rock_1754901208758140"
+  },
+  {
+    "label": "Punk Rock",
+    "color": "rgb(178,34,34)",
+    "sentimentScore": 91,
+    "id": "Punk Rock_1754901208758141"
+  },
+  {
+    "label": "Emo",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 36,
+    "id": "Emo_1754901208758142"
+  },
+  {
+    "label": "Heavy Metal",
+    "color": "rgb(105,105,105)",
+    "sentimentScore": 8,
+    "id": "Heavy Metal_1754901208758144"
+  },
+  {
+    "label": "Thrash Metal",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 69,
+    "id": "Thrash Metal_1754901208758145"
+  },
+  {
+    "label": "Death Metal",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 28,
+    "id": "Death Metal_1754901208758146"
+  },
+  {
+    "label": "Black Metal",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 49,
+    "id": "Black Metal_1754901208758147"
+  },
+  {
+    "label": "Folk Metal",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 63,
+    "id": "Folk Metal_1754901208758148"
+  },
+  {
+    "label": "Power Metal",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 34,
+    "id": "Power Metal_1754901208758149"
+  },
+  {
+    "label": "Deep House",
+    "color": "rgb(75,0,130)",
+    "sentimentScore": 42,
+    "id": "Deep House_1754901208758152"
+  },
+  {
+    "label": "Tech House",
+    "color": "rgb(0,128,0)",
+    "sentimentScore": 53,
+    "id": "Tech House_1754901208758153"
+  },
+  {
+    "label": "Progressive House",
+    "color": "rgb(0,191,255)",
+    "sentimentScore": 74,
+    "id": "Progressive House_1754901208758154"
+  },
+  {
+    "label": "Electro House",
+    "color": "rgb(0,255,255)",
+    "sentimentScore": 100,
+    "id": "Electro House_1754901208758155"
+  },
+  {
+    "label": "Minimal House",
+    "color": "rgb(192,192,192)",
+    "sentimentScore": 68,
+    "id": "Minimal House_1754901208758156"
+  },
+  {
+    "label": "Minimal Techno",
+    "color": "rgb(192,192,192)",
+    "sentimentScore": 17,
+    "id": "Minimal Techno_1754901208758158"
+  },
+  {
+    "label": "Detroit Techno",
+    "color": "rgb(0,0,139)",
+    "sentimentScore": 71,
+    "id": "Detroit Techno_1754901208758159"
+  },
+  {
+    "label": "Berlin Techno",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 63,
+    "id": "Berlin Techno_1754901208758160"
+  },
+  {
+    "label": "Hard Techno",
+    "color": "rgb(178,34,34)",
+    "sentimentScore": 68,
+    "id": "Hard Techno_1754901208758161"
+  },
+  {
+    "label": "Progressive Trance",
+    "color": "rgb(0,191,255)",
+    "sentimentScore": 39,
+    "id": "Progressive Trance_1754901208758163"
+  },
+  {
+    "label": "Psytrance",
+    "color": "rgb(148,0,211)",
+    "sentimentScore": 98,
+    "id": "Psytrance_1754901208758164"
+  },
+  {
+    "label": "Goa Trance",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 32,
+    "id": "Goa Trance_1754901208758165"
+  },
+  {
+    "label": "Uplifting Trance",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 13,
+    "id": "Uplifting Trance_1754901208758166"
+  },
+  {
+    "label": "Hard Trance",
+    "color": "rgb(178,34,34)",
+    "sentimentScore": 1,
+    "id": "Hard Trance_1754901208758167"
+  },
+  {
+    "label": "Brostep",
+    "color": "rgb(255,69,0)",
+    "sentimentScore": 64,
+    "id": "Brostep_1754901208758169"
+  },
+  {
+    "label": "Liquid DnB",
+    "color": "rgb(135,206,250)",
+    "sentimentScore": 85,
+    "id": "Liquid DnB_1754901208758171"
+  },
+  {
+    "label": "Jungle",
+    "color": "rgb(0,128,0)",
+    "sentimentScore": 45,
+    "id": "Jungle_1754901208758172"
+  },
+  {
+    "label": "Neurofunk",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 13,
+    "id": "Neurofunk_1754901208758173"
+  },
+  {
+    "label": "Big Room",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 99,
+    "id": "Big Room_1754901208758175"
+  },
+  {
+    "label": "Future Bass",
+    "color": "rgb(0,255,255)",
+    "sentimentScore": 56,
+    "id": "Future Bass_1754901208758177"
+  },
+  {
+    "label": "Noise",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 36,
+    "id": "Noise_1754901208758181"
+  },
+  {
+    "label": "Drone",
+    "color": "rgb(128,128,128)",
+    "sentimentScore": 98,
+    "id": "Drone_1754901208758182"
+  },
+  {
+    "label": "Avant-garde",
+    "color": "rgb(255,0,255)",
+    "sentimentScore": 20,
+    "id": "Avant-garde_1754901208758183"
+  },
+  {
+    "label": "Soundscape",
+    "color": "rgb(100,149,237)",
+    "sentimentScore": 55,
+    "id": "Soundscape_1754901208758184"
+  },
+  {
+    "label": "Post-rock",
+    "color": "rgb(105,105,105)",
+    "sentimentScore": 59,
+    "id": "Post-rock_1754901208758185"
+  },
+  {
+    "label": "Math rock",
+    "color": "rgb(255,140,0)",
+    "sentimentScore": 4,
+    "id": "Math rock_1754901208758186"
+  },
+  {
+    "label": "Shoegaze",
+    "color": "rgb(148,0,211)",
+    "sentimentScore": 17,
+    "id": "Shoegaze_1754901208758187"
+  },
+  {
+    "label": "Indie Folk",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 100,
+    "id": "Indie Folk_1754901208758189"
+  },
+  {
+    "label": "Chamber Pop",
+    "color": "rgb(75,0,130)",
+    "sentimentScore": 4,
+    "id": "Chamber Pop_1754901208758190"
+  },
+  {
+    "label": "Synth-pop",
+    "color": "rgb(255,0,255)",
+    "sentimentScore": 45,
+    "id": "Synth-pop_1754901208758191"
+  },
+  {
+    "label": "New Wave",
+    "color": "rgb(0,191,255)",
+    "sentimentScore": 66,
+    "id": "New Wave_1754901208758192"
+  },
+  {
+    "label": "Post-punk",
+    "color": "rgb(128,0,0)",
+    "sentimentScore": 25,
+    "id": "Post-punk_1754901208758193"
+  },
+  {
+    "label": "Gothic Rock",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 86,
+    "id": "Gothic Rock_1754901208758194"
+  },
+  {
+    "label": "EBM",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 50,
+    "id": "EBM_1754901208758196"
+  },
+  {
+    "label": "Downtempo",
+    "color": "rgb(106,90,205)",
+    "sentimentScore": 67,
+    "id": "Downtempo_1754901208758197"
+  },
+  {
+    "label": "Trip-hop",
+    "color": "rgb(75,0,130)",
+    "sentimentScore": 65,
+    "id": "Trip-hop_1754901208758198"
+  },
+  {
+    "label": "Lounge",
+    "color": "rgb(210,180,140)",
+    "sentimentScore": 89,
+    "id": "Lounge_1754901208758199"
+  },
+  {
+    "label": "Chillout",
+    "color": "rgb(32,178,170)",
+    "sentimentScore": 78,
+    "id": "Chillout_1754901208758200"
+  },
+  {
+    "label": "Lofi",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 71,
+    "id": "Lofi_1754901208758201"
+  },
+  {
+    "label": "Future Funk",
+    "color": "rgb(255,0,255)",
+    "sentimentScore": 22,
+    "id": "Future Funk_1754901208758203"
+  },
+  {
+    "label": "Glitch Hop",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 57,
+    "id": "Glitch Hop_1754901208758204"
+  },
+  {
+    "label": "IDM",
+    "color": "rgb(148,0,211)",
+    "sentimentScore": 31,
+    "id": "IDM_1754901208758205"
+  },
+  {
+    "label": "Breakbeat",
+    "color": "rgb(255,69,0)",
+    "sentimentScore": 69,
+    "id": "Breakbeat_1754901208758206"
+  },
+  {
+    "label": "Big Beat",
+    "color": "rgb(178,34,34)",
+    "sentimentScore": 24,
+    "id": "Big Beat_1754901208758207"
+  },
+  {
+    "label": "Hardcore",
+    "color": "rgb(128,0,0)",
+    "sentimentScore": 95,
+    "id": "Hardcore_1754901208758208"
+  },
+  {
+    "label": "Gabber",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 31,
+    "id": "Gabber_1754901208758209"
+  },
+  {
+    "label": "Terrorcore",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 23,
+    "id": "Terrorcore_1754901208758210"
+  },
+  {
+    "label": "Happy Hardcore",
+    "color": "rgb(255,105,180)",
+    "sentimentScore": 34,
+    "id": "Happy Hardcore_1754901208758211"
+  },
+  {
+    "label": "Chiptune",
+    "color": "rgb(0,255,127)",
+    "sentimentScore": 2,
+    "id": "Chiptune_1754901208758212"
+  },
+  {
+    "label": "Video Game Music",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 55,
+    "id": "Video Game Music_1754901208758213"
+  },
+  {
+    "label": "Anime Soundtrack",
+    "color": "rgb(255,20,147)",
+    "sentimentScore": 24,
+    "id": "Anime Soundtrack_1754901208758214"
+  },
+  {
+    "label": "Manga",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 68,
+    "id": "Manga_1754901208758215"
+  },
+  {
+    "label": "Comic Book",
+    "color": "rgb(0,191,255)",
+    "sentimentScore": 65,
+    "id": "Comic Book_1754901208758216"
+  },
+  {
+    "label": "Sci-fi",
+    "color": "rgb(0,0,255)",
+    "sentimentScore": 36,
+    "id": "Sci-fi_1754901208758217"
+  },
+  {
+    "label": "Fantasy",
+    "color": "rgb(128,0,128)",
+    "sentimentScore": 7,
+    "id": "Fantasy_1754901208758218"
+  },
+  {
+    "label": "Horror",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 19,
+    "id": "Horror_1754901208758219"
+  },
+  {
+    "label": "Thriller",
+    "color": "rgb(0,0,0)",
+    "sentimentScore": 91,
+    "id": "Thriller_1754901208758220"
+  },
+  {
+    "label": "Comedy",
+    "color": "rgb(255,255,0)",
+    "sentimentScore": 26,
+    "id": "Comedy_1754901208758221"
+  },
+  {
+    "label": "Drama",
+    "color": "rgb(139,0,0)",
+    "sentimentScore": 62,
+    "id": "Drama_1754901208758222"
+  },
+  {
+    "label": "Romance",
+    "color": "rgb(255,20,147)",
+    "sentimentScore": 16,
+    "id": "Romance_1754901208758223"
+  },
+  {
+    "label": "Action",
+    "color": "rgb(255,69,0)",
+    "sentimentScore": 92,
+    "id": "Action_1754901208758224"
+  },
+  {
+    "label": "Adventure",
+    "color": "rgb(255,140,0)",
+    "sentimentScore": 66,
+    "id": "Adventure_1754901208758225"
+  },
+  {
+    "label": "Documentary",
+    "color": "rgb(105,105,105)",
+    "sentimentScore": 33,
+    "id": "Documentary_1754901208758226"
+  },
+  {
+    "label": "Biography",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 25,
+    "id": "Biography_1754901208758227"
+  },
+  {
+    "label": "History",
+    "color": "rgb(210,180,140)",
+    "sentimentScore": 55,
+    "id": "History_1754901208758228"
+  },
+  {
+    "label": "War",
+    "color": "rgb(128,0,0)",
+    "sentimentScore": 20,
+    "id": "War_1754901208758229"
+  },
+  {
+    "label": "Western",
+    "color": "rgb(139,69,19)",
+    "sentimentScore": 55,
+    "id": "Western_1754901208758230"
+  },
+  {
+    "label": "Musical",
+    "color": "rgb(255,105,180)",
+    "sentimentScore": 20,
+    "id": "Musical_1754901208758231"
+  },
+  {
+    "label": "Animation",
+    "color": "rgb(0,255,127)",
+    "sentimentScore": 25,
+    "id": "Animation_1754901208758232"
+  },
+  {
+    "label": "Family",
+    "color": "rgb(0,128,0)",
+    "sentimentScore": 66,
+    "id": "Family_1754901208758233"
+  },
+  {
+    "label": "Kids",
+    "color": "rgb(255,215,0)",
+    "sentimentScore": 52,
+    "id": "Kids_1754901208758234"
+  },
+  {
+    "label": "TV Show",
+    "color": "rgb(100,149,237)",
+    "sentimentScore": 31,
+    "id": "TV Show_1754901208758235"
+  },
+  {
+    "label": "Sitcom",
+    "color": "rgb(255,255,0)",
+    "sentimentScore": 22,
+    "id": "Sitcom_1754901208758236"
+  },
+  {
+    "label": "Reality TV",
+    "color": "rgb(255,165,0)",
+    "sentimentScore": 57,
+    "id": "Reality TV_1754901208758237"
+  },
+  {
+    "label": "Game Show",
+    "color": "rgb(255,69,0)",
+    "sentimentScore": 19,
+    "id": "Game Show_1754901208758238"
+  },
+  {
+    "label": "Talk Show",
+    "color": "rgb(0,191,255)",
+    "sentimentScore": 83,
+    "id": "Talk Show_1754901208758239"
+  },
+  {
+    "label": "News",
+    "color": "rgb(105,105,105)",
+    "sentimentScore": 46,
+    "id": "News_1754901208758240"
+  },
+  {
+    "label": "Sports",
+    "color": "rgb(0,128,0)",
+    "sentimentScore": 92,
+    "id": "Sports_1754901208758241"
+  },
+  {
+    "label": "Fitness",
+    "color": "rgb(255,105,180)",
+    "sentimentScore": 50,
+    "id": "Fitness_1754901208758242"
+  },
+  {
+    "label": "Health",
+    "color": "rgb(32,178,170)",
+    "sentimentScore": 39,
+    "id": "Health_1754901208758243"
+  },
+  {
+    "label": "Wellness",
+    "color": "rgb(106,90,205)",
+    "sentimentScore": 6,
+    "id": "Wellness_1754901208758244"
+  },
+  {
+    "label": "Yoga",
+    "color": "rgb(128,0,128)",
+    "sentimentScore": 86,
+    "id": "Yoga_1754901208758245"
+  },
+  {
+    "label": "Meditation",
+    "color": "rgb(100,149,237)",
+    "sentimentScore": 99,
+    "id": "Meditation_1754901208758246"
+  }
+]

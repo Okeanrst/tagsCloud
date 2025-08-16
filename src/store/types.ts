@@ -1,7 +1,7 @@
 import { ThunkDispatch } from 'redux-thunk';
 import { Action } from 'redux';
 import { QueryStatuses } from 'constants/queryStatuses';
-import { NOTIFICATIONS_TYPES } from 'constants/index';
+import { DATA_SETS, NOTIFICATIONS_TYPES } from 'constants/index';
 import { VacancyKinds } from 'utilities/positioningAlgorithm/types';
 import type { PositionedTagRectT, TagDataT, IdRectAreaMapT } from 'types/types';
 import type {
@@ -27,6 +27,7 @@ export type NotificationT = {
 
 export type RootStateT = {
   settings: {
+    dataSet: DATA_SETS;
     fontFamily: FontFamilies;
     shouldDrawFinalMap: boolean;
     shouldDrawStepMap: boolean;

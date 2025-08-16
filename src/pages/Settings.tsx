@@ -14,6 +14,7 @@ import {
   PickingStrategies,
   SortingClosedVacanciesStrategies,
   SortingEdgeVacanciesStrategies,
+  DATA_SETS,
 } from 'constants/index';
 import { RootStateT } from 'store/types';
 import { InputFormField } from 'ui/InputFormField';
@@ -37,6 +38,11 @@ const useStyles = makeStyles((theme) => ({
     color: 'var(--danger-color)',
   },
 }));
+
+const dataSetOptions: { value: DATA_SETS; label: string }[] = [];
+for (let dataSet of Object.values(DATA_SETS)) {
+  dataSetOptions.push({ value: dataSet, label: dataSet });
+}
 
 const fontFamilyOptions: { value: FontFamilies; label: string }[] = [];
 for (let fontFamily of Object.values(FontFamilies)) {
@@ -178,6 +184,15 @@ export const Settings = () => {
 
   return (
     <form className={classes.form} onSubmit={onSubmit}>
+      <SelectFormField
+        classes={{ helperText: classes.helperText }}
+        helperText={errors?.dataSet}
+        label="Predefined data sets"
+        name="dataSet"
+        options={dataSetOptions}
+        value={values.dataSet}
+        onChange={onInputChange}
+      />
       <SelectFormField
         classes={{ helperText: classes.helperText }}
         helperText={errors?.fontFamily}

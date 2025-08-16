@@ -52,10 +52,16 @@ const findUnusedRectAreasMapsKeys = (state: RootStateT) => {
 };
 
 export function getData() {
-  return (dispatch: AppDispatchT) => {
+  return (dispatch: AppDispatchT, getState: GetStateT) => {
     dispatch(createAction(actionTypes.TAGS_DATA_FETCH_REQUEST));
+    const {
+      settings: { dataSet },
+    } = getState();
+    if (!dataSet) {
+      return;
+    }
     return api
-      .getData()
+      .getData(dataSet)
       .then((response) => {
         if (validateTagCloudRawData(response)) {
           throw new Error('Raw tag cloud data is invalid');

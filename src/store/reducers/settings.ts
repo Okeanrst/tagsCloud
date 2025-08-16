@@ -7,12 +7,14 @@ import {
   DEFAULT_MIN_FONT_SIZE,
   DEFAULT_MAX_FONT_SIZE,
   DEFAULT_TAG_BY_TAG_RENDER_INTERVAL,
+  DATA_SETS,
 } from 'constants/index';
 import { RootStateT } from '../types';
 import { AnyAction } from 'redux';
 import { SETTINGS_UPDATE } from '../actions/actionTypes';
 
 const initState: RootStateT['settings'] = {
+  dataSet: DATA_SETS.DEFAULT,
   fontFamily: OPEN_SANS_FONT,
   shouldDrawFinalMap: false,
   shouldDrawStepMap: false,
