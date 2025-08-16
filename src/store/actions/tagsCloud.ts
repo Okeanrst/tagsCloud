@@ -78,7 +78,7 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
     const { settings } = getState();
     const { fontFamily, sceneMapResolution, minFontSize, maxFontSize } = settings;
     const preparedTagsData = prepareTagsData(tagsData, { minFontSize, maxFontSize, maxSentimentScore });
-    const start = Date.now();
+
     const preparedTagsDataWithoutRectAreasMaps = filterPreparedTagsDataWithoutRectAreasMaps(
       preparedTagsData,
       getState().rectAreasMapsData,
@@ -156,10 +156,6 @@ export function incrementallyBuildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
         const fullRectAreasMapsData = getState().rectAreasMapsData;
         const sceneMap = getState().tagsCloud.sceneMap ?? [];
         const calcTagsPositionsOptions = formCalcTagsPositionsOptions(settings);
-        // return calcTagsPositions(preparedTagsData, fullRectAreasMapsData, sceneMap, {
-        //   ...calcTagsPositionsOptions,
-        //   addIfEmptyIndex: calcTagsPositionsOptions.addIfEmptyIndex - (getState().tagsCloud.tagsPositions?.length ?? 0),
-        // });
         return calcTagsPositions({
           tagsData: preparedTagsData,
           tagsRectAreasMaps: fullRectAreasMapsData,
