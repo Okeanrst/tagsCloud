@@ -2,6 +2,7 @@ import { batch } from 'react-redux';
 import throttle from 'lodash.throttle';
 import * as actionTypes from './actionTypes';
 import * as api from 'api';
+import { QueryStatuses } from 'constants/queryStatuses';
 import {
   calcTagsPositions,
   releaseRectAreaPositionsOnSceneMap,
@@ -19,6 +20,8 @@ import { TagDataT } from 'types/types';
 import { AppDispatchT, RootStateT, GetStateT } from '../types';
 import { AnyAction } from 'redux';
 import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
+
+const { PENDING } = QueryStatuses;
 
 function selectMaxSentimentScore(state: RootStateT) {
   return getMaxSentimentScore(state.tagsData?.data ?? []);
@@ -246,6 +249,9 @@ const createRemoveTagAction = (targetId: string, getState: GetStateT): AnyAction
 
 export function deleteDataItem(targetId: string) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
+    const {
+      tagsCloud: { status: tagsCloudStatus },
+    } = getState();
     const targetTagDataItem = selectTargetTagDataItem(getState(), targetId);
 
     dispatch(createAction(actionTypes.INCREMENTAL_BUILD_REMOVE_TAG_ID, targetId));
@@ -259,8 +265,9 @@ export function deleteDataItem(targetId: string) {
     dispatch(createAction(actionTypes.TAGS_DATA_DELETE_DATA_ITEM, targetId));
 
     if (
-      itemSentimentScore >= currentMaxSentimentScore &&
-      selectMaxSentimentScore(getState()) !== currentMaxSentimentScore
+      (itemSentimentScore >= currentMaxSentimentScore &&
+        selectMaxSentimentScore(getState()) !== currentMaxSentimentScore) ||
+      tagsCloudStatus === PENDING
     ) {
       dispatch(resetTagsCloud());
     } else {
@@ -275,6 +282,9 @@ export function deleteDataItem(targetId: string) {
 
 export function editDataItem(tagData: TagDataT) {
   return (dispatch: AppDispatchT, getState: GetStateT) => {
+    const {
+      tagsCloud: { status: tagsCloudStatus },
+    } = getState();
     const currentTagDataItem = selectTargetTagDataItem(getState(), tagData.id);
     if (!currentTagDataItem) {
       return;
@@ -285,7 +295,10 @@ export function editDataItem(tagData: TagDataT) {
       currentTagDataItem.label !== tagData.label || currentMaxSentimentScore < tagData.sentimentScore;
     dispatch(createAction(actionTypes.TAGS_DATA_EDIT_DATA_ITEM, tagData));
 
-    shouldResetTagsCloud = shouldResetTagsCloud || selectMaxSentimentScore(getState()) !== currentMaxSentimentScore;
+    shouldResetTagsCloud =
+      tagsCloudStatus === PENDING ||
+      shouldResetTagsCloud ||
+      selectMaxSentimentScore(getState()) !== currentMaxSentimentScore;
 
     if (shouldResetTagsCloud) {
       dispatch(resetTagsCloud());
