@@ -1,10 +1,11 @@
 import { saveAs } from 'file-saver';
-import React from 'react';
 import { RectAreaT } from 'types/types';
 import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
 import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { isVacancyLargeEnoughToFitRect } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { Dimensions, SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap';
+import { SizeT } from 'utilities/tagsCloud/getSuitableSize';
+import { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { CoordinatesT, VacanciesT } from './types';
 
 export const downloadTagCloudHtmlFile = (html: string, fileName?: string) => {
@@ -125,4 +126,9 @@ export const sceneCoordinatesToCanvasCoordinates = (
     x: (x - sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) * svgSizeFactor,
     y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y) * svgSizeFactor,
   };
+};
+
+export const calcSVGSizeFactor = (svgSize: SizeT, viewBox: ViewBoxT) => {
+  const [, , width] = viewBox;
+  return svgSize.width / width;
 };

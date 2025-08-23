@@ -24,8 +24,6 @@ import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
-import type { SizeT } from 'utilities/tagsCloud/getSuitableSize';
-import type { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { RootStateT } from 'store/types';
 import { Tags } from './Tags';
 import { Vacancies } from './Vacancies';
@@ -40,6 +38,7 @@ import {
   limitCoordinatesWithCanvasBoundaries,
   sortActiveVacancies,
   sceneCoordinatesToCanvasCoordinates,
+  calcSVGSizeFactor,
 } from './utils';
 import { formTagTransformStyle } from './styleUtils';
 import { TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX, TAG_AVATAR_CANVAS_Z_INDEX } from './constants';
@@ -584,10 +583,5 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
     );
   },
 );
-
-function calcSVGSizeFactor(svgSize: SizeT, viewBox: ViewBoxT) {
-  const [, , width] = viewBox;
-  return svgSize.width / width;
-}
 
 export default SvgTagsCloud;
