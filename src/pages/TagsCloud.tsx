@@ -16,7 +16,7 @@ import { TagsCloudBuildProgress } from 'components/TagsCloudBuildProgress';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
-import { ClassesT, TagDataT } from 'types/types';
+import { ClassesT, TagDataT, ScaleT } from 'types/types';
 
 const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
 

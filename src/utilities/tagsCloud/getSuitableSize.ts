@@ -1,4 +1,4 @@
-export type SizeT = { width: number; height: number };
+import { SizeT } from 'types/types';
 
 export const getSuitableSize = (availableSize: SizeT, aspectRatio: number): SizeT => {
   const { width: availableWidth, height: availableHeight } = availableSize;

@@ -1,8 +1,7 @@
 import React from 'react';
-import { SizeT } from 'utilities/tagsCloud/getSuitableSize';
 import { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { REACT_AREAS_CANVAS_Z_INDEX } from './constants';
-import { PositionedTagRectT } from 'types/types';
+import { PositionedTagRectT, SizeT } from 'types/types';
 
 type PropsT = {
   tagData: ReadonlyArray<PositionedTagRectT>;

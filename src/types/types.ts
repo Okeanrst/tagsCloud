@@ -1,5 +1,7 @@
 export type ClassesT = { [key: string]: string };
 
+export type SizeT = { width: number; height: number };
+
 export type TagSentimentT = Readonly<{
   negative?: number;
   neutral?: number;
@@ -98,3 +100,5 @@ export type PositionedTagSvgDataT = Readonly<
     rectTranslateY: number;
   }
 >;
+
+export type ScaleT = { value: number; center: { width: number; height: number } };

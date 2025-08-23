@@ -1,8 +1,8 @@
 import React from 'react';
 import { Dimensions, SceneEdgesT, SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
-import { SizeT } from 'utilities/tagsCloud/getSuitableSize';
 import { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
+import { SizeT } from 'types/types';
 
 type ActiveVacanciesPropsT = {
   sceneMapEdges: SceneEdgesT | null;
