@@ -97,24 +97,32 @@ export const limitCoordinatesWithCanvasBoundaries = (coordinates: CoordinatesT, 
 
 export const canvasCoordinatesToSceneCoordinates = (
   canvasCoordinates: CoordinatesT,
-  { sceneMapEdges, zoom, sceneMapResolution }: { sceneMapEdges: SceneEdgesT; zoom: number; sceneMapResolution: number },
+  {
+    sceneMapEdges,
+    svgSizeFactor,
+    sceneMapResolution,
+  }: { sceneMapEdges: SceneEdgesT; svgSizeFactor: number; sceneMapResolution: number },
 ) => {
   const { x, y } = canvasCoordinates;
 
   return {
-    x: (x / zoom + sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) / sceneMapResolution,
-    y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y / zoom) / sceneMapResolution,
+    x: (x / svgSizeFactor + sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) / sceneMapResolution,
+    y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y / svgSizeFactor) / sceneMapResolution,
   };
 };
 
 export const sceneCoordinatesToCanvasCoordinates = (
   sceneCoordinates: CoordinatesT,
-  { sceneMapEdges, zoom, sceneMapResolution }: { sceneMapEdges: SceneEdgesT; zoom: number; sceneMapResolution: number },
+  {
+    sceneMapEdges,
+    svgSizeFactor,
+    sceneMapResolution,
+  }: { sceneMapEdges: SceneEdgesT; svgSizeFactor: number; sceneMapResolution: number },
 ) => {
   const { x, y } = sceneCoordinates;
 
   return {
-    x: (x - sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) * zoom,
-    y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y) * zoom,
+    x: (x - sceneMapEdges[Dimensions.MINUS_X] * sceneMapResolution) * svgSizeFactor,
+    y: (sceneMapEdges[Dimensions.Y] * sceneMapResolution - y) * svgSizeFactor,
   };
 };
