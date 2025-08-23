@@ -1,9 +1,7 @@
 import { FontFamilies } from 'constants/index';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { getBorderCoordinates } from './getBorderCoordinates';
-import { PositionedTagRectT, PositionedTagSvgDataT, RectPositionT } from 'types/types';
-
-export type ViewBoxT = [number, number, number, number];
+import { PositionedTagRectT, PositionedTagSvgDataT, RectPositionT, ViewBoxT } from 'types/types';
 
 export function calcTagSvgData(
   tagData: Pick<PositionedTagRectT, 'rotate' | 'glyphsXOffset' | 'glyphsYOffset'> & RectPositionT,

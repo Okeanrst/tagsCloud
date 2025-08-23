@@ -4,8 +4,7 @@ import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
 import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { isVacancyLargeEnoughToFitRect } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { Dimensions, SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap';
-import { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
-import { SizeT } from 'types/types';
+import { SizeT, ViewBoxT } from 'types/types';
 import { CoordinatesT, VacanciesT } from './types';
 
 export const downloadTagCloudHtmlFile = (html: string, fileName?: string) => {

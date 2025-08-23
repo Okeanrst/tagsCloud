@@ -1,7 +1,6 @@
 import { PositionedTagSvgDataT } from 'types/types';
-import { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { FontFamilies } from 'constants/index';
-import { SizeT } from 'types/types';
+import { SizeT, ViewBoxT } from 'types/types';
 
 const getTagCloudSvg = ({
   tagsSvgData,

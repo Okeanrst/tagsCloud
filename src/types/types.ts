@@ -2,6 +2,8 @@ export type ClassesT = { [key: string]: string };
 
 export type SizeT = { width: number; height: number };
 
+export type ViewBoxT = [number, number, number, number];
+
 export type TagSentimentT = Readonly<{
   negative?: number;
   neutral?: number;

@@ -1,8 +1,7 @@
 import React from 'react';
-import { ViewBoxT } from 'utilities/tagsCloud/tagSvgData';
 import { getBorderCoordinates } from 'utilities/tagsCloud/getBorderCoordinates';
 import { COORDINATE_GRID_CANVAS_Z_INDEX } from './constants';
-import { PositionedTagRectT, SizeT } from 'types/types';
+import { PositionedTagRectT, SizeT, ViewBoxT } from 'types/types';
 
 type PropsT = {
   tagsPositions: ReadonlyArray<PositionedTagRectT>;
