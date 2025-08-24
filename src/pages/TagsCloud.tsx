@@ -243,7 +243,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   componentDidUpdate(prevProps: PropsT, prevState: StateT) {
     const { fontLoaded, tagsData, tagsCloud, buildTagsCloud, observerLoadFont } = this.props;
-    const { scale } = this.state;
+    const { scale, isTagsCloudInteractionDisabled } = this.state;
 
     if (prevProps.fontLoaded.status !== PRISTINE && fontLoaded.status === PRISTINE) {
       observerLoadFont();
@@ -255,6 +255,10 @@ class TagsCloud extends Component<PropsT, StateT> {
 
     if (scale && prevProps.tagsCloud.status !== SUCCESS && tagsCloud.status === SUCCESS) {
       this.setState({ scale: null });
+    }
+
+    if (isTagsCloudInteractionDisabled && (!scale || scale.value === 1)) {
+      this.setState({ isTagsCloudInteractionDisabled: false });
     }
   }
 
@@ -459,7 +463,7 @@ class TagsCloud extends Component<PropsT, StateT> {
         classes={{ root: classes.tagsCloudInteractionButton }}
         onClick={this.toggleIsTagsCloudInteractionDisabled}
       >
-        CloudInteractionDisabled
+        Interaction with tags disabled
       </Button>
     );
   };
