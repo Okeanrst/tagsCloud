@@ -92,7 +92,7 @@ export function useScale({
       setScale((prevScale) => {
         const { value: prevScaleValue = 1, center: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
 
-        return { value: prevScaleValue, center: { x: prevX - dx, y: prevY - dy } };
+        return { value: prevScaleValue, center: { x: prevX - dx / prevScaleValue, y: prevY - dy / prevScaleValue } };
       });
 
       lastDragPositionRef.current = { x: event.clientX, y: event.clientY };
@@ -147,7 +147,7 @@ export function useScale({
           const dx = event.touches[0].clientX - lastDragPositionRef.current.x;
           const dy = event.touches[0].clientY - lastDragPositionRef.current.y;
           lastDragPositionRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-          return { value: prevScaleValue, center: { x: prevX - dx, y: prevY - dy } };
+          return { value: prevScaleValue, center: { x: prevX - dx / prevScaleValue, y: prevY - dy / prevScaleValue } };
         } else if (isPinchingRef.current && event.touches.length === 2) {
           // Pinching with two fingers
           const p1 = { x: event.touches[0].clientX, y: event.touches[0].clientY };
