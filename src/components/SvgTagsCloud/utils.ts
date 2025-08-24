@@ -81,6 +81,11 @@ export const sortActiveVacancies = (vacancies: VacanciesT) => {
   return sortedVacancies;
 };
 
+// in document ->
+// coordinates in CanvasFrame ->
+// coordinates in Canvas ->
+// coordinates in Scene ->
+// coordinates in svg
 export const documentCoordinatesToCanvasFrameCoordinates = (
   documentCoordinates: CoordinatesT,
   canvasRect: DOMRect,
