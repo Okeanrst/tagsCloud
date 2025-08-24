@@ -5,7 +5,7 @@ import { PositionedTagRectT, PositionedTagSvgDataT, RectPositionT, ViewBoxT } fr
 
 export function calcTagSvgData(
   tagData: Pick<PositionedTagRectT, 'rotate' | 'glyphsXOffset' | 'glyphsYOffset'> & RectPositionT,
-  yFactor: number,
+  fontYFactor: number,
 ) {
   const diffX = tagData.rectRight - tagData.rectLeft;
   const diffY = tagData.rectTop - tagData.rectBottom;
@@ -13,8 +13,8 @@ export function calcTagSvgData(
   const middleY = tagData.rectBottom + diffY / 2;
   const { glyphsXOffset, glyphsYOffset } = tagData;
 
-  const rectTranslateX = tagData.rotate ? middleX - diffX * yFactor + glyphsYOffset : middleX + glyphsXOffset;
-  const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * yFactor) + glyphsYOffset;
+  const rectTranslateX = tagData.rotate ? middleX - diffX * fontYFactor + glyphsYOffset : middleX + glyphsXOffset;
+  const rectTranslateY = tagData.rotate ? -middleY + glyphsXOffset : -(middleY - diffY * fontYFactor) + glyphsYOffset;
 
   return {
     rectTranslateX,

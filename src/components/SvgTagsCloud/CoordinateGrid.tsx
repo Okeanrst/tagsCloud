@@ -6,6 +6,7 @@ import { PositionedTagRectT, SizeT, ViewBoxT } from 'types/types';
 type PropsT = {
   tagsPositions: ReadonlyArray<PositionedTagRectT>;
   svgSize: SizeT;
+  fullSceneViewBox: ViewBoxT;
   viewBox: ViewBoxT;
   sceneMapResolution: number;
   svgSizeFactor: number;
@@ -19,10 +20,17 @@ const style: React.CSSProperties = {
   zIndex: COORDINATE_GRID_CANVAS_Z_INDEX,
 };
 
-export function CoordinateGrid({ tagsPositions, svgSize, viewBox, sceneMapResolution, svgSizeFactor }: PropsT) {
+export function CoordinateGrid({
+  tagsPositions,
+  svgSize,
+  viewBox,
+  fullSceneViewBox,
+  sceneMapResolution,
+  svgSizeFactor,
+}: PropsT) {
   const sceneMapUnitSize = sceneMapResolution;
 
-  const [, , width, height] = viewBox;
+  const [minX, minY, width, height] = fullSceneViewBox;
 
   const borderCoordinates = getBorderCoordinates(tagsPositions);
 
@@ -41,7 +49,7 @@ export function CoordinateGrid({ tagsPositions, svgSize, viewBox, sceneMapResolu
         key={`row${row}`}
         stroke="black"
         strokeWidth={row === 0 ? 2 / svgSizeFactor : 1 / svgSizeFactor}
-        x1="0"
+        x1={minX}
         x2={width}
         y1={translateY}
         y2={translateY}
@@ -59,7 +67,7 @@ export function CoordinateGrid({ tagsPositions, svgSize, viewBox, sceneMapResolu
         strokeWidth={col === 0 ? 2 / svgSizeFactor : 1 / svgSizeFactor}
         x1={translateX}
         x2={translateX}
-        y1="0"
+        y1={minY}
         y2={height}
       />,
     );

@@ -13,12 +13,17 @@ import { IconButton } from 'ui/buttons/IconButton';
 import { DownloadCloudIcon } from 'ui/icons/DownloadCloudIcon';
 import { Collapse } from 'components/Collapse';
 import { TagsCloudBuildProgress } from 'components/TagsCloudBuildProgress';
+import { Scale } from 'utilities/hooks/useScale';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
+import { OutlinedButton } from 'ui/buttons/OutlinedButton';
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
 import { ClassesT, TagDataT, ScaleT } from 'types/types';
 
 const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
+
+const MIN_SCALE = 1;
+const MAX_SCALE = 10;
 
 const mapStateToProps = (state: RootStateT) => {
   const {
@@ -145,6 +150,12 @@ const styles = (theme: Theme) =>
       flexGrow: 12,
       marginTop: theme.spacing(1),
     },
+    tagsCloudInteractionButton: {
+      position: 'absolute',
+      bottom: 5,
+      left: 10,
+      zIndex: 2,
+    },
   });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -161,6 +172,8 @@ type StateT = {
   isCoordinateGridShown: boolean;
   isReactAreasShown: boolean;
   isVacanciesShown: boolean;
+  scale: ScaleT | null;
+  isTagsCloudInteractionDisabled: boolean;
 };
 
 const getTagsDataByTagsIds = (tagsIds: string[], tagsData: ReadonlyArray<TagDataT>) => {
@@ -176,6 +189,8 @@ class TagsCloud extends Component<PropsT, StateT> {
     isCoordinateGridShown: false,
     isReactAreasShown: false,
     isVacanciesShown: false,
+    scale: null,
+    isTagsCloudInteractionDisabled: false,
   };
 
   tagsCloudSceneRef = React.createRef<HTMLDivElement>();
@@ -228,6 +243,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   componentDidUpdate(prevProps: PropsT, prevState: StateT) {
     const { fontLoaded, tagsData, tagsCloud, buildTagsCloud, observerLoadFont } = this.props;
+    const { scale } = this.state;
 
     if (prevProps.fontLoaded.status !== PRISTINE && fontLoaded.status === PRISTINE) {
       observerLoadFont();
@@ -235,6 +251,10 @@ class TagsCloud extends Component<PropsT, StateT> {
 
     if (fontLoaded.data && tagsData.status === SUCCESS && tagsCloud.status === PRISTINE) {
       buildTagsCloud(tagsData.data);
+    }
+
+    if (scale && prevProps.tagsCloud.status !== SUCCESS && tagsCloud.status === SUCCESS) {
+      this.setState({ scale: null });
     }
   }
 
@@ -251,7 +271,7 @@ class TagsCloud extends Component<PropsT, StateT> {
       this.resizeTaskTimer = null;
       if (this.tagsCloudSceneRef && this.tagsCloudSceneRef.current) {
         const tagsCloudSceneSize = this.calcTagsCloudSize(this.tagsCloudSceneRef.current);
-        this.setState({ tagsCloudSceneSize });
+        this.setState({ tagsCloudSceneSize, scale: null });
       }
     };
 
@@ -290,6 +310,18 @@ class TagsCloud extends Component<PropsT, StateT> {
     const { toggleUseCanvas } = this.props;
     this.setState({ isSettingsControlsShown: false });
     toggleUseCanvas();
+  };
+
+  setScale = (fn: (scale: ScaleT | null) => ScaleT | null) => {
+    this.setState(({ scale }) => ({
+      scale: fn(scale),
+    }));
+  };
+
+  toggleIsTagsCloudInteractionDisabled = () => {
+    this.setState(({ isTagsCloudInteractionDisabled }) => ({
+      isTagsCloudInteractionDisabled: !isTagsCloudInteractionDisabled,
+    }));
   };
 
   renderLoader = () => (
@@ -375,8 +407,15 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   renderTagsCloud = () => {
-    const { tagsCloudSceneSize, downloadCloudCounter, isVacanciesShown, isReactAreasShown, isCoordinateGridShown } =
-      this.state;
+    const {
+      tagsCloudSceneSize,
+      downloadCloudCounter,
+      isVacanciesShown,
+      isReactAreasShown,
+      isCoordinateGridShown,
+      scale,
+      isTagsCloudInteractionDisabled,
+    } = this.state;
     const { shouldUseCanvas } = this.props;
 
     if (!tagsCloudSceneSize) {
@@ -400,8 +439,10 @@ class TagsCloud extends Component<PropsT, StateT> {
           height={tagsCloudSceneSize.height}
           isCoordinateGridShown={isCoordinateGridShown}
           isReactAreasShown={isReactAreasShown}
+          isTagsCloudInteractionDisabled={isTagsCloudInteractionDisabled}
           isVacanciesShown={isVacanciesShown}
           ref={this.svgTagsCloudRef}
+          scale={scale}
           width={tagsCloudSceneSize.width}
           onTagClick={this.onTagClick}
         />
@@ -409,8 +450,22 @@ class TagsCloud extends Component<PropsT, StateT> {
     }
   };
 
+  renderCloudInteractionDisabledButton = () => {
+    const { isTagsCloudInteractionDisabled } = this.state;
+    const { classes } = this.props;
+    const Button = isTagsCloudInteractionDisabled ? PrimaryButton : OutlinedButton;
+    return (
+      <Button
+        classes={{ root: classes.tagsCloudInteractionButton }}
+        onClick={this.toggleIsTagsCloudInteractionDisabled}
+      >
+        CloudInteractionDisabled
+      </Button>
+    );
+  };
+
   render() {
-    const { tagsCloudSceneSize } = this.state;
+    const { tagsCloudSceneSize, scale, isTagsCloudInteractionDisabled } = this.state;
     const { tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily, classes } = this.props;
 
     const loading = [tagsData.status, tagsCloud.status, fontLoaded.status, incrementalBuild.status].includes(PENDING);
@@ -421,8 +476,20 @@ class TagsCloud extends Component<PropsT, StateT> {
         {loading && this.renderLoader()}
         {this.renderControls(loading)}
         <div className={classes.tagsCloudScene} ref={this.tagsCloudSceneRef}>
-          {tagsCloudSceneSize && tagsCloud.status === SUCCESS && this.renderTagsCloud()}
+          {tagsCloudSceneSize && tagsCloud.status === SUCCESS && (
+            <>
+              {this.renderTagsCloud()}
+              {(scale?.value ?? 1) > 1 && this.renderCloudInteractionDisabledButton()}
+            </>
+          )}
         </div>
+        <Scale
+          isFrameMovable={isTagsCloudInteractionDisabled}
+          maxScale={MAX_SCALE}
+          minScale={MIN_SCALE}
+          setScale={this.setScale}
+          targetElementRef={this.tagsCloudSceneRef}
+        />
       </div>
     );
   }

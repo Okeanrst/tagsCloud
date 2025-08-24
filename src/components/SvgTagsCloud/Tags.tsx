@@ -16,15 +16,18 @@ type PropsT = {
   tagEndIndexToShow: number;
   positionedTagSvgData: ReadonlyArray<PositionedTagSvgDataT>;
   draggableTag: DraggableTagT | null;
+  isTagDraggingDisabled: boolean;
 };
 
 const ANIMATION_DURATION = 300;
 
-const tagStyle = {
+const staticStyle = {
   transition: `all ${ANIMATION_DURATION}ms ease-in-out`,
   opacity: 0,
-  cursor: 'pointer',
 };
+const getTagCursorStyle = (isTagDraggingDisabled: boolean) => ({
+  cursor: isTagDraggingDisabled ? 'default' : 'grab',
+});
 
 const useStyles = makeStyles<Theme, StylesOptionsT>({
   root: {
@@ -47,6 +50,7 @@ export const Tags = ({
   tagEndIndexToShow,
   positionedTagSvgData,
   draggableTag,
+  isTagDraggingDisabled,
 }: PropsT) => {
   const classes = useStyles({ fontFamily });
   const textRefs = useRef<Record<string, { current: SVGTextElement | null }>>({});
@@ -114,8 +118,9 @@ export const Tags = ({
                         ref={nodeRef}
                         style={{
                           ...style,
-                          ...tagStyle,
+                          ...staticStyle,
                           ...transitionStyles[state],
+                          ...getTagCursorStyle(isTagDraggingDisabled),
                         }}
                         textAnchor="middle"
                       >
