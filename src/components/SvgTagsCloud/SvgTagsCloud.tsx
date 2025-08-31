@@ -481,11 +481,12 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
     }
 
     const { viewBox: fullSceneViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
-    const viewBox = scale
-      ? getScaledViewBox(fullSceneViewBox, { scale, sceneHeight: height, sceneWidth: width })
-      : fullSceneViewBox;
 
     const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio });
+
+    const viewBox = scale
+      ? getScaledViewBox(fullSceneViewBox, { scale, sceneHeight: svgSize.height, sceneWidth: svgSize.width })
+      : fullSceneViewBox;
 
     const svgSizeFactor = calcSVGSizeFactor(svgSize, fullSceneViewBox) ?? 1;
     svgSizeFactorRef.current = svgSizeFactor;
