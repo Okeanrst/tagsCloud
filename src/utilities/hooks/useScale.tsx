@@ -8,7 +8,7 @@ type PropsT = {
   scaleFactor?: number;
   minScale?: number;
   maxScale?: number;
-  isFrameMovable: boolean;
+  isDraggable: boolean;
 };
 
 const MIN_SCALE = -100;
@@ -34,7 +34,7 @@ export function useScale({
   minScale = MIN_SCALE,
   maxScale = MAX_SCALE,
   scaleFactor = SCALE_FACTOR,
-  isFrameMovable,
+  isDraggable,
 }: PropsT) {
   const isPinchingRef = useRef(false);
   const isDraggingRef = useRef(false);
@@ -42,10 +42,10 @@ export function useScale({
   const lastPinchDistanceRef = useRef(0);
 
   useEffect(() => {
-    if (!isFrameMovable && isDraggingRef.current) {
+    if (!isDraggable && isDraggingRef.current) {
       isDraggingRef.current = false;
     }
-  }, [isFrameMovable]);
+  }, [isDraggable]);
 
   const handleWheel = useCallback(
     (event: WheelEvent) => {
@@ -72,14 +72,14 @@ export function useScale({
 
   const handleMouseDown = useCallback(
     (event: MouseEvent) => {
-      if (!isFrameMovable) {
+      if (!isDraggable) {
         return;
       }
       event.preventDefault();
       isDraggingRef.current = true;
       lastDragPositionRef.current = { x: event.clientX, y: event.clientY };
     },
-    [isFrameMovable],
+    [isDraggable],
   );
 
   const handleMouseMove = useCallback(
@@ -107,7 +107,7 @@ export function useScale({
   const handleTouchStart = useCallback(
     (event: TouchEvent) => {
       if (event.touches.length === 1) {
-        if (!isFrameMovable) {
+        if (!isDraggable) {
           return;
         }
         isDraggingRef.current = true;
@@ -121,7 +121,7 @@ export function useScale({
         );
       }
     },
-    [isFrameMovable],
+    [isDraggable],
   );
 
   const handleTouchMove = useCallback(

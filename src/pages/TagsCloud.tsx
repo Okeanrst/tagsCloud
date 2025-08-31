@@ -488,7 +488,7 @@ class TagsCloud extends Component<PropsT, StateT> {
           )}
         </div>
         <Scale
-          isFrameMovable={isTagsCloudInteractionDisabled}
+          isDraggable={isTagsCloudInteractionDisabled}
           maxScale={MAX_SCALE}
           minScale={MIN_SCALE}
           setScale={this.setScale}
