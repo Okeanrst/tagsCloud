@@ -164,7 +164,7 @@ export const getScaledViewBox = (
 ): ViewBoxT => {
   const {
     value: scaleValue,
-    center: { x: centerX, y: centerY },
+    point: { x: centerX, y: centerY },
   } = scale;
   const centerXRatio = centerX / sceneWidth;
   const centerYRatio = centerY / sceneHeight;

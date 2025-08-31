@@ -37,7 +37,7 @@ export function drawOnCanvas(
 
   const aspectRatio = sceneWidth / sceneHeight;
 
-  const { width: canvasWidth, height: canvasHeight } = getSuitableSize(availableSize, aspectRatio);
+  const { width: canvasWidth, height: canvasHeight } = getSuitableSize({ availableSize, aspectRatio });
 
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;

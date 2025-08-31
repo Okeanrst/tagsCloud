@@ -64,7 +64,7 @@ export function useScale({
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
-        return { value: nextScaleValue, center: { x: mouseX, y: mouseY } };
+        return { value: nextScaleValue, point: { x: mouseX, y: mouseY } };
       });
     },
     [maxScale, minScale, scaleFactor, setScale, targetElementRef],
@@ -90,9 +90,9 @@ export function useScale({
       const dy = event.clientY - lastDragPositionRef.current.y;
 
       setScale((prevScale) => {
-        const { value: prevScaleValue = 1, center: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
+        const { value: prevScaleValue = 1, point: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
 
-        return { value: prevScaleValue, center: { x: prevX - dx / prevScaleValue, y: prevY - dy / prevScaleValue } };
+        return { value: prevScaleValue, point: { x: prevX - dx / prevScaleValue, y: prevY - dy / prevScaleValue } };
       });
 
       lastDragPositionRef.current = { x: event.clientX, y: event.clientY };
@@ -140,14 +140,17 @@ export function useScale({
           return prevScale;
         }
 
-        const { value: prevScaleValue = 1, center: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
+        const { value: prevScaleValue = 1, point: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
 
         if (isDraggingRef.current && event.touches.length === 1) {
           // Panning with one finger
           const dx = event.touches[0].clientX - lastDragPositionRef.current.x;
           const dy = event.touches[0].clientY - lastDragPositionRef.current.y;
           lastDragPositionRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-          return { value: prevScaleValue, center: { x: prevX - dx / prevScaleValue, y: prevY - dy / prevScaleValue } };
+          return {
+            value: prevScaleValue,
+            point: { x: prevX - dx / prevScaleValue, y: prevY - dy / prevScaleValue },
+          };
         } else if (isPinchingRef.current && event.touches.length === 2) {
           // Pinching with two fingers
           const p1 = { x: event.touches[0].clientX, y: event.touches[0].clientY };
@@ -164,7 +167,7 @@ export function useScale({
           const centerX = center.x - rect.left;
           const centerY = center.y - rect.top;
 
-          return { value: nextScaleValue, center: { x: centerX, y: centerY } };
+          return { value: nextScaleValue, point: { x: centerX, y: centerY } };
         }
 
         return prevScale;

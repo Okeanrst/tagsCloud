@@ -1,4 +1,4 @@
-import { RootStateT } from '../../store/types';
+import { RootStateT } from 'store/types';
 
 export type DraggableTagT = { id: string; changeRotation: boolean };
 

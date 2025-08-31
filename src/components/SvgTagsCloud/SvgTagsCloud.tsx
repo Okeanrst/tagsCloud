@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/core';
 import throttle from 'lodash.throttle';
 import * as actions from 'store/actions/tagsCloud';
+import { noop } from 'utilities/noop';
 import { getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagSvgData';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
 import {
@@ -470,7 +471,12 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, scaleValueRef, fontFamily],
     );
 
-    if (!tagsPositions || !tagsSvgData) {
+    const isDataReady = !!(tagsPositions && tagsSvgData);
+
+    if (!isDataReady) {
+      handleMouseUpEventRef.current = noop;
+      downloadTagCloudRef.current = noop;
+
       return null;
     }
 
@@ -479,7 +485,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       ? getScaledViewBox(fullSceneViewBox, { scale, sceneHeight: height, sceneWidth: width })
       : fullSceneViewBox;
 
-    const svgSize = getSuitableSize({ width, height }, aspectRatio);
+    const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio });
 
     const svgSizeFactor = calcSVGSizeFactor(svgSize, fullSceneViewBox) ?? 1;
     svgSizeFactorRef.current = svgSizeFactor;
@@ -551,6 +557,17 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       }
     };
 
+    downloadTagCloudRef.current = () => {
+      const html = exportTagCloudAsHtml({
+        tagsSvgData: positionedTagSvgData,
+        svgSize,
+        viewBox: fullSceneViewBox,
+        transform,
+        fontFamily,
+      });
+      downloadTagCloudHtmlFile(html);
+    };
+
     const draggableTagAvatarProps = (() => {
       if (!draggableTag) {
         return {};
@@ -563,17 +580,6 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       const { label, color, fontSize } = tagPosition;
       return { label, color, fontSize, display: 'block' };
     })();
-
-    downloadTagCloudRef.current = () => {
-      const html = exportTagCloudAsHtml({
-        tagsSvgData: positionedTagSvgData,
-        svgSize,
-        viewBox: fullSceneViewBox,
-        transform,
-        fontFamily,
-      });
-      downloadTagCloudHtmlFile(html);
-    };
 
     return (
       <div className={classes.container}>

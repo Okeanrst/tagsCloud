@@ -142,7 +142,7 @@ const styles = (theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
     },
-    tagsCloudScene: {
+    tagsCloudAvailableSpace: {
       width: '100%',
       display: 'flex',
       justifyContent: 'center',
@@ -166,7 +166,7 @@ type PropsT = PropsFromRedux & {
 };
 
 type StateT = {
-  tagsCloudSceneSize: { width: number; height: number } | null;
+  tagsCloudAvailableSpace: { width: number; height: number } | null;
   downloadCloudCounter: number;
   isSettingsControlsShown: boolean;
   isCoordinateGridShown: boolean;
@@ -183,7 +183,7 @@ const getTagsDataByTagsIds = (tagsIds: string[], tagsData: ReadonlyArray<TagData
 
 class TagsCloud extends Component<PropsT, StateT> {
   state: StateT = {
-    tagsCloudSceneSize: null,
+    tagsCloudAvailableSpace: null,
     downloadCloudCounter: 0,
     isSettingsControlsShown: false,
     isCoordinateGridShown: false,
@@ -193,7 +193,7 @@ class TagsCloud extends Component<PropsT, StateT> {
     isTagsCloudInteractionDisabled: false,
   };
 
-  tagsCloudSceneRef = React.createRef<HTMLDivElement>();
+  tagsCloudAvailableSpaceRef = React.createRef<HTMLDivElement>();
   svgTagsCloudRef = React.createRef<{ oneByOne: () => void }>();
 
   resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
@@ -226,13 +226,13 @@ class TagsCloud extends Component<PropsT, StateT> {
 
     window.addEventListener('resize', this.handleResize);
 
-    if (!this.tagsCloudSceneRef.current) {
+    if (!this.tagsCloudAvailableSpaceRef.current) {
       return;
     }
 
-    const tagsCloudSceneSize = this.calcTagsCloudSize(this.tagsCloudSceneRef.current);
+    const tagsCloudAvailableSpace = this.calcSceneAvailableSpace(this.tagsCloudAvailableSpaceRef.current);
 
-    this.setState({ tagsCloudSceneSize });
+    this.setState({ tagsCloudAvailableSpace });
   }
 
   componentWillUnmount() {
@@ -262,7 +262,7 @@ class TagsCloud extends Component<PropsT, StateT> {
     }
   }
 
-  calcTagsCloudSize(elem: HTMLDivElement) {
+  calcSceneAvailableSpace(elem: HTMLDivElement) {
     const clientRect = elem.getBoundingClientRect();
     const { left, right, top, bottom } = clientRect;
     const width = right - left;
@@ -273,9 +273,9 @@ class TagsCloud extends Component<PropsT, StateT> {
   handleResize = () => {
     const recalculateState = () => {
       this.resizeTaskTimer = null;
-      if (this.tagsCloudSceneRef && this.tagsCloudSceneRef.current) {
-        const tagsCloudSceneSize = this.calcTagsCloudSize(this.tagsCloudSceneRef.current);
-        this.setState({ tagsCloudSceneSize, scale: null });
+      if (this.tagsCloudAvailableSpaceRef && this.tagsCloudAvailableSpaceRef.current) {
+        const tagsCloudAvailableSpace = this.calcSceneAvailableSpace(this.tagsCloudAvailableSpaceRef.current);
+        this.setState({ tagsCloudAvailableSpace, scale: null });
       }
     };
 
@@ -412,7 +412,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   renderTagsCloud = () => {
     const {
-      tagsCloudSceneSize,
+      tagsCloudAvailableSpace,
       downloadCloudCounter,
       isVacanciesShown,
       isReactAreasShown,
@@ -422,7 +422,7 @@ class TagsCloud extends Component<PropsT, StateT> {
     } = this.state;
     const { shouldUseCanvas } = this.props;
 
-    if (!tagsCloudSceneSize) {
+    if (!tagsCloudAvailableSpace) {
       return null;
     }
 
@@ -430,9 +430,9 @@ class TagsCloud extends Component<PropsT, StateT> {
       return (
         <CanvasTagsCloud
           downloadCloudCounter={downloadCloudCounter}
-          height={tagsCloudSceneSize.height}
+          height={tagsCloudAvailableSpace.height}
           isReactAreasShown={isReactAreasShown}
-          width={tagsCloudSceneSize.width}
+          width={tagsCloudAvailableSpace.width}
           onTagClick={this.onTagClick}
         />
       );
@@ -440,14 +440,14 @@ class TagsCloud extends Component<PropsT, StateT> {
       return (
         <SvgTagsCloud
           downloadCloudCounter={downloadCloudCounter}
-          height={tagsCloudSceneSize.height}
+          height={tagsCloudAvailableSpace.height}
           isCoordinateGridShown={isCoordinateGridShown}
           isReactAreasShown={isReactAreasShown}
           isTagsCloudInteractionDisabled={isTagsCloudInteractionDisabled}
           isVacanciesShown={isVacanciesShown}
           ref={this.svgTagsCloudRef}
           scale={scale}
-          width={tagsCloudSceneSize.width}
+          width={tagsCloudAvailableSpace.width}
           onTagClick={this.onTagClick}
         />
       );
@@ -469,7 +469,7 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   render() {
-    const { tagsCloudSceneSize, scale, isTagsCloudInteractionDisabled } = this.state;
+    const { tagsCloudAvailableSpace, scale, isTagsCloudInteractionDisabled } = this.state;
     const { tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily, classes } = this.props;
 
     const loading = [tagsData.status, tagsCloud.status, fontLoaded.status, incrementalBuild.status].includes(PENDING);
@@ -479,8 +479,8 @@ class TagsCloud extends Component<PropsT, StateT> {
         <div style={{ fontFamily, visibility: 'hidden' }} />
         {loading && this.renderLoader()}
         {this.renderControls(loading)}
-        <div className={classes.tagsCloudScene} ref={this.tagsCloudSceneRef}>
-          {tagsCloudSceneSize && tagsCloud.status === SUCCESS && (
+        <div className={classes.tagsCloudAvailableSpace} ref={this.tagsCloudAvailableSpaceRef}>
+          {tagsCloudAvailableSpace && tagsCloud.status === SUCCESS && (
             <>
               {this.renderTagsCloud()}
               {(scale?.value ?? 1) > 1 && this.renderCloudInteractionDisabledButton()}
@@ -492,7 +492,7 @@ class TagsCloud extends Component<PropsT, StateT> {
           maxScale={MAX_SCALE}
           minScale={MIN_SCALE}
           setScale={this.setScale}
-          targetElementRef={this.tagsCloudSceneRef}
+          targetElementRef={this.tagsCloudAvailableSpaceRef}
         />
       </div>
     );
