@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { createStyles, Theme, withStyles } from '@material-ui/core';
+import cx from 'classnames';
 import FadeLoader from 'react-spinners/FadeLoader';
 import * as actions from 'store/actions/tagsCloud';
 import { loadFont } from 'store/actions/loadFont';
@@ -11,11 +12,11 @@ import { QueryStatuses } from 'constants/queryStatuses';
 import { Checkbox } from 'ui/checkbox/Checkbox';
 import { IconButton } from 'ui/buttons/IconButton';
 import { DownloadCloudIcon } from 'ui/icons/DownloadCloudIcon';
+import { LockIcon } from 'ui/icons/LockIcon';
 import { Collapse } from 'components/Collapse';
 import { TagsCloudBuildProgress } from 'components/TagsCloudBuildProgress';
 import { Scale } from 'utilities/hooks/useScale';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
-import { OutlinedButton } from 'ui/buttons/OutlinedButton';
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
 import { ClassesT, TagDataT, ScaleT } from 'types/types';
@@ -159,7 +160,22 @@ const styles = (theme: Theme) =>
       position: 'absolute',
       bottom: 5,
       left: 10,
+      padding: 8,
       zIndex: 2,
+      "[data-color-scheme='light'] &": {
+        border: '1px solid var(--primary-main-color)',
+      },
+    },
+    tagsCloudInteractionEnabled: {
+      color: 'var(--primary-main-color)',
+    },
+    tagsCloudInteractionDisabled: {
+      color: 'var(--white-color)',
+      backgroundColor: 'var(--primary-main-color)',
+    },
+    lockIcon: {
+      width: 48,
+      height: 48,
     },
   });
 
@@ -468,14 +484,19 @@ class TagsCloud extends Component<PropsT, StateT> {
   renderCloudInteractionDisabledButton = () => {
     const { isTagsCloudInteractionDisabled } = this.state;
     const { classes } = this.props;
-    const Button = isTagsCloudInteractionDisabled ? PrimaryButton : OutlinedButton;
+
     return (
-      <Button
-        classes={{ root: classes.tagsCloudInteractionButton }}
+      <IconButton
+        classes={{
+          root: cx(classes.tagsCloudInteractionButton, {
+            [classes.tagsCloudInteractionEnabled]: !isTagsCloudInteractionDisabled,
+            [classes.tagsCloudInteractionDisabled]: isTagsCloudInteractionDisabled,
+          }),
+        }}
         onClick={this.toggleIsTagsCloudInteractionDisabled}
       >
-        Interaction with tags disabled
-      </Button>
+        <LockIcon className={classes.lockIcon} />
+      </IconButton>
     );
   };
 
