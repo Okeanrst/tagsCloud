@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver';
-import { RectAreaT, ScaleT } from 'types/types';
+import { RectAreaT } from 'types/types';
 import { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
 import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManager';
 import { isVacancyLargeEnoughToFitRect } from 'utilities/positioningAlgorithm/calcTagsPositions';
@@ -7,6 +7,7 @@ import { Dimensions, SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap
 import React from 'react';
 import { SizeT, ViewBoxT } from 'types/types';
 import { CoordinatesT, VacanciesT } from './types';
+import { RenderSceneT } from './renderScene';
 
 export type FrameOffsetT = { top: number; left: number };
 
@@ -158,48 +159,22 @@ export const calcSVGSizeFactor = (svgSize: SizeT, viewBox: ViewBoxT) => {
   return svgSize.width / width;
 };
 
-export const getScaledViewBox = (
-  viewBox: ViewBoxT,
-  { scale, sceneHeight, sceneWidth }: { scale: ScaleT; sceneHeight: number; sceneWidth: number },
-): ViewBoxT => {
-  const {
-    value: scaleValue,
-    point: { x: centerX, y: centerY },
-  } = scale;
-  const centerXRatio = centerX / sceneWidth;
-  const centerYRatio = centerY / sceneHeight;
-  const [minX, minY, width, height] = viewBox;
+export const getSVGViewBox = ({
+  fullSceneViewBox,
+  renderScene,
+}: {
+  renderScene: RenderSceneT;
+  fullSceneViewBox: ViewBoxT;
+}): ViewBoxT => {
+  const [minX, minY, width, height] = fullSceneViewBox;
+  const { left, top, width: sceneWidth, height: sceneHeight } = renderScene;
 
-  const scaledWidth = width / scaleValue;
-  const scaledHeight = height / scaleValue;
-
-  const getCenter = ({ start, size, ratio }: { start: number; size: number; ratio: number }) => start + size * ratio;
-
-  const getFramePosition = ({ center, size, min, max }: { center: number; size: number; min: number; max: number }) => {
-    const halfSize = size / 2;
-    let start = center - halfSize;
-    if (start < min) {
-      start = min;
-    } else if (start + size > max) {
-      start = max - size;
-    }
-    return start;
-  };
-
-  const nextMinX = getFramePosition({
-    center: getCenter({ start: minX, size: width, ratio: centerXRatio }),
-    size: scaledWidth,
-    min: minX,
-    max: minX + width,
-  });
-  const nextMinY = getFramePosition({
-    center: getCenter({ start: minY, size: height, ratio: centerYRatio }),
-    size: scaledHeight,
-    min: minY,
-    max: minY + height,
-  });
-
-  return [Math.round(nextMinX), Math.round(nextMinY), Math.round(scaledWidth), Math.round(scaledHeight)];
+  return [
+    Math.round(minX + width * left),
+    Math.round(minY + height * top),
+    Math.round(width * sceneWidth),
+    Math.round(height * sceneHeight),
+  ];
 };
 
 // offset relative to Canvas; offset in Canvas coordinates

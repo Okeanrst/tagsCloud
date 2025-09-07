@@ -1,6 +1,7 @@
 import { FontFamilies } from 'constants/index';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
+import { getAspectRatio } from 'utilities/common/getAspectRatio';
 import { getBorderCoordinates } from './getBorderCoordinates';
 import { PositionedTagRectT } from 'types/types';
 
@@ -35,7 +36,7 @@ export function drawOnCanvas(
   const sceneWidth = maxRight - minLeft;
   const sceneHeight = maxTop - minBottom;
 
-  const aspectRatio = sceneWidth / sceneHeight;
+  const aspectRatio = getAspectRatio(sceneWidth, sceneHeight);
 
   const { width: canvasWidth, height: canvasHeight } = getSuitableSize({ availableSize, aspectRatio });
 

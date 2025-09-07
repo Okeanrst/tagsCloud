@@ -1,5 +1,6 @@
 import { FontFamilies } from 'constants/index';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
+import { getAspectRatio } from 'utilities/common/getAspectRatio';
 import { getBorderCoordinates } from './getBorderCoordinates';
 import { PositionedTagRectT, PositionedTagSvgDataT, RectPositionT, ViewBoxT } from 'types/types';
 
@@ -56,7 +57,7 @@ export function getTagsSvgData(
   return {
     transform: `translate(${-minLeft}, ${maxTop})`,
     viewBox: [0, 0, sceneWidth, sceneHeight],
-    aspectRatio: sceneWidth / sceneHeight,
+    aspectRatio: getAspectRatio(sceneWidth, sceneHeight),
     data: positionedTagsSvgData,
   };
 }

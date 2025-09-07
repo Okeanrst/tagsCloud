@@ -1,6 +1,6 @@
 import { useRef, useEffect, RefObject, useCallback } from 'react';
 import { clamp } from 'utilities/helpers/clamp';
-import { PositionT, ScaleT } from 'types/types';
+import { ScaleT, SizeT } from 'types/types';
 
 type PropsT = {
   targetElementRef: RefObject<HTMLDivElement>;
@@ -15,13 +15,20 @@ const MIN_SCALE = -100;
 const MAX_SCALE = 100;
 const SCALE_FACTOR = 1.2;
 
+const getScalePoint = ({ x, y }: { x: number; y: number }, size: SizeT) => ({
+  x,
+  y,
+  relativeX: x / size.width,
+  relativeY: y / size.height,
+});
+
 // calculate the distance between two touch points
-const getDistance = (p1: PositionT, p2: PositionT) => {
+const getDistance = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
   return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 };
 
 // get the center point between two touch points
-const getCenter = (p1: PositionT, p2: PositionT) => {
+const getCenter = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
   return {
     x: (p1.x + p2.x) / 2,
     y: (p1.y + p2.y) / 2,
@@ -64,7 +71,10 @@ export function useScale({
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
-        return { value: nextScaleValue, point: { x: mouseX, y: mouseY } };
+        return {
+          value: nextScaleValue,
+          point: getScalePoint({ x: mouseX, y: mouseY }, rect),
+        };
       });
     },
     [maxScale, minScale, scaleFactor, setScale, targetElementRef],
@@ -90,14 +100,23 @@ export function useScale({
       const dy = event.clientY - lastDragPositionRef.current.y;
 
       setScale((prevScale) => {
+        if (!targetElementRef.current) {
+          return prevScale;
+        }
+
+        const rect = targetElementRef.current.getBoundingClientRect();
+
         const { value: prevScaleValue = 1, point: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
 
-        return { value: prevScaleValue, point: { x: prevX - dx / prevScaleValue, y: prevY - dy / prevScaleValue } };
+        return {
+          value: prevScaleValue,
+          point: getScalePoint({ x: prevX - dx, y: prevY - dy }, rect),
+        };
       });
 
       lastDragPositionRef.current = { x: event.clientX, y: event.clientY };
     },
-    [setScale],
+    [setScale, targetElementRef],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -140,6 +159,8 @@ export function useScale({
           return prevScale;
         }
 
+        const rect = targetElementRef.current.getBoundingClientRect();
+
         const { value: prevScaleValue = 1, point: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
 
         if (isDraggingRef.current && event.touches.length === 1) {
@@ -147,9 +168,10 @@ export function useScale({
           const dx = event.touches[0].clientX - lastDragPositionRef.current.x;
           const dy = event.touches[0].clientY - lastDragPositionRef.current.y;
           lastDragPositionRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+
           return {
             value: prevScaleValue,
-            point: { x: prevX - dx / prevScaleValue, y: prevY - dy / prevScaleValue },
+            point: getScalePoint({ x: prevX - dx, y: prevY - dy }, rect),
           };
         } else if (isPinchingRef.current && event.touches.length === 2) {
           // Pinching with two fingers
@@ -162,12 +184,11 @@ export function useScale({
           let nextScaleValue = prevScaleValue * (nextPinchDistance / lastPinchDistance);
           nextScaleValue = clamp(nextScaleValue, minScale, maxScale);
 
-          const rect = targetElementRef.current.getBoundingClientRect();
           const center = getCenter(p1, p2);
           const centerX = center.x - rect.left;
           const centerY = center.y - rect.top;
 
-          return { value: nextScaleValue, point: { x: centerX, y: centerY } };
+          return { value: nextScaleValue, point: getScalePoint({ x: centerX, y: centerY }, rect) };
         }
 
         return prevScale;

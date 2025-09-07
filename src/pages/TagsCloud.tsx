@@ -146,9 +146,14 @@ const styles = (theme: Theme) =>
       width: '100%',
       display: 'flex',
       justifyContent: 'center',
+      alignItems: 'center',
       position: 'relative',
       flexGrow: 12,
       marginTop: theme.spacing(1),
+    },
+    tagsCloudWrapper: {
+      height: 'fit-content',
+      width: 'fit-content',
     },
     tagsCloudInteractionButton: {
       position: 'absolute',
@@ -172,7 +177,8 @@ type StateT = {
   isCoordinateGridShown: boolean;
   isReactAreasShown: boolean;
   isVacanciesShown: boolean;
-  scale: ScaleT | null;
+  // [scaleFrom, scaleTo] or [prevScale, currentScale]
+  scale: [ScaleT | null, ScaleT | null];
   isTagsCloudInteractionDisabled: boolean;
 };
 
@@ -189,11 +195,12 @@ class TagsCloud extends Component<PropsT, StateT> {
     isCoordinateGridShown: false,
     isReactAreasShown: false,
     isVacanciesShown: false,
-    scale: null,
+    scale: [null, null],
     isTagsCloudInteractionDisabled: false,
   };
 
   tagsCloudAvailableSpaceRef = React.createRef<HTMLDivElement>();
+  tagsCloudWrapperRef = React.createRef<HTMLDivElement>();
   svgTagsCloudRef = React.createRef<{ oneByOne: () => void }>();
 
   resizeTaskTimer: ReturnType<typeof setTimeout> | null = null;
@@ -243,7 +250,10 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   componentDidUpdate(prevProps: PropsT, prevState: StateT) {
     const { fontLoaded, tagsData, tagsCloud, buildTagsCloud, observerLoadFont } = this.props;
-    const { scale, isTagsCloudInteractionDisabled } = this.state;
+    const {
+      scale: [, scaleTo],
+      isTagsCloudInteractionDisabled,
+    } = this.state;
 
     if (prevProps.fontLoaded.status !== PRISTINE && fontLoaded.status === PRISTINE) {
       observerLoadFont();
@@ -253,11 +263,11 @@ class TagsCloud extends Component<PropsT, StateT> {
       buildTagsCloud(tagsData.data);
     }
 
-    if (scale && prevProps.tagsCloud.status !== SUCCESS && tagsCloud.status === SUCCESS) {
-      this.setState({ scale: null });
+    if (scaleTo && prevProps.tagsCloud.status !== SUCCESS && tagsCloud.status === SUCCESS) {
+      this.setState({ scale: [null, null] });
     }
 
-    if (isTagsCloudInteractionDisabled && (!scale || scale.value === 1)) {
+    if (isTagsCloudInteractionDisabled && (!scaleTo || scaleTo.value === 1)) {
       this.setState({ isTagsCloudInteractionDisabled: false });
     }
   }
@@ -275,7 +285,7 @@ class TagsCloud extends Component<PropsT, StateT> {
       this.resizeTaskTimer = null;
       if (this.tagsCloudAvailableSpaceRef && this.tagsCloudAvailableSpaceRef.current) {
         const tagsCloudAvailableSpace = this.calcSceneAvailableSpace(this.tagsCloudAvailableSpaceRef.current);
-        this.setState({ tagsCloudAvailableSpace, scale: null });
+        this.setState({ tagsCloudAvailableSpace, scale: [null, null] });
       }
     };
 
@@ -318,7 +328,7 @@ class TagsCloud extends Component<PropsT, StateT> {
 
   setScale = (fn: (scale: ScaleT | null) => ScaleT | null) => {
     this.setState(({ scale }) => ({
-      scale: fn(scale),
+      scale: [scale[1], fn(scale[1])],
     }));
   };
 
@@ -446,7 +456,8 @@ class TagsCloud extends Component<PropsT, StateT> {
           isTagsCloudInteractionDisabled={isTagsCloudInteractionDisabled}
           isVacanciesShown={isVacanciesShown}
           ref={this.svgTagsCloudRef}
-          scale={scale}
+          scaleFrom={scale[0]}
+          scaleTo={scale[1]}
           width={tagsCloudAvailableSpace.width}
           onTagClick={this.onTagClick}
         />
@@ -482,18 +493,20 @@ class TagsCloud extends Component<PropsT, StateT> {
         <div className={classes.tagsCloudAvailableSpace} ref={this.tagsCloudAvailableSpaceRef}>
           {tagsCloudAvailableSpace && tagsCloud.status === SUCCESS && (
             <>
-              {this.renderTagsCloud()}
-              {(scale?.value ?? 1) > 1 && this.renderCloudInteractionDisabledButton()}
+              <div className={classes.tagsCloudWrapper} ref={this.tagsCloudWrapperRef}>
+                {this.renderTagsCloud()}
+              </div>
+              {(scale[1]?.value ?? 1) > 1 && this.renderCloudInteractionDisabledButton()}
+              <Scale
+                isDraggable={isTagsCloudInteractionDisabled}
+                maxScale={MAX_SCALE}
+                minScale={MIN_SCALE}
+                setScale={this.setScale}
+                targetElementRef={this.tagsCloudWrapperRef}
+              />
             </>
           )}
         </div>
-        <Scale
-          isDraggable={isTagsCloudInteractionDisabled}
-          maxScale={MAX_SCALE}
-          minScale={MIN_SCALE}
-          setScale={this.setScale}
-          targetElementRef={this.tagsCloudAvailableSpaceRef}
-        />
       </div>
     );
   }
