@@ -164,39 +164,37 @@ export function useScale({
 
       const { current: lastPinchDistance } = lastPinchDistanceRef;
 
-      setScale((prevScale) => {
-        if (!targetElementRef.current) {
-          return prevScale;
+      const rect = targetElementRef.current.getBoundingClientRect();
+
+      if (isDraggingRef.current && event.touches.length === 1) {
+        // Panning with one finger
+        if (!isDraggableRef.current) {
+          return;
         }
 
-        const rect = targetElementRef.current.getBoundingClientRect();
+        const dx = event.touches[0].clientX - lastDragPositionRef.current.x;
+        const dy = event.touches[0].clientY - lastDragPositionRef.current.y;
 
-        if (isDraggingRef.current && event.touches.length === 1) {
-          if (!isDraggableRef.current) {
-            return prevScale;
-          }
+        if (Math.abs(dx) < moveThreshold && Math.abs(dy) < moveThreshold) {
+          return;
+        }
 
-          // Panning with one finger
-          const dx = event.touches[0].clientX - lastDragPositionRef.current.x;
-          const dy = event.touches[0].clientY - lastDragPositionRef.current.y;
+        lastDragPositionRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
 
-          if (Math.abs(dx) < moveThreshold && Math.abs(dy) < moveThreshold) {
-            return prevScale;
-          }
-
-          lastDragPositionRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-
+        setScale((prevScale) => {
           const { value: prevScaleValue = 1, point: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
           return {
             value: prevScaleValue,
             point: getScalePoint({ x: prevX - dx, y: prevY - dy }, rect),
           };
-        } else if (isPinchingRef.current && event.touches.length === 2) {
-          // Pinching with two fingers
-          const p1 = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-          const p2 = { x: event.touches[1].clientX, y: event.touches[1].clientY };
-          const nextPinchDistance = getDistance(p1, p2);
+        });
+      } else if (isPinchingRef.current && event.touches.length === 2) {
+        // Pinching with two fingers
+        const p1 = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+        const p2 = { x: event.touches[1].clientX, y: event.touches[1].clientY };
+        const nextPinchDistance = getDistance(p1, p2);
 
+        setScale((prevScale) => {
           const { value: prevScaleValue = 1 } = prevScale ?? {};
           let nextScaleValue = prevScaleValue * (nextPinchDistance / lastPinchDistance);
           nextScaleValue = clamp(nextScaleValue, minScale, maxScale);
@@ -212,10 +210,8 @@ export function useScale({
           const centerY = center.y - rect.top;
 
           return { value: nextScaleValue, point: getScalePoint({ x: centerX, y: centerY }, rect) };
-        }
-
-        return prevScale;
-      });
+        });
+      }
     },
     [maxScale, minScale, moveThreshold, setScale, targetElementRef],
   );
