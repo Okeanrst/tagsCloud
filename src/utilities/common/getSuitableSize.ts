@@ -1,5 +1,5 @@
 import { SizeT } from 'types/types';
-import { cropSize } from 'utilities//common/cropSize';
+import { cropSize } from './cropSize';
 
 export const getSuitableSize = ({
   availableSize,

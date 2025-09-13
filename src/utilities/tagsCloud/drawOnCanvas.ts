@@ -1,6 +1,6 @@
 import { FontFamilies } from 'constants/index';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
-import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
+import { getSuitableSize } from 'utilities/common/getSuitableSize';
 import { getAspectRatio } from 'utilities/common/getAspectRatio';
 import { getBorderCoordinates } from './getBorderCoordinates';
 import { PositionedTagRectT } from 'types/types';

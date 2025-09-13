@@ -14,7 +14,7 @@ import throttle from 'lodash.throttle';
 import * as actions from 'store/actions/tagsCloud';
 import { noop } from 'utilities/noop';
 import { getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagSvgData';
-import { getSuitableSize } from 'utilities/tagsCloud/getSuitableSize';
+import { getSuitableSize } from 'utilities/common/getSuitableSize';
 import {
   getSceneMapVacancies,
   releaseRectAreaPositionsOnSceneMap,
