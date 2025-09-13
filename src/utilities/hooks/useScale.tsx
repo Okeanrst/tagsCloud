@@ -8,12 +8,14 @@ type PropsT = {
   scaleFactor?: number;
   minScale?: number;
   maxScale?: number;
+  moveThreshold?: number;
   isDraggable: boolean;
 };
 
 const MIN_SCALE = -100;
 const MAX_SCALE = 100;
 const SCALE_FACTOR = 1.2;
+const MOVE_THRESHOLD = 5;
 
 const getScalePoint = ({ x, y }: { x: number; y: number }, size: SizeT) => ({
   x,
@@ -42,16 +44,19 @@ export function useScale({
   maxScale = MAX_SCALE,
   scaleFactor = SCALE_FACTOR,
   isDraggable,
+  moveThreshold = MOVE_THRESHOLD,
 }: PropsT) {
   const isPinchingRef = useRef(false);
   const isDraggingRef = useRef(false);
   const lastDragPositionRef = useRef({ x: 0, y: 0 });
   const lastPinchDistanceRef = useRef(0);
+  const isDraggableRef = useRef(isDraggable);
 
   useEffect(() => {
     if (!isDraggable && isDraggingRef.current) {
       isDraggingRef.current = false;
     }
+    isDraggableRef.current = isDraggable;
   }, [isDraggable]);
 
   const handleWheel = useCallback(
@@ -67,6 +72,10 @@ export function useScale({
         let nextScaleValue = event.deltaY > 0 ? prevScaleValue / scaleFactor : prevScaleValue * scaleFactor;
         nextScaleValue = clamp(nextScaleValue, minScale, maxScale);
 
+        if (nextScaleValue === prevScaleValue) {
+          return prevScale;
+        }
+
         const rect = targetElementRef.current.getBoundingClientRect();
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
@@ -80,24 +89,28 @@ export function useScale({
     [maxScale, minScale, scaleFactor, setScale, targetElementRef],
   );
 
-  const handleMouseDown = useCallback(
-    (event: MouseEvent) => {
-      if (!isDraggable) {
-        return;
-      }
-      event.preventDefault();
-      isDraggingRef.current = true;
-      lastDragPositionRef.current = { x: event.clientX, y: event.clientY };
-    },
-    [isDraggable],
-  );
+  const handleMouseDown = useCallback((event: MouseEvent) => {
+    if (!isDraggableRef.current) {
+      return;
+    }
+    event.preventDefault();
+    isDraggingRef.current = true;
+    lastDragPositionRef.current = { x: event.clientX, y: event.clientY };
+  }, []);
 
   const handleMouseMove = useCallback(
     (event: MouseEvent) => {
-      if (!isDraggingRef.current) return;
+      if (!isDraggingRef.current || !isDraggableRef.current) {
+        return;
+      }
+
       event.preventDefault();
       const dx = event.clientX - lastDragPositionRef.current.x;
       const dy = event.clientY - lastDragPositionRef.current.y;
+
+      if (Math.abs(dx) < moveThreshold && Math.abs(dy) < moveThreshold) {
+        return;
+      }
 
       setScale((prevScale) => {
         if (!targetElementRef.current) {
@@ -116,32 +129,29 @@ export function useScale({
 
       lastDragPositionRef.current = { x: event.clientX, y: event.clientY };
     },
-    [setScale, targetElementRef],
+    [moveThreshold, setScale, targetElementRef],
   );
 
   const handleMouseUp = useCallback(() => {
     isDraggingRef.current = false;
   }, []);
 
-  const handleTouchStart = useCallback(
-    (event: TouchEvent) => {
-      if (event.touches.length === 1) {
-        if (!isDraggable) {
-          return;
-        }
-        isDraggingRef.current = true;
-        lastDragPositionRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-      } else if (event.touches.length === 2) {
-        isDraggingRef.current = false;
-        isPinchingRef.current = true;
-        lastPinchDistanceRef.current = getDistance(
-          { x: event.touches[0].clientX, y: event.touches[0].clientY },
-          { x: event.touches[1].clientX, y: event.touches[1].clientY },
-        );
+  const handleTouchStart = useCallback((event: TouchEvent) => {
+    if (event.touches.length === 1) {
+      if (!isDraggableRef.current) {
+        return;
       }
-    },
-    [isDraggable],
-  );
+      isDraggingRef.current = true;
+      lastDragPositionRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    } else if (event.touches.length === 2) {
+      isDraggingRef.current = false;
+      isPinchingRef.current = true;
+      lastPinchDistanceRef.current = getDistance(
+        { x: event.touches[0].clientX, y: event.touches[0].clientY },
+        { x: event.touches[1].clientX, y: event.touches[1].clientY },
+      );
+    }
+  }, []);
 
   const handleTouchMove = useCallback(
     (event: TouchEvent) => {
@@ -161,14 +171,22 @@ export function useScale({
 
         const rect = targetElementRef.current.getBoundingClientRect();
 
-        const { value: prevScaleValue = 1, point: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
-
         if (isDraggingRef.current && event.touches.length === 1) {
+          if (!isDraggableRef.current) {
+            return prevScale;
+          }
+
           // Panning with one finger
           const dx = event.touches[0].clientX - lastDragPositionRef.current.x;
           const dy = event.touches[0].clientY - lastDragPositionRef.current.y;
+
+          if (Math.abs(dx) < moveThreshold && Math.abs(dy) < moveThreshold) {
+            return prevScale;
+          }
+
           lastDragPositionRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
 
+          const { value: prevScaleValue = 1, point: { x: prevX = 0, y: prevY = 0 } = {} } = prevScale ?? {};
           return {
             value: prevScaleValue,
             point: getScalePoint({ x: prevX - dx, y: prevY - dy }, rect),
@@ -179,10 +197,15 @@ export function useScale({
           const p2 = { x: event.touches[1].clientX, y: event.touches[1].clientY };
           const nextPinchDistance = getDistance(p1, p2);
 
-          lastPinchDistanceRef.current = nextPinchDistance;
-
+          const { value: prevScaleValue = 1 } = prevScale ?? {};
           let nextScaleValue = prevScaleValue * (nextPinchDistance / lastPinchDistance);
           nextScaleValue = clamp(nextScaleValue, minScale, maxScale);
+
+          if (nextScaleValue === prevScaleValue) {
+            return prevScale;
+          }
+
+          lastPinchDistanceRef.current = nextPinchDistance;
 
           const center = getCenter(p1, p2);
           const centerX = center.x - rect.left;
@@ -194,7 +217,7 @@ export function useScale({
         return prevScale;
       });
     },
-    [maxScale, minScale, setScale, targetElementRef],
+    [maxScale, minScale, moveThreshold, setScale, targetElementRef],
   );
 
   const handleTouchEnd = useCallback((event: TouchEvent) => {
@@ -207,33 +230,33 @@ export function useScale({
   }, []);
 
   useEffect(() => {
-    const mapElement = targetElementRef.current;
-    if (!mapElement) {
+    const { current: targetElement } = targetElementRef;
+    if (!targetElement) {
       return;
     }
 
-    mapElement.addEventListener('wheel', handleWheel, { passive: false });
-    mapElement.addEventListener('mousedown', handleMouseDown);
+    targetElement.addEventListener('wheel', handleWheel, { passive: false });
+    targetElement.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('mouseleave', handleMouseUp);
 
-    mapElement.addEventListener('touchstart', handleTouchStart, { passive: false });
-    mapElement.addEventListener('touchmove', handleTouchMove, { passive: false });
-    mapElement.addEventListener('touchend', handleTouchEnd);
-    mapElement.addEventListener('touchcancel', handleTouchEnd);
+    targetElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+    targetElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+    targetElement.addEventListener('touchend', handleTouchEnd);
+    targetElement.addEventListener('touchcancel', handleTouchEnd);
 
     return () => {
-      mapElement.removeEventListener('wheel', handleWheel);
-      mapElement.removeEventListener('mousedown', handleMouseDown);
+      targetElement.removeEventListener('wheel', handleWheel);
+      targetElement.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('mouseleave', handleMouseUp);
 
-      mapElement.removeEventListener('touchstart', handleTouchStart);
-      mapElement.removeEventListener('touchmove', handleTouchMove);
-      mapElement.removeEventListener('touchend', handleTouchEnd);
-      mapElement.removeEventListener('touchcancel', handleTouchEnd);
+      targetElement.removeEventListener('touchstart', handleTouchStart);
+      targetElement.removeEventListener('touchmove', handleTouchMove);
+      targetElement.removeEventListener('touchend', handleTouchEnd);
+      targetElement.removeEventListener('touchcancel', handleTouchEnd);
     };
   }, [
     handleMouseDown,

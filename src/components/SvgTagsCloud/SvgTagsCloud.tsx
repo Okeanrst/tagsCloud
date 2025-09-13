@@ -69,6 +69,8 @@ type PropsT = {
 const MOVEMENT_THRESHOLD = 10; // px
 const CHANGE_ROTATION_THRESHOLD = 500; // ms
 
+const DEFAULT_RENDER_SCENE_KEY = 'normal';
+
 const useStyles = makeStyles({
   container: {
     width: '100%',
@@ -142,7 +144,7 @@ const stateSelector = (state: RootStateT) => {
 
 const getRenderSceneKey = (scale: ScaleT | null) => {
   if (!scale || scale.value === 1) {
-    return 'normal';
+    return DEFAULT_RENDER_SCENE_KEY;
   }
   return JSON.stringify(scale);
 };
@@ -501,6 +503,12 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
 
     const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale: scaleTo?.value });
 
+    const scaleFromRenderSceneKey = getRenderSceneKey(scaleFrom);
+    if ((renderSceneRef.current.from?.key ?? DEFAULT_RENDER_SCENE_KEY) !== scaleFromRenderSceneKey) {
+      renderSceneRef.current.from =
+        getRenderSceneKey(scaleFrom) === renderSceneRef.current.to?.key ? renderSceneRef.current.to : null;
+    }
+
     const scaleFromRenderScene =
       renderSceneRef.current.from?.key === getRenderSceneKey(scaleFrom) ? renderSceneRef.current.from.data : null;
 
@@ -511,9 +519,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       scale: scaleFrom,
       nextScale: scaleTo,
     });
-    if (getRenderSceneKey(scaleFrom) === renderSceneRef.current.to?.key) {
-      renderSceneRef.current.from = renderSceneRef.current.to;
-    }
+
     renderSceneRef.current.to = { key: getRenderSceneKey(scaleTo), data: renderScene };
 
     const viewBox = getSVGViewBox({ fullSceneViewBox, renderScene });

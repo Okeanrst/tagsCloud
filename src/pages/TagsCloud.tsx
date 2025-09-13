@@ -343,9 +343,12 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   setScale = (fn: (scale: ScaleT | null) => ScaleT | null) => {
-    this.setState(({ scale }) => ({
-      scale: [scale[1], fn(scale[1])],
-    }));
+    this.setState(({ scale }) => {
+      const nextScale = fn(scale[1]);
+      return {
+        scale: scale[1] === nextScale ? scale : [scale[1], nextScale],
+      };
+    });
   };
 
   toggleIsTagsCloudInteractionDisabled = () => {
