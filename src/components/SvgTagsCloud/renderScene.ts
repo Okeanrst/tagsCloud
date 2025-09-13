@@ -46,7 +46,7 @@ export const getNextRenderScene = ({
       currentPosition: number;
       diff: number;
       size: number;
-    }) => clamp(currentPosition + size * diff, 0, 1);
+    }) => clamp(currentPosition + size * diff, 0, 1 - size);
     return {
       ...renderScene,
       left: getNextPosition({ currentPosition: left, size: width, diff: nextPointX - pointX }),
