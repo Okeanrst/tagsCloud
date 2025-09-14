@@ -16,10 +16,14 @@ import { LockIcon } from 'ui/icons/LockIcon';
 import { Collapse } from 'components/Collapse';
 import { TagsCloudBuildProgress } from 'components/TagsCloudBuildProgress';
 import { Scale } from 'utilities/hooks/useScale';
+import { getSuitableSize } from 'utilities/common/getSuitableSize';
+import { getTagsCloudSceneAspectRatio } from 'utilities/tagsCloud/getTagsCloudSceneAspectRatio';
+import { getDefaultRenderScene, getNextRenderScene } from 'utilities/tagsCloud/renderScene';
+import { getAspectRatio } from 'utilities/common/getAspectRatio';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
-import { ClassesT, TagDataT, ScaleT } from 'types/types';
+import { ClassesT, TagDataT, ScaleT, RenderSceneT } from 'types/types';
 
 const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
 
@@ -195,6 +199,8 @@ type StateT = {
   isVacanciesShown: boolean;
   // [scaleFrom, scaleTo] or [prevScale, currentScale]
   scale: [ScaleT | null, ScaleT | null];
+  // corresponds to scaleFrom, scaleTo
+  renderScene: [RenderSceneT, RenderSceneT];
   isTagsCloudInteractionDisabled: boolean;
 };
 
@@ -212,6 +218,7 @@ class TagsCloud extends Component<PropsT, StateT> {
     isReactAreasShown: false,
     isVacanciesShown: false,
     scale: [null, null],
+    renderScene: [getDefaultRenderScene(), getDefaultRenderScene()],
     isTagsCloudInteractionDisabled: false,
   };
 
@@ -343,11 +350,42 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   setScale = (fn: (scale: ScaleT | null) => ScaleT | null) => {
-    this.setState(({ scale }) => {
-      const nextScale = fn(scale[1]);
-      return {
-        scale: scale[1] === nextScale ? scale : [scale[1], nextScale],
-      };
+    const { tagsCloudAvailableSpace } = this.state;
+    const {
+      tagsCloud: { tagsPositions },
+    } = this.props;
+    if (!tagsPositions || !tagsCloudAvailableSpace) {
+      // invariant
+      return null;
+    }
+    const originSceneAspectRatio = getTagsCloudSceneAspectRatio(tagsPositions);
+    if (!originSceneAspectRatio) {
+      // invariant
+      return null;
+    }
+
+    this.setState(({ scale, renderScene }): Pick<StateT, 'scale' | 'renderScene'> => {
+      const scaleTo = fn(scale[1]);
+      if (scale[1] === scaleTo) {
+        return { scale, renderScene };
+      }
+      const nextScale = [scale[1], scaleTo] as StateT['scale'];
+      const [scaleFrom] = nextScale;
+
+      const suitableSize = getSuitableSize({
+        availableSize: tagsCloudAvailableSpace,
+        aspectRatio: originSceneAspectRatio,
+        scale: scaleTo?.value,
+      });
+      const [, renderSceneFrom] = renderScene;
+      const renderSceneTo = getNextRenderScene({
+        originSceneAspectRatio,
+        nextSceneAspectRatio: getAspectRatio(suitableSize.width, suitableSize.height),
+        renderScene: renderSceneFrom,
+        scale: scaleFrom,
+        nextScale: scaleTo,
+      });
+      return { scale: nextScale, renderScene: [renderSceneFrom, renderSceneTo] };
     });
   };
 
@@ -447,6 +485,7 @@ class TagsCloud extends Component<PropsT, StateT> {
       isReactAreasShown,
       isCoordinateGridShown,
       scale,
+      renderScene,
       isTagsCloudInteractionDisabled,
     } = this.state;
     const { shouldUseCanvas } = this.props;
@@ -475,8 +514,8 @@ class TagsCloud extends Component<PropsT, StateT> {
           isTagsCloudInteractionDisabled={isTagsCloudInteractionDisabled}
           isVacanciesShown={isVacanciesShown}
           ref={this.svgTagsCloudRef}
-          scaleFrom={scale[0]}
-          scaleTo={scale[1]}
+          renderScene={renderScene[1]}
+          scale={scale[1]?.value ?? 1}
           width={tagsCloudAvailableSpace.width}
           onTagClick={this.onTagClick}
         />

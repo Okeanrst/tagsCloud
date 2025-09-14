@@ -106,3 +106,5 @@ export type PositionedTagSvgDataT = Readonly<
 export type PositionT = { x: number; y: number; relativeX: number; relativeY: number };
 
 export type ScaleT = { value: number; point: PositionT };
+
+export type RenderSceneT = { left: number; top: number; width: number; height: number };

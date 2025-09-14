@@ -5,9 +5,8 @@ import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManage
 import { isVacancyLargeEnoughToFitRect } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { Dimensions, SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap';
 import React from 'react';
-import { SizeT, ViewBoxT } from 'types/types';
+import { SizeT, ViewBoxT, RenderSceneT } from 'types/types';
 import { CoordinatesT, VacanciesT } from './types';
-import { RenderSceneT } from './renderScene';
 
 export type FrameOffsetT = { top: number; left: number };
 

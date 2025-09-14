@@ -1,13 +1,11 @@
 import { clamp } from 'utilities/helpers/clamp';
-import { ScaleT } from 'types/types';
-
-export type RenderSceneT = { left: number; top: number; width: number; height: number };
+import { ScaleT, RenderSceneT } from 'types/types';
 
 // RenderScene parameter are normalized; number from 0 to 1
 // where left, width is a fraction of the full width (no scale) of the scene
 // where top, height is a fraction of the full height (no scale) of the scene
 
-const getDefaultRenderScene = (): RenderSceneT => ({ left: 0, top: 0, width: 1, height: 1 });
+export const getDefaultRenderScene = (): RenderSceneT => ({ left: 0, top: 0, width: 1, height: 1 });
 
 export const getNextRenderScene = ({
   originSceneAspectRatio,

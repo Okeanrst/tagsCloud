@@ -47,9 +47,8 @@ import {
   getCanvasFrameOffset,
 } from './utils';
 import { formTagTransformStyle } from './styleUtils';
-import { getNextRenderScene, RenderSceneT } from './renderScene';
 import { TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX, TAG_AVATAR_CANVAS_Z_INDEX } from './constants';
-import { ScaleT } from 'types/types';
+import { ScaleT, RenderSceneT } from 'types/types';
 import { DraggableTagT, VacanciesT } from './types';
 import { FrameOffsetT } from './utils';
 
@@ -61,8 +60,8 @@ type PropsT = {
   isVacanciesShown: boolean;
   isReactAreasShown: boolean;
   isCoordinateGridShown: boolean;
-  scaleFrom: ScaleT | null;
-  scaleTo: ScaleT | null;
+  scale: number;
+  renderScene: RenderSceneT;
   isTagsCloudInteractionDisabled: boolean;
 };
 
@@ -159,8 +158,8 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       isCoordinateGridShown,
       isReactAreasShown,
       isVacanciesShown,
-      scaleFrom,
-      scaleTo,
+      scale,
+      renderScene,
       isTagsCloudInteractionDisabled,
     },
     ref,
@@ -183,10 +182,6 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
     const handleMouseUpEventRef = useRef(() => {});
     const svgSizeFactorRef = useRef(1);
     const downloadTagCloudRef = useRef(() => {});
-    const renderSceneRef = useRef<{
-      from: { key: string; data: RenderSceneT } | null;
-      to: { key: string; data: RenderSceneT } | null;
-    }>({ from: null, to: null });
 
     const [tagEndIndexToShow, setTagEndIndexToShow] = useState<number>(-1);
 
@@ -208,7 +203,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
 
     useCounterChanged({ counter: downloadCloudCounter, callbackRef: downloadTagCloudRef });
 
-    const scaleValueRef = useObjectRef(scaleTo?.value ?? null);
+    const scaleRef = useObjectRef<number>(scale);
 
     useEffect(() => {
       if (!draggableTag || !sceneMapPositions) {
@@ -351,7 +346,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
             canvasWrapperRect,
           ),
           canvasFrameOffset: canvasFrameOffset.current,
-          scale: scaleValueRef.current ?? 1,
+          scale: scaleRef.current,
         });
 
         const shiftX = initCanvasCoordinates.x - rectLeftCanvasCoordinate;
@@ -398,7 +393,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
           }
 
           const { current: currentSVGSizeFactor } = svgSizeFactorRef;
-          const scaleValue = scaleValueRef.current ?? 1;
+          const scaleValue = scaleRef.current;
 
           const pointerCanvasCoordinates = canvasFrameCoordinatesToCanvasCoordinates({
             coordinates: limitCoordinatesWithCanvasFrameBoundaries(
@@ -485,7 +480,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
           document.addEventListener('mousemove', onMouseMove);
         }
       },
-      [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, scaleValueRef, fontFamily],
+      [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, scaleRef, fontFamily],
     );
 
     const isDataReady = !!(tagsPositions && tagsSvgData);
@@ -494,33 +489,12 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       handleMouseUpEventRef.current = noop;
       downloadTagCloudRef.current = noop;
 
-      renderSceneRef.current = { from: null, to: null };
-
       return null;
     }
 
     const { viewBox: fullSceneViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
 
-    const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale: scaleTo?.value });
-
-    const scaleFromRenderSceneKey = getRenderSceneKey(scaleFrom);
-    if ((renderSceneRef.current.from?.key ?? DEFAULT_RENDER_SCENE_KEY) !== scaleFromRenderSceneKey) {
-      renderSceneRef.current.from =
-        getRenderSceneKey(scaleFrom) === renderSceneRef.current.to?.key ? renderSceneRef.current.to : null;
-    }
-
-    const scaleFromRenderScene =
-      renderSceneRef.current.from?.key === getRenderSceneKey(scaleFrom) ? renderSceneRef.current.from.data : null;
-
-    const renderScene = getNextRenderScene({
-      originSceneAspectRatio: aspectRatio,
-      nextSceneAspectRatio: getAspectRatio(svgSize.width, svgSize.height),
-      renderScene: scaleFromRenderScene,
-      scale: scaleFrom,
-      nextScale: scaleTo,
-    });
-
-    renderSceneRef.current.to = { key: getRenderSceneKey(scaleTo), data: renderScene };
+    const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale });
 
     const viewBox = getSVGViewBox({ fullSceneViewBox, renderScene });
 
