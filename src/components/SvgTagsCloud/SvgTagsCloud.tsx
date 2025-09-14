@@ -562,7 +562,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       const html = exportTagCloudAsHtml({
         tagsSvgData: positionedTagSvgData,
         svgSize,
-        viewBox: fullSceneViewBox,
+        viewBox,
         transform,
         fontFamily,
       });
