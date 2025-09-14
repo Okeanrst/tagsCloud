@@ -32,6 +32,8 @@ export function drawOnCanvas({
   clearParams: ClearParamsT;
   restoreCoords: RestoreCoordsT | null;
   sizeFactor: number;
+  offsetLeft: number;
+  offsetTop: number;
 } | null {
   const borderCoordinates = getBorderCoordinates(data);
 
@@ -53,12 +55,19 @@ export function drawOnCanvas({
   });
 
   if (scale === 1) {
-    return drawScene({
+    const drawingSceneResult = drawScene({
       data,
       canvas: targetCanvas,
       canvasSize: { width: targetCanvasWidth, height: targetCanvasHeight },
       options,
     });
+    return drawingSceneResult
+      ? {
+          ...drawingSceneResult,
+          offsetLeft: 0,
+          offsetTop: 0,
+        }
+      : null;
   }
 
   const fullSizeCanvas = document.createElement('canvas');
@@ -104,11 +113,16 @@ export function drawOnCanvas({
     targetCanvasHeight, // Destination H
   );
 
-  const { sizeFactor: drawingSceneSizeFactor } = drawingSceneResult;
-  const sizeFactor = drawingSceneSizeFactor / scale;
+  const { sizeFactor } = drawingSceneResult;
 
   const clearParams: ClearParamsT = [0, 0, targetCanvasWidth, targetCanvasHeight];
-  return { clearParams, restoreCoords: null, sizeFactor: sizeFactor / scale };
+  return {
+    clearParams,
+    restoreCoords: null,
+    sizeFactor,
+    offsetLeft: fullSizeCanvasWidth * renderSceneLeft,
+    offsetTop: fullSizeCanvasHeight * renderSceneTop,
+  };
 }
 
 function drawScene({

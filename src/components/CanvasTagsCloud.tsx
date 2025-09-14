@@ -34,6 +34,8 @@ type PropsT = PropsFromRedux & {
 
 type StateT = {
   sizeFactor: number;
+  offsetLeft: number;
+  offsetTop: number;
   restoreCoords: [number, number] | null;
   clearParams: [number, number, number, number] | null;
 };
@@ -48,6 +50,8 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   tagCloudCanvasRef = React.createRef<HTMLCanvasElement>();
   state: StateT = {
     sizeFactor: 1,
+    offsetLeft: 0,
+    offsetTop: 0,
     restoreCoords: null,
     clearParams: null,
   };
@@ -88,7 +92,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
     const sceneY = e.clientY - top;
     if (sceneX < 0 || sceneY < 0) return;
 
-    const sizeFactor = this.state.sizeFactor;
+    const { sizeFactor, offsetLeft, offsetTop } = this.state;
     const borderCoordinates = getBorderCoordinates(tagsPositions);
 
     if (!borderCoordinates) {
@@ -100,10 +104,10 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
     for (let y = tagsPositions.length - 1; y >= 0; y--) {
       const i = tagsPositions[y];
       if (
-        (maxTop - i.rectTop) * sizeFactor < sceneY &&
-        (maxTop - i.rectBottom) * sizeFactor > sceneY &&
-        -(minLeft - i.rectLeft) * sizeFactor < sceneX &&
-        -(minLeft - i.rectRight) * sizeFactor > sceneX
+        (maxTop - i.rectTop) * sizeFactor < offsetTop + sceneY &&
+        (maxTop - i.rectBottom) * sizeFactor > offsetTop + sceneY &&
+        -(minLeft - i.rectLeft) * sizeFactor < offsetLeft + sceneX &&
+        -(minLeft - i.rectRight) * sizeFactor > offsetLeft + sceneX
       ) {
         this.props.onTagClick(i.id);
         break;
@@ -162,15 +166,17 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
     if (!drawingResult) {
       this.setState({
         sizeFactor: 1,
+        offsetLeft: 0,
+        offsetTop: 0,
         restoreCoords: null,
         clearParams: null,
       });
       return;
     }
 
-    const { clearParams, restoreCoords, sizeFactor } = drawingResult;
+    const { clearParams, restoreCoords, sizeFactor, offsetLeft, offsetTop } = drawingResult;
 
-    this.setState({ clearParams, restoreCoords, sizeFactor });
+    this.setState({ clearParams, restoreCoords, sizeFactor, offsetLeft, offsetTop });
   };
 
   render() {
