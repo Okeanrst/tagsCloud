@@ -28,6 +28,7 @@ type PropsT = PropsFromRedux & {
   };
   downloadCloudCounter: number;
   isReactAreasShown: boolean;
+  isTagsCloudInteractionDisabled: boolean;
   scale: number;
   renderScene: RenderSceneT;
 };
@@ -82,8 +83,8 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       return;
     }
 
-    const { tagsPositions } = this.props;
-    if (!tagsPositions) {
+    const { tagsPositions, isTagsCloudInteractionDisabled } = this.props;
+    if (!tagsPositions || isTagsCloudInteractionDisabled) {
       return;
     }
 
