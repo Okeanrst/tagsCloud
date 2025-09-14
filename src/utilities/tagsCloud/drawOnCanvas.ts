@@ -3,7 +3,7 @@ import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { getSuitableSize } from 'utilities/common/getSuitableSize';
 import { getAspectRatio } from 'utilities/common/getAspectRatio';
 import { getBorderCoordinates } from './getBorderCoordinates';
-import { PositionedTagRectT } from 'types/types';
+import { PositionedTagRectT, SizeT, RenderSceneT } from 'types/types';
 
 type OptionsT = {
   fontFamily: FontFamilies;
@@ -14,17 +14,25 @@ type OptionsT = {
 type ClearParamsT = [number, number, number, number];
 type RestoreCoordsT = [number, number];
 
-export function drawOnCanvas(
-  data: ReadonlyArray<PositionedTagRectT>,
-  canvas: HTMLCanvasElement,
-  availableSize: { width: number; height: number },
-  options: OptionsT,
-): {
+export function drawOnCanvas({
+  data,
+  targetCanvas,
+  availableSize,
+  scale = 1,
+  renderScene,
+  options,
+}: {
+  data: ReadonlyArray<PositionedTagRectT>;
+  targetCanvas: HTMLCanvasElement;
+  availableSize: { width: number; height: number };
+  scale?: number;
+  renderScene: RenderSceneT;
+  options: OptionsT;
+}): {
   clearParams: ClearParamsT;
-  restoreCoords: RestoreCoordsT;
-  scale: number;
+  restoreCoords: RestoreCoordsT | null;
+  sizeFactor: number;
 } | null {
-  const { fontFamily, drawAxles = false, shouldDrawReactAreas } = options;
   const borderCoordinates = getBorderCoordinates(data);
 
   if (!borderCoordinates) {
@@ -38,15 +46,95 @@ export function drawOnCanvas(
 
   const aspectRatio = getAspectRatio(sceneWidth, sceneHeight);
 
-  const { width: canvasWidth, height: canvasHeight } = getSuitableSize({ availableSize, aspectRatio });
+  const { width: targetCanvasWidth, height: targetCanvasHeight } = getSuitableSize({
+    availableSize,
+    aspectRatio,
+    scale,
+  });
+
+  if (scale === 1) {
+    return drawScene({
+      data,
+      canvas: targetCanvas,
+      canvasSize: { width: targetCanvasWidth, height: targetCanvasHeight },
+      options,
+    });
+  }
+
+  const fullSizeCanvas = document.createElement('canvas');
+
+  const {
+    left: renderSceneLeft,
+    top: renderSceneTop,
+    width: renderSceneWidth,
+    height: renderSceneHeight,
+  } = renderScene;
+  const fullSizeCanvasWidth = targetCanvasWidth / renderSceneWidth;
+  const fullSizeCanvasHeight = targetCanvasHeight / renderSceneHeight;
+
+  const drawingSceneResult = drawScene({
+    data,
+    canvas: fullSizeCanvas,
+    // can be quite big
+    canvasSize: { width: fullSizeCanvasWidth, height: fullSizeCanvasHeight },
+    options,
+  });
+
+  if (!drawingSceneResult) {
+    return null;
+  }
+
+  targetCanvas.width = targetCanvasWidth;
+  targetCanvas.height = targetCanvasHeight;
+
+  const targetCTX = targetCanvas.getContext('2d');
+  if (!targetCTX) {
+    return null;
+  }
+
+  targetCTX.drawImage(
+    fullSizeCanvas,
+    fullSizeCanvasWidth * renderSceneLeft, // Source X
+    fullSizeCanvasHeight * renderSceneTop, // Source Y
+    fullSizeCanvasWidth * renderSceneWidth, // Source W
+    fullSizeCanvasHeight * renderSceneHeight, // Source H
+    0, // Destination X
+    0, // Destination Y
+    targetCanvasWidth, // Destination W
+    targetCanvasHeight, // Destination H
+  );
+
+  const { sizeFactor: drawingSceneSizeFactor } = drawingSceneResult;
+  const sizeFactor = drawingSceneSizeFactor / scale;
+
+  const clearParams: ClearParamsT = [0, 0, targetCanvasWidth, targetCanvasHeight];
+  return { clearParams, restoreCoords: null, sizeFactor: sizeFactor / scale };
+}
+
+function drawScene({
+  data,
+  canvas,
+  options,
+  canvasSize: { width: canvasWidth, height: canvasHeight },
+}: {
+  data: ReadonlyArray<PositionedTagRectT>;
+  canvas: HTMLCanvasElement;
+  canvasSize: SizeT;
+  options: OptionsT;
+}): {
+  clearParams: ClearParamsT;
+  restoreCoords: RestoreCoordsT;
+  sizeFactor: number;
+} | null {
+  const { fontFamily, drawAxles = false, shouldDrawReactAreas } = options;
+  const borderCoordinates = getBorderCoordinates(data);
+
+  if (!borderCoordinates) {
+    return null;
+  }
 
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
-
-  const scale = canvasWidth / sceneWidth;
-
-  const axisXOffset = -minLeft * scale;
-  const axisYOffset = maxTop * scale;
 
   const ctx = canvas.getContext('2d');
 
@@ -54,14 +142,24 @@ export function drawOnCanvas(
     return null;
   }
 
+  const { top: maxTop, bottom: minBottom, right: maxRight, left: minLeft } = borderCoordinates;
+
+  const sceneWidth = maxRight - minLeft;
+  const sceneHeight = maxTop - minBottom;
+
+  const sizeFactor = canvasWidth / sceneWidth;
+
+  const axisXOffset = -minLeft * sizeFactor;
+  const axisYOffset = maxTop * sizeFactor;
+
   ctx.translate(axisXOffset, axisYOffset);
 
   if (drawAxles) {
     ctx.strokeStyle = 'black';
     // axisY
-    ctx.strokeRect(0, -maxTop * scale, 1, canvasHeight);
+    ctx.strokeRect(0, -maxTop * sizeFactor, 1, canvasHeight);
     // axisX
-    ctx.strokeRect(minLeft * scale, 0, canvasWidth, 1);
+    ctx.strokeRect(minLeft * sizeFactor, 0, canvasWidth, 1);
   }
 
   const rotate = (deg: number) => ctx.rotate((Math.PI / 180) * deg);
@@ -71,33 +169,40 @@ export function drawOnCanvas(
 
     if (shouldDrawReactAreas) {
       ctx.strokeStyle = item.color;
-      ctx.strokeRect(item.rectLeft * scale, -item.rectTop * scale, width * scale, height * scale);
+      ctx.strokeRect(item.rectLeft * sizeFactor, -item.rectTop * sizeFactor, width * sizeFactor, height * sizeFactor);
     }
 
     ctx.textBaseline = 'alphabetic';
-    ctx.font = `${item.fontSize * scale}px ${fontFamily}`;
+    ctx.font = `${item.fontSize * sizeFactor}px ${fontFamily}`;
     ctx.fillStyle = item.color;
 
     const wordWidth = ctx.measureText(item.label).width;
 
     if (item.rotate) {
-      const dX = item.rectRight * scale;
-      const dY = -item.rectTop * scale;
+      const dX = item.rectRight * sizeFactor;
+      const dY = -item.rectTop * sizeFactor;
       ctx.translate(dX, dY);
       rotate(90);
-      const xOffset = (height * scale - wordWidth) / 2 + item.glyphsXOffset * scale;
-      const yOffset = width * getFontYFactor(fontFamily) * scale + item.glyphsYOffset * scale;
+      const xOffset = (height * sizeFactor - wordWidth) / 2 + item.glyphsXOffset * sizeFactor;
+      const yOffset = width * getFontYFactor(fontFamily) * sizeFactor + item.glyphsYOffset * sizeFactor;
       ctx.fillText(item.label, xOffset, yOffset);
       rotate(-90);
       ctx.translate(-dX, -dY);
     } else {
-      const xOffset = item.rectLeft * scale + (width * scale - wordWidth) / 2 + item.glyphsXOffset * scale;
-      const yOffset = (-item.rectTop + height * getFontYFactor(fontFamily)) * scale + item.glyphsYOffset * scale;
+      const xOffset =
+        item.rectLeft * sizeFactor + (width * sizeFactor - wordWidth) / 2 + item.glyphsXOffset * sizeFactor;
+      const yOffset =
+        (-item.rectTop + height * getFontYFactor(fontFamily)) * sizeFactor + item.glyphsYOffset * sizeFactor;
       ctx.fillText(item.label, xOffset, yOffset);
     }
   });
 
-  const clearParams: ClearParamsT = [minLeft * scale, -maxTop * scale, sceneWidth * scale, sceneHeight * scale];
+  const clearParams: ClearParamsT = [
+    minLeft * sizeFactor,
+    -maxTop * sizeFactor,
+    sceneWidth * sizeFactor,
+    sceneHeight * sizeFactor,
+  ];
   const restoreCoords: RestoreCoordsT = [-axisXOffset, -axisYOffset];
-  return { clearParams, restoreCoords, scale };
+  return { clearParams, restoreCoords, sizeFactor };
 }

@@ -500,6 +500,8 @@ class TagsCloud extends Component<PropsT, StateT> {
           downloadCloudCounter={downloadCloudCounter}
           height={tagsCloudAvailableSpace.height}
           isReactAreasShown={isReactAreasShown}
+          renderScene={renderScene[1]}
+          scale={scale[1]?.value ?? 1}
           width={tagsCloudAvailableSpace.width}
           onTagClick={this.onTagClick}
         />

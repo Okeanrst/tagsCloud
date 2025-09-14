@@ -4,6 +4,7 @@ import { saveAs } from 'file-saver';
 import { withStyles } from '@material-ui/core';
 import { drawOnCanvas } from 'utilities/tagsCloud/drawOnCanvas';
 import { getBorderCoordinates } from 'utilities/tagsCloud/getBorderCoordinates';
+import { RenderSceneT } from 'types/types';
 import { RootStateT } from 'store/types';
 
 const mapStateToProps = (state: RootStateT) => {
@@ -27,12 +28,14 @@ type PropsT = PropsFromRedux & {
   };
   downloadCloudCounter: number;
   isReactAreasShown: boolean;
+  scale: number;
+  renderScene: RenderSceneT;
 };
 
 type StateT = {
-  scale: number;
-  restoreCoords?: [number, number];
-  clearParams?: [number, number, number, number];
+  sizeFactor: number;
+  restoreCoords: [number, number] | null;
+  clearParams: [number, number, number, number] | null;
 };
 
 const styles = {
@@ -43,20 +46,25 @@ const styles = {
 
 class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   tagCloudCanvasRef = React.createRef<HTMLCanvasElement>();
-  state: StateT = { scale: 1 };
+  state: StateT = {
+    sizeFactor: 1,
+    restoreCoords: null,
+    clearParams: null,
+  };
 
   componentDidMount() {
     this.draw();
   }
 
   componentDidUpdate(prevProps: PropsT) {
-    const { width, height, tagsPositions, settings, downloadCloudCounter, isReactAreasShown } = this.props;
+    const { width, height, tagsPositions, settings, downloadCloudCounter, isReactAreasShown, renderScene } = this.props;
     if (
       prevProps.width !== width ||
       prevProps.height !== height ||
       prevProps.tagsPositions !== tagsPositions ||
       prevProps.settings !== settings ||
-      prevProps.isReactAreasShown !== isReactAreasShown
+      prevProps.isReactAreasShown !== isReactAreasShown ||
+      prevProps.renderScene !== renderScene
     ) {
       this.draw();
     }
@@ -80,7 +88,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
     const sceneY = e.clientY - top;
     if (sceneX < 0 || sceneY < 0) return;
 
-    const scale = this.state.scale;
+    const sizeFactor = this.state.sizeFactor;
     const borderCoordinates = getBorderCoordinates(tagsPositions);
 
     if (!borderCoordinates) {
@@ -92,10 +100,10 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
     for (let y = tagsPositions.length - 1; y >= 0; y--) {
       const i = tagsPositions[y];
       if (
-        (maxTop - i.rectTop) * scale < sceneY &&
-        (maxTop - i.rectBottom) * scale > sceneY &&
-        -(minLeft - i.rectLeft) * scale < sceneX &&
-        -(minLeft - i.rectRight) * scale > sceneX
+        (maxTop - i.rectTop) * sizeFactor < sceneY &&
+        (maxTop - i.rectBottom) * sizeFactor > sceneY &&
+        -(minLeft - i.rectLeft) * sizeFactor < sceneX &&
+        -(minLeft - i.rectRight) * sizeFactor > sceneX
       ) {
         this.props.onTagClick(i.id);
         break;
@@ -119,7 +127,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   };
 
   draw = () => {
-    const { width, height, tagsPositions, settings, isReactAreasShown } = this.props;
+    const { width, height, tagsPositions, settings, isReactAreasShown, scale, renderScene } = this.props;
 
     if (!tagsPositions) {
       return;
@@ -135,25 +143,34 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
 
     const ctx = canvas.getContext('2d');
 
-    if (ctx && this.state.clearParams && this.state.restoreCoords) {
+    if (ctx && this.state.clearParams) {
       ctx.clearRect(...this.state.clearParams);
+    }
+    if (ctx && this.state.restoreCoords) {
       ctx.translate(...this.state.restoreCoords);
     }
 
-    const drawResult = drawOnCanvas(
-      tagsPositions,
-      canvas,
-      { width, height },
-      { fontFamily, shouldDrawReactAreas: isReactAreasShown },
-    );
+    const drawingResult = drawOnCanvas({
+      data: tagsPositions,
+      targetCanvas: canvas,
+      availableSize: { width, height },
+      scale,
+      renderScene,
+      options: { fontFamily, shouldDrawReactAreas: isReactAreasShown },
+    });
 
-    if (!drawResult) {
+    if (!drawingResult) {
+      this.setState({
+        sizeFactor: 1,
+        restoreCoords: null,
+        clearParams: null,
+      });
       return;
     }
 
-    const { clearParams, restoreCoords, scale } = drawResult;
+    const { clearParams, restoreCoords, sizeFactor } = drawingResult;
 
-    this.setState({ clearParams, restoreCoords, scale });
+    this.setState({ clearParams, restoreCoords, sizeFactor });
   };
 
   render() {
