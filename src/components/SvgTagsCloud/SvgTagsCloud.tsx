@@ -25,7 +25,6 @@ import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
-import { getAspectRatio } from 'utilities/common/getAspectRatio';
 import { useObjectRef } from 'utilities/hooks/useObjectRef';
 import { RootStateT } from 'store/types';
 import { Tags } from './Tags';
@@ -48,7 +47,7 @@ import {
 } from './utils';
 import { formTagTransformStyle } from './styleUtils';
 import { TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX, TAG_AVATAR_CANVAS_Z_INDEX } from './constants';
-import { ScaleT, RenderSceneT } from 'types/types';
+import { RenderSceneT } from 'types/types';
 import { DraggableTagT, VacanciesT } from './types';
 import { FrameOffsetT } from './utils';
 
@@ -67,8 +66,6 @@ type PropsT = {
 
 const MOVEMENT_THRESHOLD = 10; // px
 const CHANGE_ROTATION_THRESHOLD = 500; // ms
-
-const DEFAULT_RENDER_SCENE_KEY = 'normal';
 
 const useStyles = makeStyles({
   container: {
@@ -139,13 +136,6 @@ const stateSelector = (state: RootStateT) => {
     sceneMapResolution,
     tagByTagRenderInterval,
   };
-};
-
-const getRenderSceneKey = (scale: ScaleT | null) => {
-  if (!scale || scale.value === 1) {
-    return DEFAULT_RENDER_SCENE_KEY;
-  }
-  return JSON.stringify(scale);
 };
 
 const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
