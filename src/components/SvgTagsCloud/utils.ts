@@ -5,7 +5,7 @@ import { VacanciesManager } from 'utilities/positioningAlgorithm/vacanciesManage
 import { isVacancyLargeEnoughToFitRect } from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { Dimensions, SceneEdgesT } from 'utilities/positioningAlgorithm/sceneMap';
 import React from 'react';
-import { SizeT, ViewBoxT, RenderSceneT } from 'types/types';
+import { SizeT, ViewBoxT, SceneFrameT } from 'types/types';
 import { CoordinatesT, VacanciesT } from './types';
 
 export type FrameOffsetT = { top: number; left: number };
@@ -160,13 +160,13 @@ export const calcSVGSizeFactor = (svgSize: SizeT, viewBox: ViewBoxT) => {
 
 export const getSVGViewBox = ({
   fullSceneViewBox,
-  renderScene,
+  sceneFrame,
 }: {
-  renderScene: RenderSceneT;
+  sceneFrame: SceneFrameT;
   fullSceneViewBox: ViewBoxT;
 }): ViewBoxT => {
   const [minX, minY, width, height] = fullSceneViewBox;
-  const { left, top, width: sceneWidth, height: sceneHeight } = renderScene;
+  const { left, top, width: sceneWidth, height: sceneHeight } = sceneFrame;
 
   return [
     Math.round(minX + width * left),

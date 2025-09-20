@@ -1,27 +1,27 @@
 import { clamp } from 'utilities/helpers/clamp';
-import { ScaleT, RenderSceneT } from 'types/types';
+import { ScaleT, SceneFrameT } from 'types/types';
 
-// RenderScene parameter are normalized; number from 0 to 1
+// sceneFrame parameter are normalized; number from 0 to 1
 // where left, width is a fraction of the full width (no scale) of the scene
 // where top, height is a fraction of the full height (no scale) of the scene
 
-export const getDefaultRenderScene = (): RenderSceneT => ({ left: 0, top: 0, width: 1, height: 1 });
+export const getDefaultSceneFrame = (): SceneFrameT => ({ left: 0, top: 0, width: 1, height: 1 });
 
-export const getNextRenderScene = ({
+export const getNextSceneFrame = ({
   originSceneAspectRatio,
   nextSceneAspectRatio,
-  renderScene: rawRenderScene,
+  sceneFrame: rawSceneFrame,
   scale,
   nextScale,
 }: {
   originSceneAspectRatio: number;
   nextSceneAspectRatio: number;
-  renderScene: RenderSceneT | null;
+  sceneFrame: SceneFrameT | null;
   scale: ScaleT | null;
   nextScale: ScaleT | null;
-}): RenderSceneT => {
+}): SceneFrameT => {
   if (!nextScale || nextScale.value === 1) {
-    return getDefaultRenderScene();
+    return getDefaultSceneFrame();
   }
 
   const { value: scaleValue = 1 } = scale ?? {};
@@ -30,12 +30,12 @@ export const getNextRenderScene = ({
     point: { relativeX: nextPointX, relativeY: nextPointY },
   } = nextScale;
 
-  const renderScene = rawRenderScene ?? getDefaultRenderScene();
+  const sceneFrame = rawSceneFrame ?? getDefaultSceneFrame();
 
   if (scaleValue === nextScaleValue) {
     // 1. move mode
     const { point: { relativeX: pointX = 0.5, relativeY: pointY = 0.5 } = {} } = scale ?? {};
-    const { left, top, width, height } = renderScene;
+    const { left, top, width, height } = sceneFrame;
     const getNextPosition = ({
       currentPosition,
       diff,
@@ -46,7 +46,7 @@ export const getNextRenderScene = ({
       size: number;
     }) => clamp(currentPosition + size * diff, 0, 1 - size);
     return {
-      ...renderScene,
+      ...sceneFrame,
       left: getNextPosition({ currentPosition: left, size: width, diff: nextPointX - pointX }),
       top: getNextPosition({ currentPosition: top, size: height, diff: nextPointY - pointY }),
     };
@@ -54,9 +54,9 @@ export const getNextRenderScene = ({
 
   // 2. scale mode
 
-  // nextScale point is inside current renderScene
-  // so its position (in current renderScene coordinate system) must be transformed to no scale Scene coordinate system
-  const { left, top, width, height } = renderScene;
+  // nextScale point is inside current sceneFrame
+  // so its position (in current sceneFrame coordinate system) must be transformed to no scale Scene coordinate system
+  const { left, top, width, height } = sceneFrame;
   const noScaleNextPoint = {
     x: left + width * nextPointX,
     y: top + height * nextPointY,

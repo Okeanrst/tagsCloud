@@ -3,7 +3,7 @@ import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { getSuitableSize } from 'utilities/common/getSuitableSize';
 import { getAspectRatio } from 'utilities/common/getAspectRatio';
 import { getBorderCoordinates } from './getBorderCoordinates';
-import { PositionedTagRectT, SizeT, RenderSceneT } from 'types/types';
+import { PositionedTagRectT, SizeT, SceneFrameT } from 'types/types';
 
 type OptionsT = {
   fontFamily: FontFamilies;
@@ -19,14 +19,14 @@ export function drawOnCanvas({
   targetCanvas,
   availableSize,
   scale = 1,
-  renderScene,
+  sceneFrame,
   options,
 }: {
   data: ReadonlyArray<PositionedTagRectT>;
   targetCanvas: HTMLCanvasElement;
   availableSize: { width: number; height: number };
   scale?: number;
-  renderScene: RenderSceneT;
+  sceneFrame: SceneFrameT;
   options: OptionsT;
 }): {
   clearParams: ClearParamsT;
@@ -72,14 +72,9 @@ export function drawOnCanvas({
 
   const fullSizeCanvas = document.createElement('canvas');
 
-  const {
-    left: renderSceneLeft,
-    top: renderSceneTop,
-    width: renderSceneWidth,
-    height: renderSceneHeight,
-  } = renderScene;
-  const fullSizeCanvasWidth = targetCanvasWidth / renderSceneWidth;
-  const fullSizeCanvasHeight = targetCanvasHeight / renderSceneHeight;
+  const { left: sceneFrameLeft, top: sceneFrameTop, width: sceneFrameWidth, height: sceneFrameHeight } = sceneFrame;
+  const fullSizeCanvasWidth = targetCanvasWidth / sceneFrameWidth;
+  const fullSizeCanvasHeight = targetCanvasHeight / sceneFrameHeight;
 
   const drawingSceneResult = drawScene({
     data,
@@ -103,10 +98,10 @@ export function drawOnCanvas({
 
   targetCTX.drawImage(
     fullSizeCanvas,
-    fullSizeCanvasWidth * renderSceneLeft, // Source X
-    fullSizeCanvasHeight * renderSceneTop, // Source Y
-    fullSizeCanvasWidth * renderSceneWidth, // Source W
-    fullSizeCanvasHeight * renderSceneHeight, // Source H
+    fullSizeCanvasWidth * sceneFrameLeft, // Source X
+    fullSizeCanvasHeight * sceneFrameTop, // Source Y
+    fullSizeCanvasWidth * sceneFrameWidth, // Source W
+    fullSizeCanvasHeight * sceneFrameHeight, // Source H
     0, // Destination X
     0, // Destination Y
     targetCanvasWidth, // Destination W
@@ -120,8 +115,8 @@ export function drawOnCanvas({
     clearParams,
     restoreCoords: null,
     sizeFactor,
-    offsetLeft: fullSizeCanvasWidth * renderSceneLeft,
-    offsetTop: fullSizeCanvasHeight * renderSceneTop,
+    offsetLeft: fullSizeCanvasWidth * sceneFrameLeft,
+    offsetTop: fullSizeCanvasHeight * sceneFrameTop,
   };
 }
 

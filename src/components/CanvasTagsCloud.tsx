@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver';
 import { withStyles } from '@material-ui/core';
 import { drawOnCanvas } from 'utilities/tagsCloud/drawOnCanvas';
 import { getBorderCoordinates } from 'utilities/tagsCloud/getBorderCoordinates';
-import { RenderSceneT } from 'types/types';
+import { SceneFrameT } from 'types/types';
 import { RootStateT } from 'store/types';
 
 const mapStateToProps = (state: RootStateT) => {
@@ -30,7 +30,7 @@ type PropsT = PropsFromRedux & {
   isReactAreasShown: boolean;
   isTagsCloudInteractionDisabled: boolean;
   scale: number;
-  renderScene: RenderSceneT;
+  sceneFrame: SceneFrameT;
 };
 
 type StateT = {
@@ -62,14 +62,14 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   }
 
   componentDidUpdate(prevProps: PropsT) {
-    const { width, height, tagsPositions, settings, downloadCloudCounter, isReactAreasShown, renderScene } = this.props;
+    const { width, height, tagsPositions, settings, downloadCloudCounter, isReactAreasShown, sceneFrame } = this.props;
     if (
       prevProps.width !== width ||
       prevProps.height !== height ||
       prevProps.tagsPositions !== tagsPositions ||
       prevProps.settings !== settings ||
       prevProps.isReactAreasShown !== isReactAreasShown ||
-      prevProps.renderScene !== renderScene
+      prevProps.sceneFrame !== sceneFrame
     ) {
       this.draw();
     }
@@ -132,7 +132,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
   };
 
   draw = () => {
-    const { width, height, tagsPositions, settings, isReactAreasShown, scale, renderScene } = this.props;
+    const { width, height, tagsPositions, settings, isReactAreasShown, scale, sceneFrame } = this.props;
 
     if (!tagsPositions) {
       return;
@@ -160,7 +160,7 @@ class CanvasTagsCloud extends React.Component<PropsT, StateT> {
       targetCanvas: canvas,
       availableSize: { width, height },
       scale,
-      renderScene,
+      sceneFrame,
       options: { fontFamily, shouldDrawReactAreas: isReactAreasShown },
     });
 

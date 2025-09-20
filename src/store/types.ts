@@ -17,6 +17,7 @@ import {
   SortingClosedVacanciesStrategies,
   SortingEdgeVacanciesStrategies,
 } from 'constants/index';
+import { SceneScaleT } from 'types/types';
 
 export type NotificationT = {
   id: string;
@@ -92,6 +93,7 @@ export type RootStateT = {
     tagsIds: string[];
   };
   notifications: NotificationT[];
+  sceneScale: SceneScaleT | null;
 };
 
 export type AppDispatchT = ThunkDispatch<RootStateT, void, Action>;

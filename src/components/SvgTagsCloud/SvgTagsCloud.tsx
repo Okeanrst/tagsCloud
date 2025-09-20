@@ -47,7 +47,7 @@ import {
 } from './utils';
 import { formTagTransformStyle } from './styleUtils';
 import { TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX, TAG_AVATAR_CANVAS_Z_INDEX } from './constants';
-import { RenderSceneT } from 'types/types';
+import { SceneFrameT } from 'types/types';
 import { DraggableTagT, VacanciesT } from './types';
 import { FrameOffsetT } from './utils';
 
@@ -60,7 +60,7 @@ type PropsT = {
   isReactAreasShown: boolean;
   isCoordinateGridShown: boolean;
   scale: number;
-  renderScene: RenderSceneT;
+  sceneFrame: SceneFrameT;
   isTagsCloudInteractionDisabled: boolean;
 };
 
@@ -149,7 +149,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       isReactAreasShown,
       isVacanciesShown,
       scale,
-      renderScene,
+      sceneFrame,
       isTagsCloudInteractionDisabled,
     },
     ref,
@@ -486,7 +486,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
 
     const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale });
 
-    const viewBox = getSVGViewBox({ fullSceneViewBox, renderScene });
+    const viewBox = getSVGViewBox({ fullSceneViewBox, sceneFrame });
 
     const svgSizeFactor = calcSVGSizeFactor(svgSize, fullSceneViewBox) ?? 1;
     svgSizeFactorRef.current = svgSizeFactor;

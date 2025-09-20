@@ -7,6 +7,7 @@ import fontLoaded from './fontLoaded';
 import { rectAreasMapsDataReducer } from './rectAreasMapsData';
 import { settingsReducer } from './settings';
 import { notificationsReducer } from './notifications';
+import { sceneScaleReducer } from './sceneScale';
 
 import type { RootStateT } from '../types';
 
@@ -24,4 +25,5 @@ export default combineReducers({
   rectAreasMapsData: rectAreasMapsDataReducer,
   incrementalBuild: incrementalBuildReducer,
   notifications: notificationsReducer,
+  sceneScale: sceneScaleReducer,
 });
