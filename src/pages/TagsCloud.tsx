@@ -25,7 +25,7 @@ import { getAspectRatio } from 'utilities/common/getAspectRatio';
 import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import type { NavigateFunction } from 'react-router-dom';
 import type { RootStateT, AppDispatchT } from 'store/types';
-import { ClassesT, TagDataT, ScaleT, SceneScaleT } from 'types/types';
+import { ClassesT, TagDataT, ScaleT } from 'types/types';
 
 const { PENDING, PRISTINE, SUCCESS } = QueryStatuses;
 
@@ -63,9 +63,6 @@ const mapDispatchToProps = (dispatch: AppDispatchT) => ({
   },
   setSceneScale(arg: Parameters<typeof sceneScaleActions.setSceneScale>[0]) {
     dispatch(sceneScaleActions.setSceneScale(arg));
-  },
-  resetSceneScale() {
-    dispatch(sceneScaleActions.resetSceneScale());
   },
 });
 
@@ -207,6 +204,7 @@ type StateT = {
   isReactAreasShown: boolean;
   isVacanciesShown: boolean;
   isTagsCloudInteractionDisabled: boolean;
+  sceneScale: RootStateT['sceneScale'];
 };
 
 const getTagsDataByTagsIds = (tagsIds: string[], tagsData: ReadonlyArray<TagDataT>) => {
@@ -223,7 +221,13 @@ class TagsCloud extends Component<PropsT, StateT> {
     isReactAreasShown: false,
     isVacanciesShown: false,
     isTagsCloudInteractionDisabled: false,
+    sceneScale: null,
   };
+
+  constructor(props: PropsT) {
+    super(props);
+    this.state = { ...this.state, sceneScale: props.sceneScale };
+  }
 
   tagsCloudAvailableSpaceRef = React.createRef<HTMLDivElement>();
   tagsCloudWrapperRef = React.createRef<HTMLDivElement>();
@@ -269,15 +273,18 @@ class TagsCloud extends Component<PropsT, StateT> {
   }
 
   componentWillUnmount() {
+    const { setSceneScale } = this.props;
+    const { sceneScale } = this.state;
+    setSceneScale(sceneScale);
+
     window.removeEventListener('resize', this.handleResize);
 
     this.resizeTaskTimer && clearTimeout(this.resizeTaskTimer);
   }
 
   componentDidUpdate(prevProps: PropsT, prevState: StateT) {
-    const { fontLoaded, tagsData, tagsCloud, buildTagsCloud, observerLoadFont, sceneScale, resetSceneScale } =
-      this.props;
-    const { isTagsCloudInteractionDisabled } = this.state;
+    const { fontLoaded, tagsData, tagsCloud, buildTagsCloud, observerLoadFont } = this.props;
+    const { isTagsCloudInteractionDisabled, sceneScale } = this.state;
 
     if (prevProps.fontLoaded.status !== PRISTINE && fontLoaded.status === PRISTINE) {
       observerLoadFont();
@@ -288,7 +295,7 @@ class TagsCloud extends Component<PropsT, StateT> {
     }
 
     if (sceneScale && prevProps.tagsCloud.status !== SUCCESS && tagsCloud.status === SUCCESS) {
-      resetSceneScale();
+      this.setState({ sceneScale: null });
     }
 
     if (isTagsCloudInteractionDisabled && (!sceneScale || sceneScale.value === 1)) {
@@ -310,7 +317,7 @@ class TagsCloud extends Component<PropsT, StateT> {
       if (this.tagsCloudAvailableSpaceRef && this.tagsCloudAvailableSpaceRef.current) {
         const tagsCloudAvailableSpace = this.calcSceneAvailableSpace(this.tagsCloudAvailableSpaceRef.current);
         this.setState({ tagsCloudAvailableSpace });
-        this.props.resetSceneScale();
+        this.setState({ sceneScale: null });
       }
     };
 
@@ -367,16 +374,16 @@ class TagsCloud extends Component<PropsT, StateT> {
       return null;
     }
 
-    setSceneScale((currentSceneScale: SceneScaleT | null): SceneScaleT | null => {
+    this.setState(({ sceneScale: currentSceneScale }): Pick<StateT, 'sceneScale'> => {
       const scale = currentSceneScale ? pick(currentSceneScale, ['value', 'point']) : null;
       const nextScale = fn(scale);
 
       if (!nextScale) {
-        return null;
+        return { sceneScale: null };
       }
 
       if (scale === nextScale) {
-        return currentSceneScale;
+        return { sceneScale: currentSceneScale };
       }
 
       const suitableSize = getSuitableSize({
@@ -394,7 +401,7 @@ class TagsCloud extends Component<PropsT, StateT> {
         scale,
         nextScale: nextScale,
       });
-      return { ...nextScale, sceneFrame: nextSceneFrame };
+      return { sceneScale: { ...nextScale, sceneFrame: nextSceneFrame } };
     });
   };
 
@@ -494,8 +501,9 @@ class TagsCloud extends Component<PropsT, StateT> {
       isReactAreasShown,
       isCoordinateGridShown,
       isTagsCloudInteractionDisabled,
+      sceneScale,
     } = this.state;
-    const { shouldUseCanvas, sceneScale } = this.props;
+    const { shouldUseCanvas } = this.props;
     const { value: scale = 1, sceneFrame = getDefaultSceneFrame() } = sceneScale ?? {};
 
     if (!tagsCloudAvailableSpace) {
@@ -554,8 +562,8 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   render() {
-    const { tagsCloudAvailableSpace, isTagsCloudInteractionDisabled } = this.state;
-    const { tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily, classes, sceneScale } = this.props;
+    const { tagsCloudAvailableSpace, sceneScale, isTagsCloudInteractionDisabled } = this.state;
+    const { tagsData, tagsCloud, fontLoaded, incrementalBuild, fontFamily, classes } = this.props;
 
     const loading = [tagsData.status, tagsCloud.status, fontLoaded.status, incrementalBuild.status].includes(PENDING);
 
