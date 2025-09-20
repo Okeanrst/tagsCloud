@@ -1,7 +1,7 @@
 import { saveAs } from 'file-saver';
 import { batch } from 'react-redux';
 import { NOTIFICATIONS_TYPES } from 'constants/index';
-import { TAGS_DATA_FETCH_FAILURE, TAGS_DATA_FETCH_REQUEST, TAGS_DATA_FETCH_SUCCESS } from './actionTypes';
+import { TAGS_DATA_FETCH_FAILURE, TAGS_DATA_FETCH_REQUEST, TAGS_DATA_FETCH_SUCCESS } from '../actionTypes';
 import { createAction } from './helpers';
 import { validateTagCloudRawData } from './rawDataValidator';
 import { addNotification } from './notifications';

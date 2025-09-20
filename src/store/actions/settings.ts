@@ -3,7 +3,7 @@ import { AppDispatchT, GetStateT, RootStateT } from '../types';
 import { omit } from 'utilities/helpers/omit';
 import { pick } from 'utilities/helpers/pick';
 import { createAction } from './helpers';
-import * as actionTypes from './actionTypes';
+import * as actionTypes from '../actionTypes';
 import { resetTagsCloud } from './tagsCloud';
 
 type SettingsT = Partial<RootStateT['settings']>;

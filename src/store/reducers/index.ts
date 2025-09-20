@@ -1,5 +1,5 @@
 import { combineReducers, AnyAction } from 'redux';
-import { USE_CANVAS_TOGGLE } from '../actions/actionTypes';
+import { USE_CANVAS_TOGGLE } from '../actionTypes';
 import { tagsDataReducer } from './tagsData';
 import { tagsCloudReducer } from './tagsCloud';
 import { incrementalBuildReducer } from './incrementalBuild';

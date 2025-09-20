@@ -11,7 +11,7 @@ import {
 } from 'constants/index';
 import { RootStateT } from '../types';
 import { AnyAction } from 'redux';
-import { SETTINGS_UPDATE } from '../actions/actionTypes';
+import { SETTINGS_UPDATE } from '../actionTypes';
 
 const initState: RootStateT['settings'] = {
   dataSet: DATA_SETS.DEFAULT,

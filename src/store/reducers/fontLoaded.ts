@@ -1,5 +1,5 @@
 import type { AnyAction } from 'redux';
-import { FONT_LOAD_REQUEST, FONT_LOAD_SUCCESS, FONT_LOAD_FAILURE, FONT_LOAD_RESET } from '../actions/actionTypes';
+import { FONT_LOAD_REQUEST, FONT_LOAD_SUCCESS, FONT_LOAD_FAILURE, FONT_LOAD_RESET } from '../actionTypes';
 import { QueryStatuses } from 'constants/queryStatuses';
 
 import type { RootStateT } from '../types';

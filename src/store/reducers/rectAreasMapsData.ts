@@ -1,6 +1,6 @@
 import { RootStateT } from '../types';
 import { AnyAction } from 'redux';
-import { RECT_AREAS_MAPS_ADD_MAPS, RECT_AREAS_MAPS_REMOVE_MAPS, RECT_AREAS_MAPS_RESET } from '../actions/actionTypes';
+import { RECT_AREAS_MAPS_ADD_MAPS, RECT_AREAS_MAPS_REMOVE_MAPS, RECT_AREAS_MAPS_RESET } from '../actionTypes';
 
 export const rectAreasMapsDataReducer = (state: RootStateT['rectAreasMapsData'] = [], action: AnyAction) => {
   switch (action.type) {

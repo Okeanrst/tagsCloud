@@ -1,4 +1,4 @@
-import { NOTIFICATIONS_PUSH, NOTIFICATIONS_DELETE } from './actionTypes';
+import { NOTIFICATIONS_PUSH, NOTIFICATIONS_DELETE } from '../actionTypes';
 import { NotificationT } from '../types';
 import { createAction } from './helpers';
 

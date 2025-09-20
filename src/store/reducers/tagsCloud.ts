@@ -11,7 +11,7 @@ import {
   TAGS_CLOUD_UPDATE_TAG,
   TAGS_CLOUD_UPDATE_TAG_COLOR,
   TAGS_CLOUD_BUILD_PROGRESS_UPDATE,
-} from '../actions/actionTypes';
+} from '../actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
 

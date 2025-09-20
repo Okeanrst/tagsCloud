@@ -1,6 +1,6 @@
 import { batch } from 'react-redux';
 import throttle from 'lodash.throttle';
-import * as actionTypes from './actionTypes';
+import * as actionTypes from '../actionTypes';
 import * as api from 'api';
 import { QueryStatuses } from 'constants/queryStatuses';
 import {

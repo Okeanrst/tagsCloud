@@ -8,7 +8,7 @@ import {
   INCREMENTAL_BUILD_ADD_TAG_ID,
   INCREMENTAL_BUILD_REMOVE_TAG_ID,
   RESET_TAGS_CLOUD,
-} from '../actions/actionTypes';
+} from '../actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
 

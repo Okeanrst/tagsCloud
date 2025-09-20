@@ -1,5 +1,5 @@
 import { createAction } from './helpers';
-import { SET_SCENE_SCALE, RESET_SCENE_SCALE } from './actionTypes';
+import { SET_SCENE_SCALE, RESET_SCENE_SCALE } from '../actionTypes';
 import { AppDispatchT, GetStateT, RootStateT } from '../types';
 
 export const setSceneScale =

@@ -1,4 +1,4 @@
-import { RESET_TAGS_DATA, SET_SCENE_SCALE, RESET_SCENE_SCALE } from '../actions/actionTypes';
+import { RESET_TAGS_DATA, SET_SCENE_SCALE, RESET_SCENE_SCALE } from '../actionTypes';
 import { RootStateT } from '../types';
 import { AnyAction } from 'redux';
 

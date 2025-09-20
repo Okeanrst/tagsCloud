@@ -10,7 +10,7 @@ import {
   TAGS_DATA_FETCH_REQUEST,
   TAGS_DATA_FETCH_SUCCESS,
   RESET_TAGS_DATA,
-} from '../actions/actionTypes';
+} from '../actionTypes';
 
 const { PENDING, PRISTINE, SUCCESS, FAILURE } = QueryStatuses;
 

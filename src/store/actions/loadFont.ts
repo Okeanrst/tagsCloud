@@ -1,7 +1,7 @@
 import { batch } from 'react-redux';
 import { NOTIFICATIONS_TYPES } from 'constants/index';
 import { addNotification } from './notifications';
-import * as actionTypes from './actionTypes';
+import * as actionTypes from '../actionTypes';
 import { createAction } from './helpers';
 import FontFaceObserver from 'fontfaceobserver';
 import { AppDispatchT, GetStateT } from '../types';
