@@ -3,8 +3,8 @@ export function register() {
     window.addEventListener('load', () => {
       navigator.serviceWorker
         .register('/service-worker.js')
-        .then((reg) => console.log('Service worker registered:', reg))
-        .catch((ex) => console.error('Service worker registration failed:', ex));
+        .then(() => {})
+        .catch(() => {});
     });
   }
 }
@@ -15,8 +15,6 @@ export function unregister() {
       .then((registration) => {
         return registration.unregister();
       })
-      .catch((error) => {
-        console.error(error.message);
-      });
+      .catch(() => {});
   }
 }

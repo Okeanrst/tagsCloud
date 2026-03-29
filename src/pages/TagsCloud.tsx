@@ -359,7 +359,6 @@ class TagsCloud extends Component<PropsT, StateT> {
   };
 
   setScale = (fn: (scale: ScaleT | null) => ScaleT | null) => {
-    const { setSceneScale } = this.props;
     const { tagsCloudAvailableSpace } = this.state;
     const {
       tagsCloud: { tagsPositions },
