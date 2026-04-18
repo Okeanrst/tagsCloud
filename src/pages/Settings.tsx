@@ -40,27 +40,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const dataSetOptions: { value: DATA_SETS; label: string }[] = [];
-for (let dataSet of Object.values(DATA_SETS)) {
+for (const dataSet of Object.values(DATA_SETS)) {
   dataSetOptions.push({ value: dataSet, label: dataSet });
 }
 
 const fontFamilyOptions: { value: FontFamilies; label: string }[] = [];
-for (let fontFamily of Object.values(FontFamilies)) {
+for (const fontFamily of Object.values(FontFamilies)) {
   fontFamilyOptions.push({ value: fontFamily, label: fontFamily });
 }
 
 const pickingStrategiesOptions: { value: PickingStrategies; label: string }[] = [];
-for (let pickingStrategy of Object.values(PickingStrategies)) {
+for (const pickingStrategy of Object.values(PickingStrategies)) {
   pickingStrategiesOptions.push({ value: pickingStrategy, label: pickingStrategy });
 }
 
 const sortingClosedVacanciesOptions: { value: SortingClosedVacanciesStrategies; label: string }[] = [];
-for (let sortingStrategy of Object.values(SortingClosedVacanciesStrategies)) {
+for (const sortingStrategy of Object.values(SortingClosedVacanciesStrategies)) {
   sortingClosedVacanciesOptions.push({ value: sortingStrategy, label: sortingStrategy });
 }
 
 const sortingEdgeVacanciesOptions: { value: SortingEdgeVacanciesStrategies; label: string }[] = [];
-for (let sortingStrategy of Object.values(SortingEdgeVacanciesStrategies)) {
+for (const sortingStrategy of Object.values(SortingEdgeVacanciesStrategies)) {
   sortingEdgeVacanciesOptions.push({ value: sortingStrategy, label: sortingStrategy });
 }
 

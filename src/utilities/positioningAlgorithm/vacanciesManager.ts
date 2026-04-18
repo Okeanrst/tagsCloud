@@ -210,10 +210,10 @@ export class VacanciesManager {
       });
 
       deduplicatedVacancyRectAreas.forEach((vacancyRectArea) => {
-        let top = row;
-        let right = vacancyRectArea.endColumn;
-        let bottom = countPositionsBackwards(row, vacancyRectArea.rows);
-        let left = vacancyRectArea.beginColumn;
+        const top = row;
+        const right = vacancyRectArea.endColumn;
+        const bottom = countPositionsBackwards(row, vacancyRectArea.rows);
+        const left = vacancyRectArea.beginColumn;
         const vacancy: RawPreparedVacancyT = { top, right, bottom, left };
 
         let closed = true;
@@ -455,7 +455,7 @@ const calcEdgeVacancyBaseSize = (vacancy: VacancyT, isHorizontal: boolean = true
 
 function prepareClosedVacancy(vacancy: VacancyT, sceneCenter: CoordinatePointT): ClosedVacancyT {
   const v = vacancy;
-  const debug = process.env.NODE_ENV !== 'production';
+  const debug = !import.meta.env.PROD;
   if (debug && (isNaN(v.top) || isNaN(v.right) || isNaN(v.bottom) || isNaN(v.left))) {
     throw new Error('prepareClosedVacancy error: isNaN(top) || isNaN(right) || isNaN(bottom) || isNaN(left)');
   }

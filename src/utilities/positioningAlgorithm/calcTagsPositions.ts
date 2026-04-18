@@ -68,7 +68,7 @@ const mapRectAreaMapOnRectPosition = (
   const rectArea = getRectAreaOfRectAreaMap(rectAreaMap);
 
   const logDebugInformation = (mainInformation: string[] = []) => {
-    if (['production', 'test'].includes(process.env.NODE_ENV)) {
+    if (['production', 'test'].includes(import.meta.env.MODE)) {
       return;
     }
 
@@ -193,7 +193,7 @@ export function creatMapPositionedTagRect(
   { top, right, bottom, left }: RectMapPositionT,
   isRotated: boolean,
 ): MapPositionedTagRectT {
-  if (!['production', 'test'].includes(process.env.NODE_ENV) && (top < bottom || left > right)) {
+  if (!['production', 'test'].includes(import.meta.env.MODE) && (top < bottom || left > right)) {
     throw new Error('creatMapPositionedTagRect error: top < bottom || left > right');
   }
   return { ...rect, top, right, bottom, left, rotate: isRotated };
@@ -945,7 +945,7 @@ export function calcTagsPositions({
           }
         }
 
-        if (!['production', 'test'].includes(process.env.NODE_ENV)) {
+        if (!['production', 'test'].includes(import.meta.env.MODE)) {
           throw new Error('it is impossible to find rect position');
         }
         return { status: false };

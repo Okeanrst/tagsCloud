@@ -21,7 +21,7 @@ export function withModalWindowBackdrop<P>({
         </ModalWindowBackdrop>
       );
     };
-    if (process.env.NODE_ENV !== 'production') {
+    if (!import.meta.env.PROD) {
       EnhancedComponent.displayName = `withModalWindowLayout(${getDisplayName(WrappedComponent)})`;
     }
     return EnhancedComponent;

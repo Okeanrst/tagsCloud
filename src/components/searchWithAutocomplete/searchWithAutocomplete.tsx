@@ -22,26 +22,15 @@ type IntegrationDownshiftPropsT = {
   disabled?: boolean;
 };
 
-type ItemPropsT = {
-  InputProps: {};
-  classes: ClassesT;
-  fullWidth: boolean;
-  disabled?: boolean;
-};
-
 type RenderSuggestionPropsT = {
   suggestion: SuggestionT;
   index: number;
-  itemProps: ItemPropsT;
+  itemProps: React.HTMLAttributes<HTMLElement>;
   highlightedIndex: number | null;
-  selectedItem?: string;
+  selectedItem: string | null;
 };
 
 type HandleKeyDownT = (event: React.KeyboardEvent) => void;
-
-type OptionsT = Pick<IntegrationDownshiftPropsT, 'placeholder' | 'onChange'> & {
-  onKeyDown: HandleKeyDownT;
-};
 
 const SUGGESTIONS_MAX_NUMBER = 5;
 
@@ -93,7 +82,7 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
   const { classes, suggestions, placeholder, onChange, onSubmit, disabled } = props;
 
   const onSelect = useCallback(
-    (selectedItem) => {
+    (selectedItem: string | null) => {
       if (selectedItem && onSubmit) {
         onSubmit(selectedItem);
       }
@@ -103,15 +92,15 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
 
   return (
     <div className={classes.root}>
-      <Downshift onChange={onSelect}>
+      <Downshift<string> onChange={onSelect}>
         {({ getInputProps, getItemProps, getMenuProps, highlightedIndex, inputValue, isOpen, selectedItem }) => {
           const {
             ref: inputRef,
             disabled: inputDisabled,
+            onChange: downshiftOnChange,
             ...inputProps
-          } = getInputProps<OptionsT>({
+          } = getInputProps({
             placeholder,
-            onChange,
             onKeyDown: handleKeyDown,
           });
 
@@ -121,8 +110,11 @@ export function SearchWithAutocomplete(props: IntegrationDownshiftPropsT) {
                 {...inputProps}
                 disabled={disabled || inputDisabled}
                 inputMode="text"
-                // @ts-ignore
                 ref={inputRef}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  downshiftOnChange?.(event);
+                  onChange?.(event.currentTarget.value);
+                }}
               />
               <div {...getMenuProps()}>
                 {isOpen ? (

@@ -9,10 +9,14 @@ const useStyles = makeStyles({
   },
 });
 
+type OuterProps<T extends { restScreenHeight: number }> = React.PropsWithChildren<Omit<T, 'restScreenHeight'>> & {
+  restScreenHeight?: never;
+};
+
 export function withRestScreenHeight<T extends { restScreenHeight: number }>(
   WrappedComponent: React.ComponentType<T>,
-): React.ComponentType<Omit<T, 'restScreenHeight'> & { restScreenHeight?: never }> {
-  return function (props) {
+): React.ComponentType<OuterProps<T>> {
+  return function EnhancedComponent(props: OuterProps<T>) {
     const [height, setHeight] = useState<number>(0);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
     const classes = useStyles();

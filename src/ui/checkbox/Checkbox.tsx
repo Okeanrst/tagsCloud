@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, useRef } from 'react';
+import React, { ChangeEventHandler, useId } from 'react';
 import { makeStyles } from '@material-ui/core';
 import cx from 'classnames';
 
@@ -70,11 +70,11 @@ export type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInput
   name?: string;
   label?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
-  classes?: Partial<ReturnType<typeof useStyles>>;
 };
 
-export const Checkbox = ({ label = '', classes, ...restProps }: PropsT) => {
-  const { current: inputId } = useRef(`${Math.random()}`);
+export const Checkbox = ({ label = '', id: idProp, ...restProps }: PropsT) => {
+  const generatedId = useId();
+  const inputId = idProp ?? generatedId;
   const ownClasses = useStyles();
   const { checked } = restProps;
   return (

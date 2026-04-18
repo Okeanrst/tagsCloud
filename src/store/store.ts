@@ -6,6 +6,6 @@ export const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) => {
     const defaultMiddleware = getDefaultMiddleware();
-    return process.env.NODE_ENV === 'production' ? defaultMiddleware : defaultMiddleware.concat(logger);
+    return import.meta.env.PROD ? defaultMiddleware : defaultMiddleware.concat(logger);
   },
 });

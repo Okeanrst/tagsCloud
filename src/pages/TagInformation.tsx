@@ -99,7 +99,7 @@ const useStyles = makeStyles({
 });
 
 const renderCell = (it: ListItemsColumnItemT) => {
-  return typeof it === 'function' ? it() : it ?? null;
+  return typeof it === 'function' ? it() : (it ?? null);
 };
 
 const renderDays = (days: TagDataT['days'], classes: ClassesT) => {
@@ -174,8 +174,8 @@ const getInformationListRenderers = (
           !days?.length
             ? 0
             : shouldShowDays
-            ? renderDaysPicker('-', toggleShowingDays, classes)
-            : renderDaysPicker('+', toggleShowingDays, classes),
+              ? renderDaysPicker('-', toggleShowingDays, classes)
+              : renderDaysPicker('+', toggleShowingDays, classes),
         ],
         () => (shouldShowDays ? renderDays(days, classes) : null),
       ],

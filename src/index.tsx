@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import packageJson from '../package.json';
 import { App } from './App';
@@ -20,11 +20,15 @@ Sentry.init({
   release: packageJson.version,
 });
 
-ReactDOM.render(
+const rootEl = document.getElementById('root');
+if (!rootEl) {
+  throw new Error('Root element "#root" not found');
+}
+
+createRoot(rootEl).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-  document.getElementById('root'),
 );
 
 // If you want to start measuring performance in your app, pass a function

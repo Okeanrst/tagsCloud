@@ -138,6 +138,7 @@ export function getRectAreaMap(
     meta: { topCutOffRows, bottomCutOffRows },
   } = trimMapEmptyEdges(fullSizeRectAreaMap);
 
+  // eslint-disable-next-line no-constant-condition
   if (false) {
     // eslint-disable-next-line no-console
     console.log('getRectAreaMap');
@@ -439,6 +440,7 @@ function getHighResolutionGlyphsMap(
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // eslint-disable-next-line no-constant-condition
   if (false) {
     // eslint-disable-next-line no-console
     console.log(word);

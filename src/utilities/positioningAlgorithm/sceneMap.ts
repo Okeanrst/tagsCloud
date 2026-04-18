@@ -117,7 +117,7 @@ export class SceneMap {
     if (this.sceneMap[BOTTOM_LEFT_QUARTER].length - 1 > bottomSize) {
       bottomSize = this.sceneMap[BOTTOM_LEFT_QUARTER].length - 1;
     }
-    this.bottomEdge = !!bottomSize ? -bottomSize : 0;
+    this.bottomEdge = bottomSize ? -bottomSize : 0;
 
     // X
     this.sceneMap[TOP_RIGHT_QUARTER].forEach((row: RowT) => {
@@ -142,7 +142,7 @@ export class SceneMap {
         leftSize = row.length - 1;
       }
     });
-    this.leftEdge = !!leftSize ? -leftSize : 0;
+    this.leftEdge = leftSize ? -leftSize : 0;
 
     this.isSceneSizeFresh = true;
   }
