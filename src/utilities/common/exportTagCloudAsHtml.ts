@@ -2,6 +2,11 @@ import { PositionedTagSvgDataT } from 'types/types';
 import { FontFamilies } from 'constants/index';
 import { SizeT, ViewBoxT } from 'types/types';
 
+const escapeXmlText = (value: unknown) =>
+  String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
+const escapeXmlAttribute = (value: unknown) => escapeXmlText(value).replaceAll('"', '&quot;').replaceAll("'", '&apos;');
+
 const getTagCloudSvg = ({
   tagsSvgData,
   svgSize,
@@ -24,16 +29,16 @@ const getTagCloudSvg = ({
       })
         .map(([key, value]) => `${key}: ${value}`)
         .join('; ');
-      return `<text style="${textStyle}" text-anchor="middle">${label}</text>`;
+      return `<text style="${escapeXmlAttribute(textStyle)}" text-anchor="middle">${escapeXmlText(label)}</text>`;
     })
     .join('');
 
   return (
     '<?xml version="1.0" ?>' +
-    `<svg width="${svgSize.width}" height="${svgSize.height}" viewBox="${viewBox.join(
-      ' ',
-    )}" xmlns="http://www.w3.org/2000/svg">` +
-    `<g transform="${transform}">` +
+    `<svg width="${escapeXmlAttribute(svgSize.width)}" height="${escapeXmlAttribute(
+      svgSize.height,
+    )}" viewBox="${escapeXmlAttribute(viewBox.join(' '))}" xmlns="http://www.w3.org/2000/svg">` +
+    `<g transform="${escapeXmlAttribute(transform)}">` +
     textTags +
     '</g></svg>'
   );
