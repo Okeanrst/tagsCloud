@@ -25,7 +25,7 @@ export type VacanciesManagerOptionsT = OptionsT;
 
 type LineT = { begin: number; end: number };
 
-type VacancyRectAreaT = { beginColumn: number; endColumn: number; rows: any };
+type VacancyRectAreaT = { beginColumn: number; endColumn: number; rows: number };
 
 type RawPreparedVacancyT = VacancyT & {
   baseSize?: number;
@@ -251,7 +251,7 @@ export class VacanciesManager {
     for (let col = sceneLeftCol; col <= sceneRightCol; col = next(col)) {
       accumulated[col] = 0;
     }
-    let prevRow: number;
+    let prevRow: number | undefined;
     for (let row = sceneBottomRow; row <= sceneTopRow; row = next(row)) {
       const currentRow: { [key: number]: boolean | void } = {};
       const columnsToClose: number[] = [];
@@ -262,8 +262,7 @@ export class VacanciesManager {
         }
       }
 
-      // @ts-ignore
-      if (typeof prevRow !== 'undefined' && columnsToClose.length) {
+      if (prevRow !== undefined && columnsToClose.length) {
         // works with data since previous row is processed
         extractVacancies(columnsToClose, prevRow);
       }
