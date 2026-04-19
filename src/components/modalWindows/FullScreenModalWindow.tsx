@@ -33,5 +33,6 @@ const FullScreenModalWindow = React.forwardRef<HTMLDivElement, PropsT>(({ style,
     </div>
   );
 });
+FullScreenModalWindow.displayName = 'FullScreenModalWindow';
 
 export default withModalWindowBackdrop<PropsT>()(FullScreenModalWindow);

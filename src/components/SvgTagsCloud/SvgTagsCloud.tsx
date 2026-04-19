@@ -103,6 +103,7 @@ const DraggableTagAvatar = React.forwardRef<SVGTextElement, DraggableTagAvatarPr
     </text>
   );
 });
+DraggableTagAvatar.displayName = 'DraggableTagAvatar';
 
 const useCounterChanged = ({
   counter,
@@ -653,5 +654,6 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
     );
   },
 );
+SvgTagsCloud.displayName = 'SvgTagsCloud';
 
 export default SvgTagsCloud;

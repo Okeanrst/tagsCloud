@@ -150,3 +150,4 @@ export const NumberInput = forwardRef<HTMLInputElement, PropsT>(({ className, ..
     </div>
   );
 });
+NumberInput.displayName = 'NumberInput';

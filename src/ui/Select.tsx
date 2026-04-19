@@ -51,3 +51,4 @@ export const Select = forwardRef<HTMLSelectElement, PropsT>(({ classes, options,
     </select>
   );
 });
+Select.displayName = 'Select';

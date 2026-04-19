@@ -310,6 +310,9 @@ class TagsListEditor extends Component<PropsT, StateT> {
         </li>
       );
     };
+    ListRow.displayName = 'TagsListRow';
+    return ListRow;
+  };
 
   renderList = (data: ReadonlyArray<TagDataT>, height: number) => {
     const { classes } = this.props;

@@ -47,3 +47,4 @@ export const Input = forwardRef<HTMLInputElement, PropsT>(({ className, ...restP
   const ownClasses = useStyles();
   return <input className={cx(ownClasses.root, className)} ref={ref} {...restProps} />;
 });
+Input.displayName = 'Input';
