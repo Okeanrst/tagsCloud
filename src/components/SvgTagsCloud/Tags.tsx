@@ -1,13 +1,12 @@
 import React, { useMemo } from 'react';
 import { Transition, TransitionGroup } from 'react-transition-group';
-import { makeStyles, Theme } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import { FontFamilies } from 'constants/index';
 import { PositionedTagSvgDataT, SizeT, ViewBoxT } from 'types/types';
 import { formTagTransformStyle } from './styleUtils';
 import { TAGS_CLOUD_CANVAS_Z_INDEX } from './constants';
 import { DraggableTagT } from './types';
 
-type StylesOptionsT = { fontFamily: FontFamilies };
 type PropsT = {
   fontFamily: FontFamilies;
   viewBox: ViewBoxT;
@@ -29,11 +28,10 @@ const getTagCursorStyle = (isTagDraggingDisabled: boolean) => ({
   cursor: isTagDraggingDisabled ? 'default' : 'grab',
 });
 
-const useStyles = makeStyles<Theme, StylesOptionsT>({
+const useStyles = makeStyles({
   root: {
     position: 'relative',
     zIndex: TAGS_CLOUD_CANVAS_Z_INDEX,
-    fontFamily: ({ fontFamily }) => fontFamily,
   },
   text: {
     'white-space': 'pre',
@@ -52,7 +50,7 @@ export const Tags = ({
   draggableTag,
   isTagDraggingDisabled,
 }: PropsT) => {
-  const classes = useStyles({ fontFamily });
+  const classes = useStyles();
 
   const displayedTags =
     tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow);
@@ -69,7 +67,7 @@ export const Tags = ({
   }, [tagEndIndexToShow, positionedTagSvgData]);
 
   return (
-    <svg {...svgSize} className={classes.root} viewBox={viewBox.join(' ')}>
+    <svg {...svgSize} className={classes.root} style={{ fontFamily }} viewBox={viewBox.join(' ')}>
       <g transform={transform}>
         <TransitionGroup appear enter className="tagsCloud" component={null} exite={false}>
           {displayedTags.map((i, index: number) => {
