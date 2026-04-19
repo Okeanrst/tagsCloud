@@ -124,7 +124,7 @@ export const NumberInput = forwardRef<HTMLInputElement, PropsT>((props, forwarde
     if (typeof forwardedRef === 'function') {
       forwardedRef(el);
     } else if (forwardedRef) {
-      (forwardedRef as React.MutableRefObject<HTMLInputElement | null>).current = el;
+      (forwardedRef as React.RefObject<HTMLInputElement | null>).current = el;
     }
   };
 
