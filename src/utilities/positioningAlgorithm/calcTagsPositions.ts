@@ -594,7 +594,7 @@ export const pickEdgeVacancy = <
 function createWorkGenerator(
   rectsData: ReadonlyArray<TagRectT>,
   performWork: PerformWorkT,
-): () => Generator<ReturnType<PerformWorkT>, any, ReturnType<PerformWorkT>> {
+): () => Generator<ReturnType<PerformWorkT>, unknown, ReturnType<PerformWorkT>> {
   return function* workGenerator() {
     let isPreviousRotated = true;
     for (let i = 0; i < rectsData.length; i++) {
