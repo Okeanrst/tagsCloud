@@ -1,6 +1,7 @@
 import React, { forwardRef, useRef, SyntheticEvent } from 'react';
 import { makeStyles } from '@material-ui/core';
 import cx from 'classnames';
+import { omit } from 'utilities/helpers/omit';
 import { Input } from './Input';
 
 type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
@@ -82,7 +83,7 @@ const ChevronIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
-const valueToInteger = (value?: any) => {
+const valueToInteger = (value?: unknown) => {
   if (typeof value === 'number') {
     return Number.isInteger(value) ? value : 0;
   }
@@ -98,11 +99,11 @@ const getIsChangeDisabled = (value: number, { min, max }: Pick<PropsT, 'min' | '
   isIncreaseDisabled: (['number', 'string'].includes(typeof max) && value >= valueToInteger(max)) || false,
 });
 
-export const NumberInput = forwardRef<HTMLInputElement, PropsT>(({ className, ...restProps }, ref) => {
-  const { value, min, max, onChange } = restProps;
+export const NumberInput = forwardRef<HTMLInputElement, PropsT>((props, forwardedRef) => {
+  const { value, min, max, onChange, className } = props;
 
   const ownClasses = useStyles();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const { isDecreaseDisabled, isIncreaseDisabled } = getIsChangeDisabled(valueToInteger(value), { min, max });
 
@@ -118,9 +119,24 @@ export const NumberInput = forwardRef<HTMLInputElement, PropsT>(({ className, ..
     onChange(event as unknown as React.ChangeEvent<HTMLInputElement>);
   };
 
+  const setRefs = (el: HTMLInputElement | null) => {
+    inputRef.current = el;
+    if (typeof forwardedRef === 'function') {
+      forwardedRef(el);
+    } else if (forwardedRef) {
+      (forwardedRef as React.MutableRefObject<HTMLInputElement | null>).current = el;
+    }
+  };
+
   return (
-    <div className={ownClasses.root}>
-      <Input {...restProps} inputMode="numeric" ref={inputRef} style={{ paddingInlineEnd: '24px' }} type="text" />
+    <div className={cx(ownClasses.root, className)}>
+      <Input
+        {...omit(props, 'className')}
+        inputMode="numeric"
+        ref={setRefs}
+        style={{ paddingInlineEnd: '24px' }}
+        type="text"
+      />
       <div className={ownClasses.controlsWrapper}>
         <div className={ownClasses.controls}>
           <button
