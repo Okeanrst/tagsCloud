@@ -1,8 +1,8 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`positioningAlgorithm tests calcTagsPositions tests return result is equal to snapshot 1`] = `
-Array [
-  Object {
+exports[`positioningAlgorithm tests > calcTagsPositions tests > return result is equal to snapshot 1`] = `
+[
+  {
     "bottom": -7,
     "color": "rgb(155, 155, 155)",
     "fontSize": 36,
@@ -21,7 +21,7 @@ Array [
     "square": 672,
     "top": 7,
   },
-  Object {
+  {
     "bottom": -25,
     "color": "rgb(155, 155, 155)",
     "fontSize": 11,
@@ -40,7 +40,7 @@ Array [
     "square": 255,
     "top": 26,
   },
-  Object {
+  {
     "bottom": 8,
     "color": "rgb(155, 155, 155)",
     "fontSize": 9,
@@ -59,7 +59,7 @@ Array [
     "square": 196,
     "top": 11,
   },
-  Object {
+  {
     "bottom": -58,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -78,7 +78,7 @@ Array [
     "square": 160,
     "top": -19,
   },
-  Object {
+  {
     "bottom": 12,
     "color": "rgb(155, 155, 155)",
     "fontSize": 9,
@@ -97,7 +97,7 @@ Array [
     "square": 148,
     "top": 15,
   },
-  Object {
+  {
     "bottom": -55,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -116,7 +116,7 @@ Array [
     "square": 144,
     "top": -8,
   },
-  Object {
+  {
     "bottom": 16,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -135,7 +135,7 @@ Array [
     "square": 136,
     "top": 19,
   },
-  Object {
+  {
     "bottom": -64,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -154,7 +154,7 @@ Array [
     "square": 132,
     "top": -32,
   },
-  Object {
+  {
     "bottom": 20,
     "color": "rgb(155, 155, 155)",
     "fontSize": 9,
@@ -173,7 +173,7 @@ Array [
     "square": 120,
     "top": 23,
   },
-  Object {
+  {
     "bottom": -64,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -192,7 +192,7 @@ Array [
     "square": 117,
     "top": -26,
   },
-  Object {
+  {
     "bottom": 23,
     "color": "rgb(155, 155, 155)",
     "fontSize": 9,
@@ -211,7 +211,7 @@ Array [
     "square": 100,
     "top": 27,
   },
-  Object {
+  {
     "bottom": -31,
     "color": "rgb(155, 155, 155)",
     "fontSize": 9,
@@ -230,7 +230,7 @@ Array [
     "square": 100,
     "top": -7,
   },
-  Object {
+  {
     "bottom": -58,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -249,7 +249,7 @@ Array [
     "square": 90,
     "top": -56,
   },
-  Object {
+  {
     "bottom": -28,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -268,7 +268,7 @@ Array [
     "square": 84,
     "top": -8,
   },
-  Object {
+  {
     "bottom": 24,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -287,7 +287,7 @@ Array [
     "square": 80,
     "top": 27,
   },
-  Object {
+  {
     "bottom": -26,
     "color": "rgb(155, 155, 155)",
     "fontSize": 9,
@@ -306,7 +306,7 @@ Array [
     "square": 76,
     "top": -8,
   },
-  Object {
+  {
     "bottom": -61,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -325,7 +325,7 @@ Array [
     "square": 75,
     "top": -59,
   },
-  Object {
+  {
     "bottom": -28,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -344,7 +344,7 @@ Array [
     "square": 69,
     "top": -6,
   },
-  Object {
+  {
     "bottom": -65,
     "color": "rgb(155, 155, 155)",
     "fontSize": 9,
@@ -363,7 +363,7 @@ Array [
     "square": 64,
     "top": -62,
   },
-  Object {
+  {
     "bottom": -26,
     "color": "rgb(155, 155, 155)",
     "fontSize": 7,
@@ -382,7 +382,7 @@ Array [
     "square": 57,
     "top": -8,
   },
-  Object {
+  {
     "bottom": -64,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -401,7 +401,7 @@ Array [
     "square": 57,
     "top": -62,
   },
-  Object {
+  {
     "bottom": -26,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -420,7 +420,7 @@ Array [
     "square": 57,
     "top": -8,
   },
-  Object {
+  {
     "bottom": 28,
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
@@ -439,7 +439,7 @@ Array [
     "square": 54,
     "top": 30,
   },
-  Object {
+  {
     "bottom": -37,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -458,7 +458,7 @@ Array [
     "square": 42,
     "top": -24,
   },
-  Object {
+  {
     "bottom": -29,
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
@@ -477,7 +477,7 @@ Array [
     "square": 33,
     "top": -27,
   },
-  Object {
+  {
     "bottom": 12,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -496,7 +496,7 @@ Array [
     "square": 33,
     "top": 22,
   },
-  Object {
+  {
     "bottom": -32,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -515,7 +515,7 @@ Array [
     "square": 30,
     "top": -30,
   },
-  Object {
+  {
     "bottom": 11,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -534,7 +534,7 @@ Array [
     "square": 24,
     "top": 16,
   },
-  Object {
+  {
     "bottom": 20,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -553,7 +553,7 @@ Array [
     "square": 18,
     "top": 22,
   },
-  Object {
+  {
     "bottom": 4,
     "color": "rgb(155, 155, 155)",
     "fontSize": 8,
@@ -575,212 +575,212 @@ Array [
 ]
 `;
 
-exports[`positioningAlgorithm tests prepareData tests should return correct result 1`] = `
-Array [
-  Object {
+exports[`positioningAlgorithm tests > prepareData tests > should return correct result 1`] = `
+[
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Odesa",
     "label": "Odesa",
     "sentimentScore": 65,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__DJ",
     "label": "DJ",
     "sentimentScore": 54,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Ostgut Ton",
     "label": "Ostgut Ton",
     "sentimentScore": 58,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Hammered",
     "label": "Hammered",
     "sentimentScore": 20,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Code",
     "label": "Code",
     "sentimentScore": 68,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Quantified Drunk",
     "label": "Quantified Drunk",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Berghain resident",
     "label": "Berghain resident",
     "sentimentScore": 73,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__San Soda's Panorama Bar",
     "label": "San Soda's Panorama Bar",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Germany",
     "label": "Germany",
     "sentimentScore": 80,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Amsterdam",
     "label": "Amsterdam",
     "sentimentScore": 91,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Kantine am Berghain",
     "label": "Kantine am Berghain",
     "sentimentScore": 59,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__London",
     "label": "London",
     "sentimentScore": 1,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__UK",
     "label": "UK",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Marcel Dettmann",
     "label": "Marcel Dettmann",
     "sentimentScore": 87,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Disco",
     "label": "Disco",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Barcelona",
     "label": "Barcelona",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Watergate",
     "label": "Watergate",
     "sentimentScore": 64,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__debut LP",
     "label": "debut LP",
     "sentimentScore": 100,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Patrick Gräser",
     "label": "Patrick Gräser",
     "sentimentScore": 100,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Panorama Bar in Berlin",
     "label": "Panorama Bar in Berlin",
     "sentimentScore": 83,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__legendary nightclub",
     "label": "legendary nightclub",
     "sentimentScore": 150,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Ben Klock",
     "label": "Ben Klock",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 36,
     "id": "1751295897__Mixes",
     "label": "Mixes",
     "sentimentScore": 895,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Panorama Bar Music",
     "label": "Panorama Bar Music",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Terrace Sundae",
     "label": "Terrace Sundae",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Jun",
     "label": "Jun",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__Live set",
     "label": "Live set",
     "sentimentScore": 75,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__dance music",
     "label": "dance music",
     "sentimentScore": 0,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__club culture",
     "label": "club culture",
     "sentimentScore": 50,
   },
-  Object {
+  {
     "color": "rgb(155, 155, 155)",
     "fontSize": 6,
     "id": "1751295897__D/B Presents",

@@ -105,4 +105,21 @@ export default defineConfig([
       ],
     },
   },
+  {
+    files: ['**/*.{spec,test}.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        afterAll: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        beforeEach: 'readonly',
+        describe: 'readonly',
+        expect: 'readonly',
+        it: 'readonly',
+        suite: 'readonly',
+        test: 'readonly',
+        vi: 'readonly',
+      },
+    },
+  },
 ]);

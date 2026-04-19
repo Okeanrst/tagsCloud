@@ -1,10 +1,10 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 1 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [],
-  "closedVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 1 1`] = `
+{
+  "bottomEdgeVacancies": [],
+  "closedVacancies": [
+    {
       "bottom": 3,
       "cols": 3,
       "distanceFromCenter": 1.4142135623730951,
@@ -14,7 +14,7 @@ Object {
       "square": 6,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 4,
       "cols": 4,
       "distanceFromCenter": 1.5811388300841898,
@@ -24,7 +24,7 @@ Object {
       "square": 4,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 2,
       "cols": 2,
       "distanceFromCenter": 1.5811388300841898,
@@ -35,10 +35,10 @@ Object {
       "top": 4,
     },
   ],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [],
-  "topEdgeVacancies": Array [
-    Object {
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [],
+  "topEdgeVacancies": [
+    {
       "baseSize": 1,
       "bottom": 2,
       "distanceFromCenter": 2.0615528128088303,
@@ -51,11 +51,11 @@ Object {
 }
 `;
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 2 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [],
-  "closedVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 2 1`] = `
+{
+  "bottomEdgeVacancies": [],
+  "closedVacancies": [
+    {
       "bottom": 3,
       "cols": 3,
       "distanceFromCenter": 1.4142135623730951,
@@ -65,7 +65,7 @@ Object {
       "square": 6,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 4,
       "cols": 4,
       "distanceFromCenter": 1.5811388300841898,
@@ -76,10 +76,10 @@ Object {
       "top": 4,
     },
   ],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [],
-  "topEdgeVacancies": Array [
-    Object {
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [],
+  "topEdgeVacancies": [
+    {
       "baseSize": 2,
       "bottom": 2,
       "distanceFromCenter": 1.5811388300841898,
@@ -92,11 +92,11 @@ Object {
 }
 `;
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 3 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [],
-  "closedVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 3 1`] = `
+{
+  "bottomEdgeVacancies": [],
+  "closedVacancies": [
+    {
       "bottom": 3,
       "cols": 3,
       "distanceFromCenter": 1.4142135623730951,
@@ -106,7 +106,7 @@ Object {
       "square": 6,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 4,
       "cols": 4,
       "distanceFromCenter": 1.5811388300841898,
@@ -116,7 +116,7 @@ Object {
       "square": 4,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 2,
       "cols": 1,
       "distanceFromCenter": 2.0615528128088303,
@@ -127,10 +127,10 @@ Object {
       "top": 4,
     },
   ],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [],
-  "topEdgeVacancies": Array [
-    Object {
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [],
+  "topEdgeVacancies": [
+    {
       "baseSize": 1,
       "bottom": 3,
       "distanceFromCenter": 1.118033988749895,
@@ -143,10 +143,10 @@ Object {
 }
 `;
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 4 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 4 1`] = `
+{
+  "bottomEdgeVacancies": [
+    {
       "baseSize": 4,
       "bottom": -Infinity,
       "bottomEdgeRow": -1,
@@ -156,8 +156,8 @@ Object {
       "top": -1,
     },
   ],
-  "closedVacancies": Array [
-    Object {
+  "closedVacancies": [
+    {
       "bottom": 3,
       "cols": 3,
       "distanceFromCenter": 1.8027756377319946,
@@ -167,7 +167,7 @@ Object {
       "square": 6,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 4,
       "cols": 4,
       "distanceFromCenter": 2.0615528128088303,
@@ -177,7 +177,7 @@ Object {
       "square": 4,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 2,
       "cols": 1,
       "distanceFromCenter": 2.23606797749979,
@@ -188,10 +188,10 @@ Object {
       "top": 4,
     },
   ],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [],
-  "topEdgeVacancies": Array [
-    Object {
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [],
+  "topEdgeVacancies": [
+    {
       "baseSize": 1,
       "bottom": 3,
       "distanceFromCenter": 1.4142135623730951,
@@ -204,11 +204,11 @@ Object {
 }
 `;
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 5 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [],
-  "closedVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 5 1`] = `
+{
+  "bottomEdgeVacancies": [],
+  "closedVacancies": [
+    {
       "bottom": 2,
       "cols": 4,
       "distanceFromCenter": 0.7071067811865476,
@@ -218,7 +218,7 @@ Object {
       "square": 4,
       "top": 2,
     },
-    Object {
+    {
       "bottom": 2,
       "cols": 1,
       "distanceFromCenter": 1.118033988749895,
@@ -228,7 +228,7 @@ Object {
       "square": 3,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 2,
       "cols": 2,
       "distanceFromCenter": 1.5,
@@ -238,7 +238,7 @@ Object {
       "square": 4,
       "top": 3,
     },
-    Object {
+    {
       "bottom": 2,
       "cols": 1,
       "distanceFromCenter": 2.0615528128088303,
@@ -249,9 +249,9 @@ Object {
       "top": 4,
     },
   ],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [
-    Object {
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [
+    {
       "baseSize": Infinity,
       "bottom": 3,
       "distanceFromCenter": 1.118033988749895,
@@ -261,14 +261,14 @@ Object {
       "top": 3,
     },
   ],
-  "topEdgeVacancies": Array [],
+  "topEdgeVacancies": [],
 }
 `;
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 6 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 6 1`] = `
+{
+  "bottomEdgeVacancies": [
+    {
       "baseSize": 3,
       "bottom": -Infinity,
       "bottomEdgeRow": -3,
@@ -277,7 +277,7 @@ Object {
       "right": 2,
       "top": -2,
     },
-    Object {
+    {
       "baseSize": 2,
       "bottom": -Infinity,
       "bottomEdgeRow": -3,
@@ -286,7 +286,7 @@ Object {
       "right": 2,
       "top": 1,
     },
-    Object {
+    {
       "baseSize": 4,
       "bottom": -Infinity,
       "bottomEdgeRow": -3,
@@ -296,8 +296,8 @@ Object {
       "top": -3,
     },
   ],
-  "closedVacancies": Array [
-    Object {
+  "closedVacancies": [
+    {
       "bottom": -1,
       "cols": 3,
       "distanceFromCenter": 1.118033988749895,
@@ -307,7 +307,7 @@ Object {
       "square": 6,
       "top": 1,
     },
-    Object {
+    {
       "bottom": 1,
       "cols": 4,
       "distanceFromCenter": 1.5,
@@ -318,16 +318,16 @@ Object {
       "top": 1,
     },
   ],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [],
-  "topEdgeVacancies": Array [],
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [],
+  "topEdgeVacancies": [],
 }
 `;
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 7 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 7 1`] = `
+{
+  "bottomEdgeVacancies": [
+    {
       "baseSize": 1,
       "bottom": -Infinity,
       "bottomEdgeRow": -4,
@@ -336,7 +336,7 @@ Object {
       "right": 4,
       "top": -2,
     },
-    Object {
+    {
       "baseSize": 3,
       "bottom": -Infinity,
       "bottomEdgeRow": -4,
@@ -345,7 +345,7 @@ Object {
       "right": 5,
       "top": -3,
     },
-    Object {
+    {
       "baseSize": 5,
       "bottom": -Infinity,
       "bottomEdgeRow": -4,
@@ -355,17 +355,17 @@ Object {
       "top": -4,
     },
   ],
-  "closedVacancies": Array [],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [],
-  "topEdgeVacancies": Array [],
+  "closedVacancies": [],
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [],
+  "topEdgeVacancies": [],
 }
 `;
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 8 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 8 1`] = `
+{
+  "bottomEdgeVacancies": [
+    {
       "baseSize": 1,
       "bottom": -Infinity,
       "bottomEdgeRow": -4,
@@ -376,10 +376,10 @@ Object {
       "topEdgeRow": -1,
     },
   ],
-  "closedVacancies": Array [],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [
-    Object {
+  "closedVacancies": [],
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [
+    {
       "baseSize": Infinity,
       "bottom": -2,
       "distanceFromCenter": 0.5,
@@ -389,8 +389,8 @@ Object {
       "top": -2,
     },
   ],
-  "topEdgeVacancies": Array [
-    Object {
+  "topEdgeVacancies": [
+    {
       "baseSize": 1,
       "bottom": -Infinity,
       "bottomEdgeRow": -4,
@@ -404,11 +404,11 @@ Object {
 }
 `;
 
-exports[`VacanciesManager tests should return correct vacancies for sceneMap 9 1`] = `
-Object {
-  "bottomEdgeVacancies": Array [],
-  "closedVacancies": Array [
-    Object {
+exports[`VacanciesManager tests > should return correct vacancies for sceneMap 9 1`] = `
+{
+  "bottomEdgeVacancies": [],
+  "closedVacancies": [
+    {
       "bottom": 2,
       "cols": 1,
       "distanceFromCenter": 0,
@@ -418,7 +418,7 @@ Object {
       "square": 3,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 3,
       "cols": 6,
       "distanceFromCenter": 0.7071067811865476,
@@ -428,7 +428,7 @@ Object {
       "square": 12,
       "top": 4,
     },
-    Object {
+    {
       "bottom": 3,
       "cols": 2,
       "distanceFromCenter": 1.8027756377319946,
@@ -438,7 +438,7 @@ Object {
       "square": 6,
       "top": 5,
     },
-    Object {
+    {
       "bottom": 2,
       "cols": 1,
       "distanceFromCenter": 2.0615528128088303,
@@ -449,8 +449,8 @@ Object {
       "top": 5,
     },
   ],
-  "leftEdgeVacancies": Array [],
-  "rightEdgeVacancies": Array [],
-  "topEdgeVacancies": Array [],
+  "leftEdgeVacancies": [],
+  "rightEdgeVacancies": [],
+  "topEdgeVacancies": [],
 }
 `;

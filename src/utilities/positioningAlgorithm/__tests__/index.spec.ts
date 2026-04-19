@@ -15,7 +15,7 @@ import preparedData from './preparedData.json';
 import tagsRectAreasMapsMock from './rectAreasMaps.json';
 import fullSizeFilledRectAreasMaps from './fullSizeFilledRectAreasMaps.json';
 
-jest.mock('utilities/common/getRandomRGBColor', () => {
+vi.mock('utilities/common/getRandomRGBColor', () => {
   return {
     getRandomRGBColor: () => {
       return 'rgb(155, 155, 155)';
@@ -23,9 +23,10 @@ jest.mock('utilities/common/getRandomRGBColor', () => {
   };
 });
 
-jest.mock('utilities/rectAreaMap/rectAreaMap', () => {
+vi.mock('utilities/rectAreaMap/rectAreaMap', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('utilities/rectAreaMap/rectAreaMap')>();
   return {
-    ...jest.requireActual('utilities/rectAreaMap/rectAreaMap'),
+    ...actual,
     getRectAreaMap: () => {
       return {};
     },

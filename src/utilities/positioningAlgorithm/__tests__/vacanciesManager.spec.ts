@@ -219,8 +219,8 @@ describe('VacanciesManager tests', () => {
     ];
 
     expect(vacanciesManager.closedVacancies).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "bottom": 1,
           "cols": 2,
           "distanceFromCenter": 0.5,
@@ -230,7 +230,7 @@ describe('VacanciesManager tests', () => {
           "square": 6,
           "top": 3,
         },
-        Object {
+        {
           "bottom": 1,
           "cols": 3,
           "distanceFromCenter": 0.7071067811865476,
