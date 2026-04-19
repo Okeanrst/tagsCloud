@@ -2,54 +2,9 @@
   {
     "key": "Odesa_8",
     "map": [
-      [
-        true,
-        true,
-        true,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-      [
-        true,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ],
-      [
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ]
+      [true, true, true, false, false, true, false, false, false, false, false, false, false, false],
+      [true, false, true, true, true, true, true, true, true, true, true, true, true, true],
+      [true, true, true, true, true, true, true, true, true, true, true, true, true, true]
     ],
     "mapMeta": {
       "marginTop": 0,
@@ -1175,19 +1130,7 @@
   {
     "key": "London_6",
     "map": [
-      [
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
+      [true, false, false, false, false, false, true, false, false, false, false],
       [true, true, true, true, true, true, true, true, true, true, true],
       [true, true, true, true, true, true, true, true, true, true, true]
     ],
@@ -1446,27 +1389,7 @@
         true,
         true
       ],
-      [
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ]
+      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
     ],
     "mapMeta": {
       "marginTop": 0,
@@ -3365,78 +3288,10 @@
   {
     "key": "Live set_9",
     "map": [
-      [
-        true,
-        false,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-      [
-        true,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ],
-      [
-        true,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ],
-      [
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ]
+      [true, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false],
+      [true, false, true, true, true, true, true, true, false, true, true, true, true, true, true, true],
+      [true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
     ],
     "mapMeta": {
       "marginTop": 0,
@@ -3470,46 +3325,8 @@
         true,
         false
       ],
-      [
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ],
-      [
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ]
+      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+      [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
     ],
     "mapMeta": {
       "marginTop": 0,
