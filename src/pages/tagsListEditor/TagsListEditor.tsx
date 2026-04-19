@@ -114,7 +114,12 @@ class TagsListEditor extends Component<PropsT, StateT> {
       return;
     }
 
-    const { top, bottom } = this.actionsBlockRef.current?.getBoundingClientRect();
+    const rect = this.actionsBlockRef.current?.getBoundingClientRect();
+    if (!rect) {
+      this.setState({ actionsBlockHeight: 0 });
+      return;
+    }
+    const { top, bottom } = rect;
     this.setState({ actionsBlockHeight: bottom - top });
   };
 
@@ -286,9 +291,8 @@ class TagsListEditor extends Component<PropsT, StateT> {
     />
   );
 
-  renderListRow =
-    (data: ReadonlyArray<TagDataT>, classes: ClassesT, highlightedIndex?: number) =>
-    ({ index, style }: { index: number; style: {} }) => {
+  renderListRow = (data: ReadonlyArray<TagDataT>, classes: ClassesT, highlightedIndex?: number) => {
+    const ListRow = ({ index, style }: { index: number; style: React.CSSProperties }) => {
       const item = data[index];
       const itemStyle = highlightedIndex === index ? { ...style, backgroundColor: 'var(--grey300-color)' } : style;
       return (
