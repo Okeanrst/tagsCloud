@@ -3,7 +3,7 @@ import { clamp } from 'utilities/helpers/clamp';
 import { ScaleT, SizeT } from 'types/types';
 
 type PropsT = {
-  targetElementRef: RefObject<HTMLDivElement>;
+  targetElementRef: RefObject<HTMLDivElement | null>;
   setScale: (fn: (scale: ScaleT | null) => ScaleT | null) => void;
   scaleFactor?: number;
   minScale?: number;

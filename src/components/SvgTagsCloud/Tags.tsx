@@ -111,7 +111,11 @@ export const Tags = ({
             const nodeRef = nodeRefsByKey[key];
 
             return (
-              <Transition key={key} nodeRef={nodeRef as React.RefObject<HTMLElement>} timeout={ANIMATION_DURATION}>
+              <Transition
+                key={key}
+                nodeRef={nodeRef as unknown as React.RefObject<HTMLElement>}
+                timeout={ANIMATION_DURATION}
+              >
                 {(state) => {
                   return (
                     <text
