@@ -36,7 +36,7 @@ export type TagDataT = Readonly<{
     twitter: number;
     video: number;
   }>;
-  queries?: any;
+  queries?: unknown;
 }>;
 
 export type PreparedTagDataT = TagDataT & Readonly<{ fontSize: number }>;
