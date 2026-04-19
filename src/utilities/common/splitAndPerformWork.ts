@@ -7,7 +7,7 @@ const delay0 = () =>
     }, 0);
   });
 
-export function splitAndPerformWork<T>(
+export async function splitAndPerformWork<T>(
   workGenerator: () => Generator<T>,
   {
     allowedDuration = 50,
@@ -15,74 +15,34 @@ export function splitAndPerformWork<T>(
     signal,
   }: { allowedDuration: number; onProgress?: () => void; signal?: AbortSignal },
 ): Promise<T[]> {
-  if (signal?.aborted) {
-    return Promise.reject(new AbortError());
+  signal?.throwIfAborted();
+
+  const iterable = workGenerator();
+  const values: T[] = [];
+
+  let lastYieldTime = Date.now();
+  let nextValue: T | undefined = undefined;
+
+  while (true) {
+    if (signal?.aborted) {
+      throw new AbortError();
+    }
+
+    const { done, value } = iterable.next(nextValue);
+
+    if (done) break;
+
+    const result = typeof value === 'function' ? value() : value;
+    onProgress?.();
+    values.push(result);
+
+    nextValue = result;
+
+    if (Date.now() - lastYieldTime >= allowedDuration) {
+      await delay0();
+      lastYieldTime = Date.now();
+    }
   }
 
-  let abortListener: () => void;
-  return new Promise(async (resolve, reject) => {
-    if (signal) {
-      abortListener = () => {
-        reject(new AbortError());
-      };
-
-      signal.addEventListener('abort', abortListener, { once: true });
-    }
-
-    const iterable = workGenerator();
-    const getAndPerformWork = (prevValue?: T): { done: false; value: T } | { done: true } => {
-      const { done, value } = iterable.next(prevValue);
-      if (done) {
-        return { done: true };
-      } else {
-        const res = typeof value === 'function' ? value() : value;
-        if (onProgress) {
-          onProgress();
-        }
-        return { done: false, value: res };
-      }
-    };
-
-    let restTime = allowedDuration;
-    const start = Date.now();
-    const values = [];
-
-    try {
-      let done = false;
-
-      let result;
-      while (!done && (!signal || !signal.aborted)) {
-        const spent = Date.now() - start;
-
-        let prevCallReturnValue;
-        if (result && !result?.done) {
-          prevCallReturnValue = result.value;
-        }
-
-        if (spent >= restTime) {
-          restTime = allowedDuration;
-
-          await delay0();
-          result = getAndPerformWork(prevCallReturnValue);
-        } else {
-          restTime = restTime - spent;
-
-          result = getAndPerformWork(prevCallReturnValue);
-        }
-
-        ({ done } = result);
-
-        if (!result.done) {
-          values.push(result.value);
-        }
-      }
-      resolve(values);
-    } catch (ex) {
-      reject(ex);
-    }
-  }).finally(() => {
-    if (signal) {
-      signal.removeEventListener('abort', abortListener);
-    }
-  }) as Promise<T[]>;
+  return values;
 }
