@@ -29,13 +29,14 @@ export const tagsDataReducer = (
       return { status: SUCCESS, data: action.payload };
     case TAGS_DATA_FETCH_FAILURE:
       return { status: FAILURE, data: null };
-    case TAGS_DATA_DELETE_DATA_ITEM:
+    case TAGS_DATA_DELETE_DATA_ITEM: {
       if (state.status !== SUCCESS) {
         return state;
       }
       const idToDelete = action.payload;
       const data = state.data.filter((item) => item.id !== idToDelete);
       return { ...state, data };
+    }
     case TAGS_DATA_EDIT_DATA_ITEM: {
       if (state.status !== SUCCESS) {
         return state;

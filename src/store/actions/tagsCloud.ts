@@ -11,6 +11,7 @@ import {
 import { updateTagPosition } from 'utilities/positioningAlgorithm/updateTagPosition';
 import { prepareTagsData } from 'utilities/prepareTagsData';
 import { getMaxSentimentScore } from 'utilities/getMaxSentimentScore';
+import { omit } from 'utilities/helpers/omit';
 import { formRectAreaMapKey, prepareRectAreasMaps } from 'utilities/prepareRectAreasMaps';
 import { selectTargetTagDataItem } from '../reducers/tagsData';
 import { createAction } from './helpers';
@@ -77,10 +78,8 @@ export function getData() {
   };
 }
 
-const formCalcTagsPositionsOptions = (settings: RootStateT['settings']) => {
-  const { fontFamily, minFontSize, maxFontSize, ...restSettings } = settings;
-  return restSettings;
-};
+const formCalcTagsPositionsOptions = (settings: RootStateT['settings']) =>
+  omit(settings, ['fontFamily', 'minFontSize', 'maxFontSize']);
 
 export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
   return async (dispatch: AppDispatchT, getState: GetStateT) => {
@@ -148,8 +147,8 @@ export function buildTagsCloud(tagsData: ReadonlyArray<TagDataT>) {
         }),
       );
       dispatch(createAction(actionTypes.RECT_AREAS_MAPS_REMOVE_MAPS, findUnusedRectAreasMapsKeys(getState())));
-    } catch (ex: any) {
-      if (ex.name === 'AbortError') {
+    } catch (ex: unknown) {
+      if (ex instanceof Error && ex.name === 'AbortError') {
         return;
       }
       dispatch(createAction(actionTypes.TAGS_CLOUD_BUILD_FAILURE));

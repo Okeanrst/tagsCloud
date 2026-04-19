@@ -8,7 +8,7 @@ import type { RootStateT } from 'store/types';
 
 const { PRISTINE } = QueryStatuses;
 
-function withTriggerGettingRawData<T extends {}>(WrappedComponent: React.ComponentType<T>) {
+function withTriggerGettingRawData<T extends object>(WrappedComponent: React.ComponentType<T>) {
   const EnhancedComponent = (props: T) => {
     const { tagsData } = useSelector((state: RootStateT): { tagsData: RootStateT['tagsData'] } => {
       return { tagsData: state.tagsData };

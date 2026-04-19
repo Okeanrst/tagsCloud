@@ -24,6 +24,7 @@ import { PrimaryButton } from 'ui/buttons/PrimaryButton';
 import { FileInput } from 'ui/FileInput';
 import StyledSearchWithAutocomplete from './StyledSearchWithAutocomplete';
 import { QueryStatuses } from 'constants/queryStatuses';
+import { omit } from 'utilities/helpers/omit';
 
 import type { TagDataT, ClassesT } from 'types/types';
 import type { RootStateT, AppDispatchT } from 'store/types';
@@ -221,7 +222,11 @@ class TagsListEditor extends Component<PropsT, StateT> {
       return;
     }
     const tagId = tagFormData.id;
-    tagId ? this.props.editTag({ ...tagFormData, ...data, id: tagId }) : this.props.addTag({ ...tagFormData, ...data });
+    if (tagId) {
+      this.props.editTag({ ...tagFormData, ...data, id: tagId });
+    } else {
+      this.props.addTag({ ...tagFormData, ...data });
+    }
   };
 
   onClone = (e: SyntheticEvent<EventTarget>) => {
@@ -237,9 +242,7 @@ class TagsListEditor extends Component<PropsT, StateT> {
       return;
     }
 
-    const { id, ...restProps } = targetTagData;
-
-    const tagFormData = { ...restProps };
+    const tagFormData = omit(targetTagData, ['id']);
     this.setState({ tagFormData });
   };
 

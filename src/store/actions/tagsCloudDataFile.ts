@@ -59,7 +59,7 @@ function parseRawTagsCloudDataFile(file: File): Promise<TagDataT> {
   });
 }
 
-export function downloadRawTagsCloudDataFile(data: any) {
+export function downloadRawTagsCloudDataFile(data: ReadonlyArray<TagDataT>) {
   const blob = new Blob([JSON.stringify(data)], {
     type: 'application/json;charset=utf-8',
   });

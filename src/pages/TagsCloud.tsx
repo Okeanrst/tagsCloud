@@ -279,10 +279,12 @@ class TagsCloud extends Component<PropsT, StateT> {
 
     window.removeEventListener('resize', this.handleResize);
 
-    this.resizeTaskTimer && clearTimeout(this.resizeTaskTimer);
+    if (this.resizeTaskTimer) {
+      clearTimeout(this.resizeTaskTimer);
+    }
   }
 
-  componentDidUpdate(prevProps: PropsT, prevState: StateT) {
+  componentDidUpdate(prevProps: PropsT) {
     const { fontLoaded, tagsData, tagsCloud, buildTagsCloud, observerLoadFont } = this.props;
     const { isTagsCloudInteractionDisabled, sceneScale } = this.state;
 
