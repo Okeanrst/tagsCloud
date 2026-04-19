@@ -5,6 +5,7 @@ import { withModalWindowBackdrop } from './withModalWindowBackdrop';
 type PropsT = {
   style?: React.CSSProperties;
   children: React.ReactNode;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,14 +26,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const FullScreenModalWindow = React.forwardRef<HTMLDivElement, PropsT>(({ style, children }: PropsT, ref) => {
+function FullScreenModalWindow({ style, children, ref }: PropsT) {
   const classes = useStyles();
   return (
     <div className={classes.root} ref={ref} style={style}>
       {children}
     </div>
   );
-});
-FullScreenModalWindow.displayName = 'FullScreenModalWindow';
+}
 
 export default withModalWindowBackdrop<PropsT>()(FullScreenModalWindow);

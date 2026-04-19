@@ -1,10 +1,10 @@
-import React, { forwardRef, useRef, SyntheticEvent } from 'react';
+import React, { useRef, SyntheticEvent } from 'react';
 import { makeStyles } from '@material-ui/core';
 import cx from 'classnames';
-import { omit } from 'utilities/helpers/omit';
 import { Input } from './Input';
 
-type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
+type PropsT = React.ComponentPropsWithoutRef<'input'> & {
+  ref?: React.Ref<HTMLInputElement>;
   className?: string;
 };
 
@@ -99,8 +99,8 @@ const getIsChangeDisabled = (value: number, { min, max }: Pick<PropsT, 'min' | '
   isIncreaseDisabled: (['number', 'string'].includes(typeof max) && value >= valueToInteger(max)) || false,
 });
 
-export const NumberInput = forwardRef<HTMLInputElement, PropsT>((props, forwardedRef) => {
-  const { value, min, max, onChange, className } = props;
+export function NumberInput({ ref: forwardedRef, className, ...restProps }: PropsT) {
+  const { value, min, max, onChange } = restProps;
 
   const ownClasses = useStyles();
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -130,13 +130,7 @@ export const NumberInput = forwardRef<HTMLInputElement, PropsT>((props, forwarde
 
   return (
     <div className={cx(ownClasses.root, className)}>
-      <Input
-        {...omit(props, 'className')}
-        inputMode="numeric"
-        ref={setRefs}
-        style={{ paddingInlineEnd: '24px' }}
-        type="text"
-      />
+      <Input {...restProps} inputMode="numeric" ref={setRefs} style={{ paddingInlineEnd: '24px' }} type="text" />
       <div className={ownClasses.controlsWrapper}>
         <div className={ownClasses.controls}>
           <button
@@ -165,5 +159,4 @@ export const NumberInput = forwardRef<HTMLInputElement, PropsT>((props, forwarde
       </div>
     </div>
   );
-});
-NumberInput.displayName = 'NumberInput';
+}

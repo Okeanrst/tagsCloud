@@ -1,8 +1,9 @@
 import cx from 'classnames';
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core';
 
-type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLSelectElement>, HTMLSelectElement> & {
+type PropsT = React.ComponentPropsWithoutRef<'select'> & {
+  ref?: React.Ref<HTMLSelectElement>;
   classes?: Partial<ReturnType<typeof useStyles>>;
   options: { value: string; label: string }[];
 };
@@ -39,7 +40,7 @@ const useStyles = makeStyles({
   option: {},
 });
 
-export const Select = forwardRef<HTMLSelectElement, PropsT>(({ classes, options, ...restProps }, ref) => {
+export function Select({ classes, options, ref, ...restProps }: PropsT) {
   const ownClasses = useStyles();
   return (
     <select className={cx(ownClasses.root, classes?.root)} ref={ref} {...restProps}>
@@ -50,5 +51,4 @@ export const Select = forwardRef<HTMLSelectElement, PropsT>(({ classes, options,
       ))}
     </select>
   );
-});
-Select.displayName = 'Select';
+}

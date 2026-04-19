@@ -1,8 +1,9 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core';
 import cx from 'classnames';
 
-type PropsT = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
+type PropsT = React.ComponentPropsWithoutRef<'input'> & {
+  ref?: React.Ref<HTMLInputElement>;
   className?: string;
 };
 
@@ -43,8 +44,7 @@ const useStyles = makeStyles({
   },
 });
 
-export const Input = forwardRef<HTMLInputElement, PropsT>(({ className, ...restProps }, ref) => {
+export function Input({ className, ref, ...restProps }: PropsT) {
   const ownClasses = useStyles();
   return <input className={cx(ownClasses.root, className)} ref={ref} {...restProps} />;
-});
-Input.displayName = 'Input';
+}
