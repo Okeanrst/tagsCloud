@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import { makeStyles, Theme } from '@material-ui/core';
 import { FontFamilies } from 'constants/index';
@@ -53,85 +53,89 @@ export const Tags = ({
   isTagDraggingDisabled,
 }: PropsT) => {
   const classes = useStyles({ fontFamily });
-  const textRefs = useRef<Record<string, { current: SVGTextElement | null }>>({});
+
+  const displayedTags =
+    tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow);
+
+  const nodeRefsByKey = useMemo(() => {
+    const displayed =
+      tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow);
+    const next: Record<string, { current: SVGTextElement | null }> = {};
+    for (const tag of displayed) {
+      const key = tag.id + tag.rectLeft + tag.rectTop;
+      next[key] = { current: null };
+    }
+    return next;
+  }, [tagEndIndexToShow, positionedTagSvgData]);
+
   return (
     <svg {...svgSize} className={classes.root} viewBox={viewBox.join(' ')}>
       <g transform={transform}>
         <TransitionGroup appear enter className="tagsCloud" component={null} exite={false}>
-          {(tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow)).map(
-            (i, index: number) => {
-              const style: React.CSSProperties = {
-                fontSize: `${i.fontSize}px`,
-                fill: i.color,
-              };
-              if (draggableTag && draggableTag.id === i.id) {
-                style.visibility = 'hidden';
-              }
-              const transitionStyles: { [key: string]: React.CSSProperties } = {
-                exited: {
-                  opacity: 0,
-                  transform: formTagTransformStyle({
-                    translateX: i.rectTranslateX,
-                    translateY: i.rectTranslateY,
-                    isRotated: i.rotate,
-                  }),
-                },
-                entering: {
-                  opacity: 0,
-                  transform: formTagTransformStyle({
-                    translateX: i.rectTranslateX,
-                    translateY: i.rectTranslateY,
-                    isRotated: i.rotate,
-                    scale: 0.1,
-                  }),
-                },
-                entered: {
-                  opacity: 1,
-                  transform: formTagTransformStyle({
-                    translateX: i.rectTranslateX,
-                    translateY: i.rectTranslateY,
-                    isRotated: i.rotate,
-                  }),
-                },
-              };
+          {displayedTags.map((i, index: number) => {
+            const style: React.CSSProperties = {
+              fontSize: `${i.fontSize}px`,
+              fill: i.color,
+            };
+            if (draggableTag && draggableTag.id === i.id) {
+              style.visibility = 'hidden';
+            }
+            const transitionStyles: { [key: string]: React.CSSProperties } = {
+              exited: {
+                opacity: 0,
+                transform: formTagTransformStyle({
+                  translateX: i.rectTranslateX,
+                  translateY: i.rectTranslateY,
+                  isRotated: i.rotate,
+                }),
+              },
+              entering: {
+                opacity: 0,
+                transform: formTagTransformStyle({
+                  translateX: i.rectTranslateX,
+                  translateY: i.rectTranslateY,
+                  isRotated: i.rotate,
+                  scale: 0.1,
+                }),
+              },
+              entered: {
+                opacity: 1,
+                transform: formTagTransformStyle({
+                  translateX: i.rectTranslateX,
+                  translateY: i.rectTranslateY,
+                  isRotated: i.rotate,
+                }),
+              },
+            };
 
-              const key = i.id + i.rectLeft + i.rectTop;
+            const key = i.id + i.rectLeft + i.rectTop;
 
-              if (!textRefs.current[key]) {
-                textRefs.current[key] = { current: null };
-              }
-              const nodeRef = textRefs.current[key];
+            const nodeRef = nodeRefsByKey[key];
 
-              return (
-                <Transition
-                  key={key}
-                  // @ts-ignore
-                  nodeRef={nodeRef}
-                  timeout={ANIMATION_DURATION}
-                >
-                  {(state) => {
-                    return (
-                      <text
-                        className={classes.text}
-                        data-id={i.id}
-                        key={`${i.id}_${index}`}
-                        ref={nodeRef}
-                        style={{
-                          ...style,
-                          ...staticStyle,
-                          ...transitionStyles[state],
-                          ...getTagCursorStyle(isTagDraggingDisabled),
-                        }}
-                        textAnchor="middle"
-                      >
-                        {i.label}
-                      </text>
-                    );
-                  }}
-                </Transition>
-              );
-            },
-          )}
+            return (
+              <Transition key={key} nodeRef={nodeRef as React.RefObject<HTMLElement>} timeout={ANIMATION_DURATION}>
+                {(state) => {
+                  return (
+                    <text
+                      className={classes.text}
+                      data-id={i.id}
+                      key={`${i.id}_${index}`}
+                      ref={nodeRef}
+                      style={{
+                        ...style,
+                        ...staticStyle,
+                        ...transitionStyles[state],
+                        ...getTagCursorStyle(isTagDraggingDisabled),
+                      }}
+                      textAnchor="middle"
+                    >
+                      {i.label}
+                    </text>
+                  );
+                }}
+              </Transition>
+            );
+          })}
         </TransitionGroup>
       </g>
     </svg>
