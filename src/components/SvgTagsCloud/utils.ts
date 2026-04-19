@@ -23,8 +23,7 @@ export const getEventDocumentCoordinates = (
     | TouchEvent
     | React.MouseEvent
     | React.TouchEvent
-    | React.SyntheticEvent<any, MouseEvent>
-    | React.SyntheticEvent<any, TouchEvent> /* React.MouseEvent | React.TouchEvent*/,
+    | React.SyntheticEvent<Element, MouseEvent | TouchEvent>,
 ) => {
   let pageX: number | null = null;
   let pageY: number | null = null;
@@ -33,11 +32,12 @@ export const getEventDocumentCoordinates = (
   } else if (window.TouchEvent && event instanceof TouchEvent) {
     ({ pageX, pageY } = event.touches[0]);
   } else if ('nativeEvent' in event && event.nativeEvent instanceof MouseEvent) {
-    // @ts-ignore
-    ({ pageX, pageY } = event);
+    ({ pageX, pageY } = event.nativeEvent);
   } else if ('nativeEvent' in event && window.TouchEvent && event.nativeEvent instanceof TouchEvent) {
-    // @ts-ignore
-    ({ pageX, pageY } = event.touches[0]);
+    const touch = event.nativeEvent.touches[0];
+    if (touch) {
+      ({ pageX, pageY } = touch);
+    }
   }
   return { pageX, pageY };
 };
