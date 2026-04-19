@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import throttle from 'lodash.throttle';
 import { makeStyles } from '@material-ui/core';
@@ -64,7 +64,7 @@ for (const sortingStrategy of Object.values(SortingEdgeVacanciesStrategies)) {
   sortingEdgeVacanciesOptions.push({ value: sortingStrategy, label: sortingStrategy });
 }
 
-const transformInputValue = (inputName: SettingsKeysT, inputValue: any) => {
+const transformInputValue = (inputName: SettingsKeysT, inputValue: unknown) => {
   const numberInputNames: SettingsKeysT[] = ['maxFontSize', 'minFontSize', 'addIfEmptyIndex', 'sceneMapResolution'];
   if (numberInputNames.includes(inputName)) {
     return Number(inputValue);
@@ -144,23 +144,22 @@ export const Settings = () => {
     return { settings: state.settings };
   });
   const [values, setValues] = useState(settings);
-  const [errors, setErrors] = useState<null | Partial<{ [key in SettingsKeysT]: string }>>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const throttledUpdateSettings = useCallback(
-    throttle((data: Partial<RootStateT['settings']>) => {
-      dispatch(updateSettings(data));
-    }, 1000),
+  const errors = useMemo(() => validate(values), [values]);
+
+  const throttledUpdateSettings = useMemo(
+    () =>
+      throttle((data: Partial<RootStateT['settings']>) => {
+        dispatch(updateSettings(data));
+      }, 1000),
     [dispatch],
   );
 
   useEffect(() => {
-    const nextErrors = validate(values);
-    setErrors(nextErrors);
-    if (!nextErrors) {
+    if (!errors) {
       throttledUpdateSettings(values);
     }
-  }, [throttledUpdateSettings, values]);
+  }, [errors, throttledUpdateSettings, values]);
 
   const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
