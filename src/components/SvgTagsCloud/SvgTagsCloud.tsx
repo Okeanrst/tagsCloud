@@ -190,21 +190,14 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
 
     const [draggableTag, setDraggableTag] = useState<DraggableTagT | null>(null);
     const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
-    const [tmpVacancies, setTmpVacancies] = useState<VacanciesT | null>(null);
 
-    useCounterChanged({ counter: downloadCloudCounter, callbackRef: downloadTagCloudRef });
-
-    const scaleRef = useObjectRef<number>(scale);
-
-    useEffect(() => {
+    const tmpVacancies = useMemo(() => {
       if (!draggableTag || !sceneMapPositions) {
-        setTmpVacancies(null);
-        return;
+        return null;
       }
       const tagPosition = tagsPositions?.find(({ id }) => id === draggableTag.id);
       if (!tagPosition) {
-        setTmpVacancies(null);
-        return;
+        return null;
       }
 
       const rectAreaMapKey = formRectAreaMapKey(tagPosition.label, tagPosition.fontSize);
@@ -212,13 +205,16 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       const { map: rectAreaMap } = rectAreasMaps.find(({ key }) => key === rectAreaMapKey) ?? {};
 
       if (!rectAreaMap) {
-        setTmpVacancies(null);
-        return;
+        return null;
       }
       const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, tagPosition, rectAreaMap);
 
-      setTmpVacancies(getSceneMapVacancies(sceneMap));
+      return getSceneMapVacancies(sceneMap);
     }, [sceneMapPositions, draggableTag, rectAreasMaps, tagsPositions]);
+
+    useCounterChanged({ counter: downloadCloudCounter, callbackRef: downloadTagCloudRef });
+
+    const scaleRef = useObjectRef<number>(scale);
 
     useEffect(() => {
       if (!draggableTag) {
