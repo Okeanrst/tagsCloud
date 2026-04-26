@@ -60,7 +60,7 @@ export const Tags = ({
       tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow);
     const next: Record<string, { current: SVGTextElement | null }> = {};
     for (const tag of displayed) {
-      const key = tag.id + tag.rectLeft + tag.rectTop;
+      const key = tag.id;
       next[key] = { current: null };
     }
     return next;
@@ -106,7 +106,7 @@ export const Tags = ({
               },
             };
 
-            const key = i.id + i.rectLeft + i.rectTop;
+            const key = i.id;
 
             const nodeRef = nodeRefsByKey[key];
 
