@@ -245,7 +245,10 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
         return;
       }
       if (tagEndIndexToShow >= tagsCount) {
-        setTagEndIndexToShow(-1);
+        queueMicrotask(() => {
+          setTagEndIndexToShow(-1);
+        });
+        return;
       }
       const timeout = setTimeout(() => {
         setTagEndIndexToShow((v) => v + 1);
