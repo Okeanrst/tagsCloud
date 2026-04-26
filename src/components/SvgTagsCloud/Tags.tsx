@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
-import { Transition, TransitionGroup } from 'react-transition-group';
+import React from 'react';
+import { TransitionGroup } from 'react-transition-group';
 import { makeStyles } from '@material-ui/core';
 import { FontFamilies } from 'constants/index';
 import { PositionedTagSvgDataT, SizeT, ViewBoxT } from 'types/types';
-import { formTagTransformStyle } from './styleUtils';
 import { TAGS_CLOUD_CANVAS_Z_INDEX } from './constants';
 import { DraggableTagT } from './types';
+import { TagTextTransition } from './TagTextTransition';
 
 type PropsT = {
   fontFamily: FontFamilies;
@@ -17,16 +17,6 @@ type PropsT = {
   draggableTag: DraggableTagT | null;
   isTagDraggingDisabled: boolean;
 };
-
-const ANIMATION_DURATION = 300;
-
-const staticStyle = {
-  transition: `all ${ANIMATION_DURATION}ms ease-in-out`,
-  opacity: 0,
-};
-const getTagCursorStyle = (isTagDraggingDisabled: boolean) => ({
-  cursor: isTagDraggingDisabled ? 'default' : 'grab',
-});
 
 const useStyles = makeStyles({
   root: {
@@ -55,89 +45,19 @@ export const Tags = ({
   const displayedTags =
     tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow);
 
-  const nodeRefsByKey = useMemo(() => {
-    const displayed =
-      tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow);
-    const next: Record<string, { current: SVGTextElement | null }> = {};
-    for (const tag of displayed) {
-      const key = tag.id;
-      next[key] = { current: null };
-    }
-    return next;
-  }, [tagEndIndexToShow, positionedTagSvgData]);
-
   return (
     <svg {...svgSize} className={classes.root} style={{ fontFamily }} viewBox={viewBox.join(' ')}>
       <g transform={transform}>
         <TransitionGroup appear enter className="tagsCloud" component={null} exite={false}>
-          {displayedTags.map((i, index: number) => {
-            const style: React.CSSProperties = {
-              fontSize: `${i.fontSize}px`,
-              fill: i.color,
-            };
-            if (draggableTag && draggableTag.id === i.id) {
-              style.visibility = 'hidden';
-            }
-            const transitionStyles: { [key: string]: React.CSSProperties } = {
-              exited: {
-                opacity: 0,
-                transform: formTagTransformStyle({
-                  translateX: i.rectTranslateX,
-                  translateY: i.rectTranslateY,
-                  isRotated: i.rotate,
-                }),
-              },
-              entering: {
-                opacity: 0,
-                transform: formTagTransformStyle({
-                  translateX: i.rectTranslateX,
-                  translateY: i.rectTranslateY,
-                  isRotated: i.rotate,
-                  scale: 0.1,
-                }),
-              },
-              entered: {
-                opacity: 1,
-                transform: formTagTransformStyle({
-                  translateX: i.rectTranslateX,
-                  translateY: i.rectTranslateY,
-                  isRotated: i.rotate,
-                }),
-              },
-            };
-
-            const key = i.id;
-
-            const nodeRef = nodeRefsByKey[key];
-
-            return (
-              <Transition
-                key={key}
-                nodeRef={nodeRef as unknown as React.RefObject<HTMLElement>}
-                timeout={ANIMATION_DURATION}
-              >
-                {(state) => {
-                  return (
-                    <text
-                      className={classes.text}
-                      data-id={i.id}
-                      key={`${i.id}_${index}`}
-                      ref={nodeRef}
-                      style={{
-                        ...style,
-                        ...staticStyle,
-                        ...transitionStyles[state],
-                        ...getTagCursorStyle(isTagDraggingDisabled),
-                      }}
-                      textAnchor="middle"
-                    >
-                      {i.label}
-                    </text>
-                  );
-                }}
-              </Transition>
-            );
-          })}
+          {displayedTags.map((tag) => (
+            <TagTextTransition
+              className={classes.text}
+              isHidden={Boolean(draggableTag && draggableTag.id === tag.id)}
+              isTagDraggingDisabled={isTagDraggingDisabled}
+              key={tag.id}
+              tag={tag}
+            />
+          ))}
         </TransitionGroup>
       </g>
     </svg>
