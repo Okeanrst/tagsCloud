@@ -6,7 +6,7 @@ import FadeLoader from 'react-spinners/FadeLoader';
 import * as tagsCloudActions from 'store/actions/tagsCloud';
 import { loadFont } from 'store/actions/loadFont';
 import * as sceneScaleActions from 'store/actions/sceneScale';
-import SvgTagsCloud from 'components/SvgTagsCloud/SvgTagsCloud';
+import { SvgTagsCloud } from 'components/SvgTagsCloud/SvgTagsCloud';
 import CanvasTagsCloud from 'components/CanvasTagsCloud';
 import withTriggerGettingRawData from 'decorators/withTriggerGettingRawData';
 import { QueryStatuses } from 'constants/queryStatuses';
