@@ -73,7 +73,7 @@ export const getActiveVacanciesByCoordinates = (
   };
 };
 
-export const sortActiveVacancies = (vacancies: VacanciesT) => {
+export const flatVacancies = (vacancies: VacanciesT) => {
   const sortedVacancies: { vacancy: VacancyT; kind: VacancyKinds }[] = [];
   for (const kind of Object.values(VacancyKinds)) {
     sortedVacancies.push(...vacancies[kind].map((vacancy) => ({ vacancy, kind })));

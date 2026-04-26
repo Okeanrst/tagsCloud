@@ -39,7 +39,7 @@ import {
   canvasCoordinatesToSceneCoordinates,
   documentCoordinatesToCanvasFrameCoordinates,
   limitCoordinatesWithCanvasFrameBoundaries,
-  sortActiveVacancies,
+  flatVacancies,
   sceneCoordinatesToCanvasCoordinates,
   calcSVGSizeFactor,
   getSVGViewBox,
@@ -236,7 +236,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       if (!vacancies || !isVacanciesShown) {
         return null;
       }
-      return sortActiveVacancies(vacancies);
+      return flatVacancies(vacancies);
     }, [vacancies, isVacanciesShown]);
 
     const tagsCount = tagsSvgData?.data?.length ?? 0;
@@ -512,9 +512,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
           sceneMapResolution,
         });
 
-        return sortActiveVacancies(
-          getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacanciesToProcess),
-        );
+        return flatVacancies(getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacanciesToProcess));
       })();
 
       return {
