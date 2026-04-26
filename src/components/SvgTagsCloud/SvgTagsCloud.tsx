@@ -5,7 +5,7 @@ import React, {
   useRef,
   useEffect,
   useImperativeHandle,
-  MutableRefObject,
+  RefObject,
   forwardRef,
 } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -105,13 +105,7 @@ const DraggableTagAvatar = React.forwardRef<SVGTextElement, DraggableTagAvatarPr
 });
 DraggableTagAvatar.displayName = 'DraggableTagAvatar';
 
-const useCounterChanged = ({
-  counter,
-  callbackRef,
-}: {
-  counter: number;
-  callbackRef: MutableRefObject<() => void>;
-}) => {
+const useCounterChanged = ({ counter, callbackRef }: { counter: number; callbackRef: RefObject<() => void> }) => {
   const counterRef = useRef(counter);
 
   useEffect(() => {
