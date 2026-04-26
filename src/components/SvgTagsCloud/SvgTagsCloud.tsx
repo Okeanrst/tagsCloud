@@ -48,7 +48,7 @@ import {
 import { formTagTransformStyle } from './styleUtils';
 import { TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX, TAG_AVATAR_CANVAS_Z_INDEX } from './constants';
 import { SceneFrameT } from 'types/types';
-import { DraggableTagT, VacanciesT } from './types';
+import { DraggableTagT } from './types';
 import { FrameOffsetT } from './utils';
 
 type PropsT = {
