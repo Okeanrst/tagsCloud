@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useRef,
   useEffect,
+  useLayoutEffect,
   useImperativeHandle,
   RefObject,
   forwardRef,
@@ -467,107 +468,163 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
       [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, scaleRef, fontFamily],
     );
 
-    const isDataReady = !!(tagsPositions && tagsSvgData);
-
-    if (!isDataReady) {
-      handleMouseUpEventRef.current = noop;
-      downloadTagCloudRef.current = noop;
-
-      return null;
-    }
-
-    const { viewBox: fullSceneViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
-
-    const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale });
-
-    const viewBox = getSVGViewBox({ fullSceneViewBox, sceneFrame });
-
-    const svgSizeFactor = calcSVGSizeFactor(svgSize, fullSceneViewBox) ?? 1;
-    svgSizeFactorRef.current = svgSizeFactor;
-
-    canvasFrameOffset.current = getCanvasFrameOffset(fullSceneViewBox, viewBox, svgSizeFactor);
-
-    const activeVacancies = (() => {
-      const vacanciesToProcess = tmpVacancies ?? vacancies;
-      if (!draggableTagPosition || !draggableTag || !vacanciesToProcess || !sceneMapEdges) {
+    const renderModel = useMemo(() => {
+      if (!tagsPositions || !tagsSvgData) {
         return null;
       }
-      const tagPosition = tagsPositions?.find(({ id }) => id === draggableTag.id);
-      if (!tagPosition) {
-        return null;
-      }
+      const { viewBox: fullSceneViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
 
-      const rectAreaMapKey = formRectAreaMapKey(tagPosition.label, tagPosition.fontSize);
+      const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale });
+      const viewBox = getSVGViewBox({ fullSceneViewBox, sceneFrame });
+      const svgSizeFactor = calcSVGSizeFactor(svgSize, fullSceneViewBox) ?? 1;
+      const canvasFrameOffsetValue = getCanvasFrameOffset(fullSceneViewBox, viewBox, svgSizeFactor);
 
-      const { map: rectAreaMap } = rectAreasMaps.find(({ key }) => key === rectAreaMapKey) ?? {};
+      const activeVacancies = (() => {
+        const vacanciesToProcess = tmpVacancies ?? vacancies;
+        if (!draggableTagPosition || !draggableTag || !vacanciesToProcess || !sceneMapEdges) {
+          return null;
+        }
+        const tagPosition = tagsPositions?.find(({ id }) => id === draggableTag.id);
+        if (!tagPosition) {
+          return null;
+        }
 
-      if (!rectAreaMap) {
-        return null;
-      }
+        const rectAreaMapKey = formRectAreaMapKey(tagPosition.label, tagPosition.fontSize);
 
-      const rotate = draggableTag.changeRotation ? !tagPosition.rotate : tagPosition.rotate;
-      const tagRectArea = rotate
-        ? rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap))
-        : getRectAreaOfRectAreaMap(rectAreaMap);
+        const { map: rectAreaMap } = rectAreasMaps.find(({ key }) => key === rectAreaMapKey) ?? {};
 
-      if (!tagRectArea) {
-        return null;
-      }
+        if (!rectAreaMap) {
+          return null;
+        }
 
-      const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, {
-        sceneMapEdges,
+        const rotate = draggableTag.changeRotation ? !tagPosition.rotate : tagPosition.rotate;
+        const tagRectArea = rotate
+          ? rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap))
+          : getRectAreaOfRectAreaMap(rectAreaMap);
+
+        if (!tagRectArea) {
+          return null;
+        }
+
+        const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, {
+          sceneMapEdges,
+          svgSizeFactor,
+          sceneMapResolution,
+        });
+
+        return sortActiveVacancies(
+          getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacanciesToProcess),
+        );
+      })();
+
+      return {
+        activeVacancies,
+        aspectRatio,
+        canvasFrameOffsetValue,
+        fullSceneViewBox,
+        positionedTagSvgData,
+        readyTagPositions: tagsPositions,
+        svgSize,
         svgSizeFactor,
-        sceneMapResolution,
-      });
+        transform,
+        viewBox,
+      };
+    }, [
+      draggableTag,
+      draggableTagPosition,
+      height,
+      rectAreasMaps,
+      scale,
+      sceneFrame,
+      sceneMapEdges,
+      sceneMapResolution,
+      tagsPositions,
+      tagsSvgData,
+      tmpVacancies,
+      vacancies,
+      width,
+    ]);
 
-      return sortActiveVacancies(
-        getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacanciesToProcess),
-      );
-    })();
-
-    handleMouseUpEventRef.current = () => {
-      setDraggableTagPosition(null);
-      setDraggableTag(null);
-
-      if (!activeVacancies || !activeVacancies.length || !draggableTag) {
+    useLayoutEffect(() => {
+      if (!renderModel) {
+        handleMouseUpEventRef.current = noop;
+        downloadTagCloudRef.current = noop;
         return;
       }
 
-      const { vacancy: targetVacancy, kind: targetVacancyKind } = activeVacancies[0] ?? {};
+      const {
+        activeVacancies,
+        positionedTagSvgData,
+        readyTagPositions,
+        svgSize,
+        svgSizeFactor,
+        transform,
+        viewBox,
+        canvasFrameOffsetValue,
+      } = renderModel;
 
-      if (targetVacancy && targetVacancyKind) {
-        const { id: tagId, changeRotation } = draggableTag;
-        const currentTagPosition = tagsPositions?.find(({ id }) => id === tagId);
-        if (!currentTagPosition) {
+      svgSizeFactorRef.current = svgSizeFactor;
+      canvasFrameOffset.current = canvasFrameOffsetValue;
+
+      handleMouseUpEventRef.current = () => {
+        setDraggableTagPosition(null);
+        setDraggableTag(null);
+
+        if (!activeVacancies || !activeVacancies.length || !draggableTag) {
           return;
         }
-        dispatch(
-          actions.changeTagPosition({
-            tagId,
-            vacancy: targetVacancy,
-            vacancyKind: targetVacancyKind,
-            isRotated: changeRotation ? !currentTagPosition.rotate : currentTagPosition.rotate,
-          }),
-        );
-      }
-    };
 
-    downloadTagCloudRef.current = () => {
-      const html = exportTagCloudAsHtml({
-        tagsSvgData: positionedTagSvgData,
-        svgSize,
-        viewBox,
-        transform,
-        fontFamily,
-      });
-      downloadTagCloudHtmlFile(html);
-    };
+        const { vacancy: targetVacancy, kind: targetVacancyKind } = activeVacancies[0] ?? {};
+
+        if (targetVacancy && targetVacancyKind) {
+          const { id: tagId, changeRotation } = draggableTag;
+          const currentTagPosition = readyTagPositions.find(({ id }) => id === tagId);
+          if (!currentTagPosition) {
+            return;
+          }
+          dispatch(
+            actions.changeTagPosition({
+              tagId,
+              vacancy: targetVacancy,
+              vacancyKind: targetVacancyKind,
+              isRotated: changeRotation ? !currentTagPosition.rotate : currentTagPosition.rotate,
+            }),
+          );
+        }
+      };
+
+      downloadTagCloudRef.current = () => {
+        const html = exportTagCloudAsHtml({
+          tagsSvgData: positionedTagSvgData,
+          svgSize,
+          viewBox,
+          transform,
+          fontFamily,
+        });
+        downloadTagCloudHtmlFile(html);
+      };
+    }, [dispatch, draggableTag, fontFamily, renderModel]);
+
+    if (!renderModel) {
+      return null;
+    }
+
+    const {
+      activeVacancies,
+      fullSceneViewBox,
+      positionedTagSvgData,
+      readyTagPositions,
+      svgSize,
+      svgSizeFactor,
+      transform,
+      viewBox,
+    } = renderModel;
 
     const draggableTagAvatarProps = (() => {
       if (!draggableTag) {
         return {};
       }
-      const tagPosition = tagsPositions?.find(({ id }) => id === draggableTag.id);
+      const tagPosition = readyTagPositions.find(({ id }) => id === draggableTag.id);
       if (!tagPosition) {
         return {};
       }
@@ -593,7 +650,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
               sceneMapResolution={sceneMapResolution}
               svgSize={svgSize}
               svgSizeFactor={svgSizeFactor}
-              tagsPositions={tagsPositions}
+              tagsPositions={readyTagPositions}
               viewBox={viewBox}
             />
           )}
@@ -601,7 +658,7 @@ const SvgTagsCloud = forwardRef<{ oneByOne: () => void }, PropsT>(
             <ReactAreas
               svgSize={svgSize}
               svgSizeFactor={svgSizeFactor}
-              tagData={tagsPositions}
+              tagData={readyTagPositions}
               transform={transform}
               viewBox={viewBox}
             />
