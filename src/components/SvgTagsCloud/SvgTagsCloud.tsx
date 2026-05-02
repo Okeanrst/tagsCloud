@@ -1,29 +1,11 @@
-import React, {
-  useCallback,
-  useState,
-  useMemo,
-  useRef,
-  useEffect,
-  useLayoutEffect,
-  useImperativeHandle,
-  RefObject,
-} from 'react';
+import React, { useState, useMemo, useRef, useEffect, useLayoutEffect, useImperativeHandle, RefObject } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/core';
-import throttle from 'lodash.throttle';
 import * as actions from 'store/actions/tagsCloud';
 import { noop } from 'utilities/noop';
-import { getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagSvgData';
+import { getTagsSvgData } from 'utilities/tagsCloud/tagSvgData';
 import { getSuitableSize } from 'utilities/common/getSuitableSize';
-import {
-  getSceneMapVacancies,
-  releaseRectAreaPositionsOnSceneMap,
-  rotateRectArea,
-} from 'utilities/positioningAlgorithm/calcTagsPositions';
 import { SceneMap } from 'utilities/positioningAlgorithm/sceneMap';
-import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
-import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
-import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
 import { useObjectRef } from 'utilities/hooks/useObjectRef';
 import { RootStateT } from 'store/types';
@@ -33,23 +15,15 @@ import { CoordinateGrid } from './CoordinateGrid';
 import { ReactAreas } from './ReactAreas';
 import {
   downloadTagCloudHtmlFile,
-  getEventDocumentCoordinates,
-  getActiveVacanciesByCoordinates,
-  canvasCoordinatesToSceneCoordinates,
-  documentCoordinatesToCanvasFrameCoordinates,
-  limitCoordinatesWithCanvasFrameBoundaries,
   flatVacancies,
-  sceneCoordinatesToCanvasCoordinates,
   calcSVGSizeFactor,
   getSVGViewBox,
-  canvasFrameCoordinatesToCanvasCoordinates,
   getCanvasFrameOffset,
 } from './utils';
-import { formTagTransformStyle } from './styleUtils';
 import { TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX, TAG_AVATAR_CANVAS_Z_INDEX } from './constants';
 import { SceneFrameT } from 'types/types';
-import { DraggableTagT } from './types';
 import { FrameOffsetT } from './utils';
+import { useTagDrag, DraggableTagAvatarProps } from './useTagDrag';
 
 type PropsT = {
   width: number;
@@ -63,9 +37,6 @@ type PropsT = {
   sceneFrame: SceneFrameT;
   isTagsCloudInteractionDisabled: boolean;
 };
-
-const MOVEMENT_THRESHOLD = 10; // px
-const CHANGE_ROTATION_THRESHOLD = 500; // ms
 
 const useStyles = makeStyles({
   container: {
@@ -87,14 +58,6 @@ const useStyles = makeStyles({
     touchAction: 'none',
   },
 });
-
-type DraggableTagAvatarProps = {
-  label?: string;
-  color?: string;
-  fontSize?: number;
-  display?: string;
-  ref?: React.Ref<SVGTextElement>;
-};
 
 const DraggableTagAvatar = (props: DraggableTagAvatarProps) => {
   const { label = '', color = 'black', fontSize = 8, display = 'none', ref } = props;
@@ -163,10 +126,9 @@ export const SvgTagsCloud = ({
   const canvasFrameOffset = useRef<FrameOffsetT | null>(null);
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
   const draggableTagAvatarRef = useRef<SVGTextElement | null>(null);
-  const preventOnClickHandlingRef = useRef<boolean>(false);
-  const handleMouseUpEventRef = useRef(() => {});
+  const handleMouseUpEventRef = useRef(noop);
   const svgSizeFactorRef = useRef(1);
-  const downloadTagCloudRef = useRef(() => {});
+  const downloadTagCloudRef = useRef(noop);
 
   const [tagEndIndexToShow, setTagEndIndexToShow] = useState<number>(-1);
 
@@ -182,39 +144,9 @@ export const SvgTagsCloud = ({
 
   const classes = useStyles({ fontFamily });
 
-  const [draggableTag, setDraggableTag] = useState<DraggableTagT | null>(null);
-  const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
-
-  const tmpVacancies = useMemo(() => {
-    if (!draggableTag || !sceneMapPositions) {
-      return null;
-    }
-    const tagPosition = tagsPositions?.find(({ id }) => id === draggableTag.id);
-    if (!tagPosition) {
-      return null;
-    }
-
-    const rectAreaMapKey = formRectAreaMapKey(tagPosition.label, tagPosition.fontSize);
-
-    const { map: rectAreaMap } = rectAreasMaps.find(({ key }) => key === rectAreaMapKey) ?? {};
-
-    if (!rectAreaMap) {
-      return null;
-    }
-    const sceneMap = releaseRectAreaPositionsOnSceneMap(sceneMapPositions, tagPosition, rectAreaMap);
-
-    return getSceneMapVacancies(sceneMap);
-  }, [sceneMapPositions, draggableTag, rectAreasMaps, tagsPositions]);
-
   useCounterChanged({ counter: downloadCloudCounter, callbackRef: downloadTagCloudRef });
 
   const scaleRef = useObjectRef<number>(scale);
-
-  useEffect(() => {
-    if (!draggableTag) {
-      preventOnClickHandlingRef.current = false;
-    }
-  }, [draggableTag]);
 
   const sceneMapEdges = useMemo(() => {
     if (!sceneMapPositions) {
@@ -240,6 +172,30 @@ export const SvgTagsCloud = ({
 
   const tagsCount = tagsSvgData?.data?.length ?? 0;
 
+  const renderModel = useMemo(() => {
+    if (!tagsPositions || !tagsSvgData) {
+      return null;
+    }
+    const { viewBox: fullSceneViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
+
+    const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale });
+    const viewBox = getSVGViewBox({ fullSceneViewBox, sceneFrame });
+    const svgSizeFactor = calcSVGSizeFactor(svgSize, fullSceneViewBox) ?? 1;
+    const canvasFrameOffsetValue = getCanvasFrameOffset(fullSceneViewBox, viewBox, svgSizeFactor);
+
+    return {
+      aspectRatio,
+      canvasFrameOffsetValue,
+      fullSceneViewBox,
+      positionedTagSvgData,
+      readyTagPositions: tagsPositions,
+      svgSize,
+      svgSizeFactor,
+      transform,
+      viewBox,
+    };
+  }, [height, scale, sceneFrame, tagsPositions, tagsSvgData, width]);
+
   useEffect(() => {
     if (!tagsCount || tagEndIndexToShow === -1) {
       return;
@@ -258,289 +214,24 @@ export const SvgTagsCloud = ({
     };
   }, [tagsCount, tagEndIndexToShow, tagByTagRenderInterval]);
 
-  const onContextMenu = useCallback((e: React.SyntheticEvent<EventTarget>) => {
-    if (!(e.target instanceof SVGTextElement)) {
-      return;
-    }
-    e.preventDefault();
-  }, []);
-
-  const onCanvasWrapperClick = useCallback(
-    (e: React.SyntheticEvent<EventTarget>) => {
-      if (isTagsCloudInteractionDisabled) {
-        return;
-      }
-      if (!(e.target instanceof SVGTextElement)) {
-        return;
-      }
-      const tagId = e.target.dataset.id;
-
-      if (!tagId) {
-        return;
-      }
-
-      if (!preventOnClickHandlingRef.current) {
-        onTagClick(tagId);
-      }
-    },
-    [isTagsCloudInteractionDisabled, onTagClick],
-  );
-
-  const onCanvasWrapperMouseDown = useCallback(
-    (event: React.MouseEvent | React.TouchEvent) => {
-      if (isTagsCloudInteractionDisabled || !canvasFrameOffset.current) {
-        return;
-      }
-
-      if (!(event.target instanceof SVGTextElement)) {
-        return;
-      }
-      const tagId = event.target.dataset.id;
-      if (!draggableTagAvatarRef.current || !tagId || !sceneMapEdges) {
-        return;
-      }
-
-      const tagPosition = tagsPositions?.find(({ id }) => id === tagId);
-
-      const { pageX: initPageX, pageY: initPageY } = getEventDocumentCoordinates(event);
-
-      if (!tagPosition || initPageX === null || initPageY === null) {
-        return;
-      }
-
-      const { x: rectLeftCanvasCoordinate, y: rectTopCanvasCoordinate } = sceneCoordinatesToCanvasCoordinates(
-        {
-          x: tagPosition.rectLeft,
-          y: tagPosition.rectTop,
-        },
-        { sceneMapEdges, svgSizeFactor: svgSizeFactorRef.current, sceneMapResolution },
-      );
-
-      const canvasWrapperRect = canvasWrapperRef.current?.getBoundingClientRect();
-      if (!canvasWrapperRect) {
-        return;
-      }
-
-      const initCanvasCoordinates = canvasFrameCoordinatesToCanvasCoordinates({
-        coordinates: documentCoordinatesToCanvasFrameCoordinates(
-          {
-            x: initPageX,
-            y: initPageY,
-          },
-          canvasWrapperRect,
-        ),
-        canvasFrameOffset: canvasFrameOffset.current,
-        scale: scaleRef.current,
-      });
-
-      const shiftX = initCanvasCoordinates.x - rectLeftCanvasCoordinate;
-      const shiftY = initCanvasCoordinates.y - rectTopCanvasCoordinate;
-
-      const initTime = Date.now();
-
-      let didDraggingStart = false;
-      let changeRotation = false;
-
-      const throttledSetDraggableTagPosition = throttle(setDraggableTagPosition, 100);
-
-      const onMouseMove = (moveEvent: MouseEvent | TouchEvent) => {
-        if ('touches' in event && event.touches.length !== 1) {
-          // probably pinching case
-          return;
-        }
-
-        const { pageX, pageY } = getEventDocumentCoordinates(moveEvent);
-        if (pageX === null || pageY === null) {
-          return;
-        }
-        if (!didDraggingStart) {
-          didDraggingStart = ((initPageX - pageX) ** 2 + (initPageY - pageY) ** 2) ** 0.5 > MOVEMENT_THRESHOLD;
-          if (didDraggingStart) {
-            changeRotation = Date.now() - initTime > CHANGE_ROTATION_THRESHOLD;
-            setDraggableTag({ id: tagId, changeRotation });
-          }
-        }
-
-        if (!didDraggingStart) {
-          return;
-        }
-
-        preventOnClickHandlingRef.current = true;
-
-        if (
-          !draggableTagAvatarRef.current ||
-          !draggableTagAvatarRef.current.style ||
-          !sceneMapEdges ||
-          !canvasFrameOffset.current
-        ) {
-          return;
-        }
-
-        const { current: currentSVGSizeFactor } = svgSizeFactorRef;
-        const scaleValue = scaleRef.current;
-
-        const pointerCanvasCoordinates = canvasFrameCoordinatesToCanvasCoordinates({
-          coordinates: limitCoordinatesWithCanvasFrameBoundaries(
-            documentCoordinatesToCanvasFrameCoordinates(
-              {
-                x: pageX,
-                y: pageY,
-              },
-              canvasWrapperRect,
-            ),
-            canvasWrapperRect,
-          ),
-          canvasFrameOffset: canvasFrameOffset.current,
-          scale: scaleValue,
-        });
-
-        const pointerSceneCoordinates = canvasCoordinatesToSceneCoordinates(pointerCanvasCoordinates, {
-          sceneMapEdges,
-          svgSizeFactor: currentSVGSizeFactor,
-          sceneMapResolution,
-        });
-
-        const rotate = changeRotation ? !tagPosition.rotate : tagPosition.rotate;
-
-        const { rectTop, rectBottom, rectLeft, rectRight } = tagPosition;
-        const tagAvatarWidth = changeRotation ? rectTop - rectBottom : rectRight - rectLeft;
-        const tagAvatarHeight = changeRotation ? rectRight - rectLeft : rectTop - rectBottom;
-
-        const nextRectTop =
-          pointerSceneCoordinates.y * sceneMapResolution +
-          (changeRotation ? tagAvatarHeight / 2 : shiftY / currentSVGSizeFactor);
-        const nextRectLeft =
-          pointerSceneCoordinates.x * sceneMapResolution -
-          (changeRotation ? tagAvatarWidth / 2 : shiftX / currentSVGSizeFactor);
-
-        const { rectTranslateX, rectTranslateY } = calcTagSvgData(
-          {
-            glyphsXOffset: tagPosition.glyphsXOffset,
-            glyphsYOffset: tagPosition.glyphsYOffset,
-            rectTop: nextRectTop,
-            rectBottom: nextRectTop - tagAvatarHeight,
-            rectLeft: nextRectLeft,
-            rectRight: nextRectLeft + tagAvatarWidth,
-            rotate,
-          },
-          getFontYFactor(fontFamily) - 0.5,
-        );
-
-        draggableTagAvatarRef.current.style.transform = formTagTransformStyle({
-          translateX: rectTranslateX,
-          translateY: rectTranslateY,
-          isRotated: rotate,
-        });
-
-        draggableTagAvatarRef.current.style.display = 'block';
-
-        throttledSetDraggableTagPosition({ x: pointerCanvasCoordinates.x, y: pointerCanvasCoordinates.y });
-      };
-      const onMouseUp = () => {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-
-        document.removeEventListener('touchmove', onMouseMove);
-        document.removeEventListener('touchend', onMouseUp);
-
-        if (!didDraggingStart) {
-          return;
-        }
-
-        throttledSetDraggableTagPosition.cancel();
-
-        if (draggableTagAvatarRef.current) {
-          draggableTagAvatarRef.current.style.display = 'none';
-        }
-
-        handleMouseUpEventRef.current();
-      };
-
-      if ('ontouchstart' in window) {
-        document.addEventListener('touchend', onMouseUp);
-        document.addEventListener('touchmove', onMouseMove);
-      } else {
-        document.addEventListener('mouseup', onMouseUp);
-        document.addEventListener('mousemove', onMouseMove);
-      }
-    },
-    [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, scaleRef, fontFamily],
-  );
-
-  const renderModel = useMemo(() => {
-    if (!tagsPositions || !tagsSvgData) {
-      return null;
-    }
-    const { viewBox: fullSceneViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
-
-    const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale });
-    const viewBox = getSVGViewBox({ fullSceneViewBox, sceneFrame });
-    const svgSizeFactor = calcSVGSizeFactor(svgSize, fullSceneViewBox) ?? 1;
-    const canvasFrameOffsetValue = getCanvasFrameOffset(fullSceneViewBox, viewBox, svgSizeFactor);
-
-    const activeVacancies = (() => {
-      const vacanciesToProcess = tmpVacancies ?? vacancies;
-      if (!draggableTagPosition || !draggableTag || !vacanciesToProcess || !sceneMapEdges) {
-        return null;
-      }
-      const tagPosition = tagsPositions?.find(({ id }) => id === draggableTag.id);
-      if (!tagPosition) {
-        return null;
-      }
-
-      const rectAreaMapKey = formRectAreaMapKey(tagPosition.label, tagPosition.fontSize);
-
-      const { map: rectAreaMap } = rectAreasMaps.find(({ key }) => key === rectAreaMapKey) ?? {};
-
-      if (!rectAreaMap) {
-        return null;
-      }
-
-      const rotate = draggableTag.changeRotation ? !tagPosition.rotate : tagPosition.rotate;
-      const tagRectArea = rotate
-        ? rotateRectArea(getRectAreaOfRectAreaMap(rectAreaMap))
-        : getRectAreaOfRectAreaMap(rectAreaMap);
-
-      if (!tagRectArea) {
-        return null;
-      }
-
-      const scenePointCoordinates = canvasCoordinatesToSceneCoordinates(draggableTagPosition, {
-        sceneMapEdges,
-        svgSizeFactor,
-        sceneMapResolution,
-      });
-
-      return flatVacancies(getActiveVacanciesByCoordinates(scenePointCoordinates, tagRectArea, vacanciesToProcess));
-    })();
-
-    return {
-      activeVacancies,
-      aspectRatio,
-      canvasFrameOffsetValue,
-      fullSceneViewBox,
-      positionedTagSvgData,
-      readyTagPositions: tagsPositions,
-      svgSize,
-      svgSizeFactor,
-      transform,
-      viewBox,
-    };
-  }, [
-    draggableTag,
-    draggableTagPosition,
-    height,
-    rectAreasMaps,
-    scale,
-    sceneFrame,
+  const { bind, draggableTag, draggableTagAvatarProps, activeVacancies, clearDragState } = useTagDrag({
+    isInteractionDisabled: isTagsCloudInteractionDisabled,
+    canvasWrapperRef,
+    canvasFrameOffsetRef: canvasFrameOffset,
+    draggableTagAvatarRef,
+    svgSizeFactorRef,
+    svgSizeFactor: renderModel?.svgSizeFactor ?? 1,
+    scaleRef,
+    onDragEndRef: handleMouseUpEventRef,
+    sceneMapPositions,
     sceneMapEdges,
     sceneMapResolution,
     tagsPositions,
-    tagsSvgData,
-    tmpVacancies,
+    rectAreasMaps,
     vacancies,
-    width,
-  ]);
+    fontFamily,
+    onTagClick,
+  });
 
   useLayoutEffect(() => {
     if (!renderModel) {
@@ -550,7 +241,6 @@ export const SvgTagsCloud = ({
     }
 
     const {
-      activeVacancies,
       positionedTagSvgData,
       readyTagPositions,
       svgSize,
@@ -564,8 +254,7 @@ export const SvgTagsCloud = ({
     canvasFrameOffset.current = canvasFrameOffsetValue;
 
     handleMouseUpEventRef.current = () => {
-      setDraggableTagPosition(null);
-      setDraggableTag(null);
+      clearDragState();
 
       if (!activeVacancies || !activeVacancies.length || !draggableTag) {
         return;
@@ -600,46 +289,24 @@ export const SvgTagsCloud = ({
       });
       downloadTagCloudHtmlFile(html);
     };
-  }, [dispatch, draggableTag, fontFamily, renderModel]);
+  }, [dispatch, draggableTag, fontFamily, renderModel, activeVacancies, clearDragState]);
 
   if (!renderModel) {
     return null;
   }
 
-  const {
-    activeVacancies,
-    fullSceneViewBox,
-    positionedTagSvgData,
-    readyTagPositions,
-    svgSize,
-    svgSizeFactor,
-    transform,
-    viewBox,
-  } = renderModel;
-
-  const draggableTagAvatarProps = (() => {
-    if (!draggableTag) {
-      return {};
-    }
-    const tagPosition = readyTagPositions.find(({ id }) => id === draggableTag.id);
-    if (!tagPosition) {
-      return {};
-    }
-
-    const { label, color, fontSize } = tagPosition;
-    return { label, color, fontSize, display: 'block' };
-  })();
+  const { fullSceneViewBox, positionedTagSvgData, readyTagPositions, svgSize, svgSizeFactor, transform, viewBox } =
+    renderModel;
 
   return (
     <div className={classes.container}>
       <div
         className={classes.canvasWrapper}
         ref={canvasWrapperRef}
-        onClick={onCanvasWrapperClick}
-        onContextMenu={onContextMenu}
-        {...('ontouchstart' in window
-          ? { onTouchStart: onCanvasWrapperMouseDown }
-          : { onMouseDown: onCanvasWrapperMouseDown })}
+        onClick={bind.onClick}
+        onContextMenu={bind.onContextMenu}
+        onMouseDown={bind.onMouseDown}
+        onTouchStart={bind.onTouchStart}
       >
         {isCoordinateGridShown && (
           <CoordinateGrid
@@ -693,7 +360,7 @@ export const SvgTagsCloud = ({
           viewBox={viewBox.join(' ')}
         >
           <g transform={transform}>
-            <DraggableTagAvatar ref={draggableTagAvatarRef} {...draggableTagAvatarProps} />
+            <DraggableTagAvatar {...draggableTagAvatarProps} />
           </g>
         </svg>
       </div>
