@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { QueryStatuses } from 'constants/queryStatuses';
 import type { RootStateT } from 'store/types';
-import type { SceneFrameT } from 'types/types';
+import type { PositionedTagRectT, SceneFrameT } from 'types/types';
 import { SvgTagsCloudBuilt, SvgTagsCloudHandle } from './SvgTagsCloudBuilt';
 
 type PropsT = {
@@ -41,6 +41,11 @@ export const SvgTagsCloud = ({
     return null;
   }
 
+  const { tagsPositions } = tagsCloud;
+  if (tagsPositions.length === 0) {
+    return null;
+  }
+
   return (
     <SvgTagsCloudBuilt
       downloadCloudCounter={downloadCloudCounter}
@@ -57,7 +62,7 @@ export const SvgTagsCloud = ({
       sceneMapPositions={tagsCloud.sceneMap}
       sceneMapResolution={sceneMapResolution}
       tagByTagRenderInterval={tagByTagRenderInterval}
-      tagsPositions={tagsCloud.tagsPositions}
+      tagsPositions={tagsPositions as readonly [PositionedTagRectT, ...PositionedTagRectT[]]}
       vacancies={tagsCloud.vacancies}
       width={width}
       onTagClick={onTagClick}

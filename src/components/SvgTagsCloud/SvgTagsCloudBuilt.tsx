@@ -1,18 +1,8 @@
-import React, {
-  RefObject,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import throttle from 'lodash.throttle';
 import { useDispatch } from 'react-redux';
 import * as actions from 'store/actions/tagsCloud';
-import { noop } from 'utilities/noop';
 import { getTagsSvgData, calcTagSvgData } from 'utilities/tagsCloud/tagSvgData';
 import { getSuitableSize } from 'utilities/common/getSuitableSize';
 import {
@@ -27,7 +17,7 @@ import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
 import { useObjectRef } from 'utilities/hooks/useObjectRef';
 import type { RootStateT } from 'store/types';
-import type { SceneFrameT } from 'types/types';
+import type { PositionedTagRectT, SceneFrameT } from 'types/types';
 import { CoordinateGrid } from './CoordinateGrid';
 import { ReactAreas } from './ReactAreas';
 import { Tags } from './Tags';
@@ -68,10 +58,14 @@ type PropsT = {
 };
 
 export type SvgTagsCloudHandle = { oneByOne: () => void };
+
+// Caller must ensure at least one tag so `getTagsSvgData` is never null
+type NonEmptyTagsPositions = readonly [PositionedTagRectT, ...PositionedTagRectT[]];
+
 type SvgTagsCloudBuiltProps = PropsT & {
   outerRef?: React.Ref<SvgTagsCloudHandle>;
   rectAreasMaps: RootStateT['rectAreasMapsData'];
-  tagsPositions: NonNullable<RootStateT['tagsCloud']['tagsPositions']>;
+  tagsPositions: NonEmptyTagsPositions;
   sceneMapPositions: NonNullable<RootStateT['tagsCloud']['sceneMap']>;
   vacancies: NonNullable<RootStateT['tagsCloud']['vacancies']>;
   fontFamily: RootStateT['settings']['fontFamily'];
@@ -140,9 +134,9 @@ export const SvgTagsCloudBuilt = ({
 
   const sceneMapEdges = useMemo(() => new SceneMap(sceneMapPositions).getSceneEdges(), [sceneMapPositions]);
 
-  const tagsSvgData = useMemo(() => {
+  const tagsSvgData: NonNullable<ReturnType<typeof getTagsSvgData>> = useMemo(() => {
     const sortedTagsPositions = [...tagsPositions].sort((a, b) => b.fontSize - a.fontSize);
-    return getTagsSvgData(sortedTagsPositions, { fontFamily });
+    return getTagsSvgData(sortedTagsPositions, { fontFamily })!;
   }, [tagsPositions, fontFamily]);
 
   const tmpVacancies = useMemo(() => {
@@ -180,8 +174,6 @@ export const SvgTagsCloudBuilt = ({
     }
     return flatVacancies(vacancies);
   }, [vacancies, isVacanciesShown]);
-
-  const tagsCount = tagsSvgData?.data?.length ?? 0;
 
   const onContextMenu = useCallback((e: React.SyntheticEvent<EventTarget>) => {
     if (!(e.target instanceof SVGTextElement)) {
@@ -387,7 +379,7 @@ export const SvgTagsCloudBuilt = ({
     [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, scaleRef, fontFamily],
   );
 
-  const { tagEndIndexToShow, beginTagByTagReveal } = useTagByTagReveal(tagsCount, tagByTagRenderInterval);
+  const { tagEndIndexToShow, beginTagByTagReveal } = useTagByTagReveal(tagsSvgData.data.length, tagByTagRenderInterval);
 
   useImperativeHandle(
     outerRef,
@@ -398,10 +390,6 @@ export const SvgTagsCloudBuilt = ({
   );
 
   const renderModel = useMemo(() => {
-    if (!tagsSvgData) {
-      return null;
-    }
-
     const { viewBox: fullSceneViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
 
     const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale });
@@ -471,15 +459,6 @@ export const SvgTagsCloudBuilt = ({
   ]);
 
   useLayoutEffect(() => {
-    if (!renderModel) {
-      handleMouseUpEventRef.current = noop;
-      downloadTagCloudRef.current = noop;
-      return;
-    }
-
-    handleMouseUpEventRef.current = noop;
-    downloadTagCloudRef.current = noop;
-
     const {
       activeVacancies,
       positionedTagSvgData,
@@ -532,10 +511,6 @@ export const SvgTagsCloudBuilt = ({
       downloadTagCloudHtmlFile(html);
     };
   }, [dispatch, draggableTag, fontFamily, renderModel]);
-
-  if (!renderModel) {
-    return null;
-  }
 
   const {
     activeVacancies,
