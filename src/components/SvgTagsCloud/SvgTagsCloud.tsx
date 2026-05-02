@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect, useLayoutEffect, useImperativeHandle, RefObject } from 'react';
+import React, { useMemo, useRef, useEffect, useLayoutEffect, useImperativeHandle, RefObject } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/core';
 import * as actions from 'store/actions/tagsCloud';
@@ -24,6 +24,7 @@ import { TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX, TAG_AVATAR_CANVAS_Z_INDEX } from './
 import { SceneFrameT } from 'types/types';
 import { FrameOffsetT } from './utils';
 import { useTagDrag, DraggableTagAvatarProps } from './useTagDrag';
+import { useTagByTagReveal } from './useTagByTagReveal';
 
 type PropsT = {
   width: number;
@@ -130,18 +131,6 @@ export const SvgTagsCloud = ({
   const svgSizeFactorRef = useRef(1);
   const downloadTagCloudRef = useRef(noop);
 
-  const [tagEndIndexToShow, setTagEndIndexToShow] = useState<number>(-1);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      oneByOne: () => {
-        setTagEndIndexToShow(1);
-      },
-    }),
-    [],
-  );
-
   const classes = useStyles({ fontFamily });
 
   useCounterChanged({ counter: downloadCloudCounter, callbackRef: downloadTagCloudRef });
@@ -172,6 +161,16 @@ export const SvgTagsCloud = ({
 
   const tagsCount = tagsSvgData?.data?.length ?? 0;
 
+  const { tagEndIndexToShow, beginTagByTagReveal } = useTagByTagReveal(tagsCount, tagByTagRenderInterval);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      oneByOne: beginTagByTagReveal,
+    }),
+    [beginTagByTagReveal],
+  );
+
   const renderModel = useMemo(() => {
     if (!tagsPositions || !tagsSvgData) {
       return null;
@@ -195,24 +194,6 @@ export const SvgTagsCloud = ({
       viewBox,
     };
   }, [height, scale, sceneFrame, tagsPositions, tagsSvgData, width]);
-
-  useEffect(() => {
-    if (!tagsCount || tagEndIndexToShow === -1) {
-      return;
-    }
-    if (tagEndIndexToShow >= tagsCount) {
-      queueMicrotask(() => {
-        setTagEndIndexToShow(-1);
-      });
-      return;
-    }
-    const timeout = setTimeout(() => {
-      setTagEndIndexToShow((v) => v + 1);
-    }, tagByTagRenderInterval * 100);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [tagsCount, tagEndIndexToShow, tagByTagRenderInterval]);
 
   const { bind, draggableTag, draggableTagAvatarProps, activeVacancies, clearDragState } = useTagDrag({
     isInteractionDisabled: isTagsCloudInteractionDisabled,
