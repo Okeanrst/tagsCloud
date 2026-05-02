@@ -127,7 +127,7 @@ export const SvgTagsCloudBuilt = ({
   const svgSizeFactorRef = useRef(1);
   const downloadTagCloudRef = useRef(() => {});
 
-  const classes = useStyles({ fontFamily });
+  const classes = useStyles();
 
   const [draggableTag, setDraggableTag] = useState<DraggableTagT | null>(null);
   const [draggableTagPosition, setDraggableTagPosition] = useState<{ x: number; y: number } | null>(null);
