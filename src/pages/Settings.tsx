@@ -161,11 +161,11 @@ export const Settings = () => {
     }
   }, [errors, throttledUpdateSettings, values]);
 
-  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = useCallback((e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
   }, []);
 
-  const onInputChange = useCallback((e: React.FormEvent<HTMLElement>) => {
+  const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     if (!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLSelectElement)) {
       return;
     }

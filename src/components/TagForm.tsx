@@ -101,7 +101,7 @@ class TagForm extends Component<PropsT, StateT> {
     };
   }
 
-  handleInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+  handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!(e.target instanceof HTMLInputElement)) {
       return;
     }
@@ -119,7 +119,7 @@ class TagForm extends Component<PropsT, StateT> {
     });
   };
 
-  onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  onSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { onSubmit } = this.props;
     const { values } = this.state;
