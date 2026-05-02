@@ -50,6 +50,7 @@ import { TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX, TAG_AVATAR_CANVAS_Z_INDEX } from './
 import { SceneFrameT } from 'types/types';
 import { DraggableTagT } from './types';
 import { FrameOffsetT } from './utils';
+import { useTagByTagReveal } from './useTagByTagReveal';
 
 type PropsT = {
   width: number;
@@ -168,18 +169,6 @@ export const SvgTagsCloud = ({
   const svgSizeFactorRef = useRef(1);
   const downloadTagCloudRef = useRef(() => {});
 
-  const [tagEndIndexToShow, setTagEndIndexToShow] = useState<number>(-1);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      oneByOne: () => {
-        setTagEndIndexToShow(1);
-      },
-    }),
-    [],
-  );
-
   const classes = useStyles({ fontFamily });
 
   const [draggableTag, setDraggableTag] = useState<DraggableTagT | null>(null);
@@ -239,24 +228,6 @@ export const SvgTagsCloud = ({
   }, [vacancies, isVacanciesShown]);
 
   const tagsCount = tagsSvgData?.data?.length ?? 0;
-
-  useEffect(() => {
-    if (!tagsCount || tagEndIndexToShow === -1) {
-      return;
-    }
-    if (tagEndIndexToShow >= tagsCount) {
-      queueMicrotask(() => {
-        setTagEndIndexToShow(-1);
-      });
-      return;
-    }
-    const timeout = setTimeout(() => {
-      setTagEndIndexToShow((v) => v + 1);
-    }, tagByTagRenderInterval * 100);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [tagsCount, tagEndIndexToShow, tagByTagRenderInterval]);
 
   const onContextMenu = useCallback((e: React.SyntheticEvent<EventTarget>) => {
     if (!(e.target instanceof SVGTextElement)) {
@@ -465,6 +436,16 @@ export const SvgTagsCloud = ({
       }
     },
     [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, scaleRef, fontFamily],
+  );
+
+  const { tagEndIndexToShow, beginTagByTagReveal } = useTagByTagReveal(tagsCount, tagByTagRenderInterval);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      oneByOne: beginTagByTagReveal,
+    }),
+    [beginTagByTagReveal],
   );
 
   const renderModel = useMemo(() => {
