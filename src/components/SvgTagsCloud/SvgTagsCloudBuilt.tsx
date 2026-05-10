@@ -16,6 +16,7 @@ import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
 import { useObjectRef } from 'utilities/hooks/useObjectRef';
+import type { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
 import type { RootStateT } from 'store/types';
 import type { PositionedTagRectT, SceneFrameT } from 'types/types';
 import { CoordinateGrid } from './CoordinateGrid';
@@ -75,6 +76,40 @@ type SvgTagsCloudBuiltProps = PropsT & {
 
 const MOVEMENT_THRESHOLD = 10; // px
 const CHANGE_ROTATION_THRESHOLD = 500; // ms
+
+type VacancyItemT = { vacancy: VacancyT; kind: VacancyKinds };
+type VacancyRenderItemT = VacancyItemT & { importance: 0 | 1 | 2 };
+
+const vacancyKey = ({ vacancy, kind }: VacancyItemT) =>
+  `${vacancy.left},${vacancy.right},${vacancy.top},${vacancy.bottom},${kind}`;
+
+const buildVacanciesToRender = ({
+  isAllVacanciesShown,
+  allVacancies,
+  activeVacancies,
+}: {
+  isAllVacanciesShown: boolean;
+  allVacancies: VacancyItemT[] | null;
+  activeVacancies: VacancyItemT[] | null;
+}): VacancyRenderItemT[] | null => {
+  const byKey = new Map<string, VacancyRenderItemT>();
+
+  if (isAllVacanciesShown) {
+    (allVacancies ?? []).forEach((v) => {
+      byKey.set(vacancyKey(v), { ...v, importance: 0 });
+    });
+  }
+
+  (activeVacancies ?? []).forEach((v, index) => {
+    byKey.set(vacancyKey(v), { ...v, importance: index === 0 ? 2 : 1 });
+  });
+
+  if (!byKey.size) {
+    return null;
+  }
+
+  return [...byKey.values()].sort((a, b) => b.importance - a.importance);
+};
 
 const useStyles = makeStyles({
   container: {
@@ -167,13 +202,6 @@ export const SvgTagsCloudBuilt = ({
       preventOnClickHandlingRef.current = false;
     }
   }, [draggableTag]);
-
-  const allVacancies = useMemo(() => {
-    if (!isVacanciesShown) {
-      return null;
-    }
-    return flatVacancies(vacancies);
-  }, [vacancies, isVacanciesShown]);
 
   const onContextMenu = useCallback((e: React.SyntheticEvent<EventTarget>) => {
     if (!(e.target instanceof SVGTextElement)) {
@@ -516,6 +544,23 @@ export const SvgTagsCloudBuilt = ({
     viewBox,
   } = renderModel;
 
+  const allVacancies = useMemo(() => {
+    if (!isVacanciesShown) {
+      return null;
+    }
+    return flatVacancies(vacancies);
+  }, [vacancies, isVacanciesShown]);
+
+  const vacanciesToRender = useMemo(
+    () =>
+      buildVacanciesToRender({
+        isAllVacanciesShown: isVacanciesShown,
+        allVacancies: allVacancies ?? [],
+        activeVacancies,
+      }),
+    [activeVacancies, allVacancies, isVacanciesShown],
+  );
+
   const draggableTagAvatarProps = (() => {
     if (!draggableTag) {
       return {};
@@ -574,15 +619,7 @@ export const SvgTagsCloudBuilt = ({
           sceneMapResolution={sceneMapResolution}
           svgSize={svgSize}
           transform={transform}
-          vacancies={activeVacancies}
-          viewBox={viewBox}
-        />
-        <Vacancies
-          sceneMapEdges={sceneMapEdges}
-          sceneMapResolution={sceneMapResolution}
-          svgSize={svgSize}
-          transform={transform}
-          vacancies={allVacancies}
+          vacancies={vacanciesToRender}
           viewBox={viewBox}
         />
         <svg

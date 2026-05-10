@@ -5,7 +5,7 @@ import { SizeT, ViewBoxT } from 'types/types';
 
 type ActiveVacanciesPropsT = {
   sceneMapEdges: SceneEdgesT | null;
-  vacancies: { vacancy: VacancyT; kind: VacancyKinds }[] | null;
+  vacancies: { vacancy: VacancyT; kind: VacancyKinds; importance: 0 | 1 | 2 }[] | null;
   svgSize: SizeT;
   viewBox: ViewBoxT;
   transform: string;
@@ -18,10 +18,16 @@ const activeVacanciesStyle: React.CSSProperties = {
   left: 0,
 };
 
+const vacancyStrokeWidthByImportance: Record<0 | 1 | 2, number> = {
+  0: 0.5,
+  1: 1,
+  2: 2,
+};
+
 const renderVacancyRect = (
   vacancy: VacancyT,
   sceneMapEdges: SceneEdgesT,
-  { kind, importanceIndex, sceneMapResolution }: { kind: string; importanceIndex: number; sceneMapResolution: number },
+  { kind, importance, sceneMapResolution }: { kind: string; importance: 0 | 1 | 2; sceneMapResolution: number },
 ) => {
   // when the coordinate is not defined, then it is a vacancy on the edge (an edge vacancy)
   const left = Number.isFinite(vacancy.left) ? vacancy.left : sceneMapEdges[Dimensions.MINUS_X];
@@ -42,7 +48,7 @@ const renderVacancyRect = (
       key={`${left},${right},${top},${bottom},${kind}`}
       stroke="blue"
       strokeOpacity="0.25"
-      strokeWidth={importanceIndex === 0 ? 1 : 0.5}
+      strokeWidth={vacancyStrokeWidthByImportance[importance]}
       width={SceneMap.countPositions(left, right) * sceneMapResolution}
       x={SceneMap.getPositionLeftEdge(left) * sceneMapResolution}
       y={-SceneMap.getPositionRightEdge(top) * sceneMapResolution}
@@ -60,9 +66,13 @@ export const Vacancies = ({
 }: ActiveVacanciesPropsT) => {
   const rects: React.ReactNode[] = [];
   if (vacancies && sceneMapEdges) {
-    vacancies.forEach(({ vacancy, kind }) => {
+    vacancies.forEach(({ vacancy, kind, importance }) => {
       rects.push(
-        renderVacancyRect(vacancy, sceneMapEdges, { kind, importanceIndex: rects.length, sceneMapResolution }),
+        renderVacancyRect(vacancy, sceneMapEdges, {
+          kind,
+          importance,
+          sceneMapResolution,
+        }),
       );
     });
   }
