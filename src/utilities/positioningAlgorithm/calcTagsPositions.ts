@@ -808,7 +808,7 @@ export async function calcTagsPositions({
             }) ?? {});
         }
 
-        if (rectPosition && pickedVacancyIndex) {
+        if (rectPosition && pickedVacancyIndex !== undefined) {
           try {
             updateSceneMap(rectPosition, rectAreaMap, isRotated);
             positionedRectsData.push(creatMapPositionedTagRect(rect, rectPosition, isRotated));
