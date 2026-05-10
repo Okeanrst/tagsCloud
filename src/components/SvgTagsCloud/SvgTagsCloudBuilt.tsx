@@ -119,7 +119,7 @@ export const SvgTagsCloudBuilt = ({
 }: SvgTagsCloudBuiltProps) => {
   const dispatch = useDispatch();
 
-  const canvasFrameOffset = useRef<FrameOffsetT | null>(null);
+  const canvasFrameOffsetRef = useRef<FrameOffsetT | null>(null);
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
   const draggableTagAvatarRef = useRef<SVGTextElement | null>(null);
   const preventOnClickHandlingRef = useRef<boolean>(false);
@@ -205,7 +205,7 @@ export const SvgTagsCloudBuilt = ({
 
   const onCanvasWrapperMouseDown = useCallback(
     (event: React.MouseEvent | React.TouchEvent) => {
-      if (isTagsCloudInteractionDisabled || !canvasFrameOffset.current) {
+      if (isTagsCloudInteractionDisabled || !canvasFrameOffsetRef.current) {
         return;
       }
 
@@ -246,7 +246,7 @@ export const SvgTagsCloudBuilt = ({
           },
           canvasWrapperRect,
         ),
-        canvasFrameOffset: canvasFrameOffset.current,
+        canvasFrameOffset: canvasFrameOffsetRef.current,
         scale: scaleRef.current,
       });
 
@@ -284,7 +284,7 @@ export const SvgTagsCloudBuilt = ({
 
         preventOnClickHandlingRef.current = true;
 
-        if (!draggableTagAvatarRef.current || !draggableTagAvatarRef.current.style || !canvasFrameOffset.current) {
+        if (!draggableTagAvatarRef.current || !draggableTagAvatarRef.current.style || !canvasFrameOffsetRef.current) {
           return;
         }
 
@@ -302,7 +302,7 @@ export const SvgTagsCloudBuilt = ({
             ),
             canvasWrapperRect,
           ),
-          canvasFrameOffset: canvasFrameOffset.current,
+          canvasFrameOffset: canvasFrameOffsetRef.current,
           scale: scaleValue,
         });
 
@@ -460,7 +460,7 @@ export const SvgTagsCloudBuilt = ({
 
   useLayoutEffect(() => {
     svgSizeFactorRef.current = renderModel.svgSizeFactor;
-    canvasFrameOffset.current = renderModel.canvasFrameOffsetValue;
+    canvasFrameOffsetRef.current = renderModel.canvasFrameOffsetValue;
   }, [renderModel.svgSizeFactor, renderModel.canvasFrameOffsetValue]);
 
   useLayoutEffect(() => {
