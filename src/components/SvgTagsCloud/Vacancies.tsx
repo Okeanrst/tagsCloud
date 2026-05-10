@@ -24,12 +24,15 @@ const vacancyStrokeWidthByImportance: Record<0 | 1 | 2, number> = {
   2: 2,
 };
 
-const renderVacancyRect = (
-  id: string,
-  vacancy: VacancyT,
-  sceneMapEdges: SceneEdgesT,
-  { importance, sceneMapResolution }: { importance: 0 | 1 | 2; sceneMapResolution: number },
-) => {
+type RenderVacancyRectArgsT = {
+  id: string;
+  vacancy: VacancyT;
+  sceneMapEdges: SceneEdgesT;
+  importance: 0 | 1 | 2;
+  sceneMapResolution: number;
+};
+
+const renderVacancyRect = ({ id, vacancy, sceneMapEdges, importance, sceneMapResolution }: RenderVacancyRectArgsT) => {
   // when the coordinate is not defined, then it is a vacancy on the edge (an edge vacancy)
   const left = Number.isFinite(vacancy.left) ? vacancy.left : sceneMapEdges[Dimensions.MINUS_X];
   const right = Number.isFinite(vacancy.right) ? vacancy.right : sceneMapEdges[Dimensions.X];
@@ -69,7 +72,10 @@ export const Vacancies = ({
   if (vacancies && sceneMapEdges) {
     vacancies.forEach(({ id, vacancy, importance }) => {
       rects.push(
-        renderVacancyRect(id, vacancy, sceneMapEdges, {
+        renderVacancyRect({
+          id,
+          vacancy,
+          sceneMapEdges,
           importance,
           sceneMapResolution,
         }),
