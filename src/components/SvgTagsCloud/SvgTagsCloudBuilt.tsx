@@ -459,19 +459,12 @@ export const SvgTagsCloudBuilt = ({
   ]);
 
   useLayoutEffect(() => {
-    const {
-      activeVacancies,
-      positionedTagSvgData,
-      readyTagPositions,
-      svgSize,
-      svgSizeFactor,
-      transform,
-      viewBox,
-      canvasFrameOffsetValue,
-    } = renderModel;
+    svgSizeFactorRef.current = renderModel.svgSizeFactor;
+    canvasFrameOffset.current = renderModel.canvasFrameOffsetValue;
+  }, [renderModel.svgSizeFactor, renderModel.canvasFrameOffsetValue]);
 
-    svgSizeFactorRef.current = svgSizeFactor;
-    canvasFrameOffset.current = canvasFrameOffsetValue;
+  useLayoutEffect(() => {
+    const { activeVacancies, positionedTagSvgData, readyTagPositions, svgSize, transform, viewBox } = renderModel;
 
     handleMouseUpEventRef.current = () => {
       setDraggableTagPosition(null);
