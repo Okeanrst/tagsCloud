@@ -78,9 +78,9 @@ const MOVEMENT_THRESHOLD = 10; // px
 const CHANGE_ROTATION_THRESHOLD = 500; // ms
 
 type VacancyItemT = { vacancy: VacancyT; kind: VacancyKinds };
-type VacancyRenderItemT = VacancyItemT & { importance: 0 | 1 | 2 };
+type VacancyRenderItemT = VacancyItemT & { id: string; importance: 0 | 1 | 2 };
 
-const vacancyKey = ({ vacancy, kind }: VacancyItemT) =>
+const vacancyId = ({ vacancy, kind }: VacancyItemT) =>
   `${vacancy.left},${vacancy.right},${vacancy.top},${vacancy.bottom},${kind}`;
 
 const buildVacanciesToRender = ({
@@ -96,12 +96,14 @@ const buildVacanciesToRender = ({
 
   if (isAllVacanciesShown) {
     (allVacancies ?? []).forEach((v) => {
-      byKey.set(vacancyKey(v), { ...v, importance: 0 });
+      const id = vacancyId(v);
+      byKey.set(id, { ...v, id, importance: 0 });
     });
   }
 
   (activeVacancies ?? []).forEach((v, index) => {
-    byKey.set(vacancyKey(v), { ...v, importance: index === 0 ? 2 : 1 });
+    const id = vacancyId(v);
+    byKey.set(id, { ...v, id, importance: index === 0 ? 2 : 1 });
   });
 
   if (!byKey.size) {

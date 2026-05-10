@@ -5,7 +5,7 @@ import { SizeT, ViewBoxT } from 'types/types';
 
 type ActiveVacanciesPropsT = {
   sceneMapEdges: SceneEdgesT | null;
-  vacancies: { vacancy: VacancyT; kind: VacancyKinds; importance: 0 | 1 | 2 }[] | null;
+  vacancies: { id: string; vacancy: VacancyT; kind: VacancyKinds; importance: 0 | 1 | 2 }[] | null;
   svgSize: SizeT;
   viewBox: ViewBoxT;
   transform: string;
@@ -25,9 +25,10 @@ const vacancyStrokeWidthByImportance: Record<0 | 1 | 2, number> = {
 };
 
 const renderVacancyRect = (
+  id: string,
   vacancy: VacancyT,
   sceneMapEdges: SceneEdgesT,
-  { kind, importance, sceneMapResolution }: { kind: string; importance: 0 | 1 | 2; sceneMapResolution: number },
+  { importance, sceneMapResolution }: { importance: 0 | 1 | 2; sceneMapResolution: number },
 ) => {
   // when the coordinate is not defined, then it is a vacancy on the edge (an edge vacancy)
   const left = Number.isFinite(vacancy.left) ? vacancy.left : sceneMapEdges[Dimensions.MINUS_X];
@@ -45,7 +46,7 @@ const renderVacancyRect = (
       fill="purple"
       fillOpacity="0"
       height={SceneMap.countPositions(bottom, top) * sceneMapResolution}
-      key={`${left},${right},${top},${bottom},${kind}`}
+      key={id}
       stroke="blue"
       strokeOpacity="0.25"
       strokeWidth={vacancyStrokeWidthByImportance[importance]}
@@ -66,10 +67,9 @@ export const Vacancies = ({
 }: ActiveVacanciesPropsT) => {
   const rects: React.ReactNode[] = [];
   if (vacancies && sceneMapEdges) {
-    vacancies.forEach(({ vacancy, kind, importance }) => {
+    vacancies.forEach(({ id, vacancy, importance }) => {
       rects.push(
-        renderVacancyRect(vacancy, sceneMapEdges, {
-          kind,
+        renderVacancyRect(id, vacancy, sceneMapEdges, {
           importance,
           sceneMapResolution,
         }),
