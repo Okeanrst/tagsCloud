@@ -5,7 +5,7 @@ import { PositionedTagRectT, SizeT, ViewBoxT } from 'types/types';
 type PropsT = {
   tagData: ReadonlyArray<PositionedTagRectT>;
   svgSize: SizeT;
-  viewBox: ViewBoxT;
+  svgViewBox: ViewBoxT;
   transform: string;
   svgSizeFactor: number;
 };
@@ -22,7 +22,7 @@ const reactStyle: React.CSSProperties = {
   position: 'relative',
 };
 
-export function ReactAreas({ tagData, svgSize, viewBox, transform, svgSizeFactor }: PropsT) {
+export function ReactAreas({ tagData, svgSize, svgViewBox, transform, svgSizeFactor }: PropsT) {
   const rects = tagData.map(({ id, color, rectRight, rectTop, rectLeft, rectBottom }) => {
     const x = rectLeft;
     const y = -rectTop;
@@ -32,7 +32,6 @@ export function ReactAreas({ tagData, svgSize, viewBox, transform, svgSizeFactor
 
     return (
       <rect
-        // fill="purple"
         fillOpacity="0"
         height={height}
         key={id}
@@ -47,7 +46,7 @@ export function ReactAreas({ tagData, svgSize, viewBox, transform, svgSizeFactor
     );
   });
   return (
-    <svg {...svgSize} style={rootStyle} viewBox={viewBox.join(' ')}>
+    <svg {...svgSize} style={rootStyle} viewBox={svgViewBox.join(' ')}>
       <g transform={transform}>{rects}</g>
     </svg>
   );

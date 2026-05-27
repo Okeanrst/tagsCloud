@@ -9,7 +9,7 @@ import { TagTextTransition } from './TagTextTransition';
 
 type PropsT = {
   fontFamily: FontFamilies;
-  viewBox: ViewBoxT;
+  svgViewBox: ViewBoxT;
   transform: string;
   svgSize: SizeT;
   tagEndIndexToShow: number;
@@ -32,7 +32,7 @@ const useStyles = makeStyles({
 
 export const Tags = ({
   fontFamily,
-  viewBox,
+  svgViewBox,
   transform,
   svgSize,
   tagEndIndexToShow,
@@ -46,7 +46,7 @@ export const Tags = ({
     tagEndIndexToShow === -1 ? positionedTagSvgData : positionedTagSvgData.slice(0, tagEndIndexToShow);
 
   return (
-    <svg {...svgSize} className={classes.root} style={{ fontFamily }} viewBox={viewBox.join(' ')}>
+    <svg {...svgSize} className={classes.root} style={{ fontFamily }} viewBox={svgViewBox.join(' ')}>
       <g transform={transform}>
         <TransitionGroup appear enter className="tagsCloud" component={null} exite={false}>
           {displayedTags.map((tag) => (

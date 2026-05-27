@@ -7,7 +7,7 @@ type ActiveVacanciesPropsT = {
   sceneMapEdges: SceneEdgesT | null;
   vacancies: { id: string; vacancy: VacancyT; kind: VacancyKinds; importance: 0 | 1 | 2 }[] | null;
   svgSize: SizeT;
-  viewBox: ViewBoxT;
+  svgViewBox: ViewBoxT;
   transform: string;
   sceneMapResolution: number;
 };
@@ -64,7 +64,7 @@ export const Vacancies = ({
   sceneMapEdges,
   vacancies,
   svgSize,
-  viewBox,
+  svgViewBox,
   transform,
   sceneMapResolution,
 }: ActiveVacanciesPropsT) => {
@@ -84,7 +84,7 @@ export const Vacancies = ({
   }
 
   return (
-    <svg {...svgSize} style={activeVacanciesStyle} viewBox={viewBox.join(' ')}>
+    <svg {...svgSize} style={activeVacanciesStyle} viewBox={svgViewBox.join(' ')}>
       <g transform={transform}>{rects}</g>
     </svg>
   );

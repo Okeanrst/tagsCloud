@@ -106,19 +106,47 @@ export const limitCoordinatesWithCanvasFrameBoundaries = (
   };
 };
 
-// in Canvas coordinates; not scaled
+// Rendered pixels per svgViewBox user unit (svg element size vs visible svgViewBox from sceneFrame).
+export const getViewBoxUniformScale = (svgSize: SizeT, svgViewBox: ViewBoxT) => {
+  const [, , vbWidth, vbHeight] = svgViewBox;
+  return Math.min(svgSize.width / vbWidth, svgSize.height / vbHeight);
+};
+
+// Offset of the visible svgViewBox within full-scene canvas coordinates (sceneFrame pan).
+export const getCanvasFrameOffset = (
+  noScaleSvgViewBox: ViewBoxT,
+  svgViewBox: ViewBoxT,
+  svgSizeFactor: number,
+): FrameOffsetT => {
+  const [fullSceneMinX, fullSceneMinY] = noScaleSvgViewBox;
+  const [minX, minY] = svgViewBox;
+  return { left: (minX - fullSceneMinX) * svgSizeFactor, top: (minY - fullSceneMinY) * svgSizeFactor };
+};
+
+// Map pointer position inside the SVG element to full-scene canvas coordinates.
 export const canvasFrameCoordinatesToCanvasCoordinates = ({
   coordinates,
-  canvasFrameOffset,
-  scale,
+  svgSize,
+  svgViewBox,
+  noScaleSvgViewBox,
+  svgSizeFactor,
 }: {
   coordinates: CoordinatesT;
-  canvasFrameOffset: FrameOffsetT;
-  scale: number;
+  svgSize: SizeT;
+  svgViewBox: ViewBoxT;
+  noScaleSvgViewBox: ViewBoxT;
+  svgSizeFactor: number;
 }) => {
-  const { x, y } = coordinates;
-  const { top: offsetTop, left: offsetLeft } = canvasFrameOffset;
-  return { x: x / scale + offsetLeft, y: y / scale + offsetTop };
+  const uniformScale = getViewBoxUniformScale(svgSize, svgViewBox);
+
+  const viewBoxLocalX = coordinates.x / uniformScale;
+  const viewBoxLocalY = coordinates.y / uniformScale;
+  const { left: panOffsetX, top: panOffsetY } = getCanvasFrameOffset(noScaleSvgViewBox, svgViewBox, svgSizeFactor);
+
+  return {
+    x: panOffsetX + viewBoxLocalX * svgSizeFactor,
+    y: panOffsetY + viewBoxLocalY * svgSizeFactor,
+  };
 };
 
 export const canvasCoordinatesToSceneCoordinates = (
@@ -153,19 +181,19 @@ export const sceneCoordinatesToCanvasCoordinates = (
   };
 };
 
-export const calcSVGSizeFactor = (svgSize: SizeT, viewBox: ViewBoxT) => {
-  const [, , width] = viewBox;
+export const calcSVGSizeFactor = (svgSize: SizeT, svgViewBox: ViewBoxT) => {
+  const [, , width] = svgViewBox;
   return svgSize.width / width;
 };
 
 export const getSVGViewBox = ({
-  fullSceneViewBox,
+  noScaleSvgViewBox,
   sceneFrame,
 }: {
   sceneFrame: SceneFrameT;
-  fullSceneViewBox: ViewBoxT;
+  noScaleSvgViewBox: ViewBoxT;
 }): ViewBoxT => {
-  const [minX, minY, width, height] = fullSceneViewBox;
+  const [minX, minY, width, height] = noScaleSvgViewBox;
   const { left, top, width: sceneWidth, height: sceneHeight } = sceneFrame;
 
   return [
@@ -174,15 +202,4 @@ export const getSVGViewBox = ({
     Math.round(width * sceneWidth),
     Math.round(height * sceneHeight),
   ];
-};
-
-// offset relative to Canvas; offset in Canvas coordinates
-export const getCanvasFrameOffset = (
-  fullSceneViewBox: ViewBoxT,
-  viewBox: ViewBoxT,
-  svgSizeFactor: number,
-): FrameOffsetT => {
-  const [fullSceneMinX, fullSceneMinY] = fullSceneViewBox;
-  const [minX, minY] = viewBox;
-  return { left: (minX - fullSceneMinX) * svgSizeFactor, top: (minY - fullSceneMinY) * svgSizeFactor };
 };

@@ -6,8 +6,8 @@ import { PositionedTagRectT, SizeT, ViewBoxT } from 'types/types';
 type PropsT = {
   tagsPositions: ReadonlyArray<PositionedTagRectT>;
   svgSize: SizeT;
-  fullSceneViewBox: ViewBoxT;
-  viewBox: ViewBoxT;
+  noScaleSvgViewBox: ViewBoxT;
+  svgViewBox: ViewBoxT;
   sceneMapResolution: number;
   svgSizeFactor: number;
 };
@@ -23,14 +23,14 @@ const style: React.CSSProperties = {
 export function CoordinateGrid({
   tagsPositions,
   svgSize,
-  viewBox,
-  fullSceneViewBox,
+  svgViewBox,
+  noScaleSvgViewBox,
   sceneMapResolution,
   svgSizeFactor,
 }: PropsT) {
   const sceneMapUnitSize = sceneMapResolution;
 
-  const [minX, minY, width, height] = fullSceneViewBox;
+  const [minX, minY, width, height] = noScaleSvgViewBox;
 
   const borderCoordinates = getBorderCoordinates(tagsPositions);
 
@@ -74,7 +74,7 @@ export function CoordinateGrid({
   }
 
   return (
-    <svg {...svgSize} style={style} viewBox={viewBox.join(' ')}>
+    <svg {...svgSize} style={style} viewBox={svgViewBox.join(' ')}>
       <g>{lines}</g>
     </svg>
   );

@@ -15,16 +15,14 @@ import { formRectAreaMapKey } from 'utilities/prepareRectAreasMaps';
 import { getRectAreaOfRectAreaMap } from 'utilities/rectAreaMap/rectAreaMap';
 import { getFontYFactor } from 'utilities/common/getFontYFactor';
 import { exportTagCloudAsHtml } from 'utilities/common/exportTagCloudAsHtml';
-import { useObjectRef } from 'utilities/hooks/useObjectRef';
 import type { VacancyKinds, VacancyT } from 'utilities/positioningAlgorithm/types';
 import type { RootStateT } from 'store/types';
-import type { PositionedTagRectT, SceneFrameT } from 'types/types';
+import type { PositionedTagRectT, SceneFrameT, SizeT, ViewBoxT } from 'types/types';
 import { CoordinateGrid } from './CoordinateGrid';
 import { ReactAreas } from './ReactAreas';
 import { Tags } from './Tags';
 import { Vacancies } from './Vacancies';
 import type { DraggableTagT } from './types';
-import type { FrameOffsetT } from './utils';
 import {
   canvasCoordinatesToSceneCoordinates,
   canvasFrameCoordinatesToCanvasCoordinates,
@@ -33,7 +31,6 @@ import {
   documentCoordinatesToCanvasFrameCoordinates,
   flatVacancies,
   getActiveVacanciesByCoordinates,
-  getCanvasFrameOffset,
   getEventDocumentCoordinates,
   getSVGViewBox,
   limitCoordinatesWithCanvasFrameBoundaries,
@@ -156,12 +153,14 @@ export const SvgTagsCloudBuilt = ({
 }: SvgTagsCloudBuiltProps) => {
   const dispatch = useDispatch();
 
-  const canvasFrameOffsetRef = useRef<FrameOffsetT | null>(null);
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
   const draggableTagAvatarRef = useRef<SVGTextElement | null>(null);
   const preventOnClickHandlingRef = useRef<boolean>(false);
   const handleMouseUpEventRef = useRef(() => {});
   const svgSizeFactorRef = useRef(1);
+  const svgSizeRef = useRef<SizeT | null>(null);
+  const svgViewBoxRef = useRef<ViewBoxT | null>(null);
+  const fullSceneViewBoxRef = useRef<ViewBoxT | null>(null);
   const downloadTagCloudRef = useRef(() => {});
 
   const classes = useStyles();
@@ -196,8 +195,6 @@ export const SvgTagsCloudBuilt = ({
   }, [sceneMapPositions, draggableTag, rectAreasMaps, tagsPositions]);
 
   useCounterChanged({ counter: downloadCloudCounter, callbackRef: downloadTagCloudRef });
-
-  const scaleRef = useObjectRef<number>(scale);
 
   useEffect(() => {
     if (!draggableTag) {
@@ -235,7 +232,12 @@ export const SvgTagsCloudBuilt = ({
 
   const onCanvasWrapperMouseDown = useCallback(
     (event: React.MouseEvent | React.TouchEvent) => {
-      if (isTagsCloudInteractionDisabled || !canvasFrameOffsetRef.current) {
+      if (
+        isTagsCloudInteractionDisabled ||
+        !svgViewBoxRef.current ||
+        !fullSceneViewBoxRef.current ||
+        !svgSizeRef.current
+      ) {
         return;
       }
 
@@ -276,8 +278,10 @@ export const SvgTagsCloudBuilt = ({
           },
           canvasWrapperRect,
         ),
-        canvasFrameOffset: canvasFrameOffsetRef.current,
-        scale: scaleRef.current,
+        svgSize: svgSizeRef.current,
+        svgViewBox: svgViewBoxRef.current,
+        noScaleSvgViewBox: fullSceneViewBoxRef.current,
+        svgSizeFactor: svgSizeFactorRef.current,
       });
 
       const shiftX = initCanvasCoordinates.x - rectLeftCanvasCoordinate;
@@ -314,12 +318,17 @@ export const SvgTagsCloudBuilt = ({
 
         preventOnClickHandlingRef.current = true;
 
-        if (!draggableTagAvatarRef.current || !draggableTagAvatarRef.current.style || !canvasFrameOffsetRef.current) {
+        if (
+          !draggableTagAvatarRef.current ||
+          !draggableTagAvatarRef.current.style ||
+          !svgViewBoxRef.current ||
+          !fullSceneViewBoxRef.current ||
+          !svgSizeRef.current
+        ) {
           return;
         }
 
         const { current: currentSVGSizeFactor } = svgSizeFactorRef;
-        const scaleValue = scaleRef.current;
 
         const pointerCanvasCoordinates = canvasFrameCoordinatesToCanvasCoordinates({
           coordinates: limitCoordinatesWithCanvasFrameBoundaries(
@@ -332,8 +341,10 @@ export const SvgTagsCloudBuilt = ({
             ),
             canvasWrapperRect,
           ),
-          canvasFrameOffset: canvasFrameOffsetRef.current,
-          scale: scaleValue,
+          svgSize: svgSizeRef.current,
+          svgViewBox: svgViewBoxRef.current,
+          noScaleSvgViewBox: fullSceneViewBoxRef.current,
+          svgSizeFactor: currentSVGSizeFactor,
         });
 
         const pointerSceneCoordinates = canvasCoordinatesToSceneCoordinates(pointerCanvasCoordinates, {
@@ -406,7 +417,7 @@ export const SvgTagsCloudBuilt = ({
         document.addEventListener('mousemove', onMouseMove);
       }
     },
-    [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, scaleRef, fontFamily],
+    [isTagsCloudInteractionDisabled, sceneMapEdges, tagsPositions, sceneMapResolution, fontFamily],
   );
 
   const { tagEndIndexToShow, beginTagByTagReveal } = useTagByTagReveal(tagsSvgData.data.length, tagByTagRenderInterval);
@@ -420,12 +431,11 @@ export const SvgTagsCloudBuilt = ({
   );
 
   const renderModel = useMemo(() => {
-    const { viewBox: fullSceneViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
+    const { viewBox: noScaleSvgViewBox, transform, aspectRatio, data: positionedTagSvgData } = tagsSvgData;
 
+    const svgViewBox = getSVGViewBox({ noScaleSvgViewBox, sceneFrame });
     const svgSize = getSuitableSize({ availableSize: { width, height }, aspectRatio, scale });
-    const viewBox = getSVGViewBox({ fullSceneViewBox, sceneFrame });
-    const svgSizeFactor = calcSVGSizeFactor(svgSize, fullSceneViewBox) ?? 1;
-    const canvasFrameOffsetValue = getCanvasFrameOffset(fullSceneViewBox, viewBox, svgSizeFactor);
+    const svgSizeFactor = calcSVGSizeFactor(svgSize, noScaleSvgViewBox) ?? 1;
 
     const activeVacancies = (() => {
       const vacanciesToProcess = tmpVacancies ?? vacancies;
@@ -463,14 +473,13 @@ export const SvgTagsCloudBuilt = ({
 
     return {
       activeVacancies,
-      canvasFrameOffsetValue,
-      fullSceneViewBox,
+      noScaleSvgViewBox: noScaleSvgViewBox,
       positionedTagSvgData,
       readyTagPositions: tagsPositions,
       svgSize,
       svgSizeFactor,
       transform,
-      viewBox,
+      svgViewBox,
     };
   }, [
     draggableTag,
@@ -490,11 +499,13 @@ export const SvgTagsCloudBuilt = ({
 
   useLayoutEffect(() => {
     svgSizeFactorRef.current = renderModel.svgSizeFactor;
-    canvasFrameOffsetRef.current = renderModel.canvasFrameOffsetValue;
-  }, [renderModel.svgSizeFactor, renderModel.canvasFrameOffsetValue]);
+    svgSizeRef.current = renderModel.svgSize;
+    svgViewBoxRef.current = renderModel.svgViewBox;
+    fullSceneViewBoxRef.current = renderModel.noScaleSvgViewBox;
+  }, [renderModel.noScaleSvgViewBox, renderModel.svgSize, renderModel.svgSizeFactor, renderModel.svgViewBox]);
 
   useLayoutEffect(() => {
-    const { activeVacancies, positionedTagSvgData, readyTagPositions, svgSize, transform, viewBox } = renderModel;
+    const { activeVacancies, positionedTagSvgData, readyTagPositions, svgSize, transform, svgViewBox } = renderModel;
 
     handleMouseUpEventRef.current = () => {
       setDraggableTagPosition(null);
@@ -527,7 +538,7 @@ export const SvgTagsCloudBuilt = ({
       const html = exportTagCloudAsHtml({
         tagsSvgData: positionedTagSvgData,
         svgSize,
-        viewBox,
+        svgViewBox: svgViewBox,
         transform,
         fontFamily,
       });
@@ -537,13 +548,13 @@ export const SvgTagsCloudBuilt = ({
 
   const {
     activeVacancies,
-    fullSceneViewBox,
+    noScaleSvgViewBox,
     positionedTagSvgData,
     readyTagPositions,
     svgSize,
     svgSizeFactor,
     transform,
-    viewBox,
+    svgViewBox,
   } = renderModel;
 
   const allVacancies = useMemo(() => {
@@ -589,21 +600,21 @@ export const SvgTagsCloudBuilt = ({
       >
         {isCoordinateGridShown && (
           <CoordinateGrid
-            fullSceneViewBox={fullSceneViewBox}
+            noScaleSvgViewBox={noScaleSvgViewBox}
             sceneMapResolution={sceneMapResolution}
             svgSize={svgSize}
             svgSizeFactor={svgSizeFactor}
+            svgViewBox={svgViewBox}
             tagsPositions={readyTagPositions}
-            viewBox={viewBox}
           />
         )}
         {isReactAreasShown && (
           <ReactAreas
             svgSize={svgSize}
             svgSizeFactor={svgSizeFactor}
+            svgViewBox={svgViewBox}
             tagData={readyTagPositions}
             transform={transform}
-            viewBox={viewBox}
           />
         )}
         <Tags
@@ -612,23 +623,23 @@ export const SvgTagsCloudBuilt = ({
           isTagDraggingDisabled={isTagsCloudInteractionDisabled}
           positionedTagSvgData={positionedTagSvgData}
           svgSize={svgSize}
+          svgViewBox={svgViewBox}
           tagEndIndexToShow={tagEndIndexToShow}
           transform={transform}
-          viewBox={viewBox}
         />
         <Vacancies
           sceneMapEdges={sceneMapEdges}
           sceneMapResolution={sceneMapResolution}
           svgSize={svgSize}
+          svgViewBox={svgViewBox}
           transform={transform}
           vacancies={vacanciesToRender}
-          viewBox={viewBox}
         />
         <svg
           {...svgSize}
           className={classes.tagAvatarCanvas}
           style={{ zIndex: draggableTag ? TAG_AVATAR_CANVAS_Z_INDEX : TAG_AVATAR_CANVAS_DEFAULT_Z_INDEX }}
-          viewBox={viewBox.join(' ')}
+          viewBox={svgViewBox.join(' ')}
         >
           <g transform={transform}>
             <DraggableTagAvatar ref={draggableTagAvatarRef} {...draggableTagAvatarProps} />

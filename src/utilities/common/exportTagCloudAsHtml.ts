@@ -10,12 +10,12 @@ const escapeXmlAttribute = (value: unknown) => escapeXmlText(value).replaceAll('
 const getTagCloudSvg = ({
   tagsSvgData,
   svgSize,
-  viewBox,
+  svgViewBox,
   transform,
 }: {
   tagsSvgData: ReadonlyArray<PositionedTagSvgDataT>;
   svgSize: SizeT;
-  viewBox: ViewBoxT;
+  svgViewBox: ViewBoxT;
   transform: string;
 }) => {
   const textTags = tagsSvgData
@@ -37,7 +37,7 @@ const getTagCloudSvg = ({
     '<?xml version="1.0" ?>' +
     `<svg width="${escapeXmlAttribute(svgSize.width)}" height="${escapeXmlAttribute(
       svgSize.height,
-    )}" viewBox="${escapeXmlAttribute(viewBox.join(' '))}" xmlns="http://www.w3.org/2000/svg">` +
+    )}" viewBox="${escapeXmlAttribute(svgViewBox.join(' '))}" xmlns="http://www.w3.org/2000/svg">` +
     `<g transform="${escapeXmlAttribute(transform)}">` +
     textTags +
     '</g></svg>'
@@ -54,13 +54,13 @@ const fontLinksByFontFamily = {
 export const exportTagCloudAsHtml = ({
   tagsSvgData,
   svgSize,
-  viewBox,
+  svgViewBox,
   transform,
   fontFamily,
 }: {
   tagsSvgData: ReadonlyArray<PositionedTagSvgDataT>;
   svgSize: SizeT;
-  viewBox: ViewBoxT;
+  svgViewBox: ViewBoxT;
   transform: string;
   fontFamily: FontFamilies;
 }) => {
@@ -74,7 +74,7 @@ ${fontLinksByFontFamily[fontFamily]}
   font-family: "${fontFamily}";
 }
 </style>`;
-  const svg = getTagCloudSvg({ tagsSvgData, svgSize, viewBox, transform });
+  const svg = getTagCloudSvg({ tagsSvgData, svgSize, svgViewBox, transform });
   const body = `<object type="image/svg+xml" data="tagCloud.svg" class="${objectClassName}">${svg}</object>`;
   return `<!DOCTYPE html><html lang="en"><head>${head}</head><body>${body}</body></html>`;
 };
