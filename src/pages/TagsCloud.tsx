@@ -73,6 +73,7 @@ const styles = (theme: Theme) =>
     pageContainer: {
       position: 'relative',
       minHeight: '250px',
+      height: '100%',
       display: 'flex',
       flexDirection: 'column',
       flexGrow: 12,
@@ -159,8 +160,11 @@ const styles = (theme: Theme) =>
       justifyContent: 'center',
       alignItems: 'center',
       position: 'relative',
-      flexGrow: 12,
+      flex: '1 1 0',
       marginTop: theme.spacing(1),
+      minHeight: 0,
+      minWidth: 0,
+      overflow: 'hidden',
     },
     tagsCloudWrapper: {
       height: 'fit-content',
